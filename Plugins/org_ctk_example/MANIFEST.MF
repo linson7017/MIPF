@@ -1,0 +1,3 @@
+Plugin-SymbolicName: org.ctk.example
+Plugin-Version: 0.9.0
+
