@@ -1,0 +1,161 @@
+#include "RobotControl.h"
+
+#include <QFile>
+#include <QtMath>
+#include <QTime>
+
+#include "hardwareController/robot_loader.h"
+#include "hardwareController/force_sensor_loader.h"
+#include "hardwareController/laser_range_finder_loader.h"
+
+#include <iostream>
+
+void RobotControl::Init()
+{
+    if (m_robotController.isNull())
+    {
+        SpRobotLoader robotLoader;
+        m_robotController = robotLoader.Load();
+        if (m_robotController.isNull())
+        {
+            //TODO:发送失败消息
+            //ret.SetErrorCode(ERROR_HARDWARE_FAILED);
+        }
+    }
+
+    SpResult ret;
+    ret = m_robotController->Init();
+    m_robotController->BackToHome();
+
+    while (m_robotController->IsBusy())
+    {
+
+    }
+
+    m_robotController->Stop();
+
+    if (m_forceSensorController.isNull())
+    {
+        SpForceSensorLoader forceSensorLoader;
+        m_forceSensorController = forceSensorLoader.Load();
+        if (m_forceSensorController.isNull())
+        {
+            //TODO:errorcode需要改成正确的
+            ret.SetErrorCode(ERROR_HARDWARE_FAILED);
+        }
+    }
+    ret = m_forceSensorController->Init();
+    QSharedPointer<SpTool> tool = QSharedPointer<SpTool>(new SpTool);
+    ret = tool->Load("laserTool");
+    if (m_robotController.isNull())
+    {
+        ret.SetErrorCode(ERROR_HARDWARE_FAILED);
+    }
+    else
+    {
+        m_robotController->SetTool(tool);
+    }
+
+    if (m_laserRangeFinderController.isNull())
+    {
+        SpLaserRangeFinderLoader loader;
+        m_laserRangeFinderController = loader.Load();
+    }
+
+    if (!m_laserRangeFinderController.isNull())
+    {
+        ret = m_laserRangeFinderController->Init();
+    }
+}
+
+void RobotControl::StartDrag(bool b)
+{
+    if (m_robotController.isNull())
+    {
+        return;
+    }
+
+    if (b)
+    {
+        m_isDragging = true;
+
+        SpResult ret;
+        m_robotController->UnlockRadial();
+        ret = m_robotController->StartMoveWithForce();
+
+        while (m_isDragging)
+        {
+            ret = m_robotController->WaitMotion();
+            if (ret.IsSuccess())
+            {
+                QSharedPointer<SpForceSonserParam> param = m_forceSensorController->GetParam();
+                if (param->Valid())
+                {
+                    ret = m_robotController->MoveWithForce(param);
+                }
+            }
+            else
+            {
+                m_isDragging = false;
+            }
+
+            QCoreApplication::processEvents();
+        }
+        ret = m_robotController->StopMoveWithForce();
+    }
+    else
+    {
+        m_isDragging = false;
+        m_robotController->Pause();
+    }
+}
+
+void RobotControl::MoveX(double step, double speed)
+{
+    if (m_robotController.isNull())
+    {
+        return;
+    }
+    SpFlangeExpression expression = m_robotController->GetFlangePosition();
+    expression.SetX(expression.GetX() + step);
+    m_robotController->MoveToPosition(expression, speed);
+}
+
+void RobotControl::MoveY(double step, double speed)
+{
+    if (m_robotController.isNull())
+    {
+        return;
+    }
+    SpFlangeExpression expression = m_robotController->GetFlangePosition();
+    expression.SetY(expression.GetY() + step);
+    m_robotController->MoveToPosition(expression, speed);
+}
+
+void RobotControl::MoveZ(double step, double speed)
+{
+    if (m_robotController.isNull())
+    {
+        return;
+    }
+    SpFlangeExpression expression = m_robotController->GetFlangePosition();
+    expression.SetZ(expression.GetZ() + step);
+    m_robotController->MoveToPosition(expression, speed);
+}
+
+void RobotControl::SlotMoveX()
+{
+    MoveX(m_SpeedLineEdit->text().toDouble());
+    //   qDebug() << "Move X: " << m_robotController->GetFlangePosition().GetPosition();
+
+}
+void RobotControl::SlotMoveY()
+{
+    MoveY(m_SpeedLineEdit->text().toDouble());
+    //   qDebug() << "Move Y: " << m_robotController->GetFlangePosition().GetPosition();
+}
+void RobotControl::SlotMoveZ()
+{
+    MoveZ(m_SpeedLineEdit->text().toDouble());
+    //  qDebug() << "Move Z: " << m_robotController->GetFlangePosition().GetPosition();
+}

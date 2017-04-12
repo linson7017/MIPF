@@ -1,0 +1,36 @@
+#ifndef RobotControl_h__
+#define RobotControl_h__
+
+#include <QObject>
+
+#include "hardwareController/ilaser_range_finder_controller.h"
+#include "hardwareController/irobot_controller.h"
+#include "hardwareController/iforce_sensor_controller.h"
+
+class RobotControl:QObject
+{
+    Q_OBJECT
+public:
+    RobotControl() {}
+    ~RobotControl() {}
+    void Init();
+    void MoveX(double step,double speed);
+    void MoveY(double step, double speed);
+    void MoveZ(double step, double speed);
+    void StartDrag(bool b);
+protected slots:
+    void SlotMoveX();
+    void SlotMoveY();
+    void SlotMoveZ();
+private:
+    QSharedPointer<ISpRobotController> m_robotController;
+    QSharedPointer<ISpForceSensorController> m_forceSensorController;
+    QSharedPointer<ISpLaserRangeFinderController> m_laserRangeFinderController;
+
+    bool m_isDragging;
+    SpFlangeExpression m_groupPositions[3];
+    QMap<int, QStringList> m_validPoints[10];
+};
+
+
+#endif // RobotControl_h__
