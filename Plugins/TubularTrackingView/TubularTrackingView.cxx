@@ -148,7 +148,7 @@ void TubularTrackingView::ShowResults(std::vector< std::vector<Vector3> > graph)
         char num[10];
         name.append(itoa(i+1, num,10));
         lineNode->SetProperty("name", mitk::StringProperty::New(name));
-        lineNode->SetProperty("color", mitk::ColorProperty::New(1.0, 1.0, 1.0));
+        lineNode->SetProperty("color", mitk::ColorProperty::New(0.0, 0.0, 1.0));
         lineNode->Update();
 
 

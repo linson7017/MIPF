@@ -18,3 +18,7 @@ add_subdirectory(SliceBySliceTrackingView)
 add_subdirectory(TubularTrackingView)
 
 add_subdirectory(ImageRegistrationView)
+
+add_subdirectory(NDIPlugin)
+
+add_subdirectory(RobotControlPlugin)

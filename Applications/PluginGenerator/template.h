@@ -17,117 +17,117 @@ const char CMakeListTemplate[] = ""\
 "cmake_policy(SET CMP0053 NEW) # CMake 3.1\n"\
 "endif()\n"\
 "\n"\
-"project(@PluginName)\n"\
+"project(@PluginName@)\n"\
 ""\
-"    file(GLOB Headers \"./*.h\")\n"\
-"    AUX_SOURCE_DIRECTORY(.DIR_SRCS)\n"\
+"file(GLOB Headers \"./*.h\")\n"\
+"AUX_SOURCE_DIRECTORY(. DIR_SRCS)\n"\
 "\n"\
-"    set(CMAKE_AUTOMOC ON)\n"\
+"set(CMAKE_AUTOMOC ON)\n"\
 "\n"\
-"    if (VTK_QT_VERSION VERSION_GREATER \"4\")\n"\
+"if (VTK_QT_VERSION VERSION_GREATER \"4\")\n"\
 "\n"\
-"        add_library(@PluginName SHARED ${ DIR_SRCS } ${ Headers } ${ UI_Srcs } ${ MOC_Hdrs })\n"\
-"        qt5_use_modules(@PluginName Core Gui Widgets)\n"\
-"        target_link_libraries(@PluginName @VTK_LIBRARIES @ITK_LIBRARIES @QTFRAMEWORK_LIBRARIES @QFMAIN_LIBRARIES @MitkQtWidgets @MitkQtWidgetsExt)\n"\
+"    add_library(@PluginName@ SHARED ${DIR_SRCS} ${Headers} ${UI_Srcs} ${MOC_Hdrs})\n"\
+"    qt5_use_modules(@PluginName@ Core Gui Widgets)\n"\
+"    target_link_libraries(@PluginName@ @VTK_LIBRARIES@ @ITK_LIBRARIES@ @QTFRAMEWORK_LIBRARIES@ @QFMAIN_LIBRARIES@ @MitkQtWidgets@ @MitkQtWidgetsExt@)\n"\
 "\n"\
-"    else()\n"\
+"else()\n"\
 ""\
-"        add_library(@PluginName SHARED ${ DIR_SRCS } ${ Headers } ${ UI_Srcs } ${ MOC_Hdrs })\n"\
-"        target_link_libraries(@PluginName ${ QT_LIBRARIES } @VTK_LIBRARIES @ITK_LIBRARIES @QTFRAMEWORK_LIBRARIES @QFMAIN_LIBRARIES @MitkQtWidgets @MitkQtWidgetsExt)\n"\
+"    add_library(@PluginName@ SHARED ${DIR_SRCS} ${Headers} ${UI_Srcs} ${MOC_Hdrs})\n"\
+"    target_link_libraries(@PluginName@ ${QT_LIBRARIES@} @VTK_LIBRARIES@ @ITK_LIBRARIES@ @QTFRAMEWORK_LIBRARIES@ @QFMAIN_LIBRARIES@ @MitkQtWidgets@ @MitkQtWidgetsExt@)\n"\
 "\n"\
 "endif()\n";
 
 const char ViewH[] = ""\
-"#ifndef @ViewName_h__\n"\
-"#define @ViewName_h__\n"\
+"#ifndef @ViewName@_h__\n"\
+"#define @ViewName@_h__\n"\
 "\n"\
 "#include \"PluginView.h\"\n"\
 "\n"\
-"class @ViewName : public PluginView\n"\
+"class @ViewName@ : public PluginView\n"\
 "{\n"\
 "public:\n"\
-"    @ViewName(QF::IQF_Main* pMain);\n"\
+"    @ViewName@(QF::IQF_Main* pMain);\n"\
 "protected:\n"\
 "    virtual void Update(const char* szMessage, int iValue = 0, void* pValue = 0);\n"\
-"}\n"\
+"};\n"\
 "\n"\
-"#endif // @ViewName_h__";
+"#endif // @ViewName@_h__";
 
 
 const char ViewC[] = ""\
-"#include \"@ViewName.h\"\n"\
+"#include \"@ViewName@.h\"\n"\
 "#include \"iqf_main.h\"\n"\
-"#include \"Res / R.h\"\n"\
-"@ViewName::@ViewName(QF::IQF_Main* pMain) :PluginView(pMain)\n"\
+"#include \"Res/R.h\"\n"\
+"@ViewName@::@ViewName@(QF::IQF_Main* pMain) :PluginView(pMain)\n"\
 "{\n"\
 "    m_pMain->Attach(this);\n"\
 "}\n"\
 "\n"\
-"void @ViewName::Update(const char* szMessage, int iValue, void* pValue)\n"\
+"void @ViewName@::Update(const char* szMessage, int iValue, void* pValue)\n"\
 "{\n"\
-"    if (strcmp(szMessage, "") == 0)\n"\
+"    if (strcmp(szMessage, \"\") == 0)\n"\
 "    {\n"\
 "        //do what you want for the message\n"\
 "    }\n"\
 "}";
 
 const char ViewActivatorH[] = ""\
-"#ifndef @PluginNameActivator_h__\n"\
-"#define @PluginNameActivator_h__\n"\
+"#ifndef @PluginName@Activator_h__\n"\
+"#define @PluginName@Activator_h__\n"\
 "\n"\
 "#pragma once\n"\
 "#include \"iqf_activator.h\"\n"\
 "\n"\
-"class @ViewName;\n"\
+"class @ViewName@;\n"\
 "\n"\
-"class @PluginName_Activator : public QF::IQF_Activator\n"\
+"class @PluginName@_Activator : public QF::IQF_Activator\n"\
 "{\n"\
 "public:\n"\
-"    @PluginName_Activator(QF::IQF_Main* pMain);\n"\
+"    @PluginName@_Activator(QF::IQF_Main* pMain);\n"\
 "\n"\
 "    bool Init();\n"\
 "    const char* GetID();\n"\
 "    void Register(R* pR);\n"\
 "private:\n"\
-"    @ViewName* m_p@ViewName;\n"\
-"    QF::IQF_Main* m_PMain;\n"\
+"    @ViewName@* m_p@ViewName@;\n"\
+"    QF::IQF_Main* m_pMain;\n"\
 "};\n"\
 "\n"\
-"#endif // @PluginNameActivator_h__"; 
+"#endif // @PluginName@Activator_h__"; 
 
 
 const char ViewActivatorC[] = ""\
-"#include \"@PluginNameActivator.h\"\n"\
-"#include \"@ViewName.h\"\n"\
+"#include \"@PluginName@Activator.h\"\n"\
+"#include \"@ViewName@.h\"\n"\
 "\n"\
 "QF_API QF::IQF_Activator* QF::QF_CreatePluginActivator(QF::IQF_Main* pMain)\n"\
 "{\n"\
-"    QF::IQF_Activator* pActivator = new @PluginName_Activator(pMain);\n"\
+"    QF::IQF_Activator* pActivator = new @PluginName@_Activator(pMain);\n"\
 "    //assert(pActivator);\n"\
 "    return pActivator;\n"\
 "}\n"\
 "\n"\
-"const char @PluginName_Activator_Activator_ID[] = \"@PluginName_Activator_Activator_ID\";\n"\
+"const char @PluginName@_Activator_Activator_ID[] = \"@PluginName@_Activator_Activator_ID\";\n"\
 "\n"\
-"@PluginName_Activator::@PluginName_Activator(QF::IQF_Main* pMain)\n"\
+"@PluginName@_Activator::@PluginName@_Activator(QF::IQF_Main* pMain)\n"\
 "{\n"\
-"   m_PMain = pMain; \n"\
+"   m_pMain = pMain; \n"\
 "}\n"\
 "\n"\
-"bool @PluginName_Activator::Init()\n"\
+"bool @PluginName@_Activator::Init()\n"\
 "{\n"\
-"    m_p@ViewName = new @ViewName(m_PMain); \n"\
+"    m_p@ViewName@ = new @ViewName@(m_PMain); \n"\
 "    return true; \n"\
 "}\n"\
 "\n"\
-"const char* @PluginName_Activator::GetID()\n"\
+"const char* @PluginName@_Activator::GetID()\n"\
 "{\n"\
-"    return @PluginName_Activator_Activator_ID; \n"\
+"    return @PluginName@_Activator_Activator_ID; \n"\
 "}\n"\
 "\n"\
-"void @PluginName_Activator::Register(R* pR)\n"\
+"void @PluginName@_Activator::Register(R* pR)\n"\
 "{\n"\
-"    m_pView->InitResource(pR); \n"\
+"    m_p@ViewName@->InitResource(pR); \n"\
 "}";
 
 #endif // template_h__

@@ -96,21 +96,21 @@ void MainWindow::CreateFile(QString fileName, const QString fileContent)
 void MainWindow::GenerateSourceFiles()
 {
     QString text = ViewH;
-    text.replace("@ViewName", m_ViewName);
+    text.replace("@ViewName@", m_ViewName);
     CreateFile(QString(m_ViewName + ".h"), text);
 
     text = ViewC;
-    text.replace("@ViewName", m_ViewName);
+    text.replace("@ViewName@", m_ViewName);
     CreateFile(QString(m_ViewName + ".cxx"), text);
 
     text = ViewActivatorH;
-    text.replace("@PluginName", m_PluginName);
-    text.replace("@ViewName", m_ViewName);
+    text.replace("@PluginName@", m_PluginName);
+    text.replace("@ViewName@", m_ViewName);
     CreateFile(QString(m_PluginName + "Activator.h"), text);
 
     text = ViewActivatorC;
-    text.replace("@PluginName", m_PluginName);
-    text.replace("@ViewName", m_ViewName);
+    text.replace("@PluginName@", m_PluginName);
+    text.replace("@ViewName@", m_ViewName);
     CreateFile(QString(m_PluginName + "Activator.cxx"), text);
 
 }
@@ -129,15 +129,15 @@ void MainWindow::GenerateCMakeList()
     checkBox = (QCheckBox*)getViewByID("UseMitkWidgetsExt");
     m_UseMitkWidgetsExt = checkBox->isChecked();
 
-    m_CMakeListText.replace("@PluginName", m_PluginName);
-    m_CMakeListText.replace("@QTFRAMEWORK_LIBRARIES", "${QTFRAMEWORK_LIBRARIES}");
-    m_CMakeListText.replace("@QFMAIN_LIBRARIES", "${QFMAIN_LIBRARIES}");
+    m_CMakeListText.replace("@PluginName@", m_PluginName);
+    m_CMakeListText.replace("@QTFRAMEWORK_LIBRARIES@", "${QTFRAMEWORK_LIBRARIES}");
+    m_CMakeListText.replace("@QFMAIN_LIBRARIES@", "${QFMAIN_LIBRARIES}");
 
-    m_CMakeListText.replace("@VTK_LIBRARIES", m_UseVTK ? "${VTK_LIBRARIES}" : "");
-    m_CMakeListText.replace("@ITK_LIBRARIES", m_UseITK ? "${ITK_LIBRARIES}" : "");
+    m_CMakeListText.replace("@VTK_LIBRARIES@", m_UseVTK ? "${VTK_LIBRARIES}" : "");
+    m_CMakeListText.replace("@ITK_LIBRARIES@", m_UseITK ? "${ITK_LIBRARIES}" : "");
 
-    m_CMakeListText.replace("@MitkQtWidgets", m_UseMitkWidgets ? "${MitkQtWidgets}" : "");
-    m_CMakeListText.replace("@MitkQtWidgetsExt", m_UseMitkWidgetsExt ? "${MitkQtWidgetsExt}" : "");
+    m_CMakeListText.replace("@MitkQtWidgets@", m_UseMitkWidgets ? "MitkQtWidgets" : "");
+    m_CMakeListText.replace("@MitkQtWidgetsExt@", m_UseMitkWidgetsExt ? "MitkQtWidgetsExt" : "");
 
     std::cout << m_CMakeListText.toStdString() << std::endl;
 

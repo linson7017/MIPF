@@ -44,7 +44,6 @@ public:
     ~DataManagerWidget();
     void Init(QWidget* parent);
     void SetDataStorage(IQF_MitkDataManager* dataStorage);
-    void InitResource(R* pR);
 public slots:
     void NodeSelectionChanged(const QItemSelection & selected, const QItemSelection & deselected);
     void NodeTreeViewRowsInserted(const QModelIndex & parent, int start, int end);

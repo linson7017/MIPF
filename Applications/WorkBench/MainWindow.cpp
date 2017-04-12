@@ -3,7 +3,6 @@
 #include <QtWidgets>
 #include <QtCore>
 #include <QtGui>
-#include "MultiViews.h"
 
 #include "Res/R.h"
 #include "Common/app_env.h"

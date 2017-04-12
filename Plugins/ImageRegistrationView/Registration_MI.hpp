@@ -89,7 +89,7 @@ RegistrationMI<FixedImageType, MovingImageType>::~RegistrationMI()
 }
 
 template<class FixedImageType, class MovingImageType>
-void RegistrationMI<FixedImageType, MovingImageType>::Start(const FixedImageType* fixedImage, const MovingImageType* movingImage, FixedImageType* resultImage)
+void RegistrationMI<FixedImageType, MovingImageType>::Start(const FixedImageType* fixedImage, const MovingImageType* movingImage, FixedImageType* resultImage, itk::Matrix<double, 4, 4>& initTransformMatrix)
 {
     typedef itk::VersorRigid3DTransform<double> TransformType;
     typedef itk::VersorRigid3DTransformOptimizer OptimizerType;
@@ -99,20 +99,11 @@ void RegistrationMI<FixedImageType, MovingImageType>::Start(const FixedImageType
 
     //**************Transform****************//
     TransformType::Pointer initTransform = TransformType::New();
-    TransformType::MatrixType matrix = initTransform->GetMatrix();
-
-    itk::Point<double, 3> fixedImageOrigin = fixedImage->GetOrigin();
-    itk::Point<double, 3> movingImageOrigin = movingImage->GetOrigin();
     TransformType::OffsetType offset = initTransform->GetOffset();
-    matrix.SetIdentity();
-    offset[0] = fixedImageOrigin[0] - movingImageOrigin[0];
-    offset[1] = fixedImageOrigin[1] - movingImageOrigin[1];
-    offset[2] = fixedImageOrigin[2] - movingImageOrigin[2];
-    initTransform->SetMatrix(matrix);
+    offset[0] = -initTransformMatrix[0][3];
+    offset[1] = -initTransformMatrix[1][3];
+    offset[2] = -initTransformMatrix[2][3];
     initTransform->SetOffset(offset);
-   // TransformType::MatrixType matrix = initTransform->GetMatrix();
-  //  TransformType::OutputVectorType offset = initTransform->GetOffset();
-
 
     //**************Optimizer****************//
     OptimizerType::Pointer optimizer = OptimizerType::New();
@@ -136,8 +127,8 @@ void RegistrationMI<FixedImageType, MovingImageType>::Start(const FixedImageType
 
     CommandIterationUpdate::Pointer observer = CommandIterationUpdate::New();
    // observer->SetNotifier(m_notifier);
-   // optimizer->AddObserver(itk::IterationEvent(), observer);
-  //  optimizer->AddObserver(itk::EndEvent(), observer);
+    optimizer->AddObserver(itk::IterationEvent(), observer);
+    optimizer->AddObserver(itk::EndEvent(), observer);
 
     //**************Metric****************//
     MetricType::Pointer metric = MetricType::New();
@@ -164,10 +155,21 @@ void RegistrationMI<FixedImageType, MovingImageType>::Start(const FixedImageType
     registration->SetFixedImageRegion(fixedImageRegion);
 
 
-    registration->Update();
+    try
+    {
+        registration->Update();
+        std::cout << "Optimizer stop condition = "
+            << registration->GetOptimizer()->GetStopConditionDescription()
+            << std::endl;
+    }
+    catch (itk::ExceptionObject & err)
+    {
+        std::cout << "ExceptionObject caught !" << std::endl;
+        std::cout << err << std::endl;
+        return;
+    }
 
    // transform->SetParameters(registration->GetLastTransformParameters());
-
 
 
     typedef itk::ResampleImageFilter<

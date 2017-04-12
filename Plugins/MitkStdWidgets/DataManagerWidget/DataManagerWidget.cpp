@@ -317,11 +317,6 @@ void DataManagerWidget::CreateView()
     m_DescriptorActionList.push_back(std::pair<QmitkNodeDescriptor*, QAction*>(unknownDataNodeDescriptor, actionShowInfoDialog));
 }
 
-void DataManagerWidget::InitResource(R* pR)
-{
-    PluginView::InitResource(pR);
-    CreateView();
-}
 
 void DataManagerWidget::Init(QWidget* parent)
 {

@@ -14,7 +14,7 @@ class PluginView : public QF::IQF_Observer
 public:
     PluginView(QF::IQF_Main* pMain) :m_pMain(pMain),m_pR(0){}
     //override
-    void InitResource(R* pR) { m_pR = pR; }
+    virtual void InitResource(R* pR) { m_pR = pR; CreateView(); }
 protected:
     //override
     virtual void Update(const char* szMessage, int iValue = 0, void* pValue = 0) {}

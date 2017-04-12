@@ -36,7 +36,7 @@ class RegistrationMI
 public:
     RegistrationMI();
     ~RegistrationMI();
-    void Start(const FixedImageType* fixedImage, const MovingImageType* movingImage, FixedImageType* resultImage);
+    void Start(const FixedImageType* fixedImage, const MovingImageType* movingImage, FixedImageType* resultImage, itk::Matrix<double, 4, 4>& initTransformMatrix = itk::Matrix<double, 4, 4>());
 
     MIRegistrationParameters RegistrationParameters;
 };

@@ -1,6 +1,7 @@
 #include "ImageRegistrationView.h"
 #include "iqf_main.h"
 #include "Res/R.h"
+#include "Utils/variant.h"
 //qt
 #include <QtWidgets>
 
@@ -118,7 +119,25 @@ void ImageRegistrationView::Update(const char* szMessage, int iValue, void* pVal
         Float3DImagePointerType itkResultImage = Float3DImageType::New();;
 
         RegistrationMI<Float3DImageType,Float3DImageType> rm;
-        rm.Start(itkFixedImage.GetPointer(), itkMovingImage.GetPointer(), itkResultImage.GetPointer());
+        
+        itk::Matrix<double,4,4> m;
+        bool alignCenter = false;
+        VarientMap vmp = *(VarientMap*)pValue;
+        variant v = variant::GetVariant(vmp, "checked");
+        if (vmp.size()>0)
+        {
+            alignCenter = v.getBool();
+        }
+        m.SetIdentity();
+        if (alignCenter)
+        {
+            mitk::Point3D movingImageCenter = m_MovingImageNode->GetData()->GetGeometry()->GetCenter();
+            mitk::Point3D fixedImageCenter = m_FixedImageNode->GetData()->GetGeometry()->GetCenter();
+            m[0][3] = fixedImageCenter[0] - movingImageCenter[0];
+            m[1][3] = fixedImageCenter[1] - movingImageCenter[1];
+            m[2][3] = fixedImageCenter[2] - movingImageCenter[2];
+        }
+        rm.Start(itkFixedImage.GetPointer(), itkMovingImage.GetPointer(), itkResultImage.GetPointer(), m);
 
         //add result image to datastorage
         mitk::Image::Pointer result = mitk::Image::New();
@@ -135,13 +154,13 @@ void ImageRegistrationView::Update(const char* szMessage, int iValue, void* pVal
     }
     else if (strcmp(szMessage, "ImageRegistration.AlignCenter") == 0)
     {
-        /*mitk::Image* movingImage = dynamic_cast<mitk::Image *>(m_MovingImageNode->GetData());
-        mitk::Image* fixedImage = dynamic_cast<mitk::Image *>(m_FixedImageNode->GetData());
 
-        mitk::Point3D movingOrigin = movingImage->GetGeometry()->GetOrigin();
-        mitk::Point3D fixedOrigin = fixedImage->GetGeometry()->GetOrigin();
-        movingImage->SetOrigin(fixedOrigin);
-        mitk::RenderingManager::GetInstance()->RequestUpdateAll();*/
+        mitk::Point3D movingCenter = m_MovingImageNode->GetData()->GetGeometry()->GetCenter();
+        mitk::Point3D fixedCenter = m_FixedImageNode->GetData()->GetGeometry()->GetCenter();
+
+        vtkImageData* vtkFixedImage = dynamic_cast<vtkImageData*>(m_MovingImageNode->GetData());
+        
+        mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     }
 }
 

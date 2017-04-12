@@ -6,5 +6,6 @@ FIND_PACKAGE(QFMAIN REQUIRED)
 
 add_subdirectory(WorkBench)
 add_subdirectory(PluginGenerator)
+add_subdirectory(RobotControlApp)
 #add_subdirectory(CTKTest)
 
