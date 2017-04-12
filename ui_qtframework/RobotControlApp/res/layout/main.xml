@@ -1,0 +1,60 @@
+<Widget activityRoot="true" id="main.main" style="@style/mainstyle" >
+	<HLayout>
+		<DataManagerWidget  id="main.DataManager"/>
+		<MultiViewsWidget id="main.vtkMulitView" contents_margin="0" stretch="5"/>
+		<Tabs  stretch="2">
+			<Tab text="robot">
+				<VLayout >
+					<Button text="Init" msgcommand="main.Init" />
+					<HLayout>
+						<Button text="Start Drag" msgcommand="main.StartDrag"/>
+						<Button text="Stop Drag" msgcommand="main.StopDrag"/>
+					</HLayout>
+					<HLayout>
+						<Label text="Speed: "/>
+						<LineEdit id="main.Speed" text="1"/>
+					</HLayout>
+					<GridLayout>
+						<LineEdit id="main.XStep" text="1" row="0" col="0"/>
+						<Button id="main.MoveX" text="Move X" row="0" col="1"  msgcommand="main.MoveX" itemProperty="main.XStep:text"/>
+						
+						<LineEdit id="main.YStep" text="1" row="1" col="0"/>
+						<Button id="main.MoveY" text="Move Y" row="1" col="1" msgcommand="main.MoveY" itemProperty="main.YStep:text"/>
+						
+						<LineEdit id="main.ZStep" text="1" row="2" col="0"/>
+						<Button id="main.MoveZ" text="Move Z" row="2" col="1" msgcommand="main.MoveZ" itemProperty="main.ZStep:text"/>
+					</GridLayout>		
+					<HLayout>
+						<LineEdit id="main.TargetPosition" />
+						<Button text="Record Target Position" msgcommand="main.RecordTargetPosition"/>
+					</HLayout>
+					<Button text="Back To Target Position" msgcommand="main.BackToTargetPosition"/>
+					<GridLayout>
+						<Label text="MaxStep:" row="0" col="0"/>
+						<LineEdit id="main.MaxStep" text="30" row="0" col="1"/>
+						<Label text="MinStep:" row="1" col="0"/>
+						<LineEdit id="main.MinStep" text="0.01" row="1" col="1"/>
+						<Label text="Relax Factor:" row="2" col="0"/>
+						<LineEdit id="main.RelaxFactor" text="0.8" row="2" col="1"/>
+					</GridLayout>			
+					<Button text="Approach To Target Position" msgcommand="main.ApproachToTargetPosition"/>		
+					<HLayout>
+						<LineEdit id="main.NDIError"/>
+						<Button text="NDI Error Estimate" msgcommand="main.NDIErrorEstimate"/>
+					</HLayout>
+					<Stretch size="200"/>
+				</VLayout>
+			</Tab >
+			<Tab text="NDI">
+				<VLayout>
+					<NDIWidget />
+					<TextEdit id="main.RegistrationMatrix"/>
+					<Button text="GetNeedlePosition" msgcommand="main.GetNeedlePosition"/>
+					<Button text="Mattes Registration" msgcommand="main.MattesRegistration" />
+					<Button text="Registrate" msgcommand="main.Registrate"/>
+				</VLayout>			
+			</Tab>
+		</Tabs>
+	</HLayout>
+	
+</Widget>

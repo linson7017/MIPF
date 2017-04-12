@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<UICommand>
+  <!--弹出对话框-->
+  <Command id="popDialogFromXML_uicommand" type="PopDialog" layout="graph.xml"/>
+  <Command id="popDialogFromID_uicommand" type="PopDialog" layout="graph"/>
+  <Command id="DisableGroupBox2" type="DisableWidget" widgetID="GroupBox2"/>
+  <Commands id="MutiUICommand">
+	<Command type="PopDialog" layout="graph"/>
+	<Command type="DisableWidget" widgetID="GroupBox1"/>
+  </Commands>
+  <Command id="enableWidget" type="EnableWidget" widgetID="GroupBox1" />
+  
+  <Commands id="uicommand1">
+	<Command type="SwitchWidget" widgetID="stackedWidget1" index="0"/>
+	<Command type="SwitchWidget" widgetID="stackedWidget2" index="0"/>
+	<Command type="ShowWidget" widgetID="stackedWidget2" />
+  </Commands>
+  <Commands id="uicommand2">
+	<Command type="SwitchWidget" widgetID="innerWidget" index="1"/>
+	<Command type="SwitchWidget" widgetID="stackedWidget2" index="1"/>
+	<Command type="HideWidget" widgetID="stackedWidget2" />
+	<Command type="ResizeWidget" widgetID="button3" size="200,200"/>
+  </Commands>
+  
+  <Command id="ChangeApplicationStyleToWindows" type="ChangeApplicationStyle" style="windows"/>
+  <Command id="ChangeApplicationStyleToWindowsXP" type="ChangeApplicationStyle" style="windowsxp"/>
+  <Command id="ChangeApplicationStyleToMotif" type="ChangeApplicationStyle" style="windowsvista"/>
+  <Command id="ChangeApplicationStyleToCDE" type="ChangeApplicationStyle" style="gtk"/>
+  <Command id="ChangeApplicationStyleToPlastique" type="ChangeApplicationStyle" style="macintosh"/>
+  <Command id="ChangeApplicationStyleToCleanlooks" type="ChangeApplicationStyle" style="Cleanlooks"/>
+</UICommand>
+
+

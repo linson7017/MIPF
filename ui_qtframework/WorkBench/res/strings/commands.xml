@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--命令输入定义-->
+<strings>
+  <string id="clean" desc="清屏">10000074</string>  
+  <string id="d" desc="目标撤销命令（批号+d）">10000054</string>
+</strings>
+
+

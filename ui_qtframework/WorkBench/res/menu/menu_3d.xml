@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Menu id="menu_3d" desc="三维右键菜单">
+    <Action text="工具">
+		<Menu>
+			<ActionGroup>
+			  <Action text="选取" toolcommand="10027" checkable="true"/>
+			  <Action text="移标" toolcommand="10026" checkable="true"/>      
+			</ActionGroup>
+		</Menu>		
+  </Action>  
+</Menu>

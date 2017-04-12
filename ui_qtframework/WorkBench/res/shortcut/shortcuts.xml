@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Shortcuts>
+  <Shortcut name="Key_F1" command="10001" desc="复位"/>
+  <Shortcut name="Key_F2" command="10002" desc="模型改大"/>
+  <Shortcut name="Key_F3" command="10003" desc="模型改小"/>  
+</Shortcuts>
+
+

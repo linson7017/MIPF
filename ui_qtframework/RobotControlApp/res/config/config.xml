@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Properties>
+	<Property name="IPAddress" valueType="string">192.168.1.102</Property>
+	<Property name="Port" valueType="int">8765</Property>
+	<Property name="TipOffsetX" valueType="double">-47.18</Property>
+	<Property name="TipOffsetY" valueType="double">-0.06</Property>
+	<Property name="TipOffsetZ" valueType="double">-57.40</Property>
+</Properties>
