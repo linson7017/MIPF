@@ -45,6 +45,10 @@ public:
     {
         return m_Points.at(index);
     }
+    int GetPointSize()
+    {
+        return m_Points.size();
+    }
 private:
     void linear(double **x, double *y, double *beta, int n, int p)
     {

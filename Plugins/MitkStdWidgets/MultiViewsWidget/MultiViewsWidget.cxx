@@ -95,6 +95,7 @@ void MultiViewsWidget::SetupWidgets()
     m_multiWidget->AddDisplayPlaneSubTree();
     m_multiWidget->AddPlanesToDataStorage();
     m_multiWidget->SetWidgetPlanesVisibility(true);
+
 }
 
 

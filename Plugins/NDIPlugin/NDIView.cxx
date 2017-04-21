@@ -21,6 +21,26 @@
 NDIView::NDIView(QF::IQF_Main* pMain) :PluginView(pMain), m_robotArrived(false)
 {
     m_pMain->Attach(this);
+
+    SphereFit sf;
+    sf.InsertPoint(QVector3D(14.2651,  -296.672, 588.538));
+    sf.InsertPoint(QVector3D(52.7645,  -268.218, 574.207));
+    sf.InsertPoint(QVector3D(-16.2902, -295.397, 588.781));
+    sf.InsertPoint(QVector3D(17.1993,  -246.208, 574.911));
+    sf.InsertPoint(QVector3D(75.6449,  -249.325, 552.671));
+
+    /*sf.InsertPoint(QVector3D(-14.0844,-9.96628,-137.891));
+    sf.InsertPoint(QVector3D(-52.5838,-38.4207,-123.561));
+    sf.InsertPoint(QVector3D(16.4709,-11.2415,-138.135));
+    sf.InsertPoint(QVector3D(-17.0186,-60.4308,-124.265));
+    sf.InsertPoint(QVector3D(-75.4642,-57.3139,-102.024));*/
+    QVector3D center;
+    double radius;
+    sf.Fit(center, radius);
+
+
+    qDebug() << "Center:" << center;
+    qDebug() << "Radius:" << radius;
 }
 
 void NDIView::Update(const char* szMessage, int iValue, void* pValue)
@@ -119,11 +139,11 @@ void NDIView::Update(const char* szMessage, int iValue, void* pValue)
         m_targetPosition.setY(currentRobotPointY->text().toDouble());
         m_targetPosition.setZ(currentRobotPointZ->text().toDouble());
 
-        qDebug() << "Target Position: " << m_targetPosition;
+        qDebug() << "Target NDI Position: " << m_targetPosition;
         QLineEdit* lineEdit = (QLineEdit*)m_pR->getObjectFromGlobalMap("main.TargetPosition");
         if (lineEdit)
         {
-            QString targetPositionText = QString("%1, %2, %3").arg(currentRobotPointX->text()).arg(currentRobotPointY->text()).arg(currentRobotPointZ->text());
+            QString targetPositionText = QString("%1, %2, %3").arg(m_currentNdiPosition.x()).arg(m_currentNdiPosition.y()).arg(m_currentNdiPosition.z());
             lineEdit->setText(targetPositionText);
         }
     }
@@ -482,9 +502,7 @@ void NDIView::OnUpdateNavigationData()
     m_PunctureNeedleRegistrationOffsetMatrix.setToIdentity();
     m_PunctureNeedleRegistrationOffsetMatrix.translate(tipOffsetX->text().toDouble(), tipOffsetY->text().toDouble(), tipOffsetZ->text().toDouble());
     m_NDIComm->GetQMatrix4x4(0, m_ReferenceMatrix);
-    m_NDIComm->GetQMatrix4x4(1, m_PunctureNeedleMatrix);
-
-    
+    m_NDIComm->GetQMatrix4x4(1, m_PunctureNeedleMatrix);    
 
     m_PunctureNeedleMatrix = m_PunctureNeedleMatrix*m_PunctureNeedleRegistrationOffsetMatrix;
     m_PunctureNeedleMatrix = m_PunctureNeedleMatrix*m_PunctureNeedleAxisMatrix;
@@ -782,8 +800,6 @@ void NDIView::OnFitCenter(bool start)
         QVector3D center;
         double radius;
         m_fit.Fit(center, radius);
-
-        m_fit.GetPoint(0);
 
         QString text;
         text.setNum(center.x());

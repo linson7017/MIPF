@@ -4,10 +4,11 @@
 #include "PluginView.h"
 #include <QWidget>
 #include <QVector3D>
+#include <../NDIPlugin/SphereFit.h>
+#include "RobotControlImpl.h"
 
 class QPushButton;
 class QLineEdit;
-class RobotControlImpl;
 class QThread;
 
 
@@ -27,17 +28,36 @@ signals:
     void SignalMoveY(double step, double speed);
     void SignalMoveZ(double step, double speed);
     void SignalMoveToPosition(double x, double y, double z);
-    void SignalApproachToNDIPosition(const QVector3D& ndiPosition, const QVector3D& initPosition,double maxStep,double minStep,double relaxFactor);
+    void SignalMoveToExpression(SpFlangeExpression expression);
+
+    void SignalApproachToNDIPosition(const QVector3D& ndiPosition, double acceptError ,double maxStep,double minStep,double relaxFactor);
     void SignalNDIErrorEstimate(const QVector3D& ndiPosition);
+
+    void SignalAutoCaculateOffset(const QVector3D& ndiPosition, double acceptError, double maxStep, double minStep, double relaxFactor);
+    
+
+    void SignalMoveToPositionWithOffset(QVector3D position,QVector3D offset);
 protected slots:
     void SlotCurrentPositionChanged(QVector3D position);
     void SlotNDIErrorEstimated(double error);
+    void SlotCurrentTExpressionChanged(QMatrix4x4 tExpression);
+    void SlotCurrentPExpressionChanged(SpFlangeExpression pExpression);
+    void SlotApproachFinished();
+    void SlotAutoCaculateOffsetCompleted();
+private:
+    void RecordTargetPosition();
+    void AddSpherePoint();
+    void ApproachToTargetPosition();
+    void CaculateOffset();
+    void AutoCaculateOffset();
+
 private:
     RobotControlImpl* m_RobotControlImpl;
     QThread *m_robotThread;
     QVector3D m_currentRobotPosition;
     QVector3D m_targetRobotPositionAppro;
     QVector3D m_targetNdiPosition;
+    SphereFit m_sphere;
 };
 
 #endif // RobotControlView_h__

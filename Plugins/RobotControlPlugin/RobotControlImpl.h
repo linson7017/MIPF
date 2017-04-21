@@ -11,7 +11,7 @@ class RobotControlImpl:public QObject
 {
     Q_OBJECT
 public:
-    RobotControlImpl() : m_isDragging(false), m_robotController(NULL)
+    RobotControlImpl() : m_isDragging(false), m_robotController(NULL), m_speed(1.0)
     {
 
     }
@@ -20,6 +20,15 @@ public:
 
     }
     QVector3D CurrentPosition();
+    QMatrix4x4 CurrentTExpression();
+
+
+    void SetApproachFinished(bool finished) { m_isApproachFinished = finished; }
+    bool GetApproachFinished() { return m_isApproachFinished; }
+
+    void SetSpeed(double speed) { m_speed = speed; }
+    double GetSpeed() { return m_speed; }
+
 public slots:
     void SlotInit();
     void SlotStartDrag();
@@ -28,12 +37,28 @@ public slots:
     void SlotMoveY(double step, double speed);
     void SlotMoveZ(double step, double speed);
     void SlotMoveToPosition(double x, double y, double z);
-    void SlotApproachToNDIPosition(const QVector3D& ndiPosition,const QVector3D& initPosition, double maxStep, double minStep, double relaxFactor);
+    void SlotApproachToNDIPosition(const QVector3D& ndiPosition, double acceptError, double maxStep, double minStep, double relaxFactor);
     void SlotNDIErrorEstimate(const QVector3D& ndiPosition);
+    void SlotMoveToExpression(SpFlangeExpression expression);
+
+    void SlotAutoCaculateOffset(const QVector3D& ndiPosition, double acceptError, double maxStep, double minStep, double relaxFactor);
+    void SlotMoveToPositionWithOffset(QVector3D position, QVector3D offset);
 signals:
     void CurrentPositionChanged(QVector3D position);
+    void CurrentTExpressionChanged(QMatrix4x4 tExpression);
+    void CurrentPExpressionChanged(SpFlangeExpression pExpression);
+
     void SignalNDIErrorEstimated(double error);
+    void SignalApproachFinished();
+    void SignalAutoCaculateOffsetCompleted();
 private:
+    double Approach(const QVector3D& ndiPosition,double initStep,double minStep,double relaxFactor,int axis=0);
+    void PExpressionToTExpression(const SpFlangeExpression &pExpression,
+        QMatrix4x4 &tExpression/*,
+                               QStringList &strExpression*/);
+    void TExpressionToPExpression(const QMatrix4x4& tExpression,SpFlangeExpression& pExpression);
+
+    void EmitRobotMoved();
 
     QSharedPointer<ISpRobotController> m_robotController;
     QSharedPointer<ISpForceSensorController> m_forceSensorController;
@@ -43,5 +68,9 @@ private:
 
     SpFlangeExpression m_groupPositions[3];
     QMap<int, QStringList> m_validPoints[10];
+
+    bool m_isApproachFinished;
+
+    double m_speed;
 };
 #endif // RobotControlImpl_h__
