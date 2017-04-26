@@ -10,6 +10,8 @@
 
 #include <QtWidgets>
 
+bool global_force_stop = false;
+
 bool global_robot_stop = false;
 bool global_position_sync = false;
 bool global_approach_finished = false;
@@ -34,6 +36,8 @@ RobotControlView::RobotControlView(QF::IQF_Main* pMain) :PluginView(pMain)
 
     
     connect(this, &RobotControlView::SignalInit, m_RobotControlImpl, &RobotControlImpl::SlotInit);
+    connect(this, &RobotControlView::SignalStop, m_RobotControlImpl, &RobotControlImpl::SlotStop);
+    connect(this, &RobotControlView::SignalBackToHome, m_RobotControlImpl, &RobotControlImpl::SlotBackToHome);
     connect(this, &RobotControlView::SignalStartDrag, m_RobotControlImpl, &RobotControlImpl::SlotStartDrag);
     connect(this, &RobotControlView::SignalStopDrag, m_RobotControlImpl, &RobotControlImpl::SlotStopDrag);
     connect(this, &RobotControlView::SignalMoveX, m_RobotControlImpl, &RobotControlImpl::SlotMoveX);
@@ -82,15 +86,24 @@ void RobotControlView::Update(const char* szMessage, int iValue, void* pValue)
 {
     if (strcmp(szMessage, "main.Init") == 0)
     {
-        SignalInit();
+        emit SignalInit();
+    }
+    else if (strcmp(szMessage, "main.Stop") == 0)
+    {
+        global_force_stop = true;
+        emit SignalStop();
+    }
+    else if (strcmp(szMessage, "main.BackToHome") == 0)
+    {
+        emit SignalBackToHome();
     }
     else if (strcmp(szMessage, "main.StartDrag") == 0)
     {
-        SignalStartDrag();
+        emit SignalStartDrag();
     }
     else if (strcmp(szMessage, "main.StopDrag") == 0)
     {
-        SignalStopDrag();
+        emit SignalStopDrag();
     }
     else if (strcmp(szMessage, "main.MoveX") == 0)
     {
@@ -98,7 +111,7 @@ void RobotControlView::Update(const char* szMessage, int iValue, void* pValue)
         variant v = variant::GetVariant(vmp, "text");
         QString step = v.getString();
         qDebug() << "Move X Step: " << step;
-        SignalMoveX(step.toDouble(), 1);
+        emit SignalMoveX(step.toDouble(), 1);
     }
     else if (strcmp(szMessage, "main.MoveY") == 0)
     {
@@ -112,13 +125,13 @@ void RobotControlView::Update(const char* szMessage, int iValue, void* pValue)
         VarientMap vmp = *(VarientMap*)pValue;
         variant v = variant::GetVariant(vmp, "text");
         QString step = v.getString();
-        SignalMoveZ(step.toDouble(), 1);
+        emit SignalMoveZ(step.toDouble(), 1);
     }
     else if (strcmp(szMessage, "main.MoveToPosition") == 0)
     {
         QVector3D* positionValue = (QVector3D*)(pValue);
         qDebug() << "Move To Position: " << *positionValue;
-        SignalMoveToPosition(positionValue->x(),positionValue->y(),positionValue->z());
+        emit SignalMoveToPosition(positionValue->x(),positionValue->y(),positionValue->z());
     }
     else if (strcmp(szMessage, "main.GetFlangePosition") == 0)
     {
@@ -138,7 +151,7 @@ void RobotControlView::Update(const char* szMessage, int iValue, void* pValue)
         {
             m_pMain->SendMessageQf("main.GetNeedlePosition", 0, NULL);
         }
-        SignalMoveY(20,1);
+        emit SignalMoveY(20,1);
         while (global_robot_stop)
         {
             m_pMain->SendMessageQf("main.GetNeedlePosition", 0, NULL);
@@ -313,7 +326,7 @@ void RobotControlView::ApproachToTargetPosition()
 
     qDebug() << "Target NDI Position: " << m_targetNdiPosition;
     qDebug() << "Parameter: " << maxStep<<", "<< minStep<<", "<< relaxFactor;
-    emit SignalApproachToNDIPosition(m_targetNdiPosition, acceptError, maxStep, minStep, relaxFactor);
+    emit SignalApproachToNDIPosition(m_targetNdiPosition, acceptError, maxStep, minStep, relaxFactor,true);
 }
 void RobotControlView::CaculateOffset()
 {

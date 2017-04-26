@@ -22,6 +22,8 @@ protected:
 
 signals:
     void SignalInit();
+    void SignalStop();
+    void SignalBackToHome();
     void SignalStartDrag();
     void SignalStopDrag();
     void SignalMoveX(double step, double speed);
@@ -30,7 +32,7 @@ signals:
     void SignalMoveToPosition(double x, double y, double z);
     void SignalMoveToExpression(SpFlangeExpression expression);
 
-    void SignalApproachToNDIPosition(const QVector3D& ndiPosition, double acceptError ,double maxStep,double minStep,double relaxFactor);
+    void SignalApproachToNDIPosition(const QVector3D& ndiPosition, double acceptError ,double maxStep,double minStep,double relaxFactor, bool autoStop);
     void SignalNDIErrorEstimate(const QVector3D& ndiPosition);
 
     void SignalAutoCaculateOffset(const QVector3D& ndiPosition, double acceptError, double maxStep, double minStep, double relaxFactor);

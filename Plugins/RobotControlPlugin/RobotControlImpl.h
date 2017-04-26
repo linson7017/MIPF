@@ -31,13 +31,15 @@ public:
 
 public slots:
     void SlotInit();
+    void SlotStop();
+    void SlotBackToHome();
     void SlotStartDrag();
     void SlotStopDrag();
     void SlotMoveX(double step, double speed);
     void SlotMoveY(double step, double speed);
     void SlotMoveZ(double step, double speed);
     void SlotMoveToPosition(double x, double y, double z);
-    void SlotApproachToNDIPosition(const QVector3D& ndiPosition, double acceptError, double maxStep, double minStep, double relaxFactor);
+    void SlotApproachToNDIPosition(const QVector3D& ndiPosition, double acceptError, double maxStep, double minStep, double relaxFactor,bool autoStop);
     void SlotNDIErrorEstimate(const QVector3D& ndiPosition);
     void SlotMoveToExpression(SpFlangeExpression expression);
 
@@ -52,7 +54,9 @@ signals:
     void SignalApproachFinished();
     void SignalAutoCaculateOffsetCompleted();
 private:
-    double Approach(const QVector3D& ndiPosition,double initStep,double minStep,double relaxFactor,int axis=0);
+    double Approach(const QVector3D& ndiPosition,double acceptError,double initStep,double minStep,double relaxFactor,int axis=0);
+    bool ApproachToNDIPosition(const QVector3D& ndiPosition, double acceptError, double maxStep, double minStep, double relaxFactor, bool autoStop);
+
     void PExpressionToTExpression(const SpFlangeExpression &pExpression,
         QMatrix4x4 &tExpression/*,
                                QStringList &strExpression*/);

@@ -5,6 +5,8 @@
 #include <QtMath>
 #include <QTime>
 
+#include <float.h>
+
 #include "hardwareController/robot_loader.h"
 #include "hardwareController/force_sensor_loader.h"
 #include "hardwareController/laser_range_finder_loader.h"
@@ -20,6 +22,8 @@ extern bool global_position_sync;
 extern QMatrix4x4 global_t_expression;
 
 extern QMatrix4x4 global_temp_t_expression;
+
+extern bool global_force_stop;
 
 void RobotControlImpl::SlotInit()
 {
@@ -40,7 +44,11 @@ void RobotControlImpl::SlotInit()
 
     while (m_robotController->IsBusy())
     {
-
+        if (global_force_stop)
+        {
+            m_robotController->Stop();
+            return;
+        }
     }
 
     m_robotController->Stop();
@@ -80,6 +88,29 @@ void RobotControlImpl::SlotInit()
     {
         ret = m_laserRangeFinderController->Init();
     }*/
+}
+
+
+void RobotControlImpl::SlotStop()
+{
+    m_robotController->Stop();
+    global_force_stop = false;
+}
+
+void RobotControlImpl::SlotBackToHome()
+{
+    m_robotController->BackInitPosition();
+
+    while (m_robotController->IsBusy())
+    {
+        if (global_force_stop)
+        {
+            m_robotController->Stop();
+            return;
+        }
+    }
+
+    m_robotController->Stop();
 }
 
 void RobotControlImpl::SlotStartDrag()
@@ -128,19 +159,20 @@ void RobotControlImpl::SlotStopDrag()
 void RobotControlImpl::SlotMoveX(double step, double speed)
 {
     global_robot_stop = false;
-    qDebug() << "Slot MoveX: "<<step;
     if (m_robotController.isNull())
     {
         return;
     }
     SpFlangeExpression expression = m_robotController->GetFlangePosition();
-    qDebug() << "Current Position: " << expression.GetPosition();
     expression.SetX(expression.GetX() + step);
     m_robotController->MoveToPosition(expression, speed);
-    qDebug() << "Move X: "<< CurrentPosition();
     while (m_robotController->IsBusy())
     {
-
+        if (global_force_stop)
+        {
+            m_robotController->Stop();
+            return;
+        }
     }
     global_robot_stop = true;
     EmitRobotMoved();
@@ -157,7 +189,11 @@ void RobotControlImpl::SlotMoveY(double step, double speed)
     m_robotController->MoveToPosition(expression,speed);
     while (m_robotController->IsBusy())
     {
-
+        if (global_force_stop)
+        {
+            m_robotController->Stop();
+            return;
+        }
     }
     m_robotController->Pause();
     global_robot_stop = true;
@@ -175,7 +211,11 @@ void RobotControlImpl::SlotMoveZ(double step, double speed)
     m_robotController->MoveToPosition(expression, speed);
     while (m_robotController->IsBusy())
     {
-
+        if (global_force_stop)
+        {
+            m_robotController->Stop();
+            return;
+        }
     }
     m_robotController->Pause();
     global_robot_stop = true;
@@ -195,7 +235,11 @@ void RobotControlImpl::SlotMoveToPosition(double x, double y, double z)
     m_robotController->MoveToPosition(expression, 1);
     while (m_robotController->IsBusy())
     {
-
+        if (global_force_stop)
+        {
+            m_robotController->Stop();
+            return;
+        }
     }
     m_robotController->Pause();
     global_robot_stop = true;
@@ -212,7 +256,11 @@ void RobotControlImpl::SlotMoveToExpression(SpFlangeExpression expression)
     m_robotController->MoveToPosition(expression, 1);
     while (m_robotController->IsBusy())
     {
-
+        if (global_force_stop)
+        {
+            m_robotController->Stop();
+            return;
+        }
     }
     m_robotController->Pause();
     global_robot_stop = true;
@@ -313,7 +361,11 @@ void RobotControlImpl::SlotNDIErrorEstimate(const QVector3D& ndiPosition)
     m_robotController->MoveToPosition(expression, 1);
     while (m_robotController->IsBusy())
     {
-
+        if (global_force_stop)
+        {
+            m_robotController->Stop();
+            return;
+        }
     }
     double offset = 20;
     //X
@@ -364,7 +416,7 @@ void RobotControlImpl::SlotNDIErrorEstimate(const QVector3D& ndiPosition)
     emit SignalNDIErrorEstimated(variance);
 }
 
-double RobotControlImpl::Approach(const QVector3D& ndiPosition, double initStep, double minStep, double relaxFactor, int axis)
+double RobotControlImpl::Approach(const QVector3D& ndiPosition, double acceptError, double initStep, double minStep, double relaxFactor, int axis)
 {
     double step = initStep;
     double metric = INT_MAX;
@@ -391,6 +443,14 @@ double RobotControlImpl::Approach(const QVector3D& ndiPosition, double initStep,
 
        // qDebug() << "Current NDI Position: " << global_ndi_pos;
         double cmetric = qAbs(ndiPosition.distanceToPoint(global_ndi_pos));
+        if (cmetric<acceptError)
+        {
+            return cmetric;
+        }
+        if (qAbs(cmetric-metric)<FLT_MIN)
+        {
+            return -1;
+        }
 
         if (cmetric > metric)
         {
@@ -406,12 +466,18 @@ double RobotControlImpl::Approach(const QVector3D& ndiPosition, double initStep,
             }*/
         }
         metric = cmetric;
-        //qDebug() << "Step: " << step;
+        qDebug() << "Current Metric: " << cmetric;
+       // qDebug() << "Current Step: "   << step;
     }
     return metric;
 }
 
-void RobotControlImpl::SlotApproachToNDIPosition(const QVector3D& ndiPosition, double acceptError, double maxStep, double minStep, double relaxFactor)
+void RobotControlImpl::SlotApproachToNDIPosition(const QVector3D& ndiPosition, double acceptError, double maxStep, double minStep, double relaxFactor, bool autoStop)
+{
+    ApproachToNDIPosition(ndiPosition, acceptError, maxStep, minStep,relaxFactor,autoStop);
+}
+
+bool RobotControlImpl::ApproachToNDIPosition(const QVector3D& ndiPosition, double acceptError, double maxStep, double minStep, double relaxFactor, bool autoStop)
 {
     qDebug() << "SlotApproachToNDIPosition";
     qDebug() << "Target NDI Position: " << ndiPosition;
@@ -424,46 +490,89 @@ void RobotControlImpl::SlotApproachToNDIPosition(const QVector3D& ndiPosition, d
     double p1, p2, p3;
     double step = qAbs(ndiPosition.distanceToPoint(global_ndi_pos));
 
+    bool arriveROI = false;
+
     while (metric>acceptError)
     {
         double cmetric = 0.0;
         if (metric > 1.0)
         {
             qDebug() << "Approach X!";
-            cmetric = Approach(ndiPosition, qAbs(ndiPosition.distanceToPoint(global_ndi_pos)), minStep, relaxFactor, 0);
+            cmetric = Approach(ndiPosition, acceptError, qAbs(ndiPosition.distanceToPoint(global_ndi_pos)), minStep, relaxFactor, 0);
+            if (cmetric<acceptError || cmetric == -1)
+            {
+                metric = cmetric;
+                break;
+            }
 
             qDebug() << "Approach Y!";
-            cmetric = Approach(ndiPosition, cmetric, minStep, relaxFactor, 1);
+            cmetric = Approach(ndiPosition, acceptError, cmetric, minStep, relaxFactor, 1);
+            if (cmetric < acceptError || cmetric == -1)
+            {
+                metric = cmetric;
+                break;
+            }
 
             qDebug() << "Approach Z!";
-            cmetric = Approach(ndiPosition, cmetric, minStep, relaxFactor, 2);
+            cmetric = Approach(ndiPosition, acceptError, cmetric, minStep, relaxFactor, 2);
+            if (cmetric < acceptError || cmetric == -1)
+            {
+                metric = cmetric;
+                break;
+            }
         }
         else
         {
+            /*qDebug() << "Get In ROI";
+            arriveROI = true;*/
             qDebug() << "Approach X!";
-            cmetric = Approach(ndiPosition, minStep * 10, minStep*0.1, relaxFactor, 0);
+            cmetric = Approach(ndiPosition, acceptError, 0.1, 0.001, relaxFactor, 0);
+            if (cmetric < acceptError || cmetric == -1)
+            {
+                metric = cmetric;
+                break;
+            }
 
             qDebug() << "Approach Y!";
-            cmetric = Approach(ndiPosition, minStep * 10, minStep*0.1, relaxFactor, 1);
+            cmetric = Approach(ndiPosition, acceptError, 0.1, 0.001, relaxFactor, 1);
+            if (cmetric < acceptError || cmetric == -1)
+            {
+                metric = cmetric;
+                break;
+            }
 
             qDebug() << "Approach Z!";
-            cmetric = Approach(ndiPosition, minStep * 10, minStep*0.1, relaxFactor, 2);
+            cmetric = Approach(ndiPosition, acceptError, 0.1, 0.001, relaxFactor, 2);
+            if (cmetric < acceptError || cmetric == -1)
+            {
+                metric = cmetric;
+                break;
+            }
         }
 
-            metric = cmetric;
+        metric = cmetric;
 
-            qDebug() << "Current Metric: " << cmetric;
 
-        
+    }
+
+    if (autoStop)
+    {
+        m_robotController->Stop();
+    }
+
+    if (metric==-1)
+    {
+        return false;
+    }
+    else
+    {
+        return true;
     }
 
     qDebug() << "Approach Target NDI Position Finished!";
     qDebug() << "Target: " << ndiPosition;
     qDebug() << "Current: " << global_ndi_pos;
     qDebug() << "Distance: " << ndiPosition.distanceToPoint(global_ndi_pos);
-    m_robotController->Pause();
-
-
 }
 
 
@@ -478,9 +587,10 @@ void RobotControlImpl::SlotAutoCaculateOffset(const QVector3D& ndiPosition, doub
         SlotMoveToExpression(expression);
         while (!global_position_sync) {}
 
-        SlotApproachToNDIPosition(ndiPosition, acceptError,maxStep,minStep,relaxFactor);
-
-        emit SignalApproachFinished();
+        if (ApproachToNDIPosition(ndiPosition, acceptError, maxStep, minStep, relaxFactor, false))
+        {
+            emit SignalApproachFinished();
+        }
     }
 
     for (int j = -2; j <= 2; j++)
@@ -491,9 +601,10 @@ void RobotControlImpl::SlotAutoCaculateOffset(const QVector3D& ndiPosition, doub
         SlotMoveToExpression(expression);
         while (!global_position_sync) {}
 
-        SlotApproachToNDIPosition(ndiPosition, acceptError, maxStep, minStep, relaxFactor);
-
-        emit SignalApproachFinished();
+        if (ApproachToNDIPosition(ndiPosition, acceptError, maxStep, minStep, relaxFactor, false))
+        {
+            emit SignalApproachFinished();
+        }
     }
 
     for (int k = -2; k <= 2; k++)
@@ -504,11 +615,12 @@ void RobotControlImpl::SlotAutoCaculateOffset(const QVector3D& ndiPosition, doub
         SlotMoveToExpression(expression);
         while (!global_position_sync) {}
 
-        SlotApproachToNDIPosition(ndiPosition, acceptError, maxStep, minStep, relaxFactor);
-
-        emit SignalApproachFinished();
+        if (ApproachToNDIPosition(ndiPosition, acceptError, maxStep, minStep, relaxFactor, false))
+        {
+            emit SignalApproachFinished();
+        }
     }
-
+    m_robotController->Stop();
     emit SignalAutoCaculateOffsetCompleted();
 }
 
@@ -532,14 +644,8 @@ void RobotControlImpl::SlotMoveToPositionWithOffset(QVector3D position, QVector3
     double z = position.z() - (tExpression(2, 0)*offset.x() + tExpression(2, 1)*offset.y() + tExpression(2, 2)*offset.z());
 
     qDebug() << "MoveToPositionWithOffset1£º" << QVector3D(x, y, z);
-    /*double modelOffsetX = tExpression(0, 0)*offset.x() + tExpression(0, 1)*offset.y() + tExpression(0, 2)*offset.z();
-    double modelOffsetY = tExpression(1, 0)*offset.x() + tExpression(1, 1)*offset.y() + tExpression(1, 2)*offset.z();
-    double modelOffsetZ = tExpression(2, 0)*offset.x() + tExpression(2, 1)*offset.y() + tExpression(2, 2)*offset.z();
 
-    expression.SetPosition(position + QVector3D(modelOffsetX, modelOffsetY,modelOffsetZ));
-    SlotMoveToExpression(expression);*/
-
-    double tx = (global_temp_t_expression(0, 0) - tExpression(0, 0))*offset.x() +
+    /*double tx = (global_temp_t_expression(0, 0) - tExpression(0, 0))*offset.x() +
         (global_temp_t_expression(0, 1) - tExpression(0, 1))*offset.y() +
         (global_temp_t_expression(0, 2) - tExpression(0, 2))*offset.z() + global_temp_t_expression(0, 3);
     double ty = (global_temp_t_expression(1, 0) - tExpression(1, 0))*offset.x() +
@@ -549,8 +655,9 @@ void RobotControlImpl::SlotMoveToPositionWithOffset(QVector3D position, QVector3
         (global_temp_t_expression(2, 1) - tExpression(2, 1))*offset.y() +
         (global_temp_t_expression(2, 2) - tExpression(2, 2))*offset.z() + global_temp_t_expression(2, 3);
 
-    qDebug() << "MoveToPositionWithOffset2£º" << QVector3D(tx,ty,tz);
+    qDebug() << "MoveToPositionWithOffset2£º" << QVector3D(tx,ty,tz);*/
 
-    expression.SetPosition(QVector3D(tx, ty, tz));
+    expression.SetPosition(QVector3D(x, y, z));
     SlotMoveToExpression(expression);
+    m_robotController->Stop();
 }
