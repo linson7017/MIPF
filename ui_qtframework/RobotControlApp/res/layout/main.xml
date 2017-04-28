@@ -5,7 +5,11 @@
 		<Tabs  stretch="2">
 			<Tab text="robot">
 				<VLayout >
-					<Button text="Init" msgcommand="main.Init" />
+					<HLayout>
+						<Button text="Init" msgcommand="main.Init" />
+						<Button text="Stop" msgcommand="main.Stop"/>
+						<Button text="Back To Home" msgcommand="main.BackToHome"/>
+					</HLayout>
 					<HLayout>
 						<Button text="Start Drag" msgcommand="main.StartDrag"/>
 						<Button text="Stop Drag" msgcommand="main.StopDrag"/>
@@ -15,33 +19,69 @@
 						<LineEdit id="main.Speed" text="1"/>
 					</HLayout>
 					<GridLayout>
-						<LineEdit id="main.XStep" text="1" row="0" col="0"/>
+						<LineEdit id="main.XStep" text="10" row="0" col="0"/>
 						<Button id="main.MoveX" text="Move X" row="0" col="1"  msgcommand="main.MoveX" itemProperty="main.XStep:text"/>
 						
-						<LineEdit id="main.YStep" text="1" row="1" col="0"/>
-						<Button id="main.MoveY" text="Move Y" row="1" col="1" msgcommand="main.MoveY" itemProperty="main.YStep:text"/>
+						<LineEdit id="main.YStep" text="10" row="0" col="2"/>
+						<Button id="main.MoveY" text="Move Y" row="0" col="3" msgcommand="main.MoveY" itemProperty="main.YStep:text"/>
 						
-						<LineEdit id="main.ZStep" text="1" row="2" col="0"/>
-						<Button id="main.MoveZ" text="Move Z" row="2" col="1" msgcommand="main.MoveZ" itemProperty="main.ZStep:text"/>
-					</GridLayout>		
+						<LineEdit id="main.ZStep" text="10" row="0" col="4"/>
+						<Button id="main.MoveZ" text="Move Z" row="0" col="5" msgcommand="main.MoveZ" itemProperty="main.ZStep:text"/>
+					</GridLayout>	
 					<HLayout>
 						<LineEdit id="main.TargetPosition" />
-						<Button text="Record Target Position" msgcommand="main.RecordTargetPosition"/>
+						<Button text="Record Target NDI Position" msgcommand="main.RecordTargetPosition"/>
 					</HLayout>
-					<Button text="Back To Target Position" msgcommand="main.BackToTargetPosition"/>
-					<GridLayout>
-						<Label text="MaxStep:" row="0" col="0"/>
-						<LineEdit id="main.MaxStep" text="30" row="0" col="1"/>
-						<Label text="MinStep:" row="1" col="0"/>
-						<LineEdit id="main.MinStep" text="0.01" row="1" col="1"/>
-						<Label text="Relax Factor:" row="2" col="0"/>
-						<LineEdit id="main.RelaxFactor" text="0.8" row="2" col="1"/>
-					</GridLayout>			
-					<Button text="Approach To Target Position" msgcommand="main.ApproachToTargetPosition"/>		
 					<HLayout>
+						<Label text="Target Robot Position"/>
+						<LineEdit id="main.TargetRobotPosition" />
+					</HLayout>
+					<HLayout>
+						<Label text="Current NDI Position:"/>
+						<LineEdit id="main.CurrentNDIPosition" />
+					</HLayout>
+					<HLayout>
+						<Label text="Current Robot Position:"/>
+						<LineEdit id="main.CurrentRobotPosition" />
+					</HLayout>
+					<HLayout>
+						<Button text="Caculate Target Robot Position" msgcommand="main.CaculateTargetRobotPosition"/>
+						<LineEdit id="main.CaculatedTargetRobotPosition" />
+					</HLayout>
+					<!-- <Button text="Back To Target Position" msgcommand="main.BackToTargetPosition"/> -->
+					<GridLayout>
+						<Label text="Accept Error:" row="0" col="0"/>
+						<LineEdit id="main.AcceptError" text="0.5" row="0" col="1"/>
+						<Label text="MaxStep:" row="1" col="0"/>
+						<LineEdit id="main.MaxStep" text="30" row="1" col="1"/>
+						<Label text="MinStep:" row="2" col="0"/>
+						<LineEdit id="main.MinStep" text="0.01" row="2" col="1"/>
+						<Label text="Relax Factor:" row="3" col="0"/>
+						<LineEdit id="main.RelaxFactor" text="0.5" row="3" col="1"/>
+					</GridLayout>			
+					<Button text="Approach To Target Position" msgcommand="main.ApproachToTargetPosition"/>
+					<ListWidget id="main.RobotSpherePointList" height="100"/>
+					<Button text="Add Sphere Point" msgcommand="main.AddSpherePoint"/>
+					<HLayout>
+						<LineEdit text="79.7594" id="main.NDICenterXInRobot"/>
+						<LineEdit text="-0.23077" id="main.NDICenterYInRobot"/>
+						<LineEdit text="108.346" id="main.NDICenterZInRobot"/>
+						<LineEdit text="134.538" id="main.NDIRadius"/>
+					</HLayout>				
+					<Button text="Caculate Offset" msgcommand="main.CaculateOffset"/>
+					<Button text="Auto Caculate Offset" msgcommand="main.AutoCaculateOffset"/>
+					
+					<HLayout>
+						<LineEdit id="main.RobotPointX"/>
+						<LineEdit id="main.RobotPointY"/>
+						<LineEdit id="main.RobotPointZ"/>
+						<Button text="Record Robot Position With Offset" msgcommand="main.RecordRobotPositionWithOffset"/>	
+					</HLayout>
+					<Button text="Move To Robot Position After Calibrate" msgcommand="main.MoveToRobotPositionAfterCalibrate"/>
+					<!-- <HLayout>
 						<LineEdit id="main.NDIError"/>
 						<Button text="NDI Error Estimate" msgcommand="main.NDIErrorEstimate"/>
-					</HLayout>
+					</HLayout> -->
 					<Stretch size="200"/>
 				</VLayout>
 			</Tab >

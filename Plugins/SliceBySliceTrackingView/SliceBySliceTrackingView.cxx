@@ -17,6 +17,8 @@
 #include "QmitkPointListWidget.h"
 
 #include "vtkPolyData.h"
+#include "vtkPolyVertex.h"
+#include "vtkUnstructuredGrid.h"
 
 SliceBySliceTrackingView::SliceBySliceTrackingView(QF::IQF_Main* pMain):PluginView(pMain)
 {
@@ -121,6 +123,38 @@ void SliceBySliceTrackingView::ShowResults(std::vector< std::vector<Vector3> > g
     for (int i = 0; i < graph.size(); i++)
     {
         std::vector<Vector3> points = graph.at(i);
+        //points
+        vtkSmartPointer<vtkPoints> pointSet = vtkSmartPointer<vtkPoints>::New();
+        vtkSmartPointer<vtkCellArray> vertices = vtkSmartPointer<vtkCellArray>::New();
+        for (int i=0;i<points.size();i++)
+        {
+            vtkIdType pid[1];
+            pid[0] = pointSet->InsertNextPoint(points.at(i).x(), points.at(i).y(), points.at(i).z());
+            vertices->InsertNextCell(1, pid);
+        }
+
+        // Create a polydata object
+        vtkSmartPointer<vtkPolyData> pointsPolyData =
+            vtkSmartPointer<vtkPolyData>::New();
+        pointsPolyData->Allocate();
+
+        // Set the points and vertices we created as the geometry and topology of the polydata
+        pointsPolyData->SetPoints(pointSet);
+        pointsPolyData->SetVerts(vertices);
+        mitk::Surface::Pointer pointsSurface = mitk::Surface::New();
+        pointsSurface->SetVtkPolyData(pointsPolyData);
+        pointsSurface->Update();
+        mitk::DataNode::Pointer pointsNode = mitk::DataNode::New();
+        pointsNode->SetData(pointsSurface);
+        std::string pointsName = "points";
+        char temp[10];
+        pointsName.append(itoa(i + 1, temp, 10));
+        pointsNode->SetProperty("name", mitk::StringProperty::New(pointsName));
+        pointsNode->SetProperty("color", mitk::ColorProperty::New(0.0, 1.0, 1.0));
+        pointsNode->Update();
+
+
+        //line
         Vector3 center, normal;
         pMathUtil->FitLine(points, center,normal);
 
@@ -153,6 +187,7 @@ void SliceBySliceTrackingView::ShowResults(std::vector< std::vector<Vector3> > g
         if (pMitkDataStorage)
         {
             pMitkDataStorage->GetDataStorage()->Add(lineNode, pMitkDataStorage->GetCurrentNode());
+            pMitkDataStorage->GetDataStorage()->Add(pointsNode, pMitkDataStorage->GetCurrentNode());
             mitk::RenderingManager::GetInstance()->RequestUpdateAll();
         }
     }

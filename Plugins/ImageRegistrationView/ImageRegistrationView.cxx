@@ -158,11 +158,11 @@ void ImageRegistrationView::Update(const char* szMessage, int iValue, void* pVal
         mitk::Point3D movingImageCenter = m_MovingImageNode->GetData()->GetGeometry()->GetCenter();
         mitk::Point3D fixedImageCenter = m_FixedImageNode->GetData()->GetGeometry()->GetCenter();
 
-        /*mitk::Vector3D translate;
-        translate[0] = +fixedImageCenter[0] - movingImageCenter[0];
-        translate[1] = +fixedImageCenter[1] - movingImageCenter[1];
-        translate[2] = +fixedImageCenter[2] - movingImageCenter[2];
-        m_MovingImageNode->GetData()->GetGeometry()->Translate(translate);*/
+        /* mitk::Vector3D translate;
+         translate[0] = +fixedImageCenter[0] - movingImageCenter[0];
+         translate[1] = +fixedImageCenter[1] - movingImageCenter[1];
+         translate[2] = +fixedImageCenter[2] - movingImageCenter[2];
+         m_MovingImageNode->GetData()->GetGeometry()->Translate(translate);*/
         
         mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     }
