@@ -5,6 +5,9 @@
 #include "CQF_MitkRenderWindow.h"
 #include "CQF_MitkReference.h"
 
+#include "CQF_MainCommand.h"
+#include "internal/qf_interfacedef.h"
+
 QF::IQF_Component* QF::QF_CreateComponentObject(QF::IQF_Main* pMain)
 {
     QF::IQF_Component* pComponent = new CQF_MitkMain(pMain);
@@ -33,13 +36,15 @@ bool CQF_MitkMain::Init()
     m_pMitkDataManager = new CQF_MitkDataManager(m_pMain);
     m_pMitkRenderWindow = new CQF_MitkRenderWindow;
     m_pMitkReference = new CQF_MitkReference;
+
+	m_pMainCommand = new CQF_MainCommand(m_pMain);
     return true;
 }
 
 
 int CQF_MitkMain::GetInterfaceCount()
 {
-    return 3;
+    return 4;
 
 }
 
@@ -49,11 +54,13 @@ const char* CQF_MitkMain::GetInterfaceID(int iID)
     switch (iID)
     {
     case 0:
-        return QF_MitkMain_DataManager;
+        return QF_INTERFACCE_MAIN_COMMAND;
     case 1:
         return QF_MitkMain_RenderWindow;
     case 2:
         return QF_MitkMain_Reference;
+	case 3:
+		return QF_MitkMain_DataManager;
     default:
         break;
     }
@@ -62,9 +69,9 @@ const char* CQF_MitkMain::GetInterfaceID(int iID)
 
 void* CQF_MitkMain::GetInterfacePtr(const char* szInterfaceID)
 {
-    if (strcmp(szInterfaceID, QF_MitkMain_DataManager) == 0)
+    if (strcmp(szInterfaceID, QF_INTERFACCE_MAIN_COMMAND) == 0)
     {
-        return m_pMitkDataManager;
+        return m_pMainCommand;
     }
     else if (strcmp(szInterfaceID, QF_MitkMain_RenderWindow) == 0)
     {
@@ -74,6 +81,10 @@ void* CQF_MitkMain::GetInterfacePtr(const char* szInterfaceID)
     {
         return m_pMitkReference;
     }
+	else if (strcmp(szInterfaceID, QF_MitkMain_DataManager) == 0)
+	{
+		return m_pMitkDataManager;
+	}
     else
         return NULL;
 }

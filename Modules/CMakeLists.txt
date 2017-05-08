@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 2.8.11)
 
 FIND_PACKAGE(QTFRAMEWORK REQUIRED)
 FIND_PACKAGE(QFMAIN REQUIRED)
+FIND_PACKAGE(QFCOMMON REQUIRED)
 
 include(${VTK_USE_FILE})
 include(${ITK_USE_FILE})
@@ -16,6 +17,8 @@ include_directories(
 add_definitions(-DQF_API_EXPORTS)
 
 add_subdirectory(MitkMain)
+
+add_subdirectory(MIPF_MitkSegmentation)
 
 add_subdirectory(SliceBySliceTracking)
 

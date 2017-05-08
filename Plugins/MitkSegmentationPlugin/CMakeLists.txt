@@ -14,13 +14,14 @@ endif()
 
 project(MitkSegmentationPlugin)
 file(GLOB Headers "./*.h")
+file(GLOB UI_Srcs "./*.ui")
 AUX_SOURCE_DIRECTORY(. DIR_SRCS)
 
 set(CMAKE_AUTOMOC ON)
 
 if (VTK_QT_VERSION VERSION_GREATER "4")
-
-    add_library(MitkSegmentationPlugin SHARED ${DIR_SRCS} ${Headers} ${UI_Srcs} ${MOC_Hdrs})
+	qt5_wrap_ui(ui_Files ${UI_Srcs})
+    add_library(MitkSegmentationPlugin SHARED ${DIR_SRCS} ${Headers} ${ui_Files} ${MOC_Hdrs})
     qt5_use_modules(MitkSegmentationPlugin Core Gui Widgets)
     target_link_libraries(MitkSegmentationPlugin ${VTK_LIBRARIES} ${ITK_LIBRARIES} ${QTFRAMEWORK_LIBRARIES} ${QFMAIN_LIBRARIES} MitkQtWidgets MitkQtWidgetsExt MitkSegmentation MitkSegmentationUI)
 

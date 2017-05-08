@@ -8,6 +8,8 @@ class CQF_MitkDataManager;
 class CQF_MitkRenderWindow;
 class CQF_MitkReference;
 
+class CQF_MainCommand;
+
 class CQF_MitkMain :public QF::IQF_Component
 {
 public:
@@ -23,6 +25,9 @@ private:
     CQF_MitkDataManager* m_pMitkDataManager;
     CQF_MitkRenderWindow* m_pMitkRenderWindow;
     CQF_MitkReference* m_pMitkReference;
+
+	CQF_MainCommand* m_pMainCommand;
+
     QF::IQF_Main* m_pMain;
 };
 
