@@ -8,6 +8,7 @@
 #include <mitkDataNode.h>
 #include "MitkMain/IQF_MitkRenderWindow.h"
 #include "MitkMain/IQF_MitkDataManager.h"
+#include "MitkMain/IQF_MitkReference.h"
 #include "iqf_main.h"
 
 class IQF_MitkDataManager;
@@ -20,6 +21,7 @@ public:
 	{
 		m_pMitkDataManager = (IQF_MitkDataManager*)m_pMain->GetInterfacePtr(QF_MitkMain_DataManager);
 		m_pMitkRenderWindow = (IQF_MitkRenderWindow*)m_pMain->GetInterfacePtr(QF_MitkMain_RenderWindow);
+		m_pMitkReferences = (IQF_MitkReference*)m_pMain->GetInterfacePtr(QF_MitkMain_Reference);
 	}
     ~MitkPluginView() {}
     void RequestRenderWindowUpdate(mitk::RenderingManager::RequestType requestType = mitk::RenderingManager::REQUEST_UPDATE_ALL)
@@ -47,6 +49,7 @@ protected:
 protected:
     IQF_MitkDataManager* m_pMitkDataManager;
     IQF_MitkRenderWindow* m_pMitkRenderWindow;
+	IQF_MitkReference* m_pMitkReferences;
 };
 
 

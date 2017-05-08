@@ -25,6 +25,10 @@ public:
     virtual void Update(const char* szMessage, int iValue = 0, void* pValue = 0);
 protected:
     virtual void SetupWidgets();
+	//event
+	virtual void hideEvent(QHideEvent *e);
+	virtual void showEvent(QShowEvent * e);
+	virtual void closeEvent(QCloseEvent *e);
     IQF_MitkDataManager* m_DataManager;
     mitk::Image::Pointer m_currentImage;
     mitk::PointSet::Pointer m_Seeds;

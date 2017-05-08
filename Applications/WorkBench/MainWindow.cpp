@@ -44,8 +44,6 @@ MainWindow::~MainWindow()
 
 void MainWindow::Update(const char* szMessage, int iValue, void* pValue)
 {
-
-
     if (strcmp(szMessage, "main.ChangeView") == 0)
     {
         VarientMap vmp = *(VarientMap*)pValue;
@@ -78,7 +76,7 @@ void MainWindow::OpenDicom()
     IQF_MitkReference* pMitkReference = (IQF_MitkReference*)m_pMain->GetInterfacePtr(QF_MitkMain_Reference);
     IQF_MitkDataManager* pMitkDataManager = (IQF_MitkDataManager*)m_pMain->GetInterfacePtr(QF_MitkMain_DataManager);
     IQF_MitkRenderWindow* pMitkRenderWindow = (IQF_MitkRenderWindow*)m_pMain->GetInterfacePtr(QF_MitkMain_RenderWindow);
-    QString defaultOpenFilePath = pMitkReference->GetStringConfig("LastOpenDirectory");
+    QString defaultOpenFilePath = pMitkReference->GetString("LastOpenDirectory");
 
     QStringList fileNames = QFileDialog::getOpenFileNames(NULL, "Open",
         defaultOpenFilePath,
@@ -95,13 +93,13 @@ void MainWindow::OpenDicom()
         return;
     }
     mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(pMitkDataManager->GetDataStorage());
-    pMitkReference->SetStringConfig("LastOpenDirectory", defaultOpenFilePath.toStdString().c_str());
+    pMitkReference->SetString("LastOpenDirectory", defaultOpenFilePath.toStdString().c_str());
 }
 
 void MainWindow::OpenMetaImage()
 {
     IQF_MitkReference* pMitkReference = (IQF_MitkReference*)m_pMain->GetInterfacePtr(QF_MitkMain_Reference);
-    QString defaultOpenFilePath = pMitkReference->GetStringConfig("LastOpenFilePath");
+    QString defaultOpenFilePath = pMitkReference->GetString("LastOpenFilePath");
     QString filename = QFileDialog::getOpenFileName(this, "Select one or more files to open",
         defaultOpenFilePath,
         "Images (*.mha *.mhd)");
@@ -110,56 +108,10 @@ void MainWindow::OpenMetaImage()
         return;
     }
     m_pMitkDataManager->Load(filename.toLocal8Bit().constData());
-    pMitkReference->SetStringConfig("LastOpenFilePath", filename.toStdString().c_str());
+    pMitkReference->SetString("LastOpenFilePath", filename.toStdString().c_str());
 }
 
 void MainWindow::SetupWidgets(const char* xmlfile)
 {
-    m_pMitkDataManager = (IQF_MitkDataManager*)m_pMain->GetInterfacePtr(QF_MitkMain_DataManager);
-    if (m_pMitkDataManager)
-    {
-        m_pMitkDataManager->Init();
-    }
-  //  ctkPluginFrameworkLauncher::addSearchPath("E:/codes/MIPF-build/bin/plugins/Release",true);
- //   QStringList symbolicNames = ctkPluginFrameworkLauncher::getPluginSymbolicNames("E:/codes/MIPF-build/bin/plugins/Release");
-    
-    //bool SUCCEEDED = false;
-    //try
-    //{
-    //  
-    //    ctkPluginFrameworkLauncher::start("org.mitk.core.ext");
-    //    
-    //}
-    //catch (ctkPluginException &e)
-    //{
-    //    //std::cout << "Error in " << pluginSybolName << " " << e.message().toStdString() << std::endl;
-    //    const ctkException* e2 = e.cause();
-
-    //    if (e2)
-    //        std::cout << e2->message().toStdString() << std::endl;
-    //   // return LOAD_FAILED;
-    //}
-
-    //catch (ctkRuntimeException &e)
-    //{
-    //   // std::cout << "Error in " << pluginSybolName << " " << e.what() << std::endl;
-    //    const ctkException* e2 = e.cause();
-
-    //    if (e2)
-    //        std::cout << e2->message().toStdString() << std::endl;
-    //   // return LOAD_FAILED;
-    //}
-    //catch (...)
-    //{
-    //   // std::cout << "Error in " << pluginSybolName << std::endl;
-    //   // return UNKNOW_EXCEPTION;
-    //}
-    //ctkServiceReference reference = ctkPluginFrameworkLauncher::getPluginContext()->getServiceReference("org.mitk.views.datamanager");
-    //if (reference)
-    //{
-    //    QWidget* datamanagerWidget = qobject_cast<QWidget*>( ctkPluginFrameworkLauncher::getPluginContext()->getService(reference));
-    //    R::Instance()->registerCustomWidget("DataManager", datamanagerWidget);
-    //}
     setContentView(xmlfile);
-
 }

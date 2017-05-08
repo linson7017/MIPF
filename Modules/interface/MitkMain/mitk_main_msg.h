@@ -53,8 +53,25 @@ void* IQF_MitkRenderWindow*÷∏’Î
 */
 #define MITK_MESSAGE_MULTIWIDGET_INIT "MITK_MESSAGE_MULTIWIDGET_INIT"
 
+/**
+MitkMultiWidgets “˛≤ÿ
+int 0
+void* QmitkStdMultiWidget*
+*/
+#define MITK_MESSAGE_MULTIWIDGET_HIDE "MITK_MESSAGE_MULTIWIDGET_HIDE"
 
+/**
+MitkMultiWidgets œ‘ æ
+int 0
+void* QmitkStdMultiWidget*
+*/
+#define MITK_MESSAGE_MULTIWIDGET_SHOW "MITK_MESSAGE_MULTIWIDGET_SHOW"
 
-
+/**
+MitkMultiWidgets πÿ±’
+int 0
+void* QmitkStdMultiWidget*
+*/
+#define MITK_MESSAGE_MULTIWIDGET_CLOSE "MITK_MESSAGE_MULTIWIDGET_CLOSE"
 
 #endif // mitk_main_msg_h__

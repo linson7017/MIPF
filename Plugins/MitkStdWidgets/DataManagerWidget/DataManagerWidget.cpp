@@ -550,11 +550,11 @@ void DataManagerWidget::SaveSelectedNodes(bool checked)
     {
         IQF_MitkReference* pReference = (IQF_MitkReference*)m_pMain->GetInterfacePtr(QF_MitkMain_Reference);
 
-        QStringList fileNames = QmitkIOUtil::Save(data, names, pReference? pReference->GetStringConfig("LastFileSavePath"):"",
+        QStringList fileNames = QmitkIOUtil::Save(data, names, pReference? pReference->GetString("LastFileSavePath"):"",
             this);
         if (!fileNames.empty()&& pReference)
         {
-            pReference->SetStringConfig("LastFileSavePath", QFileInfo(fileNames.back()).absolutePath().toStdString().c_str());
+            pReference->SetString("LastFileSavePath", QFileInfo(fileNames.back()).absolutePath().toStdString().c_str());
         }
     }
     catch (const mitk::Exception& e)

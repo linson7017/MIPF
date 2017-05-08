@@ -150,3 +150,21 @@ void MultiViewsWidget::ResetView()
 {
     m_multiWidget->ResetCrosshair();
 }
+
+void MultiViewsWidget::hideEvent(QHideEvent *e)
+{
+	m_pMain->SendMessageQf(MITK_MESSAGE_MULTIWIDGET_HIDE, 0, m_multiWidget);
+	QWidget::hideEvent(e);
+}
+
+void MultiViewsWidget::showEvent(QShowEvent *e)
+{
+	m_pMain->SendMessageQf(MITK_MESSAGE_MULTIWIDGET_SHOW, 0, m_multiWidget);
+	QWidget::showEvent(e);
+}
+
+void MultiViewsWidget::closeEvent(QCloseEvent *e)
+{
+	m_pMain->SendMessageQf(MITK_MESSAGE_MULTIWIDGET_CLOSE, 0, m_multiWidget);
+	QWidget::closeEvent(e);
+}
