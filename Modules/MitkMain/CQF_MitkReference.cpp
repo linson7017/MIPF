@@ -47,3 +47,18 @@ void CQF_MitkReference::SetBool(const char* szID, bool value)
 	m_Settings->setValue(szID, value);
 	m_Settings->endGroup();
 }
+
+int CQF_MitkReference::GetInt(const char* szID, int bDef)
+{
+    m_Settings->beginGroup("config");
+    int value = m_Settings->value(szID, bDef).toInt();
+    m_Settings->endGroup();
+    return value;
+}
+
+void CQF_MitkReference::SetInt(const char* szID, int value)
+{
+    m_Settings->beginGroup("config");
+    m_Settings->setValue(szID, value);
+    m_Settings->endGroup();
+}

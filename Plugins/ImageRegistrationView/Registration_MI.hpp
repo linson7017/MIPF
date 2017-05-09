@@ -9,6 +9,8 @@
 #include <itkResampleImageFilter.h>
 #include "itkImage.h" 
 
+#include "ItkNotifier.h"
+
 class CommandIterationUpdate : public itk::Command
 {
 public:
@@ -33,7 +35,10 @@ public:
 
         if (itk::EndEvent().CheckEvent(&event))
         {
-        //    m_notifier->EmitRegistrationComplete();
+            if (m_notifier)
+            {
+                m_notifier->RegistrationFinished();
+            }
             return;
         }
 
@@ -46,7 +51,7 @@ public:
         TransformType::MatrixType matrix = m_transform->GetMatrix();
         TransformType::OffsetType offset = m_transform->GetOffset();
 
-        std::vector<double> result;
+        /*std::vector<double> result;
         std::cout << "current parameter:";
         for (int i = 0; i < 3; i++)
         {
@@ -63,29 +68,41 @@ public:
         result.push_back(0);
         result.push_back(1);
         std::cout << endl;
-        std::cout <<"Value: "<< optimizer->GetValue() <<endl;
-     //   m_notifier->EmitRegistrationIterationEnd(result);
+        std::cout <<"Value: "<< optimizer->GetValue() <<endl;*/
+        itk::Matrix<double, 4, 4> m;
+        m.SetIdentity();
+        for (int i = 0; i < 3; i++)
+        {
+            for (int j = 0; j < 3; j++)
+            {
+                m[i][j] = matrix.GetVnlMatrix().get(i, j);
+            }
+            m[i][3] = offset[i];
+        }
+        if (m_notifier)
+        {
+            m_notifier->SignalRegistrationIterationEnd(m);
+        }
+        
     }
 
-   // void SetNotifier(const QSharedPointer<SpItkNotifier> &notifier)
-   // {
-   //     m_notifier = notifier;
-   // }
+    void SetNotifier(ItkNotifier* notifier)
+    {
+        m_notifier = notifier;
+    }
 private:
     TransformType::Pointer  m_transform;
-   // QSharedPointer<SpItkNotifier> m_notifier;
+     ItkNotifier* m_notifier;
 };
 
 template<class FixedImageType, class MovingImageType>
-RegistrationMI<FixedImageType, MovingImageType>::RegistrationMI()
+RegistrationMI<FixedImageType, MovingImageType>::RegistrationMI():m_notifier(NULL)
 {
-
 }
 
 template<class FixedImageType, class MovingImageType>
 RegistrationMI<FixedImageType, MovingImageType>::~RegistrationMI()
 {
-
 }
 
 template<class FixedImageType, class MovingImageType>
@@ -126,7 +143,7 @@ void RegistrationMI<FixedImageType, MovingImageType>::Start(const FixedImageType
     optimizer->SetScales(optimizerScales);
 
     CommandIterationUpdate::Pointer observer = CommandIterationUpdate::New();
-   // observer->SetNotifier(m_notifier);
+    observer->SetNotifier(m_notifier);
     optimizer->AddObserver(itk::IterationEvent(), observer);
     optimizer->AddObserver(itk::EndEvent(), observer);
 
@@ -166,6 +183,7 @@ void RegistrationMI<FixedImageType, MovingImageType>::Start(const FixedImageType
     {
         std::cout << "ExceptionObject caught !" << std::endl;
         std::cout << err << std::endl;
+        emit m_notifier->SignalRegistrationFinsihed();
         return;
     }
 
@@ -192,5 +210,8 @@ void RegistrationMI<FixedImageType, MovingImageType>::Start(const FixedImageType
     resample->SetDefaultPixelValue(100);
     resample->Update();
 
-    resultImage->Graft(resample->GetOutput());
+    if (resultImage)
+    {
+        resultImage->Graft(resample->GetOutput());
+    }
 }

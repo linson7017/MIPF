@@ -16,8 +16,12 @@ public:
     ~CQF_MitkReference();
     virtual const char* GetString(const char* szID, const char* szDef="");
     virtual void SetString(const char* szID, const char* szValue);
+
 	virtual bool GetBool(const char* szID, bool bDef=false);
 	virtual void SetBool(const char* szID, bool value );
+
+    virtual int GetInt(const char* szID, int bDef = 0);
+    virtual void SetInt(const char* szID, int value);
 private:
     QSettings* m_Settings;
 };

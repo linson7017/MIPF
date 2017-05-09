@@ -29,6 +29,7 @@ public:
 
 };
 
+class ItkNotifier;
 
 template<class FixedImageType, class MovingImageType>
 class RegistrationMI
@@ -37,8 +38,12 @@ public:
     RegistrationMI();
     ~RegistrationMI();
     void Start(const FixedImageType* fixedImage, const MovingImageType* movingImage, FixedImageType* resultImage, itk::Matrix<double, 4, 4>& initTransformMatrix = itk::Matrix<double, 4, 4>());
-
+    void SetNotifier(ItkNotifier* notifier) {
+        m_notifier = notifier;
+    }
     MIRegistrationParameters RegistrationParameters;
+private:
+    ItkNotifier* m_notifier;
 };
 
 #include "Registration_MI.hpp"
