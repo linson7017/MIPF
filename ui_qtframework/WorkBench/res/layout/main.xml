@@ -69,6 +69,9 @@
 	<DockWidget id="main.MeasurementDocWidget" tabfiedDocWidgetID="main.TubularTrackingDocWidget"  windowTitle="Measurement" dockWidgetArea="RightDockWidgetArea">
 		<MeasurementWidget />
 	</DockWidget>
+	<DockWidget id="main.SegmentationDocWidget" tabfiedDocWidgetID="main.TubularTrackingDocWidget"  windowTitle="Segmentation" dockWidgetArea="RightDockWidgetArea">
+		<SegmentationWidget />
+	</DockWidget>
 	<DockWidget id="main.ImageRegistrationDocWidget" tabfiedDocWidgetID="main.TubularTrackingDocWidget"  windowTitle="Image Registration" dockWidgetArea="RightDockWidgetArea">
 		<Holder id="@ui/ImageRegistration"  />
 	</DockWidget>
