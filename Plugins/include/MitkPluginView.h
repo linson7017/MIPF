@@ -26,7 +26,7 @@ public:
     ~MitkPluginView() {}
     void RequestRenderWindowUpdate(mitk::RenderingManager::RequestType requestType = mitk::RenderingManager::REQUEST_UPDATE_ALL)
 	{
-		if (m_pMitkRenderWindow)
+		if (m_pMitkRenderWindow&&m_pMitkRenderWindow->GetRenderingManager())
 		{
 			m_pMitkRenderWindow->GetRenderingManager()->RequestUpdateAll(requestType);
 		}

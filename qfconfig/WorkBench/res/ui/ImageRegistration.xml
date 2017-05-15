@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Widget id="ImageRegistration">
+	<VLayout>
+		<GridLayout>
+			<Label text="Fixed Image:" row="0" col="0"/>
+			<FixedImageComboBox  row="0" col="1"/>
+			<Label text="Moving Image:" row="1" col="0"/>			
+			<MovingImageComboBox row="1" col="1"/>
+		</GridLayout>	
+		<HLayout>
+			<CheckBox id="ImageRegistration.AlignCenter" text="Align Center" msgcommand="ImageRegistration.AlignCenter"/>
+			<CheckBox id="ImageRegistration.UseMultiResolution" text="Multi Resolution" />
+		</HLayout>
+		<Button text="Init" msgcommand="ImageRegistration.InitRegister"/>		
+		<Button text="Register" msgcommand="ImageRegistration.Register" itemProperty="ImageRegistration.AlignCenter:checked"/>
+		<Button text="Stop" msgcommand="ImageRegistration.StopRegister" itemProperty="ImageRegistration.AlignCenter:checked"/>
+		<Button text="Reset" msgcommand="ImageRegistration.ResetRegister" />
+		<HLayout>
+			<Button id="ImageRegistration.Btn.MoveXAdd" text="MoveX+"/>
+			<Button id="ImageRegistration.Btn.MoveYAdd" text="MoveY+"/>
+			<Button id="ImageRegistration.Btn.MoveZAdd" text="MoveZ+"/>
+		</HLayout>
+		<HLayout>
+			<Button id="ImageRegistration.Btn.MoveXSub" text="MoveX-"/>
+			<Button id="ImageRegistration.Btn.MoveYSub" text="MoveY-"/>
+			<Button id="ImageRegistration.Btn.MoveZSub" text="MoveZ-"/>
+		</HLayout>
+		<HLayout>
+			<Button id="ImageRegistration.Btn.RotateXAdd" text="RotateX+"/>
+			<Button id="ImageRegistration.Btn.RotateYAdd" text="RotateY+"/>
+			<Button id="ImageRegistration.Btn.RotateZAdd" text="RotateZ+"/>
+		</HLayout>
+		<HLayout>
+			<Button id="ImageRegistration.Btn.RotateXSub" text="RotateX-"/>
+			<Button id="ImageRegistration.Btn.RotateYSub" text="RotateY-"/>
+			<Button id="ImageRegistration.Btn.RotateZSub" text="RotateZ-"/>
+		</HLayout>
+		
+		<Stretch size="400"/>
+	</VLayout>
+</Widget>
+
+
+
+
+
+
+
+
+

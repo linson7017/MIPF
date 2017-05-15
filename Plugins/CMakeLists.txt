@@ -11,18 +11,14 @@ find_package(QFMAIN REQUIRED)
 
 add_definitions(-DQF_API_EXPORTS)
 
-add_subdirectory(MitkStdWidgets)
+add_subdirectory(Mipf_Plugin_MitkStdWidgets)
 
-add_subdirectory(ItkAlgorithmSetView)
+add_subdirectory(Mipf_Plugin_ItkAlgorithmSet)
 
-add_subdirectory(SliceBySliceTrackingView)
+add_subdirectory(Mipf_Plugin_SliceBySliceTracking)
 
-add_subdirectory(TubularTrackingView)
+add_subdirectory(Mipf_Plugin_TubularTracking)
 
-add_subdirectory(ImageRegistrationView)
+add_subdirectory(Mipf_Plugin_ImageRegistration)
 
-add_subdirectory(NDIPlugin)
-
-add_subdirectory(RobotControlPlugin)
-
-add_subdirectory(MitkSegmentationPlugin)
+add_subdirectory(Mipf_Plugin_MitkSegmentation)

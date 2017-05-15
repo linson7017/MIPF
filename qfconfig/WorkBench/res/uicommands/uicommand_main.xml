@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<UICommand>
+	<!-- modules -->
+	<Command id="toggleWelcomDockWidget" type="ToggleWidget" widgetID="main.WelcomDocWidget"/>
+	<Command id="toggleTubularTrackingDockWidget" type="ToggleWidget" widgetID="main.TubularTrackingDocWidget"/>
+	<Command id="toggleSliceBySliceTrackingDockWidget" type="ToggleWidget" widgetID="main.SliceBySliceTrackingDocWidget"/>
+	<Command id="toggleITKAlgorithmSetDockWidget" type="ToggleWidget" widgetID="main.ITKAlgorithmSetDocWidget"/>
+	<Command id="toggleDataManagerDockWidget" type="ToggleWidget" widgetID="main.DataManagerDocWidget"/>
+	<Command id="toggleImageNavigatorDockWidget" type="ToggleWidget" widgetID="main.ImageNavigatorDockWidget"/>
+	<Command id="toggleVolumeVisualizationDockWidget" type="ToggleWidget" widgetID="main.VolumeVisualizationDocWidget"/>
+	<Command id="toggleMeasurementDockWidget" type="ToggleWidget" widgetID="main.MeasurementDocWidget"/>
+	<Command id="toggleImageRegistrationDockWidget" type="ToggleWidget" widgetID="main.ImageRegistrationDocWidget"/>
+	<Command id="toggleSegmentationDocWidget" type="ToggleWidget" widgetID="main.SegmentationDocWidget"/>
+	
+	<Command id="toggleNDIDockWidget" type="ToggleWidget" widgetID="main.NDIDocWidget"/>
+	
+	<Command id="popOpenImageDlg" type="PopDialog" layout="open_image_dlg.xml"/>
+	<Command id="closeLoadDataDlg" type="CloseDialog" activityID="LoadDataDlg" />
+</UICommand>
+
+

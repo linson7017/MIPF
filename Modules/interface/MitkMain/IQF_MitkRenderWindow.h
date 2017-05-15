@@ -29,5 +29,7 @@ public:
     virtual QmitkStdMultiWidget* GetMitkStdMultiWidget() = 0; 
     virtual QmitkRenderWindow* GetActiveMitkRenderWindow() = 0;
     virtual mitk::RenderingManager* GetRenderingManager(QString name = "") = 0;
+
+    virtual void SetCrossHairVisibility(bool state) = 0;
 };
 #endif // IQF_MitkRenderWindow_h__

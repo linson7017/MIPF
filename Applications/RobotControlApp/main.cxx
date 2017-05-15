@@ -27,7 +27,6 @@ int main(int argc, char *argv[])
     QString wk = qApp->applicationFilePath();
     app_env appenv(wk.toLocal8Bit().constData());
     appenv.setMainPtr(QF::QF_CreateMainObject());
-    ((QF::IQF_Main*)appenv.getMainPtr())->RegisterResource(R::Instance());
     //指定qtframework工作目录，没指定则自动设置为可执行程序路径下ui_qtframework/app_name/目录
     //app_env::setWorkDir("G:/Projects/20160111/bin/ui_qtframework/UITestApp");
     //初始化qt环境

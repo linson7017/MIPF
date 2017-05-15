@@ -16,12 +16,12 @@ include_directories(
 
 add_definitions(-DQF_API_EXPORTS)
 
-add_subdirectory(MitkMain)
+add_subdirectory(Mipf_Module_MitkMain)
 
-add_subdirectory(MIPF_MitkSegmentation)
+add_subdirectory(Mipf_Module_MitkSegmentation)
 
-add_subdirectory(SliceBySliceTracking)
+add_subdirectory(Mipf_Module_SliceBySliceTracking)
 
-add_subdirectory(TubularTracking)
+add_subdirectory(Mipf_Module_TubularTracking)
 
-add_subdirectory(MathUtil)
+add_subdirectory(Mipf_Module_MathUtil)

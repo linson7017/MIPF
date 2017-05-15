@@ -73,9 +73,13 @@ void MainWindow::Update(const char* szMessage, int iValue, void* pValue)
 
 void MainWindow::OpenDicom()
 {
-    IQF_MitkReference* pMitkReference = (IQF_MitkReference*)m_pMain->GetInterfacePtr(QF_MitkMain_Reference);
     IQF_MitkDataManager* pMitkDataManager = (IQF_MitkDataManager*)m_pMain->GetInterfacePtr(QF_MitkMain_DataManager);
     IQF_MitkRenderWindow* pMitkRenderWindow = (IQF_MitkRenderWindow*)m_pMain->GetInterfacePtr(QF_MitkMain_RenderWindow);
+    if (!pMitkDataManager|| !pMitkRenderWindow)
+    {
+        return;
+    }
+    IQF_MitkReference* pMitkReference = (IQF_MitkReference*)m_pMain->GetInterfacePtr(QF_MitkMain_Reference);
     QString defaultOpenFilePath = pMitkReference->GetString("LastOpenDirectory");
 
     QStringList fileNames = QFileDialog::getOpenFileNames(NULL, "Open",
@@ -114,4 +118,5 @@ void MainWindow::OpenMetaImage()
 void MainWindow::SetupWidgets(const char* xmlfile)
 {
     setContentView(xmlfile);
+    R::Instance()->Contructed();
 }
