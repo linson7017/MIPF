@@ -12,6 +12,7 @@
 #include "IndicateDlg.h"
 
 class QPushButton;
+class QLineEdit;
 
 //class QmitkPointListWidget;
 class QmitkDataStorageComboBox;
@@ -55,8 +56,9 @@ private:
     void InitRegistration(Float3DImageType* itkFixedImage, Float3DImageType* itkMovingImage);
     void Reset();
     void Stop();
-    void RefreshMovingImage(QMatrix4x4& matrix);
-
+    void RefreshMovingImage(/*QMatrix4x4& matrix*/);
+    void TranslateMovingImage(const QVector3D& translate);
+    void RotateMovingImage(double angle, const QVector3D& normal);
 
     mitk::PointSet::Pointer m_PointSet;
     QmitkDataStorageComboBox* m_FixedDataStorageComboBox;
@@ -69,10 +71,11 @@ private:
 
     vtkMatrix4x4* m_originMatrix;
 
-    QMatrix4x4 m_initMatrix;
+    QMatrix4x4 m_registrationMatrix;
 
     bool m_bInited;
 
+    QLineEdit* m_leMoveStep;
     QPushButton* m_btnMoveXAdd;
     QPushButton* m_btnMoveYAdd;
     QPushButton* m_btnMoveZAdd;
@@ -80,12 +83,15 @@ private:
     QPushButton* m_btnMoveYSub;
     QPushButton* m_btnMoveZSub;
 
+    QLineEdit* m_leRotateStep;
     QPushButton* m_btnRotateXAdd;
     QPushButton* m_btnRotateYAdd;
     QPushButton* m_btnRotateZAdd;
     QPushButton* m_btnRotateXSub;
     QPushButton* m_btnRotateYSub;
     QPushButton* m_btnRotateZSub;
+
+
 };
 
 

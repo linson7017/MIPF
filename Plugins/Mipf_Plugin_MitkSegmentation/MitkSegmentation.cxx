@@ -69,7 +69,7 @@ void MitkSegmentation::Update(const char* szMessage, int iValue, void* pValue)
 		mitk::DataNode* node = (mitk::DataNode*)pValue;
 		NodeAdded(node);
 	}
-	if (strcmp(szMessage, MITK_MESSAGE_NODE_REMOVED) == 0)
+	else if (strcmp(szMessage, MITK_MESSAGE_NODE_REMOVED) == 0)
 	{
 		//do what you want for the message
 		mitk::DataNode* node = (mitk::DataNode*)pValue;

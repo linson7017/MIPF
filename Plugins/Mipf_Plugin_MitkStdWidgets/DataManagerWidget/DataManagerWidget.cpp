@@ -30,6 +30,7 @@
 //#include <QmitkFileSaveAction.h>
 #include <QmitkDataStorageFilterProxyModel.h>
 #include <QmitkNumberPropertySlider.h>
+#include <QmitkStdMultiWidget.h>
 //#include "src/internal/QmitkNodeTableViewKeyFilter.h"
 //#include "src/internal/QmitkInfoDialog.h"
 //#include "src/internal/QmitkDataManagerItemDelegate.h"
@@ -707,4 +708,9 @@ void DataManagerWidget::ColorActionChanged()
         styleSheet.append(")");
         m_ColorButton->setStyleSheet(styleSheet);
     }
+}
+
+void DataManagerWidget::GlobalReinit(bool checked)
+{
+    m_pMitkRenderWindow->GetMitkStdMultiWidget()->ResetCrosshair();
 }

@@ -4,6 +4,7 @@
 
 #include "CQF_MainCommand.h"
 #include "CQF_MainMessage.h"
+#include "CMitkSegmentation.h"
 #include "internal/qf_interfacedef.h"
 
 QF::IQF_Component* QF::QF_CreateComponentObject(QF::IQF_Main* pMain)
@@ -23,6 +24,7 @@ CQF_MitkSegmentationCom::~CQF_MitkSegmentationCom()
 {
     m_pMainCommand->Release();
     m_pMainMessage->Release();
+    delete m_pSegmentation;
 }
 
 
@@ -35,6 +37,10 @@ bool CQF_MitkSegmentationCom::Init()
 {
 	m_pMainCommand = new CQF_MainCommand(m_pMain);
     m_pMainMessage = new CQF_MainMessage(m_pMain);
+
+    m_pSegmentation = new CMitkSegmentation(m_pMain);
+    m_pMainCommand->SetSegmentationImp(m_pSegmentation);
+    m_pMainMessage->SetSegmentationImp(m_pSegmentation);
 	return true;
 }
 

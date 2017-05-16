@@ -28,7 +28,7 @@ public:
         m_numberOfHistogramBins(128),
         m_rateOfSpatialSamples(0.01),
         m_minimumStepLength(0.001),
-        m_maximumStepLength(2.0)
+        m_maximumStepLength(1.0)
     {}
     void SetNumberOfIterations(int numberOfIterations) { m_numberOfIterations = numberOfIterations; }
     int GetNumberOfIterations() { return m_numberOfIterations; }

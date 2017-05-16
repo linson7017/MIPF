@@ -19,9 +19,8 @@ void CQF_MitkDataManager::Init()
     if (!m_DataStorage)
     {
         m_DataStorage = mitk::StandaloneDataStorage::New();
+        RelateDataStorage();
     }
-    RelateDataStorage();
-
 }
 
 void CQF_MitkDataManager::RelateDataStorage()

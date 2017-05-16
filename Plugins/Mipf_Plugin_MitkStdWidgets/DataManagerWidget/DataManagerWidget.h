@@ -69,7 +69,7 @@ public slots:
     void ShowOnlySelectedNodes(bool checked = false) {}
     void ToggleVisibilityOfSelectedNodes(bool checked = false) {}
     void ShowInfoDialogForSelectedNodes(bool checked = false) {}
-    void GlobalReinit(bool checked = false) {}
+    void GlobalReinit(bool checked = false);
     void ContextMenuActionTriggered(bool) {}
     void ShowIn(const QString& editorId) {}
 protected:
