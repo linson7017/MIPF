@@ -1,0 +1,240 @@
+#ifndef template_h__
+#define template_h__
+
+
+const char CMakeListTemplate[] = ""\
+"cmake_minimum_required(VERSION 2.8.11)\n"\
+"if (POLICY CMP0020)\n"\
+"   cmake_policy(SET CMP0020 NEW)\n"\
+"endif()\n"\
+"if (POLICY CMP0025)\n"\
+"   cmake_policy(SET CMP0025 NEW) # CMake 3.0\n"\
+"endif()\n"\
+"if (POLICY CMP0043)\n"\
+"   cmake_policy(SET CMP0043 NEW) # CMake 3.0\n"\
+"endif()\n"\
+"if (POLICY CMP0053)\n"\
+"   cmake_policy(SET CMP0053 NEW) # CMake 3.1\n"\
+"endif()\n"\
+"\n"\
+"project(@ProjectName@)\n"\
+"\n"\
+"file(GLOB Headers ./*.h\")\n"\
+"AUX_SOURCE_DIRECTORY(.DIR_SRCS)\n"\
+"\n"\
+"FIND_PACKAGE(PocoFoundation REQUIRED)\n"\
+"\n"\
+"add_library(@ProjectName@ SHARED ${ DIR_SRCS } ${ Headers })\n"\
+"target_link_libraries(@ProjectName@ @VTK_LIBRARIES@ @ITK_LIBRARIES@ @QTFRAMEWORK_LIBRARIES@ @QFMAIN_LIBRARIES@ @MitkQtWidgets@ @MitkQtWidgetsExt@)\n"\
+"\n";
+
+const char ComH[] = ""\
+"#ifndef CQF_@ComName@Com_h__\n"\
+"#define CQF_@ComName@Com_h__\n"\
+"\n"\
+"#pragma once\n"\
+"#include \"iqf_component.h\"\n"\
+"\n"\
+"class CQF_@CommandName@Command;\n"\
+"class CQF_@MessageName@Message;\n"\
+"\n"\
+"class CQF_@ComName@Com :public QF::IQF_Component\n"\
+"{\n"\
+"public:\n"\
+"    CQF_@ComName@Com(QF::IQF_Main* pMain);\n"\
+"    ~CQF_@ComName@Com();\n"\
+"    virtual void Release();\n"\
+"    virtual bool Init();\n"\
+"    virtual void* GetInterfacePtr(const char* szInterfaceID);\n"\
+"    const char* GetComponentID() { return \"QF_Component_@ComName@\"; }\n"\
+"    int GetInterfaceCount();\n"\
+"    const char* GetInterfaceID(int iID);\n"\
+"private:\n"\
+"    CQF_@CommandName@Command* m_pMainCommand;\n"\
+"    CQF_@MessageName@Message* m_pMainMessage;\n"\
+"\n"\
+"   QF::IQF_Main* m_pMain;\n"\
+"};\n"\
+"\n"\
+"#endif // CQF_@ComName@Com_h__";
+
+
+const char ComC[] = ""\
+"#include \"CQF_@ComName@Com.h\"\n"\
+"#include <string>\n"\
+"#include <assert.h>\n"\
+"\n"\
+"#include \"CQF_@CommandName@Command.h\"\n"\
+"#include \"CQF_@MessageName@Message.h\"\n"\
+"#include \"internal/qf_interfacedef.h\"\n"\
+"\n"\
+"QF::IQF_Component* QF::QF_CreateComponentObject(QF::IQF_Main* pMain)\n"\
+"{\n"\
+"    QF::IQF_Component* pComponent = new CQF_@ComName@Com(pMain);\n"\
+"    assert(pComponent);\n"\
+"    return pComponent;\n"\
+"}\n"\
+"\n"\
+"CQF_@ComName@Com::CQF_@ComName@Com(QF::IQF_Main* pMain) :m_pMain(pMain)\n"\
+"{\n"\
+"\n"\
+"}\n"\
+"\n"\
+"CQF_@ComName@Com::~CQF_@ComName@Com()\n"\
+"{\n"\
+"    m_pMainCommand->Release();\n"\
+"    m_pMainMessage->Release();\n"\
+"    delete m_pSegmentation;\n"\
+"}\n"\
+"\n"\
+"void CQF_@ComName@Com::Release()\n"\
+"{\n"\
+"    delete this;\n"\
+"}\n"\
+"\n"\
+"bool CQF_@ComName@Com::Init()\n"\
+"{\n"\
+"    m_pMainCommand = new CQF_@CommandName@Command(m_pMain);\n"\
+"    m_pMainMessage = new CQF_@MessageName@Message(m_pMain);\n"\
+"    return true;\n"\
+"}\n"\
+"\n"\
+"int CQF_@ComName@Com::GetInterfaceCount()\n"\
+"{\n"\
+"    return 2;\n"\
+"}\n"\
+"\n"\
+"const char* CQF_@ComName@Com::GetInterfaceID(int iID)\n"\
+"{\n"\
+"    switch (iID)\n"\
+"    {\n"\
+"    case 0:\n"\
+"        return QF_INTERFACCE_MAIN_COMMAND;\n"\
+"    case 1:\n"\
+"        return QF_INTERFACCE_MAIN_MESSAGE;\n"\
+"    default:\n"\
+"        break;\n"\
+"    }\n"\
+"    return \"\";\n"\
+"}\n"\
+"\n"\
+"void* CQF_@ComName@Com::GetInterfacePtr(const char* szInterfaceID)\n"\
+"{\n"\
+"    if (strcmp(szInterfaceID, QF_INTERFACCE_MAIN_COMMAND) == 0)\n"\
+"    {\n"\
+"        return m_pMainCommand;\n"\
+"    }\n"\
+"    else if (strcmp(szInterfaceID, QF_INTERFACCE_MAIN_MESSAGE) == 0)\n"\
+"    {\n"\
+"        return m_pMainMessage;\n"\
+"    }\n"\
+"    else\n"\
+"        return NULL;\n"\
+"}";
+
+const char CommandH[] = ""\
+"#ifndef CQF_@CommandName@Command_h__\n"\
+"#define CQF_@CommandName@Command_h__\n"\
+"#include \"qf_config.h\"\n"\
+"#include \"iqf_command.h\"\n"\
+"\n"\
+"#pragma once\n"\
+"\n"\
+"namespace QF {\n"\
+"    class IQF_Main;\n"\
+"}\n"\
+"\n"\
+"class CQF_@CommandName@Command :public QF::IQF_Command\n"\
+"{\n"\
+"public:\n"\
+"    CQF_@CommandName@Command(QF::IQF_Main* pMain);\n"\
+"    ~CQF_@CommandName@Command();\n"\
+"    void Release();\n"\
+"    virtual bool ExecuteCommand(const char* szCommandID, QF::IQF_PropertySet* pInParam, QF::IQF_PropertySet* pOutParam);\n"\
+"    virtual int GetCommandCount();\n"\
+"    virtual const char* GetCommandID(int iIndex);\n"\
+"private:\n"\
+"\n"\
+"    QF::IQF_Main* m_pMain;\n"\
+"};\n"\
+"\n"\
+"#endif // CQF_@CommandName@Command_h__"; 
+
+
+const char CommandC[] = ""\
+"#include \"CQF_@CommandName@Command.h\"\n"\
+"#include <string.h>\n"\
+"#include \"iqf_main.h\"\n"\
+"\n"\
+"CQF_@CommandName@Command::CQF_@CommandName@Command(QF::IQF_Main* pMain)\n"\
+"{\n"\
+"    m_pMain = pMain;\n"\
+"}\n"\
+"\n"\
+"CQF_@CommandName@Command::~CQF_@CommandName@Command()\n"\
+"{\n"\
+"}\n"\
+"\n"\
+"void CQF_@CommandName@Command::Release()\n"\
+"{\n"\
+"   delete this;\n"\
+"}\n"\
+"\n"\
+"bool CQF_@CommandName@Command::ExecuteCommand(const char* szCommandID, QF::IQF_PropertySet* pInParam, QF::IQF_PropertySet* pOutParam)\n"\
+"{\n"\
+"    if (strcmp(szCommandID, "") == 0)\n"\
+"    {      \n"\
+"        return true;\n"\
+"    }\n"\
+"    else\n"\
+"    {\n"\
+"        return false;\n"\
+"    }\n"\
+"}\n"\
+"\n"\
+"int CQF_@CommandName@Command::GetCommandCount()\n"\
+"{\n"\
+"    return 1;\n"\
+"}\n"\
+"\n"\
+"const char* CQF_@CommandName@Command::GetCommandID(int iIndex)\n"\
+"{\n"\
+"    switch (iIndex)\n"\
+"    {\n"\
+"    case 0:\n"\
+"        return "";\n"\
+"    default:\n"\
+"        return "";\n"\
+"        break;\n"\
+"    }\n"\
+"}\n"\
+"\n";
+
+const char MessageH[] = ""\
+"#ifndef CQF_@MessageName@Message_h__\n"\
+"#define CQF_@MessageName@Message_h__\n"\
+"#include \"qf_config.h\"\n"\
+"#include \"iqf_message.h\"\n"\
+"\n"\
+"namespace QF\n"\
+"{\n"\
+"    class IQF_Main;\n"\
+"}\n"\
+"\n"\
+"class CQF_@MessageName@Message : public QF::IQF_Message\n"\
+"{\n"\
+"public:\n"\
+"    CQF_@MessageName@Message(QF::IQF_Main* pMain);\n"\
+"    ~CQF_@MessageName@Message();\n"\
+"    void Release();\n"\
+"    virtual int GetMessageCount();\n"\
+"    virtual const char* GetMessageID(int iIndex);\n"\
+"    virtual void OnMessage(const char* szMessage, int iValue, void *pValue);\n"\
+"    void SetSegmentationImp(CMitkSegmentation* pSegmentation) { m_pSegmentation = pSegmentation; }\n"\
+"private:\n"\
+"    QF::IQF_Main*  m_pMain;\n"\
+"};\n"\
+"\n"\
+"#endif // CQF_@MessageName@Message_h__\n";
+
+#endif // template_h__

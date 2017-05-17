@@ -49,7 +49,7 @@ void CQF_MainMessage::OnMessage(const char* szMessage, int iValue, void *pValue)
     if (strcmp(szMessage, MITK_MESSAGE_SELECTION_CHANGED)==0)
     {
         IQF_MitkDataManager* pDataManager = (IQF_MitkDataManager*)pValue;
-        m_pSegmentation->OnSelectionChanged(pDataManager->GetCurrentNode());
+        m_pSegmentation->OnSelectionChanged(pDataManager->GetSelectedNodes());
     }
     else if (strcmp(szMessage, MITK_MESSAGE_NODE_ADDED) == 0)
     {

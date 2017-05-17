@@ -1,0 +1,32 @@
+<VLayout activityRoot="true" id="main.main" style="@style/mainstyle" title="Plugin Generator" >
+	<GridLayout>
+		<Label text="* Project Name: " row="0" col="0"/>
+		<LineEdit id="ProjectName"  row="0" col="1"/>
+	
+		<Label text="* Module Name: " row="1" col="0"/>
+		<LineEdit id="ModuleName"  row="1" col="1"/>
+		
+		<CheckBox id="UseCom" checked="true" row="2" col="0"/>
+		<Label text="* Com Name: " row="2" col="1"/>
+		<LineEdit id="ComName"  row="2" col="2"/>	
+		
+		<CheckBox id="UseCommand" checked="true" row="3" col="0"/>
+		<Label text="* Command Name: " row="3" col="1"/>
+		<LineEdit id="CommandName"  row="3" col="2"/>	
+		
+		<CheckBox id="UseMessage" checked="true" row="4" col="0"/>
+		<Label text="* Message Name: " row="4" col="1"/>
+		<LineEdit id="MessageName"  row="4" col="2"/>
+		
+		<Label text="* Generate Directory : " row="5" col="0"/>
+		<LineEdit text ="S:\Codes\MIPF\Modules" id="Directory"  row="5" col="1" width="500"/>
+		<Button text=".." row="5" col="2" msgcommand="ScanDirectory"/>
+	</GridLayout>
+	<HLayout>
+		<CheckBox id="UseITK" text="ITK" checked="true"/>
+		<CheckBox id="UseVTK" text="VTK" checked="true"/>
+		<CheckBox id="UseMitkWidgets" text="MitkWidgets" checked="true"/>
+		<CheckBox id="UseMitkWidgetsExt" text="MitkWidgetsExt" checked="true"/>
+	</HLayout>
+	<Button text="Generate" msgcommand="Generate"/>
+</VLayout>

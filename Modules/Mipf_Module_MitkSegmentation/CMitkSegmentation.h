@@ -8,6 +8,7 @@
 class QmitkRenderWindow;
 class QmitkStdMultiWidget;
 class QmitkSlicesInterpolator;
+class QmitkToolSelectionBox;
 
 namespace QF {
     class IQF_Main;
@@ -84,6 +85,8 @@ protected:
     bool m_toolSelectionEnabled;
 
     QmitkSlicesInterpolator* m_interpolator;
+
+    QmitkToolSelectionBox *m_ManualToolSelectionBox;
 
 private:
         IQF_MitkDataManager* m_pMitkDataManager;

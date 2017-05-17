@@ -9,6 +9,7 @@
 //qmitk
 #include "QmitkStdMultiWidget.h"
 #include "QmitkNewSegmentationDialog.h"
+#include "QmitkToolSelectionBox.h"
 //mitk
 #include <mitkSurfaceToImageFilter.h>
 #include <mitkToolManagerProvider.h>
@@ -70,6 +71,15 @@ m_MouseCursorSet(false), refNode(NULL),workingNode(NULL), m_inited(false)
 
     toolManager->NewNodeObjectsGenerated +=
         mitk::MessageDelegate1<CMitkSegmentation, mitk::ToolManager::DataVectorType*>(this, &CMitkSegmentation::NewNodeObjectsGenerated);
+
+    m_interpolator = new QmitkSlicesInterpolator();
+    m_ManualToolSelectionBox = new QmitkToolSelectionBox();
+    m_ManualToolSelectionBox->SetGenerateAccelerators(true);
+    m_ManualToolSelectionBox->SetDisplayedToolGroups(QObject::tr("Add Subtract Correction Paint Wipe 'Region Growing' Fill Erase 'Live Wire' '2D Fast Marching'").toStdString());
+    m_ManualToolSelectionBox->SetLayoutColumns(3);
+    m_ManualToolSelectionBox->SetEnabledMode(QmitkToolSelectionBox::EnabledWithReferenceAndWorkingDataVisible);
+    R::Instance()->registerCustomWidget("ManualToolSelectionBox", m_ManualToolSelectionBox);
+    R::Instance()->registerCustomWidget("SlicesInterpolator", m_interpolator);
 }
 
 CMitkSegmentation::~CMitkSegmentation()
@@ -115,7 +125,9 @@ void CMitkSegmentation::Init()
     m_RenderingManagerObserverTag = mitk::RenderingManager::GetInstance()->AddObserver(mitk::RenderingManagerViewsInitializedEvent(), command3);
 
     //this->SetToolManagerSelection(m_Controls->patImageSelector->GetSelectedNode(), m_Controls->segImageSelector->GetSelectedNode());
-    m_interpolator = new QmitkSlicesInterpolator();
+    
+    //connect(m_ManualToolSelectionBox, SIGNAL(ToolSelected(int)), this, SLOT(OnManualTool2DSelected(int)));
+
     //m_interpolator->Enable3DInterpolation(true);
 
     SetMultiWidget(m_pMitkRenderWindow->GetMitkStdMultiWidget());
@@ -479,7 +491,7 @@ void CMitkSegmentation::OnSelectionChanged(std::vector<mitk::DataNode::Pointer> 
             return;
         }
     }
-    if (1/*m_AutoSelectionEnabled && this->IsActivated()*/)
+    if (0/*m_AutoSelectionEnabled && this->IsActivated()*/)
     {
         if (nodes.size() == 0 && refNode == NULL)
         {

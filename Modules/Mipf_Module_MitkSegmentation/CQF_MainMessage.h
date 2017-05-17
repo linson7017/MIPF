@@ -1,6 +1,5 @@
 #ifndef CQF_MainMessage_h__
 #define CQF_MainMessage_h__
-
 #include "qf_config.h"
 #include "iqf_message.h"
 
@@ -28,7 +27,5 @@ private:
     QF::IQF_Main*  m_pMain;
     CMitkSegmentation* m_pSegmentation;
 };
-
-
 
 #endif // CQF_MainMessage_h__

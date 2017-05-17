@@ -116,6 +116,7 @@ void ImageRegistrationView::Update(const char* szMessage, int iValue, void* pVal
         {
             return;
         }
+        //correct the origin of the fixed image
         mitk::Point3D preFixedOrigin = m_FixedImageNode->GetData()->GetGeometry()->GetOrigin();
         mitk::Point3D preMovingOrigin = m_MovingImageNode->GetData()->GetGeometry()->GetOrigin();
         mitk::Point3D origin;
