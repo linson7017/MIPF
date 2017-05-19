@@ -38,6 +38,10 @@
 
 #include "QmitkStdMultiWidget.h"
 
+#include "usGetModuleContext.h"
+#include "usModuleContext.h"
+#include <usModuleInitialization.h>
+#include "ImageNavigationInteractor.h"
 
 mitk::NodePredicateBase::Pointer CreatePredicate(int type)
 {
@@ -91,7 +95,8 @@ mitk::NodePredicateBase::Pointer CreatePredicate(int type)
 }
 
 
-ImageRegistrationView::ImageRegistrationView(QF::IQF_Main* pMain):MitkPluginView(pMain), m_FixedImageNode(NULL),m_MovingImageNode(NULL), m_bInited(false)
+ImageRegistrationView::ImageRegistrationView(QF::IQF_Main* pMain):MitkPluginView(pMain), m_FixedImageNode(NULL),m_MovingImageNode(NULL), m_bInited(false),
+m_EventConfig("DisplayConfigMITK.xml"), m_ScrollEnabled(true)
 {
     m_pMain->Attach(this);
     m_registrationMatrix.setToIdentity();
@@ -117,17 +122,24 @@ void ImageRegistrationView::Update(const char* szMessage, int iValue, void* pVal
             return;
         }
         //correct the origin of the fixed image
-        mitk::Point3D preFixedOrigin = m_FixedImageNode->GetData()->GetGeometry()->GetOrigin();
-        mitk::Point3D preMovingOrigin = m_MovingImageNode->GetData()->GetGeometry()->GetOrigin();
-        mitk::Point3D origin;
-        origin[0] = 0.0;
-        origin[1] = 0.0;
-        origin[2] = 0.0;
-        m_FixedImageNode->GetData()->GetGeometry()->SetOrigin(origin);
-        origin[0] = preMovingOrigin[0] - preFixedOrigin[0];
-        origin[1] = preMovingOrigin[1] - preFixedOrigin[1];
-        origin[2] = preMovingOrigin[2] - preFixedOrigin[2];
-        m_MovingImageNode->GetData()->GetGeometry()->SetOrigin(origin);
+        bool correctCenter = false;
+        QCheckBox* cb = (QCheckBox*)m_pR->getObjectFromGlobalMap("ImageRegistration.CorrectFixedCenter");
+        correctCenter = cb->isChecked();
+        if (correctCenter)
+        {
+            mitk::Point3D preFixedOrigin = m_FixedImageNode->GetData()->GetGeometry()->GetOrigin();
+            mitk::Point3D preMovingOrigin = m_MovingImageNode->GetData()->GetGeometry()->GetOrigin();
+            mitk::Point3D origin;
+            origin[0] = 0.0;
+            origin[1] = 0.0;
+            origin[2] = 0.0;
+            m_FixedImageNode->GetData()->GetGeometry()->SetOrigin(origin);
+            origin[0] = preMovingOrigin[0] - preFixedOrigin[0];
+            origin[1] = preMovingOrigin[1] - preFixedOrigin[1];
+            origin[2] = preMovingOrigin[2] - preFixedOrigin[2];
+            m_MovingImageNode->GetData()->GetGeometry()->SetOrigin(origin);
+        }
+        
 
 
         Float3DImagePointerType itkFixedImage = Float3DImageType::New();
@@ -151,12 +163,8 @@ void ImageRegistrationView::Update(const char* szMessage, int iValue, void* pVal
         QMatrix4x4 qm;
         qm.setToIdentity();
         bool alignCenter = false;
-        VarientMap vmp = *(VarientMap*)pValue;
-        variant v = variant::GetVariant(vmp, "checked");
-        if (vmp.size()>0)
-        {
-            alignCenter = v.getBool();
-        }
+        cb = (QCheckBox*)m_pR->getObjectFromGlobalMap("ImageRegistration.AlignCenter");
+        alignCenter = cb->isChecked();
         QMatrix4x4 initMatrix = m_registrationMatrix;
         if (alignCenter)
         {
@@ -265,6 +273,19 @@ void ImageRegistrationView::Update(const char* szMessage, int iValue, void* pVal
     else if (strcmp(szMessage, "ImageRegistration.StopRegister") == 0)
     {
         Stop();
+    }
+    else if (strcmp(szMessage, "ImageRegistration.EndRegister") == 0)
+    {
+        EndRegistration();
+    }
+    else if (strcmp(szMessage, MITK_MESSAGE_NODE_REMOVED) == 0)
+    {
+        mitk::DataNode* removedNode = (mitk::DataNode*)pValue;
+        if (removedNode== m_pMitkDataManager->GetDataStorage()->GetNamedNode("DisplayMoving")||
+            removedNode == m_pMitkDataManager->GetDataStorage()->GetNamedNode("DisplayFixed"))
+        {
+            m_bInited = false;
+        }
     }
 }
 
@@ -414,6 +435,27 @@ void ImageRegistrationView::InitRegistration(Float3DImageType* itkFixedImage, Fl
     displayMovingNode->SetVisibility(true);
    // displayMovingNode->SetIntProperty("layer", 100);
     displayMovingNode->Update();
+    m_movingImageInteractor = displayMovingNode->GetDataInteractor();
+    if (m_movingImageInteractor.IsNull())
+    {
+        //DisableDefaultInteraction();
+        //// Create PointSetData Interactor
+        m_movingImageInteractor = ImageNavigationInteractor::New();
+        connect((ImageNavigationInteractor*)m_movingImageInteractor.GetPointer(), &ImageNavigationInteractor::SignalTranslateImage, 
+            this, &ImageRegistrationView::TranslateMovingImage);
+        connect((ImageNavigationInteractor*)m_movingImageInteractor.GetPointer(), &ImageNavigationInteractor::SignalRotateImage, 
+            this, &ImageRegistrationView::RotateMovingImage);
+
+        // Load the according state machine for regular point set interaction
+        m_movingImageInteractor->LoadStateMachine("S:/Codes/MIPF/Plugins/Mipf_Plugin_ImageRegistration/resource/Interactions/ImageNavigation.xml");
+        // Set the configuration file that defines the triggers for the transitions
+        m_movingImageInteractor->SetEventConfig("S:/Codes/MIPF/Plugins/Mipf_Plugin_ImageRegistration/resource/Interactions/ImageNavigationConfig.xml");
+        // set the DataNode (which already is added to the DataStorage
+        m_movingImageInteractor->SetDataNode(displayMovingNode);
+        displayMovingNode->SetDataInteractor(m_movingImageInteractor);
+    }
+
+    
 
     //display fixed image
     mitk::DataNode::Pointer displayFixedNode = mitk::DataNode::New();
@@ -434,7 +476,6 @@ void ImageRegistrationView::InitRegistration(Float3DImageType* itkFixedImage, Fl
     m_pMitkDataManager->GetDataStorage()->Add(displayFixedNode);
     m_pMitkDataManager->GetDataStorage()->Add(displayMovingNode);
     
-    
 
     //init to fixed image
     mitk::RenderingManager::GetInstance()->InitializeViews(
@@ -443,6 +484,70 @@ void ImageRegistrationView::InitRegistration(Float3DImageType* itkFixedImage, Fl
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 
     m_bInited = true;
+}
+
+void ImageRegistrationView::EndRegistration()
+{
+    m_FixedImageNode->SetVisibility(true);
+    m_MovingImageNode->SetVisibility(true);
+    m_pMitkDataManager->GetDataStorage()->Remove(m_pMitkDataManager->GetDataStorage()->GetNamedNode("DisplayMoving"));
+    m_pMitkDataManager->GetDataStorage()->Remove(m_pMitkDataManager->GetDataStorage()->GetNamedNode("DisplayFixed"));
+    if (m_movingImageInteractor.IsNotNull())
+    {
+        disconnect((ImageNavigationInteractor*)m_movingImageInteractor.GetPointer(), &ImageNavigationInteractor::SignalTranslateImage,
+            this, &ImageRegistrationView::TranslateMovingImage);
+        disconnect((ImageNavigationInteractor*)m_movingImageInteractor.GetPointer(), &ImageNavigationInteractor::SignalRotateImage,
+            this, &ImageRegistrationView::RotateMovingImage);
+    }
+
+    m_bInited = false;
+}
+
+void ImageRegistrationView::DisableDefaultInteraction()
+{
+    // dont deactivate twice, else we will clutter the config list ...
+    if (m_ScrollEnabled == false)
+        return;
+
+    // As a legacy solution the display interaction of the new interaction framework is disabled here  to avoid conflicts with tools
+    // Note: this only affects InteractionEventObservers (formerly known as Listeners) all DataNode specific interaction will still be enabled
+    m_DisplayInteractorConfigs.clear();
+
+    auto eventObservers = us::GetModuleContext()->GetServiceReferences<mitk::InteractionEventObserver>();
+
+    for (const auto& eventObserver : eventObservers)
+    {
+        auto displayInteractor = dynamic_cast<mitk::DisplayInteractor*>(us::GetModuleContext()->GetService<mitk::InteractionEventObserver>(eventObserver));
+
+        if (displayInteractor != nullptr)
+        {
+            EnableDefaultInteraction();
+            // remember the original configuration
+            m_DisplayInteractorConfigs.insert(std::make_pair(eventObserver, displayInteractor->GetEventConfig()));
+            displayInteractor->SetEventConfig("DisplayConfigMITKLimited.xml");
+        }
+    }
+
+    m_ScrollEnabled = false;
+}
+void ImageRegistrationView::EnableDefaultInteraction()
+{
+    for (const auto& displayInteractorConfig : m_DisplayInteractorConfigs)
+    {
+        if (displayInteractorConfig.first)
+        {
+            auto displayInteractor = static_cast<mitk::DisplayInteractor*>(us::GetModuleContext()->GetService<mitk::InteractionEventObserver>(displayInteractorConfig.first));
+
+            if (displayInteractor != nullptr)
+            {
+                // here the regular configuration is loaded again
+                displayInteractor->SetEventConfig(displayInteractorConfig.second);
+            }
+        }
+    }
+
+    m_DisplayInteractorConfigs.clear();
+    m_ScrollEnabled = true;
 }
 
 void ImageRegistrationView::Reset()

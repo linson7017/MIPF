@@ -19,12 +19,12 @@ const char CMakeListTemplate[] = ""\
 "\n"\
 "project(@ProjectName@)\n"\
 "\n"\
-"file(GLOB Headers ./*.h\")\n"\
-"AUX_SOURCE_DIRECTORY(.DIR_SRCS)\n"\
+"file(GLOB Headers \"./*.h\")\n"\
+"AUX_SOURCE_DIRECTORY(./ DIR_SRCS)\n"\
 "\n"\
 "FIND_PACKAGE(PocoFoundation REQUIRED)\n"\
 "\n"\
-"add_library(@ProjectName@ SHARED ${ DIR_SRCS } ${ Headers })\n"\
+"add_library(@ProjectName@ SHARED ${DIR_SRCS} ${Headers})\n"\
 "target_link_libraries(@ProjectName@ @VTK_LIBRARIES@ @ITK_LIBRARIES@ @QTFRAMEWORK_LIBRARIES@ @QFMAIN_LIBRARIES@ @MitkQtWidgets@ @MitkQtWidgetsExt@)\n"\
 "\n";
 
@@ -181,7 +181,7 @@ const char CommandC[] = ""\
 "\n"\
 "bool @CommandName@::ExecuteCommand(const char* szCommandID, QF::IQF_PropertySet* pInParam, QF::IQF_PropertySet* pOutParam)\n"\
 "{\n"\
-"    if (strcmp(szCommandID, "") == 0)\n"\
+"    if (strcmp(szCommandID, \"\") == 0)\n"\
 "    {      \n"\
 "        return true;\n"\
 "    }\n"\
@@ -201,9 +201,9 @@ const char CommandC[] = ""\
 "    switch (iIndex)\n"\
 "    {\n"\
 "    case 0:\n"\
-"        return "";\n"\
+"        return \"\";\n"\
 "    default:\n"\
-"        return "";\n"\
+"        return \"\";\n"\
 "        break;\n"\
 "    }\n"\
 "}\n"\
@@ -229,7 +229,6 @@ const char MessageH[] = ""\
 "    virtual int GetMessageCount();\n"\
 "    virtual const char* GetMessageID(int iIndex);\n"\
 "    virtual void OnMessage(const char* szMessage, int iValue, void *pValue);\n"\
-"    void SetSegmentationImp(CMitkSegmentation* pSegmentation) { m_pSegmentation = pSegmentation; }\n"\
 "private:\n"\
 "    QF::IQF_Main*  m_pMain;\n"\
 "};\n"\
@@ -274,7 +273,7 @@ const char MessageC[] = ""\
 "\n"\
 "void @MessageName@::OnMessage(const char* szMessage, int iValue, void *pValue)\n"\
 "{\n"\
-"    if (strcmp(szMessage, "") == 0)\n"\
+"    if (strcmp(szMessage, \"\") == 0)\n"\
 "    {\n"\
 "    }\n"\
 "}";

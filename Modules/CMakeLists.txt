@@ -25,3 +25,5 @@ add_subdirectory(Mipf_Module_SliceBySliceTracking)
 add_subdirectory(Mipf_Module_TubularTracking)
 
 add_subdirectory(Mipf_Module_MathUtil)
+
+add_subdirectory(Mipf_Module_MitkStd)

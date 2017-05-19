@@ -8,7 +8,8 @@
 #include <QObject>
 #include "ITKImageTypeDef.h"
 #include <QMatrix4x4>
-
+#include <mitkEventConfig.h>
+#include <usServiceReference.h>
 #include "IndicateDlg.h"
 
 class QPushButton;
@@ -49,16 +50,22 @@ protected slots:
     void SlotRotateXSub();
     void SlotRotateYSub();
     void SlotRotateZSub();
+
+    void TranslateMovingImage(const QVector3D& translate);
+    void RotateMovingImage(double angle, const QVector3D& normal);
 signals:
     void SignalDoRegistration(const Float3DImagePointerType fixedImage, const Float3DImagePointerType movingImage, QMatrix4x4 initTransformMatrix);
     void SignalStopRegistration();
 private:
     void InitRegistration(Float3DImageType* itkFixedImage, Float3DImageType* itkMovingImage);
+    void EndRegistration();
     void Reset();
     void Stop();
     void RefreshMovingImage(/*QMatrix4x4& matrix*/);
-    void TranslateMovingImage(const QVector3D& translate);
-    void RotateMovingImage(double angle, const QVector3D& normal);
+    
+
+    void DisableDefaultInteraction();
+    void EnableDefaultInteraction();
 
     mitk::PointSet::Pointer m_PointSet;
     QmitkDataStorageComboBox* m_FixedDataStorageComboBox;
@@ -91,7 +98,10 @@ private:
     QPushButton* m_btnRotateYSub;
     QPushButton* m_btnRotateZSub;
 
-
+    mitk::DataInteractor::Pointer m_movingImageInteractor;
+    std::map<us::ServiceReferenceU, mitk::EventConfig> m_DisplayInteractorConfigs;
+    std::string m_EventConfig;
+    bool m_ScrollEnabled;
 };
 
 
