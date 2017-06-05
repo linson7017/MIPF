@@ -22,3 +22,5 @@ add_subdirectory(Mipf_Plugin_TubularTracking)
 add_subdirectory(Mipf_Plugin_ImageRegistration)
 
 add_subdirectory(Mipf_Plugin_MitkSegmentation)
+
+add_subdirectory(Mipf_Plugin_GraphcutSegmentation)

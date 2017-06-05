@@ -12,6 +12,8 @@
 #include <usServiceReference.h>
 #include "IndicateDlg.h"
 
+#include "QfResult.h"
+
 class QPushButton;
 class QLineEdit;
 
@@ -34,34 +36,18 @@ protected slots:
     void OnMovingImageSelectionChanged(const mitk::DataNode* node);
 
     void SlotRegistrationIterationEnd(const itk::Matrix<double, 4, 4>& result);
-    void SlotRegistrationFinished();
+    void SlotRegistrationFinished(const QfResult& result);
+    void SlotReslutImageGenerated(const Float3DImagePointerType resultImage);
 
-
-    void SlotMoveXAdd();
-    void SlotMoveYAdd();
-    void SlotMoveZAdd();
-    void SlotMoveXSub();
-    void SlotMoveYSub();
-    void SlotMoveZSub();
-
-    void SlotRotateXAdd();
-    void SlotRotateYAdd();
-    void SlotRotateZAdd();
-    void SlotRotateXSub();
-    void SlotRotateYSub();
-    void SlotRotateZSub();
-
-    void TranslateMovingImage(const QVector3D& translate);
-    void RotateMovingImage(double angle, const QVector3D& normal);
 signals:
     void SignalDoRegistration(const Float3DImagePointerType fixedImage, const Float3DImagePointerType movingImage, QMatrix4x4 initTransformMatrix);
     void SignalStopRegistration();
 private:
     void InitRegistration(Float3DImageType* itkFixedImage, Float3DImageType* itkMovingImage);
+    void DoRegistration();
     void EndRegistration();
     void Reset();
     void Stop();
-    void RefreshMovingImage(/*QMatrix4x4& matrix*/);
     
 
     void DisableDefaultInteraction();
@@ -81,22 +67,6 @@ private:
     QMatrix4x4 m_registrationMatrix;
 
     bool m_bInited;
-
-    QLineEdit* m_leMoveStep;
-    QPushButton* m_btnMoveXAdd;
-    QPushButton* m_btnMoveYAdd;
-    QPushButton* m_btnMoveZAdd;
-    QPushButton* m_btnMoveXSub;
-    QPushButton* m_btnMoveYSub;
-    QPushButton* m_btnMoveZSub;
-
-    QLineEdit* m_leRotateStep;
-    QPushButton* m_btnRotateXAdd;
-    QPushButton* m_btnRotateYAdd;
-    QPushButton* m_btnRotateZAdd;
-    QPushButton* m_btnRotateXSub;
-    QPushButton* m_btnRotateYSub;
-    QPushButton* m_btnRotateZSub;
 
     mitk::DataInteractor::Pointer m_movingImageInteractor;
     std::map<us::ServiceReferenceU, mitk::EventConfig> m_DisplayInteractorConfigs;

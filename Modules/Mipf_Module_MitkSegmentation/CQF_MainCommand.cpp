@@ -32,6 +32,25 @@
 
 #include "CMitkSegmentation.h"
 
+int GetToolIdByToolName(const std::string &toolName)
+{
+    // find tool from toolname
+    mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
+    int numberOfTools = toolManager->GetTools().size();
+    int toolId = 0;
+   // std::vector<std::string> toolnames;
+    for (; toolId < numberOfTools; ++toolId)
+    {
+        mitk::Tool *currentTool = toolManager->GetToolById(toolId);
+       // toolnames.push_back(currentTool->GetName());
+        if (toolName.compare(currentTool->GetName()) == 0)
+        {
+            return toolId;
+        }
+    }
+    return -1;
+}
+
 CQF_MainCommand::CQF_MainCommand(QF::IQF_Main* pMain)
 {
     m_pMain = pMain;
@@ -73,9 +92,15 @@ bool CQF_MainCommand::ExecuteCommand(const char* szCommandID, QF::IQF_PropertySe
     if (strcmp(szCommandID, "MITK_MAIN_COMMAND_TOOLADD") == 0)
     {
         IQF_MitkDataManager* pMitkDataManager = (IQF_MitkDataManager*)m_pMain->GetInterfacePtr(QF_MitkMain_DataManager);
-        m_pSegmentation->SetReferenceNode(pMitkDataManager->GetCurrentNode());
-        m_pSegmentation->SetWorkingNode(m_workingNode);
-        m_pSegmentation->SelectTool(1);
+        mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
+        toolManager->SetDataStorage(*(pMitkDataManager->GetDataStorage()));
+        toolManager->InitializeTools();
+        toolManager->RegisterClient();
+        toolManager->SetReferenceData(pMitkDataManager->GetCurrentNode());
+        toolManager->SetWorkingData(m_workingNode);
+        int toolID = GetToolIdByToolName("Add");
+        toolManager->ActivateTool(toolID);
+        //m_pSegmentation->SelectTool(1);
         return true;
     }
     else if (strcmp(szCommandID, "MITK_MAIN_COMMAND_CREATE_NEW_SEGMENTATION") == 0)

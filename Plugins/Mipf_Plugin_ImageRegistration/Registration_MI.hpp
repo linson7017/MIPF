@@ -29,13 +29,12 @@ public:
 
         if (itk::EndEvent().CheckEvent(&event))
         {
-            if (/*m_notifier&&m_currentLevel== m_maxLevel-1*/1)
+            m_currentLevel = 0;
+            if (optimizer->GetNumberOfIterations() == 1)
             {
-                m_currentLevel = 0;
-                m_notifier->RegistrationFinished();     
-                return;
+                m_notifier->RESULT.SetResultMessage("Stopped ! \n");
+                m_notifier->RegistrationFinished();
             }
-            m_currentLevel++;
             return;
         }
 
@@ -84,6 +83,7 @@ private:
 template<class FixedImageType, class MovingImageType>
 RegistrationMI<FixedImageType, MovingImageType>::RegistrationMI()
 {
+    m_beginStepLength = -1.0;
 }
 
 template<class FixedImageType, class MovingImageType>
@@ -117,14 +117,20 @@ void RegistrationMI<FixedImageType, MovingImageType>::Start(const FixedImageType
     m_Optimizer = optimizer.GetPointer();
     optimizer->SetNumberOfIterations(RegistrationParameters.GetNumberOfIterations());
     optimizer->SetMinimumStepLength(RegistrationParameters.GetMinimumStepLength());
-    optimizer->SetMaximumStepLength(RegistrationParameters.GetMaximumStepLength());
+    optimizer->SetMaximumStepLength(m_beginStepLength>0?m_beginStepLength:RegistrationParameters.GetMaximumStepLength());
     optimizer->SetMinimize(true);
     optimizer->SetRelaxationFactor(0.8);
 
     TransformType::Pointer transform = TransformType::New();
     typedef OptimizerType::ScalesType       OptimizerScalesType;
     OptimizerScalesType optimizerScales(transform->GetNumberOfParameters());
-    double translationScale = 1.0 / 1000;
+    FixedImageType::RegionType::SizeType fixedImageSize = fixedImage->GetLargestPossibleRegion().GetSize();
+    FixedImageType::SpacingType fixedImageSpacing = fixedImage->GetSpacing();
+    double imageSizeInMM[3];
+    imageSizeInMM[0] = fixedImageSize[0] * fixedImageSpacing[0];
+    imageSizeInMM[1] = fixedImageSize[1] * fixedImageSpacing[1];
+    imageSizeInMM[2] = fixedImageSize[2] * fixedImageSpacing[2];
+    double translationScale = 1.0 / sqrt(imageSizeInMM[0]* imageSizeInMM[0]+ imageSizeInMM[1] * imageSizeInMM[1]+ imageSizeInMM[2] * imageSizeInMM[2]);
     optimizerScales[0] = 1.0;//original
     optimizerScales[1] = 1.0;
     optimizerScales[2] = 1.0;
@@ -161,20 +167,25 @@ void RegistrationMI<FixedImageType, MovingImageType>::Start(const FixedImageType
     registration->SetInterpolator(interpolator);
     registration->SetFixedImage(fixedImage);
     registration->SetMovingImage(movingImage);
-    registration->SetFixedImageRegion(fixedImageRegion);
+    registration->SetFixedImageRegion(fixedImage->GetLargestPossibleRegion());
     try
     {
         registration->Update();
         std::cout << "Optimizer stop condition = "
             << registration->GetOptimizer()->GetStopConditionDescription()
             << std::endl;
+        m_notifier->RESULT.AppendMessage(registration->GetOptimizer()->GetStopConditionDescription());
     }
     catch (itk::ExceptionObject & err)
     {
-        std::cout << "ExceptionObject caught !" << std::endl;
-        std::cout << err << std::endl;
-        emit m_notifier->SignalRegistrationFinsihed();
-        return;
+        /*std::cout << "ExceptionObject caught !" << std::endl;
+        std::cout << err << std::endl;*/
+        m_notifier->RESULT.SetResultCode(RESULT_ERROR);
+        m_notifier->RESULT.SetResultMessage(err.what());
+    }
+    if (m_quitAfterFinished)
+    {
+        m_notifier->RegistrationFinished();
     }
 
    // transform->SetParameters(registration->GetLastTransformParameters());
@@ -200,7 +211,6 @@ void RegistrationMI<FixedImageType, MovingImageType>::Start(const FixedImageType
         resample->SetOutputDirection(fixedImage->GetDirection());
         resample->SetDefaultPixelValue(100);
         resample->Update();
-
 
         resultImage->Graft(resample->GetOutput());
     }

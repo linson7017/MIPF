@@ -7,6 +7,8 @@ typedef unsigned char UCharPixelType;
 typedef int IntPixelType;
 typedef unsigned int UIntPixelType;
 
+typedef itk::FixedArray< int, 1 > IntVectorType1;
+
 
 const unsigned int Dimens3D = 3;
 const unsigned int Dimens2D = 2;
@@ -16,6 +18,7 @@ typedef itk::Image< FloatPixelType, Dimens3D >      Float3DImageType;
 typedef itk::Image< UCharPixelType, Dimens3D >      UChar3DImageType;
 typedef itk::Image< IntPixelType, Dimens3D >        Int3DImageType;
 typedef itk::Image< UIntPixelType, Dimens3D >       UInt3DImageType;
+typedef itk::Image< IntVectorType1, 3 > IntArray3DImageType;
 
 typedef itk::Image< FloatPixelType, Dimens2D >      Float2DImageType;
 typedef itk::Image< UCharPixelType, Dimens2D >      UChar2DImageType;

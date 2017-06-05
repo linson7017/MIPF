@@ -12,7 +12,9 @@ class R;
 class PluginView : public QF::IQF_Observer
 {
 public:
-    PluginView(QF::IQF_Main* pMain) :m_pMain(pMain),m_pR(0), m_bActivated(false) {}
+    PluginView(QF::IQF_Main* pMain) :m_pMain(pMain),m_pR(0), m_bActivated(false) 
+    {
+    }
     //override
 	virtual void InitResource(R* pR)
 	{

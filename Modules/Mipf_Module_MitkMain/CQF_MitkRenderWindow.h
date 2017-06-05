@@ -28,6 +28,8 @@ public:
     virtual QmitkRenderWindow* GetActiveMitkRenderWindow();
 
     virtual void SetCrossHairVisibility(bool state);
+
+    virtual void ResetCrossHair();
 private:
     QSet<QmitkRenderWindow*> m_RenderWindows;
     QHash<QString, QmitkRenderWindow*> m_RenderWindowMap;

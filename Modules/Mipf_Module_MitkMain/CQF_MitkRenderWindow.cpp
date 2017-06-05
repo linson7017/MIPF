@@ -115,3 +115,11 @@ void CQF_MitkRenderWindow::SetCrossHairVisibility(bool state)
         }
     }
 }
+
+void CQF_MitkRenderWindow::ResetCrossHair()
+{
+    if (m_StdMultiWidget)
+    {
+        m_StdMultiWidget->ResetCrosshair();
+    }
+}

@@ -10,7 +10,7 @@ template<class FixedImageType, class MovingImageType>
 class RegistrationBase
 {
 public:
-    RegistrationBase():m_useMultiResolution(false), m_notifier(NULL), m_resolutionLevel(3){}
+    RegistrationBase():m_useMultiResolution(false), m_notifier(NULL), m_resolutionLevel(3), m_quitAfterFinished(true){}
     ~RegistrationBase() {}
     virtual void Start(const FixedImageType* fixedImage, const MovingImageType* movingImage, FixedImageType* resultImage, itk::Matrix<double, 4, 4>& initTransformMatrix = itk::Matrix<double, 4, 4>()) = 0;
     virtual void Stop() = 0;
@@ -19,11 +19,13 @@ public:
         m_notifier = notifier;
     }
     void SetUseMultiResolution(bool useMultiResolution) { m_useMultiResolution = useMultiResolution; }
+    void SetBeginStepLength(double stepLength){}
     void SetMultiResolutionLevel(int level) { m_resolutionLevel = level; }
-    
+    void SetQuitAfterFinished(bool b) { m_quitAfterFinished = b; }
 protected:
     ItkNotifier* m_notifier;
     bool m_useMultiResolution;
+    bool m_quitAfterFinished;
     int m_resolutionLevel;
 };
 

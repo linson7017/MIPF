@@ -68,7 +68,7 @@ m_MouseCursorSet(false), refNode(NULL),workingNode(NULL), m_inited(false)
 
     toolManager->SetDataStorage(*(m_pMitkDataManager->GetDataStorage()));
     toolManager->InitializeTools();
-
+    toolManager->RegisterClient();
     toolManager->NewNodeObjectsGenerated +=
         mitk::MessageDelegate1<CMitkSegmentation, mitk::ToolManager::DataVectorType*>(this, &CMitkSegmentation::NewNodeObjectsGenerated);
 
@@ -78,8 +78,6 @@ m_MouseCursorSet(false), refNode(NULL),workingNode(NULL), m_inited(false)
     m_ManualToolSelectionBox->SetDisplayedToolGroups(QObject::tr("Add Subtract Correction Paint Wipe 'Region Growing' Fill Erase 'Live Wire' '2D Fast Marching'").toStdString());
     m_ManualToolSelectionBox->SetLayoutColumns(3);
     m_ManualToolSelectionBox->SetEnabledMode(QmitkToolSelectionBox::EnabledWithReferenceAndWorkingDataVisible);
-    R::Instance()->registerCustomWidget("ManualToolSelectionBox", m_ManualToolSelectionBox);
-    R::Instance()->registerCustomWidget("SlicesInterpolator", m_interpolator);
 }
 
 CMitkSegmentation::~CMitkSegmentation()
@@ -491,7 +489,7 @@ void CMitkSegmentation::OnSelectionChanged(std::vector<mitk::DataNode::Pointer> 
             return;
         }
     }
-    if (0/*m_AutoSelectionEnabled && this->IsActivated()*/)
+    if (1/*m_AutoSelectionEnabled && this->IsActivated()*/)
     {
         if (nodes.size() == 0 && refNode == NULL)
         {

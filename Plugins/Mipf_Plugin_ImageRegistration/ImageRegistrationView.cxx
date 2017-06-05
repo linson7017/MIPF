@@ -100,14 +100,13 @@ m_EventConfig("DisplayConfigMITK.xml"), m_ScrollEnabled(true)
 {
     m_pMain->Attach(this);
     m_registrationMatrix.setToIdentity();
+
+    qRegisterMetaType<QfResult>("QfResult");
 }
 
 ImageRegistrationView::~ImageRegistrationView()
 {
-  //  delete m_FixedDataStorageComboBox;
- //   delete m_MovingDataStorageComboBox;
-   // delete m_RegistrationWorkStation;
-  //  delete m_RegistrationThread;
+
 }
 
 
@@ -115,125 +114,13 @@ void ImageRegistrationView::Update(const char* szMessage, int iValue, void* pVal
 {
     if (strcmp(szMessage, "ImageRegistration.Register") == 0)
     {
-        IQF_MitkDataManager* pDataManager = (IQF_MitkDataManager*)m_pMain->GetInterfacePtr(QF_MitkMain_DataManager);
-        //Set Current Image
-        if (!m_FixedImageNode||!m_MovingImageNode)
-        {
-            return;
-        }
-        //correct the origin of the fixed image
-        bool correctCenter = false;
-        QCheckBox* cb = (QCheckBox*)m_pR->getObjectFromGlobalMap("ImageRegistration.CorrectFixedCenter");
-        correctCenter = cb->isChecked();
-        if (correctCenter)
-        {
-            mitk::Point3D preFixedOrigin = m_FixedImageNode->GetData()->GetGeometry()->GetOrigin();
-            mitk::Point3D preMovingOrigin = m_MovingImageNode->GetData()->GetGeometry()->GetOrigin();
-            mitk::Point3D origin;
-            origin[0] = 0.0;
-            origin[1] = 0.0;
-            origin[2] = 0.0;
-            m_FixedImageNode->GetData()->GetGeometry()->SetOrigin(origin);
-            origin[0] = preMovingOrigin[0] - preFixedOrigin[0];
-            origin[1] = preMovingOrigin[1] - preFixedOrigin[1];
-            origin[2] = preMovingOrigin[2] - preFixedOrigin[2];
-            m_MovingImageNode->GetData()->GetGeometry()->SetOrigin(origin);
-        }
-        
-
-
-        Float3DImagePointerType itkFixedImage = Float3DImageType::New();
-        mitk::CastToItkImage<Float3DImageType>(dynamic_cast<mitk::Image *>(m_FixedImageNode->GetData()), itkFixedImage);
-
-        Float3DImagePointerType itkMovingImage = Float3DImageType::New();
-        mitk::CastToItkImage<Float3DImageType>(dynamic_cast<mitk::Image *>(m_MovingImageNode->GetData()), itkMovingImage);
-
-       /* float origin[] = { 0.0,0.0,0.0 };
-        itkFixedImage->SetOrigin(origin);*/
-
-
-        
-        if (!m_bInited|| !m_pMitkDataManager->GetDataStorage()->GetNamedNode("DisplayMoving")|| !m_pMitkDataManager->GetDataStorage()->GetNamedNode("DisplayFixed"))
-        {
-            InitRegistration(itkFixedImage, itkMovingImage);
-        }
-        
-
-       //init matrix
-        QMatrix4x4 qm;
-        qm.setToIdentity();
-        bool alignCenter = false;
-        cb = (QCheckBox*)m_pR->getObjectFromGlobalMap("ImageRegistration.AlignCenter");
-        alignCenter = cb->isChecked();
-        QMatrix4x4 initMatrix = m_registrationMatrix;
-        if (alignCenter)
-        {
-            initMatrix.setToIdentity();
-            mitk::Point3D movingImageCenter = m_MovingImageNode->GetData()->GetGeometry()->GetCenter();
-            mitk::Point3D fixedImageCenter = m_FixedImageNode->GetData()->GetGeometry()->GetCenter();
-            initMatrix.translate(fixedImageCenter[0] - movingImageCenter[0],
-                fixedImageCenter[1] - movingImageCenter[1],
-                fixedImageCenter[2] - movingImageCenter[2]);
-        }
-
-        //use multi resolution
-        bool useMultiResolution = false;
-        QCheckBox* useMultiResolutionCheckbox = (QCheckBox*)m_pR->getObjectFromGlobalMap("ImageRegistration.UseMultiResolution");
-        if (useMultiResolutionCheckbox)
-        {
-            useMultiResolution = useMultiResolutionCheckbox->isChecked();
-        }
-
-        ///////////////Normal Version///////////////////////////
-       /* RegistrationMI<Float3DImageType, Float3DImageType> rm;
-        rm.Start(itkFixedImage.GetPointer(), itkMovingImage.GetPointer(), itkResultImage.GetPointer(), m);*/
-
-        ///////////MultiThread Version////////////////////////
-
-        m_RegistrationWorkStation = new RegistrationWorkStation;
-        m_RegistrationWorkStation->SetRegistrationType(RegistrationWorkStation::MI);
-        m_RegistrationWorkStation->SetUseMultiResolution(useMultiResolution);
-        m_RegistrationThread = new QThread;
-        m_RegistrationWorkStation->moveToThread(m_RegistrationThread);
-        disconnect(m_RegistrationThread, &QThread::finished,
-            m_RegistrationThread, &QThread::deleteLater);
-        disconnect(m_RegistrationThread, &QThread::finished,
-            m_RegistrationWorkStation, &QThread::deleteLater);
-
-        connect(m_RegistrationThread, &QThread::finished,
-            m_RegistrationThread, &QThread::deleteLater);
-        connect(m_RegistrationThread, &QThread::finished,
-            m_RegistrationWorkStation, &QThread::deleteLater);
-
-        qRegisterMetaType<Float3DImagePointerType>("Float3DImagePointerType");
-        connect(this, &ImageRegistrationView::SignalDoRegistration, m_RegistrationWorkStation, &RegistrationWorkStation::SlotDoRegistration);
-        connect(this, &ImageRegistrationView::SignalStopRegistration, m_RegistrationWorkStation, &RegistrationWorkStation::SlotStopRegistration,Qt::DirectConnection);
-        connect(m_RegistrationWorkStation, &RegistrationWorkStation::SignalRegistrationIterationEnd, this, &ImageRegistrationView::SlotRegistrationIterationEnd, Qt::BlockingQueuedConnection);
-        connect(m_RegistrationWorkStation, &RegistrationWorkStation::SignalRegistrationFinished, this, &ImageRegistrationView::SlotRegistrationFinished);
-
-
-        m_RegistrationThread->start();
-        emit SignalDoRegistration(itkFixedImage, itkMovingImage, initMatrix.inverted());
-
-
-        //add result image to datastorage
-        /*mitk::Image::Pointer result = mitk::Image::New();
-        mitk::CastToMitkImage(itkResultImage, result);
-        mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
-        imageNode->SetData(result);
-        std::string name = "result";
-        imageNode->SetProperty("name", mitk::StringProperty::New(name));
-        imageNode->SetProperty("color", mitk::ColorProperty::New(0.0, 1.0, 0.0));
-        imageNode->Update();
-        pDataManager->GetDataStorage()->Add(imageNode);
-        mitk::RenderingManager::GetInstance()->RequestUpdateAll();*/
-        
+        DoRegistration();
     }
     else if (strcmp(szMessage, "ImageRegistration.AlignCenter") == 0)
     {
         
-        mitk::Point3D movingImageCenter = m_MovingImageNode->GetData()->GetGeometry()->GetCenter();
-        mitk::Point3D fixedImageCenter = m_FixedImageNode->GetData()->GetGeometry()->GetCenter();
+       // mitk::Point3D movingImageCenter = m_MovingImageNode->GetData()->GetGeometry()->GetCenter();
+        //mitk::Point3D fixedImageCenter = m_FixedImageNode->GetData()->GetGeometry()->GetCenter();
 
         //mitk::Vector3D translate;
         //translate[0] = +fixedImageCenter[0] - movingImageCenter[0];
@@ -289,6 +176,117 @@ void ImageRegistrationView::Update(const char* szMessage, int iValue, void* pVal
     }
 }
 
+void ImageRegistrationView::DoRegistration()
+{
+    IQF_MitkDataManager* pDataManager = (IQF_MitkDataManager*)m_pMain->GetInterfacePtr(QF_MitkMain_DataManager);
+    //Set Current Image
+    if (!m_FixedImageNode || !m_MovingImageNode)
+    {
+        return;
+    }
+    //correct the origin of the fixed image
+    bool correctCenter = false;
+    QCheckBox* cb = (QCheckBox*)m_pR->getObjectFromGlobalMap("ImageRegistration.CorrectFixedCenter");
+    correctCenter = cb->isChecked();
+    if (correctCenter)
+    {
+        mitk::Point3D preFixedOrigin = m_FixedImageNode->GetData()->GetGeometry()->GetOrigin();
+        mitk::Point3D preMovingOrigin = m_MovingImageNode->GetData()->GetGeometry()->GetOrigin();
+        mitk::Point3D origin;
+        origin[0] = 0.0;
+        origin[1] = 0.0;
+        origin[2] = 0.0;
+        m_FixedImageNode->GetData()->GetGeometry()->SetOrigin(origin);
+        origin[0] = preMovingOrigin[0] - preFixedOrigin[0];
+        origin[1] = preMovingOrigin[1] - preFixedOrigin[1];
+        origin[2] = preMovingOrigin[2] - preFixedOrigin[2];
+        m_MovingImageNode->GetData()->GetGeometry()->SetOrigin(origin);
+    }
+
+
+
+    Float3DImagePointerType itkFixedImage = Float3DImageType::New();
+    mitk::CastToItkImage<Float3DImageType>(dynamic_cast<mitk::Image *>(m_FixedImageNode->GetData()), itkFixedImage);
+
+    Float3DImagePointerType itkMovingImage = Float3DImageType::New();
+    mitk::CastToItkImage<Float3DImageType>(dynamic_cast<mitk::Image *>(m_MovingImageNode->GetData()), itkMovingImage);
+
+    if (!m_bInited || !m_pMitkDataManager->GetDataStorage()->GetNamedNode("DisplayMoving") || !m_pMitkDataManager->GetDataStorage()->GetNamedNode("DisplayFixed"))
+    {
+        InitRegistration(itkFixedImage, itkMovingImage);
+    }
+
+
+    //init matrix
+    QMatrix4x4 qm;
+    qm.setToIdentity();
+    bool alignCenter = false;
+    cb = (QCheckBox*)m_pR->getObjectFromGlobalMap("ImageRegistration.AlignCenter");
+    alignCenter = cb->isChecked();
+    //QMatrix4x4 initMatrix = m_registrationMatrix;
+    QMatrix4x4 initMatrix = static_cast<ImageNavigationInteractor*>(m_movingImageInteractor.GetPointer())->GetTransformMatrix();
+    if (alignCenter)
+    {
+        initMatrix.setToIdentity();
+        mitk::Point3D movingImageCenter = m_MovingImageNode->GetData()->GetGeometry()->GetCenter();
+        mitk::Point3D fixedImageCenter = m_FixedImageNode->GetData()->GetGeometry()->GetCenter();
+        initMatrix.translate(fixedImageCenter[0] - movingImageCenter[0],
+            fixedImageCenter[1] - movingImageCenter[1],
+            fixedImageCenter[2] - movingImageCenter[2]);
+    }
+
+    //use multi resolution
+    QCheckBox* useMultiResolutionCheckbox = (QCheckBox*)m_pR->getObjectFromGlobalMap("ImageRegistration.UseMultiResolution");
+
+    ///////////////Normal Version///////////////////////////
+    /* RegistrationMI<Float3DImageType, Float3DImageType> rm;
+    rm.Start(itkFixedImage.GetPointer(), itkMovingImage.GetPointer(), itkResultImage.GetPointer(), m);*/
+
+    ///////////MultiThread Version////////////////////////
+    cb = (QCheckBox*)m_pR->getObjectFromGlobalMap("ImageRegistration.DeformableRegistration");
+    m_RegistrationWorkStation = new RegistrationWorkStation;
+    if (cb->isChecked())
+    {
+        m_RegistrationWorkStation->SetRegistrationType(RegistrationWorkStation::SFD);
+    }
+    else
+    {
+        m_RegistrationWorkStation->SetRegistrationType(RegistrationWorkStation::MI);
+    } 
+    cb = (QCheckBox*)m_pR->getObjectFromGlobalMap("ImageRegistration.BeginWithTranslation");
+    m_RegistrationWorkStation->SetBeginWithTranslation(cb->isChecked());
+
+    m_RegistrationWorkStation->SetUseMultiResolution(useMultiResolutionCheckbox->isChecked());
+    m_RegistrationThread = new QThread;
+    m_RegistrationWorkStation->moveToThread(m_RegistrationThread);
+    disconnect(m_RegistrationThread, &QThread::finished,
+        m_RegistrationThread, &QThread::deleteLater);
+    disconnect(m_RegistrationThread, &QThread::finished,
+        m_RegistrationWorkStation, &QThread::deleteLater);
+
+    connect(m_RegistrationThread, &QThread::finished,
+        m_RegistrationThread, &QThread::deleteLater);
+    connect(m_RegistrationThread, &QThread::finished,
+        m_RegistrationWorkStation, &QThread::deleteLater);
+
+    qRegisterMetaType<Float3DImagePointerType>("Float3DImagePointerType");
+    connect(this, &ImageRegistrationView::SignalDoRegistration, m_RegistrationWorkStation, &RegistrationWorkStation::SlotDoRegistration);
+    connect(this, &ImageRegistrationView::SignalStopRegistration, m_RegistrationWorkStation, &RegistrationWorkStation::SlotStopRegistration, Qt::DirectConnection);
+    connect(m_RegistrationWorkStation, &RegistrationWorkStation::SignalRegistrationIterationEnd, this, &ImageRegistrationView::SlotRegistrationIterationEnd, Qt::BlockingQueuedConnection);
+    connect(m_RegistrationWorkStation, &RegistrationWorkStation::SignalRegistrationFinished, this, &ImageRegistrationView::SlotRegistrationFinished);
+    connect(m_RegistrationWorkStation, &RegistrationWorkStation::SignalReslutImageGenerated, this, &ImageRegistrationView::SlotReslutImageGenerated);
+
+
+    //init view to fixed image
+    mitk::RenderingManager::GetInstance()->InitializeViews(
+        m_FixedImageNode->GetData()->GetTimeGeometry(),
+        mitk::RenderingManager::REQUEST_UPDATE_ALL, true);
+
+    //start registration
+    m_RegistrationThread->start();
+    emit SignalDoRegistration(itkFixedImage, itkMovingImage, initMatrix.inverted());
+}
+
 void ImageRegistrationView::InitResource(R* pR)
 {
     m_pR = pR;
@@ -308,42 +306,7 @@ void ImageRegistrationView::InitResource(R* pR)
 
 void ImageRegistrationView::ResourceContructed(R* pR)
 {
-    m_leMoveStep = (QLineEdit*)pR->getObjectFromGlobalMap("ImageRegistration.MoveStep");
-    m_btnMoveXAdd = (QPushButton*)pR->getObjectFromGlobalMap("ImageRegistration.Btn.MoveXAdd");
-    m_btnMoveYAdd = (QPushButton*)pR->getObjectFromGlobalMap("ImageRegistration.Btn.MoveYAdd");
-    m_btnMoveZAdd = (QPushButton*)pR->getObjectFromGlobalMap("ImageRegistration.Btn.MoveZAdd");
-    m_btnMoveXSub = (QPushButton*)pR->getObjectFromGlobalMap("ImageRegistration.Btn.MoveXSub");
-    m_btnMoveYSub = (QPushButton*)pR->getObjectFromGlobalMap("ImageRegistration.Btn.MoveYSub");
-    m_btnMoveZSub = (QPushButton*)pR->getObjectFromGlobalMap("ImageRegistration.Btn.MoveZSub");
 
-    m_leRotateStep = (QLineEdit*)pR->getObjectFromGlobalMap("ImageRegistration.RotateStep");
-    m_btnRotateXAdd = (QPushButton*)pR->getObjectFromGlobalMap("ImageRegistration.Btn.RotateXAdd");
-    m_btnRotateYAdd = (QPushButton*)pR->getObjectFromGlobalMap("ImageRegistration.Btn.RotateYAdd");
-    m_btnRotateZAdd = (QPushButton*)pR->getObjectFromGlobalMap("ImageRegistration.Btn.RotateZAdd");
-    m_btnRotateXSub = (QPushButton*)pR->getObjectFromGlobalMap("ImageRegistration.Btn.RotateXSub");
-    m_btnRotateYSub = (QPushButton*)pR->getObjectFromGlobalMap("ImageRegistration.Btn.RotateYSub");
-    m_btnRotateZSub = (QPushButton*)pR->getObjectFromGlobalMap("ImageRegistration.Btn.RotateZSub");
-    if (m_btnMoveXAdd&&m_btnMoveYAdd&&m_btnMoveZAdd
-        &&m_btnMoveXSub&&m_btnMoveYSub&&m_btnMoveZSub
-        &&m_btnRotateXAdd&&m_btnRotateYAdd&&m_btnRotateZAdd
-        &&m_btnRotateXSub&&m_btnRotateYSub&&m_btnRotateZSub
-        &&m_leMoveStep&&m_leRotateStep)
-
-    {
-        connect(m_btnMoveXAdd, SIGNAL(pressed()), this, SLOT(SlotMoveXAdd()));
-        connect(m_btnMoveYAdd, SIGNAL(pressed()), this, SLOT(SlotMoveYAdd()));
-        connect(m_btnMoveZAdd, SIGNAL(pressed()), this, SLOT(SlotMoveZAdd()));
-        connect(m_btnMoveXSub, SIGNAL(pressed()), this, SLOT(SlotMoveXSub()));
-        connect(m_btnMoveYSub, SIGNAL(pressed()), this, SLOT(SlotMoveYSub()));
-        connect(m_btnMoveZSub, SIGNAL(pressed()), this, SLOT(SlotMoveZSub()));
-
-        connect(m_btnRotateXAdd, SIGNAL(pressed()), this, SLOT(SlotRotateXAdd()));
-        connect(m_btnRotateYAdd, SIGNAL(pressed()), this, SLOT(SlotRotateYAdd()));
-        connect(m_btnRotateZAdd, SIGNAL(pressed()), this, SLOT(SlotRotateZAdd()));
-        connect(m_btnRotateXSub, SIGNAL(pressed()), this, SLOT(SlotRotateXSub()));
-        connect(m_btnRotateYSub, SIGNAL(pressed()), this, SLOT(SlotRotateYSub()));
-        connect(m_btnRotateZSub, SIGNAL(pressed()), this, SLOT(SlotRotateZSub()));
-    }
 }
 
 void ImageRegistrationView::OnFixedImageSelectionChanged(const mitk::DataNode* node)
@@ -365,47 +328,16 @@ void ImageRegistrationView::SlotRegistrationIterationEnd(const itk::Matrix<doubl
     {
         return;
     }
-
     QMatrix4x4 m;
     vnl_matrix_fixed<double, 4, 4> matrix = result.GetInverse();
     vtkMatrix4x4* transform = vtkMatrix4x4::New();
     vtkMatrix4x4* rm = vtkMatrix4x4::New();
-    for (int i = 0; i < 4; i++)
-    {
-        for (int j = 0; j < 4; j++)
-        {
-            transform->SetElement(i, j, matrix(i, j));
-            m_registrationMatrix(i, j) = matrix(i,j);
-        }
-    }
+
+    MatrixUtil::VnlMatrixToVtkMatrix(matrix, transform);
+    MatrixUtil::VtkMatrixToQMatrix(transform, m_registrationMatrix);
+    static_cast<ImageNavigationInteractor*>(m_movingImageInteractor.GetPointer())->SetTransformMatrix(m_registrationMatrix);
 
     vtkMatrix4x4::Multiply4x4(transform, m_originMatrix, rm);      
-    if (displayNode != NULL)
-    {
-        displayNode->GetData()->GetGeometry()->SetIndexToWorldTransformByVtkMatrix(rm);
-        displayNode->Modified();
-        RequestRenderWindowUpdate();
-    }
-}
-
-void ImageRegistrationView::RefreshMovingImage(/*QMatrix4x4& matrix*/)
-{
-    mitk::DataNode* displayNode = m_pMitkDataManager->GetDataStorage()->GetNamedNode("DisplayMoving");
-    if (!displayNode || !displayNode->GetData())
-    {
-        return;
-    }
-   // m_registrationMatrix = matrix*m_registrationMatrix;
-    vtkMatrix4x4* transform = vtkMatrix4x4::New();
-    vtkMatrix4x4* rm = vtkMatrix4x4::New();
-    for (int i = 0; i < 4; i++)
-    {
-        for (int j = 0; j < 4; j++)
-        {
-            transform->SetElement(i, j, m_registrationMatrix(i, j));
-        }
-    }
-    vtkMatrix4x4::Multiply4x4(transform, m_originMatrix, rm);
     if (displayNode != NULL)
     {
         displayNode->GetData()->GetGeometry()->SetIndexToWorldTransformByVtkMatrix(rm);
@@ -433,29 +365,16 @@ void ImageRegistrationView::InitRegistration(Float3DImageType* itkFixedImage, Fl
     displayMovingNode->SetProperty("volumerendering.uselod", mitk::BoolProperty::New(true));
     displayMovingNode->SetOpacity(0.5);
     displayMovingNode->SetVisibility(true);
-   // displayMovingNode->SetIntProperty("layer", 100);
     displayMovingNode->Update();
     m_movingImageInteractor = displayMovingNode->GetDataInteractor();
     if (m_movingImageInteractor.IsNull())
     {
-        //DisableDefaultInteraction();
-        //// Create PointSetData Interactor
         m_movingImageInteractor = ImageNavigationInteractor::New();
-        connect((ImageNavigationInteractor*)m_movingImageInteractor.GetPointer(), &ImageNavigationInteractor::SignalTranslateImage, 
-            this, &ImageRegistrationView::TranslateMovingImage);
-        connect((ImageNavigationInteractor*)m_movingImageInteractor.GetPointer(), &ImageNavigationInteractor::SignalRotateImage, 
-            this, &ImageRegistrationView::RotateMovingImage);
-
-        // Load the according state machine for regular point set interaction
         m_movingImageInteractor->LoadStateMachine("S:/Codes/MIPF/Plugins/Mipf_Plugin_ImageRegistration/resource/Interactions/ImageNavigation.xml");
-        // Set the configuration file that defines the triggers for the transitions
         m_movingImageInteractor->SetEventConfig("S:/Codes/MIPF/Plugins/Mipf_Plugin_ImageRegistration/resource/Interactions/ImageNavigationConfig.xml");
-        // set the DataNode (which already is added to the DataStorage
         m_movingImageInteractor->SetDataNode(displayMovingNode);
         displayMovingNode->SetDataInteractor(m_movingImageInteractor);
     }
-
-    
 
     //display fixed image
     mitk::DataNode::Pointer displayFixedNode = mitk::DataNode::New();
@@ -477,11 +396,8 @@ void ImageRegistrationView::InitRegistration(Float3DImageType* itkFixedImage, Fl
     m_pMitkDataManager->GetDataStorage()->Add(displayMovingNode);
     
 
-    //init to fixed image
-    mitk::RenderingManager::GetInstance()->InitializeViews(
-        m_FixedImageNode->GetData()->GetTimeGeometry(),
-        mitk::RenderingManager::REQUEST_UPDATE_ALL, true);
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    //init to fixed and moving image
+    m_pMitkRenderWindow->ResetCrossHair();
 
     m_bInited = true;
 }
@@ -492,13 +408,8 @@ void ImageRegistrationView::EndRegistration()
     m_MovingImageNode->SetVisibility(true);
     m_pMitkDataManager->GetDataStorage()->Remove(m_pMitkDataManager->GetDataStorage()->GetNamedNode("DisplayMoving"));
     m_pMitkDataManager->GetDataStorage()->Remove(m_pMitkDataManager->GetDataStorage()->GetNamedNode("DisplayFixed"));
-    if (m_movingImageInteractor.IsNotNull())
-    {
-        disconnect((ImageNavigationInteractor*)m_movingImageInteractor.GetPointer(), &ImageNavigationInteractor::SignalTranslateImage,
-            this, &ImageRegistrationView::TranslateMovingImage);
-        disconnect((ImageNavigationInteractor*)m_movingImageInteractor.GetPointer(), &ImageNavigationInteractor::SignalRotateImage,
-            this, &ImageRegistrationView::RotateMovingImage);
-    }
+
+    m_movingImageInteractor = NULL;
 
     m_bInited = false;
 }
@@ -566,6 +477,7 @@ void ImageRegistrationView::Reset()
         RequestRenderWindowUpdate();
     }
     m_registrationMatrix.setToIdentity();
+    static_cast<ImageNavigationInteractor*>(m_movingImageInteractor.GetPointer())->SetTransformMatrix(m_registrationMatrix);
 }
 
 void ImageRegistrationView::Stop()
@@ -573,111 +485,45 @@ void ImageRegistrationView::Stop()
     emit SignalStopRegistration();
 }
 
-void ImageRegistrationView::SlotRegistrationFinished()
+void ImageRegistrationView::SlotRegistrationFinished(const QfResult& result)
 {
+    if (result.IsSuccess())
+    {
+        qDebug() << "Registration Successfully !";
+    }
+    else
+    {
+        qDebug() << "Registration Failed !";
+    }
+    qDebug() << result.GetResultMessage();
 
     disconnect(this, &ImageRegistrationView::SignalDoRegistration, m_RegistrationWorkStation, &RegistrationWorkStation::SlotDoRegistration);
     disconnect(this, &ImageRegistrationView::SignalStopRegistration, m_RegistrationWorkStation, &RegistrationWorkStation::SlotStopRegistration);
     disconnect(m_RegistrationWorkStation, &RegistrationWorkStation::SignalRegistrationIterationEnd, this, &ImageRegistrationView::SlotRegistrationIterationEnd);
     disconnect(m_RegistrationWorkStation, &RegistrationWorkStation::SignalRegistrationFinished, this, &ImageRegistrationView::SlotRegistrationFinished);
+    disconnect(m_RegistrationWorkStation, &RegistrationWorkStation::SignalReslutImageGenerated, this, &ImageRegistrationView::SlotReslutImageGenerated);
     
     m_RegistrationThread->quit();
-  //  m_pMitkRenderWindow->SetCrossHairVisibility(true);
-    qDebug() << "Registration Finished And Quit !";
+    qDebug() << "Registration Thread Quit !";
 }
 
-
-void ImageRegistrationView::TranslateMovingImage(const QVector3D& translate)
+void ImageRegistrationView::SlotReslutImageGenerated(const Float3DImagePointerType resultImage)
 {
-    QMatrix4x4 invertMatrix = m_registrationMatrix;
-    invertMatrix = invertMatrix.inverted();
-    invertMatrix(0, 3) = 0.0;
-    invertMatrix(1, 3) = 0.0;
-    invertMatrix(2, 3) = 0.0;
-    invertMatrix(3, 3) = 1.0;
-    invertMatrix(3, 0) = 0.0;
-    invertMatrix(3, 1) = 0.0;
-    invertMatrix(3, 2) = 0.0;
-    QVector3D delta = invertMatrix*translate;
-    m_registrationMatrix.translate(delta);
-    RefreshMovingImage();
+    mitk::DataNode::Pointer resultImageNode = mitk::DataNode::New();
+    mitk::Image::Pointer mitkResultImage = mitk::Image::New();
+
+    mitk::CastToMitkImage<Float3DImageType>(resultImage.GetPointer(), mitkResultImage);
+    resultImageNode->SetData(mitkResultImage);
+    resultImageNode->SetProperty("name", mitk::StringProperty::New("ResultImage"));
+    resultImageNode->SetProperty("color", mitk::ColorProperty::New(1.0, 1.0, 0.0));
+    resultImageNode->SetOpacity(0.5);
+    resultImageNode->SetVisibility(true);
+    resultImageNode->Update();
+
+    m_pMitkDataManager->GetDataStorage()->Add(resultImageNode);
+    RequestRenderWindowUpdate();
 }
 
-void ImageRegistrationView::RotateMovingImage(double angle, const QVector3D& normal)
-{
-    mitk::Point3D center = m_MovingImageNode->GetData()->GetGeometry()->GetCenter();
-    m_registrationMatrix.translate(center[0], center[1], center[2]);
-    m_registrationMatrix.rotate(angle, normal);
-    m_registrationMatrix.translate(-center[0], -center[1], -center[2]);
-    RefreshMovingImage();
-}
-
-void ImageRegistrationView::SlotMoveXAdd()
-{
-    TranslateMovingImage(QVector3D(m_leMoveStep->text().toDouble(), 0, 0));
-}
-
-void ImageRegistrationView::SlotMoveYAdd()
-{
-    TranslateMovingImage(QVector3D(0, m_leMoveStep->text().toDouble(), 0));
-}
-
-void ImageRegistrationView::SlotMoveZAdd()
-{
-    TranslateMovingImage(QVector3D(0, 0, m_leMoveStep->text().toDouble()));
-}
-
-void ImageRegistrationView::SlotMoveXSub()
-{
-    TranslateMovingImage(QVector3D(-m_leMoveStep->text().toDouble(), 0, 0));
-
-}
-
-void ImageRegistrationView::SlotMoveYSub()
-{
-    TranslateMovingImage(QVector3D(0, -m_leMoveStep->text().toDouble(), 0.0));
-}
-
-void ImageRegistrationView::SlotMoveZSub()
-{
-    TranslateMovingImage(QVector3D(0, 0, -m_leMoveStep->text().toDouble()));
-}
-
-
-void ImageRegistrationView::SlotRotateXAdd()
-{
-    RotateMovingImage(m_leRotateStep->text().toDouble(), QVector3D(1.0, 0, 0.0));
-}
-
-
-void ImageRegistrationView::SlotRotateYAdd()
-{
-    RotateMovingImage(m_leRotateStep->text().toDouble(), QVector3D(0, 1.0, 0.0));
-}
-
-
-void ImageRegistrationView::SlotRotateZAdd()
-{
-    RotateMovingImage(m_leRotateStep->text().toDouble(), QVector3D(0.0, 0, 1.0));
-}
-
-
-void ImageRegistrationView::SlotRotateXSub()
-{
-    RotateMovingImage(-m_leRotateStep->text().toDouble(), QVector3D(1.0, 0, 0.0));
-}
-
-
-void ImageRegistrationView::SlotRotateYSub()
-{
-    RotateMovingImage(-m_leRotateStep->text().toDouble(), QVector3D(0, 1.0, 0.0));
-}
-
-
-void ImageRegistrationView::SlotRotateZSub()
-{
-    RotateMovingImage(-m_leRotateStep->text().toDouble(), QVector3D(0, 0, 1.0));
-}
 
 
 

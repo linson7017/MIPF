@@ -15,7 +15,6 @@
 
 #include <mitkIOUtil.h>
 
-
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QLineEdit>
@@ -23,9 +22,8 @@
 #include <QPushButton>
 #include <QVBoxLayout>
 
-
 #include <MitkMain/IQF_MitkDataManager.h>
-#include <mitkMain/IQF_MitkRenderWindow.h>
+#include <MitkMain/IQF_MitkRenderWindow.h>
 
 #include "iqf_main.h"
 #include "Utils/variant.h"

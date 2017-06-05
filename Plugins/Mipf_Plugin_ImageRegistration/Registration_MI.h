@@ -24,11 +24,11 @@ class MIRegistrationParameters
     double m_maximumStepLength;
 public:
     MIRegistrationParameters() :
-        m_numberOfIterations(500),
+        m_numberOfIterations(200),
         m_numberOfHistogramBins(128),
         m_rateOfSpatialSamples(0.01),
         m_minimumStepLength(0.001),
-        m_maximumStepLength(1.0)
+        m_maximumStepLength(0.5)
     {}
     void SetNumberOfIterations(int numberOfIterations) { m_numberOfIterations = numberOfIterations; }
     int GetNumberOfIterations() { return m_numberOfIterations; }
@@ -53,10 +53,14 @@ public:
     ~RegistrationMI();
     void Start(const FixedImageType* fixedImage, const MovingImageType* movingImage, FixedImageType* resultImage, itk::Matrix<double, 4, 4>& initTransformMatrix = itk::Matrix<double, 4, 4>());
     void Stop();
+    void SetBeginStepLength(double stepLength) {
+        m_beginStepLength = stepLength;
+    ;}
     MIRegistrationParameters RegistrationParameters;
 
 private:
     itk::RegularStepGradientDescentBaseOptimizer* m_Optimizer;
+    double m_beginStepLength;
 };
 
 #include "Registration_MI.hpp"

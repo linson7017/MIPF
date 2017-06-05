@@ -31,5 +31,6 @@ public:
     virtual mitk::RenderingManager* GetRenderingManager(QString name = "") = 0;
 
     virtual void SetCrossHairVisibility(bool state) = 0;
+    virtual void ResetCrossHair() = 0;
 };
 #endif // IQF_MitkRenderWindow_h__
