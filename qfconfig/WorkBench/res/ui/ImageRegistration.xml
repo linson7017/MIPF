@@ -11,11 +11,17 @@
 		<HLayout>
 			<CheckBox id="ImageRegistration.AlignCenter" text="Align Center" msgcommand="ImageRegistration.AlignCenter"/>
 			<CheckBox id="ImageRegistration.UseMultiResolution" text="Multi Resolution" />
+			<CheckBox id="ImageRegistration.CorrectFixedCenter" text="Correct Init Center" />
+		</HLayout>
+		<HLayout>
+			<CheckBox id="ImageRegistration.BeginWithTranslation" text="Begin With Translation" checked="true"/>
+			<CheckBox id="ImageRegistration.DeformableRegistration" text="Deformable" />
 		</HLayout>
 		<Button text="Init" msgcommand="ImageRegistration.InitRegister"/>		
 		<Button text="Register" msgcommand="ImageRegistration.Register" itemProperty="ImageRegistration.AlignCenter:checked"/>
 		<Button text="Stop" msgcommand="ImageRegistration.StopRegister" itemProperty="ImageRegistration.AlignCenter:checked"/>
 		<Button text="Reset" msgcommand="ImageRegistration.ResetRegister" />
+		<Button text="End" msgcommand="ImageRegistration.EndRegister" />
 		<HLayout>
 			<Label text="Move Step:"/>
 			<LineEdit id="ImageRegistration.MoveStep" text="10.0"/>

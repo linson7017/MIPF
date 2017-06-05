@@ -9,10 +9,8 @@
 		<ManualToolSelectionBox />
 		<SlicesInterpolator />
 		<DataManagerWidget />
-		<VolumeVisualizationWidget />
+		<ImageNavigatorWidget />
 	</VLayout>
-	<MultiViewsWidget  stretch="7"/>
-	<!-- <Holder id="@ui/GraphcutSegmentation" stretch="2.0"/> -->
-	<!-- <Holder id="@ui/ImageRegistration"  stretch="2.0"/> -->
-	<SegmentationWidget />
+	<MultiViewsWidget  stretch="5"/>
+	<SegmentationWidget  stretch="2"/>
 </HLayout>

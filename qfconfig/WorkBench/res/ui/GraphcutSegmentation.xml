@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Widget id="GraphcutSegmentation">
+	<VLayout  stretch="1.5">
+		<HLayout>
+			<Label text="Image"/>
+			<ImageComboBox />
+		</HLayout>
+		<HLayout>
+			<Label text="Seg Image"/>
+			<WorkImageComboBox  stretch="2"/>
+			<Button text=".." msgcommand="MITK_MESSAGE_GRAPHCUT_CREATE_NEW_SEGMENTATION"/>
+		</HLayout>
+		<HLayout>
+			<Button text="Resample" msgcommand="MITK_MESSAGE_GRAPHCUT_RESAMPLE"/>
+			<LineEdit id="GraphcutSegmentation.Resample"/>
+		</HLayout>
+		<HLayout>
+			<Label text="Lambda"/>
+			<LineEdit text="0.5" msgcommand="MITK_MESSAGE_GRAPHCUT_LAMBDA_CHANGED" property="text"/>
+			<Label text="Histogram Bins"/>
+			<LineEdit text="32" msgcommand="MITK_MESSAGE_GRAPHCUT_HISTOGRAMBINS_CHANGED" property="text"/>
+		</HLayout>
+		
+		<Button text="Init" msgcommand="MITK_MESSAGE_GRAPHCUT_INIT"/>
+		<Button text="Remove All" msgcommand="MITK_MESSAGE_GRAPHCUT_REMOVEALL"/>
+		<Button text="Segment" msgcommand="MITK_MESSAGE_GRAPHCUT_SEGMENT"/>
+		<Button text="Save Mask" msgcommand="MITK_MESSAGE_GRAPHCUT_SAVEMASK"/>
+		<HLayout>
+			<Label text="Pen Size"/>
+			<LineEdit text="5" msgcommand="MITK_MESSAGE_GRAPHCUT_PENSIZE_CHANGED" property="text"/>
+			<Button text="Paint" msgcommand="MITK_MESSAGE_GRAPHCUT_BEGIN_PAINT"/>
+			<Button text="Erase" msgcommand="MITK_MESSAGE_GRAPHCUT_BEGIN_WIPE"/>
+			<Button text="End" msgcommand="MITK_MESSAGE_GRAPHCUT_END_PAINT"/>
+		</HLayout>
+		<HLayout>
+			<ButtonGroup>	
+				<CheckBox text="Foreground" id="GraphcutSegmentation.Foreground" checked="true" msgcommand="MITK_MESSAGE_GRAPHCUT_FOREGROUND" property="checked"/>
+				<CheckBox text="Background" id="GraphcutSegmentation.Background" msgcommand="MITK_MESSAGE_GRAPHCUT_BACKGROUND" property="checked"/>
+			</ButtonGroup>
+		</HLayout>
+		<Button text="Generate Surface" msgcommand="MITK_MESSAGE_GRAPHCUT_GENERATESURFACE"/>
+		<HSlider id="GraphcutSegmentation.ContourValueSlider"/>
+		<Stretch size="100"/>
+	</VLayout>
+</Widget>
+
+
+
+
+
+
+
+
+
