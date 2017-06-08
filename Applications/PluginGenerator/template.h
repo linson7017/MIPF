@@ -20,12 +20,13 @@ const char CMakeListTemplate[] = ""\
 "project(@PluginName@)\n"\
 ""\
 "file(GLOB Headers \"./*.h\")\n"\
+"file(GLOB UI_Srcs \"./*.ui\")\n"\
 "AUX_SOURCE_DIRECTORY(. DIR_SRCS)\n"\
 "\n"\
 "set(CMAKE_AUTOMOC ON)\n"\
 "\n"\
 "if (VTK_QT_VERSION VERSION_GREATER \"4\")\n"\
-"\n"\
+"    qt5_wrap_ui(ui_Files ${UI_Srcs})\n"\
 "    add_library(@PluginName@ SHARED ${DIR_SRCS} ${Headers} ${UI_Srcs} ${MOC_Hdrs})\n"\
 "    qt5_use_modules(@PluginName@ Core Gui Widgets)\n"\
 "    target_link_libraries(@PluginName@ @VTK_LIBRARIES@ @ITK_LIBRARIES@ @QTFRAMEWORK_LIBRARIES@ @QFMAIN_LIBRARIES@ @MitkQtWidgets@ @MitkQtWidgetsExt@)\n"\
@@ -76,11 +77,11 @@ const char ViewActivatorH[] = ""\
 "#define @PluginName@Activator_h__\n"\
 "\n"\
 "#pragma once\n"\
-"#include \"iqf_activator.h\"\n"\
+"#include \"Activator_Base.h\"\n"\
 "\n"\
 "class @ViewName@;\n"\
 "\n"\
-"class @PluginName@_Activator : public QF::IQF_Activator\n"\
+"class @PluginName@_Activator : public ActivatorBase\n"\
 "{\n"\
 "public:\n"\
 "    @PluginName@_Activator(QF::IQF_Main* pMain);\n"\
@@ -90,7 +91,6 @@ const char ViewActivatorH[] = ""\
 "    void Register(R* pR);\n"\
 "private:\n"\
 "    @ViewName@* m_p@ViewName@;\n"\
-"    QF::IQF_Main* m_pMain;\n"\
 "};\n"\
 "\n"\
 "#endif // @PluginName@Activator_h__"; 
@@ -99,6 +99,7 @@ const char ViewActivatorH[] = ""\
 const char ViewActivatorC[] = ""\
 "#include \"@PluginName@Activator.h\"\n"\
 "#include \"@ViewName@.h\"\n"\
+"#include \"Res/R.h\"\n"\
 "\n"\
 "QF_API QF::IQF_Activator* QF::QF_CreatePluginActivator(QF::IQF_Main* pMain)\n"\
 "{\n"\
@@ -109,14 +110,14 @@ const char ViewActivatorC[] = ""\
 "\n"\
 "const char @PluginName@_Activator_Activator_ID[] = \"@PluginName@_Activator_Activator_ID\";\n"\
 "\n"\
-"@PluginName@_Activator::@PluginName@_Activator(QF::IQF_Main* pMain)\n"\
+"@PluginName@_Activator::@PluginName@_Activator(QF::IQF_Main* pMain):ActivatorBase(pMain)\n"\
 "{\n"\
-"   m_pMain = pMain; \n"\
+"   \n"\
 "}\n"\
 "\n"\
 "bool @PluginName@_Activator::Init()\n"\
 "{\n"\
-"    m_p@ViewName@ = new @ViewName@(m_PMain); \n"\
+"    m_p@ViewName@ = new @ViewName@(m_pMain); \n"\
 "    return true; \n"\
 "}\n"\
 "\n"\
@@ -128,6 +129,7 @@ const char ViewActivatorC[] = ""\
 "void @PluginName@_Activator::Register(R* pR)\n"\
 "{\n"\
 "    m_p@ViewName@->InitResource(pR); \n"\
+"   // pR->registerCustomWidget(\"@ViewName@\", m_p@ViewName@); \n"\
 "}";
 
 #endif // template_h__

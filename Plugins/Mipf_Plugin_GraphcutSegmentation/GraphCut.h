@@ -49,7 +49,7 @@ public:
     IndexContainer GetSinks();
 
 
-    Mask* GetSegmentMask();
+    UChar3DImageType* GetSegmentMask();
 
     void SetLambda(const float);
     void SetNumberOfHistogramBins(const int);
@@ -62,7 +62,7 @@ public:
 private:
     GraphType* m_graph;
 
-    Mask::Pointer m_segmentMask;
+    UChar3DImageType::Pointer m_segmentMask;
 
     IndexContainer m_sources;
     IndexContainer m_sinks;

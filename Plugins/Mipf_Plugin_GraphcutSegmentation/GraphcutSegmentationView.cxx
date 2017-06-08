@@ -303,12 +303,16 @@ void GraphcutSegmentationView::Init()
     InitSourceAndSinkNodes();
     InitTool();
 
-    m_bInited = true;
+    m_bInited = true; 
 }
 
 void GraphcutSegmentationView::InitSourceAndSinkNodes()
 {
-    if (m_sourceImageNode.IsNull())
+    if (m_bInited)
+    {
+        return;
+    }
+    if (1)
     {
         mitk::Color color;
         color.SetRed(0);
@@ -317,7 +321,7 @@ void GraphcutSegmentationView::InitSourceAndSinkNodes()
         m_sourceImageNode = CreateSegmentationNode(m_originMitkImage, "source", color);
         m_pMitkDataManager->GetDataStorage()->Add(m_sourceImageNode);
     }
-    if (m_sinkImageNode.IsNull())
+    if (1)
     {
         mitk::Color color;
         color.SetRed(0);
@@ -431,7 +435,7 @@ void GraphcutSegmentationView::RefreshSourceAndSink()
 
 void GraphcutSegmentationView::SaveMask()
 {
-    Mask* maskImage = m_graphcut.GetSegmentMask();
+    UChar3DImageType* maskImage = m_graphcut.GetSegmentMask();
     Float3DImageType::Pointer itkImage = Float3DImageType::New();
     ITKHelpers::DeepCopy(maskImage, itkImage.GetPointer());
 
@@ -714,7 +718,7 @@ void GraphcutSegmentationView::Segment()
     m_graphcut.SetSinks(m_sinks);
     m_graphcut.PerformSegmentation();
 
-    Mask* maskImage = m_graphcut.GetSegmentMask();
+    UChar3DImageType* maskImage = m_graphcut.GetSegmentMask();
     Float3DImageType::Pointer itkImage = Float3DImageType::New();
     ITKHelpers::DeepCopy(maskImage, itkImage.GetPointer());
 
@@ -797,9 +801,11 @@ void GraphcutSegmentationView::OnContourValueChanged(int value)
 void GraphcutSegmentationView::OnImageSelectionChanged(const mitk::DataNode* node)
 {
     m_refImageNode = (mitk::DataNode*)node;
+    m_bInited = false;
 }
 
 void GraphcutSegmentationView::OnWorkingImageSelectionChanged(const mitk::DataNode* node)
 {
     m_workImageNode = (mitk::DataNode*)node;
+    m_bInited = false;
 }

@@ -6,6 +6,7 @@ typedef float FloatPixelType;
 typedef unsigned char UCharPixelType;
 typedef int IntPixelType;
 typedef unsigned int UIntPixelType;
+typedef unsigned short UShortPixelType;
 
 typedef itk::FixedArray< int, 1 > IntVectorType1;
 
@@ -18,23 +19,28 @@ typedef itk::Image< FloatPixelType, Dimens3D >      Float3DImageType;
 typedef itk::Image< UCharPixelType, Dimens3D >      UChar3DImageType;
 typedef itk::Image< IntPixelType, Dimens3D >        Int3DImageType;
 typedef itk::Image< UIntPixelType, Dimens3D >       UInt3DImageType;
+typedef itk::Image< UShortPixelType, Dimens3D >       UShort3DImageType;
+
 typedef itk::Image< IntVectorType1, 3 > IntArray3DImageType;
 
 typedef itk::Image< FloatPixelType, Dimens2D >      Float2DImageType;
 typedef itk::Image< UCharPixelType, Dimens2D >      UChar2DImageType;
 typedef itk::Image< IntPixelType, Dimens2D >        Int2DImageType;
 typedef itk::Image< UIntPixelType, Dimens2D >       UInt2DImageType;
+typedef itk::Image< UShortPixelType, Dimens2D >       UShort2DImageType;
 
 //image pointer type
 typedef Float3DImageType::Pointer                   Float3DImagePointerType;
 typedef UChar3DImageType::Pointer                   UChar3DImagePointerType;
 typedef Int3DImageType::Pointer                     Int3DImagePointerType;
 typedef UInt3DImageType::Pointer                    UInt3DImagePointerType;
+typedef UShort3DImageType::Pointer                    UShort3DImagePointerType;
 
 typedef Float2DImageType::Pointer                   Float2DImagePointerType;
 typedef UChar2DImageType::Pointer                   UChar2DImagePointerType;
 typedef Int2DImageType::Pointer                     Int2DImagePointerType;
 typedef UInt2DImageType::Pointer                    UInt2DImagePointerType;
+typedef UShort2DImageType::Pointer                    UShort2DImagePointerType;
 
 //image const pointer type
 typedef Float3DImageType::ConstPointer                   Float3DImageConstPointerType;
@@ -64,11 +70,12 @@ typedef Float3DImageType::IndexType                   Float3DImageIndexType;
 typedef UChar3DImageType::IndexType                   UChar3DImageIndexType;
 typedef Int3DImageType::IndexType                     Int3DImageIndexType;
 typedef UInt3DImageType::IndexType                    UInt3DImageIndexType;
+typedef UShort3DImageType::IndexType                    UShort3DImageIndexType;
 
 typedef Float2DImageType::IndexType                   Float2DImageIndexType;
 typedef UChar2DImageType::IndexType                   UChar2DImageIndexType;
 typedef Int2DImageType::IndexType                     Int2DImageIndexType;
 typedef UInt2DImageType::IndexType                    UInt2DImageIndexType;
-
+typedef UShort2DImageType::IndexType                    UShort2DImageIndexType;
 
 #endif // ITKImageTypeDef_h__

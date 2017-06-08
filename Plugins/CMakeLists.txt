@@ -3,7 +3,6 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 include_directories(${PROJECT_SOURCE_DIR}/Modules/include)
 include_directories(${PROJECT_SOURCE_DIR}/Modules/interface)
 
-
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 find_package(QTFRAMEWORK REQUIRED)
@@ -24,3 +23,7 @@ add_subdirectory(Mipf_Plugin_ImageRegistration)
 add_subdirectory(Mipf_Plugin_MitkSegmentation)
 
 add_subdirectory(Mipf_Plugin_GraphcutSegmentation)
+
+add_subdirectory(Mipf_Plugin_ImageCropper)
+
+add_subdirectory(Mipf_Plugin_SFLSSegmentation)

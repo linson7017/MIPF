@@ -24,14 +24,21 @@ public:
 		m_pMitkReferences = (IQF_MitkReference*)m_pMain->GetInterfacePtr(QF_MitkMain_Reference);
 	}
     ~MitkPluginView() {}
-    void RequestRenderWindowUpdate(mitk::RenderingManager::RequestType requestType = mitk::RenderingManager::REQUEST_UPDATE_ALL)
-	{
-		if (m_pMitkRenderWindow&&m_pMitkRenderWindow->GetRenderingManager())
-		{
-			m_pMitkRenderWindow->GetRenderingManager()->RequestUpdateAll(requestType);
-		}
-	}
 protected:
+    void RequestRenderWindowUpdate(mitk::RenderingManager::RequestType requestType = mitk::RenderingManager::REQUEST_UPDATE_ALL)
+    {
+        if (m_pMitkRenderWindow)
+        {
+            if (m_pMitkRenderWindow->GetRenderingManager())
+            {
+                m_pMitkRenderWindow->GetRenderingManager()->RequestUpdateAll(requestType);
+            }       
+        }
+    }
+    mitk::DataStorage::Pointer GetDataStorage()
+    {
+        return m_pMitkDataManager->GetDataStorage();
+    }
     QList<mitk::DataNode::Pointer> GetCurrentSelection()
 	{
 		QList<mitk::DataNode::Pointer> qlistNodes;

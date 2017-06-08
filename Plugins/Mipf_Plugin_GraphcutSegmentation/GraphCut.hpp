@@ -122,11 +122,11 @@ void GraphCut<TImageType, TPixelDifferenceFunc>::PerformSegmentation()
     // Blank the output image
     //itk::ImageRegionIterator<GrayscaleImageType> segmentMaskImageIterator(m_segmentMask,
     //                                             m_segmentMask->GetLargestPossibleRegion());
-    itk::ImageRegionIterator<Mask> segmentMaskImageIterator(m_segmentMask,
+    itk::ImageRegionIterator<UChar3DImageType> segmentMaskImageIterator(m_segmentMask,
         m_segmentMask->GetLargestPossibleRegion());
     segmentMaskImageIterator.GoToBegin();
 
-    Mask::PixelType empty = 0;
+    UChar3DImageType::PixelType empty = 0;
     //empty[0] = 0;
 
     while (!segmentMaskImageIterator.IsAtEnd())
@@ -455,7 +455,7 @@ void GraphCut<TImageType, TPixelDifferenceFunc>::SetNumberOfHistogramBins(int bi
 }
 
 template <typename TImageType, typename TPixelDifferenceFunc>
-Mask* GraphCut<TImageType, TPixelDifferenceFunc>::GetSegmentMask()
+UChar3DImageType* GraphCut<TImageType, TPixelDifferenceFunc>::GetSegmentMask()
 {
     return m_segmentMask;
 }
