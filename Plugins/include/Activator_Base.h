@@ -10,7 +10,7 @@ public:
     virtual bool Init() { return true; }
     virtual const char* GetID() { return ""; }
     virtual void Register(R* pR) {}
-    virtual void Contructed(R* pR) {}
+    virtual void Constructed(R* pR) {}
 protected:
     QF::IQF_Main* m_pMain;
 };

@@ -15,7 +15,7 @@ public:
     bool Init();
     const char* GetID();
     void Register(R* pR);
-    void Contructed(R* pR);
+    void Constructed(R* pR);
 private:
     GraphcutSegmentationView* m_pGraphcutSegmentationView;
 };

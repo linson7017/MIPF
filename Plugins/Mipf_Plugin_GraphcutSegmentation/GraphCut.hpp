@@ -17,6 +17,8 @@ template <typename TImageType, typename TPixelDifferenceFunc>
 GraphCut<TImageType, TPixelDifferenceFunc>::GraphCut()
 {
     itk::MetaImageIOFactory::RegisterOneFactory();
+    m_lambda = 0.5;
+    m_numberOfHistogramBins = 32;
 }
 
 template <typename TImageType, typename TPixelDifferenceFunc>
@@ -25,21 +27,27 @@ GraphCut<TImageType, TPixelDifferenceFunc>::~GraphCut()
 }
 
 template <typename TImageType, typename TPixelDifferenceFunc>
+void GraphCut<TImageType, TPixelDifferenceFunc>::SetRegion(itk::ImageRegion<3> region)
+{
+    m_region = region;
+}
+
+template <typename TImageType, typename TPixelDifferenceFunc>
 void GraphCut<TImageType, TPixelDifferenceFunc>::SetImage(const TImageType* image)
 {
     m_image = TImageType::New();
     ITKHelpers::DeepCopy(image, m_image.GetPointer());
+    m_region = m_image->GetLargestPossibleRegion();
+    ITKHelpers::GetImageScalarRange(m_image.GetPointer(), m_scalarMin, m_scalarMax);
 
-    m_segmentMask = Mask::New();
-    m_segmentMask->SetRegions(m_image->GetLargestPossibleRegion());
+
+    m_segmentMask = UChar3DImageType::New();
+    m_segmentMask->SetRegions(m_region);
     m_segmentMask->Allocate();
 
     m_nodeImage = NodeImageType::New();
-    m_nodeImage->SetRegions(m_image->GetLargestPossibleRegion());
+    m_nodeImage->SetRegions(m_region);
     m_nodeImage->Allocate();
-
-    m_lambda = 0.5;
-    m_numberOfHistogramBins = 32; 
 
     m_foregroundHistogram = NULL;
     m_backgroundHistogram = NULL;
@@ -65,11 +73,11 @@ void GraphCut<TImageType, TPixelDifferenceFunc>::CutGraph()
     std::cout << "Max Flow Compute Cost:" << (float)m_clock.GetMean() << std::endl;
 
    
-    Mask::PixelType sinkPixel = 0;
-    Mask::PixelType sourcePixel = 255;
+    UChar3DImageType::PixelType sinkPixel = 0;
+    UChar3DImageType::PixelType sourcePixel = 255;
 
     itk::ImageRegionConstIterator<NodeImageType> nodeImageIterator(m_nodeImage,
-        m_nodeImage->GetLargestPossibleRegion());
+        m_region);
     nodeImageIterator.GoToBegin();
 
     while (!nodeImageIterator.IsAtEnd())
@@ -168,11 +176,18 @@ void GraphCut<TImageType, TPixelDifferenceFunc>::CreateSamples()
     //std::cout << "Measurement vector size: " <<m_foregroundSample->GetMeasurementVectorSize() << std::endl;
     //std::cout << "Pixel size: " << m_image->GetPixel(m_sources[0]).GetNumberOfElements() << std::endl;
 
+   int temp = 0;
+
     for (unsigned int i = 0; i < m_sources.size(); i++)
     {
-       m_foregroundSample->PushBack(m_image->GetPixel(m_sources[i]));
+        if (ITKHelpers::IndexInRegion(m_sources[i], m_region))
+        {
+            m_foregroundSample->PushBack(m_image->GetPixel(m_sources[i]));
+            temp++;
+        }
+       
     }
-
+    std::cout << "Foreground Samples: " << temp << std::endl;
     m_foregroundHistogramFilter->SetHistogramSize(histogramSize);
     m_foregroundHistogramFilter->SetHistogramBinMinimum(binMinimum);
     m_foregroundHistogramFilter->SetHistogramBinMaximum(binMaximum);
@@ -186,10 +201,19 @@ void GraphCut<TImageType, TPixelDifferenceFunc>::CreateSamples()
     // Create background samples and histogram
     m_backgroundSample->Clear();
     m_backgroundSample->SetMeasurementVectorSize(m_image->GetNumberOfComponentsPerPixel());
+
+    temp = 0;
     for (unsigned int i = 0; i < m_sinks.size(); i++)
     {
-        m_backgroundSample->PushBack(m_image->GetPixel(m_sinks[i]));
+        if (ITKHelpers::IndexInRegion(m_sinks[i], m_region))
+        {
+            m_backgroundSample->PushBack(m_image->GetPixel(m_sinks[i]));
+            temp++;
+        }
+        
     }
+    std::cout << "Foreground Samples: " << temp << std::endl;
+
 
     m_backgroundHistogramFilter->SetHistogramSize(histogramSize);
     m_backgroundHistogramFilter->SetHistogramBinMinimum(binMinimum);
@@ -206,24 +230,36 @@ void GraphCut<TImageType, TPixelDifferenceFunc>::CreateSamples()
 template <typename TImageType, typename TPixelDifferenceFunc>
 void GraphCut<TImageType, TPixelDifferenceFunc>::CreateGraph()
 {
+    std::cout << "Region Start: " << m_region.GetIndex(0)<<","
+        << m_region.GetIndex(1) << "," 
+        << m_region.GetIndex(2) << std::endl;
+    std::cout << "Region Size: " << m_region.GetSize(0) << ","
+        << m_region.GetSize(1) << ","
+        << m_region.GetSize(2) << std::endl;
+
+
     // Form the graph
-    TImageType::RegionType imageRegion = m_image->GetBufferedRegion();
-    const unsigned int numberOfPixels = imageRegion.GetNumberOfPixels();
-    
+    //TImageType::RegionType imageRegion = m_image->GetBufferedRegion();
+    const unsigned int numberOfPixels = m_region.GetNumberOfPixels();
+    long tempOutput = 0;
 
     m_graph = new GraphType(numberOfPixels, 2*numberOfPixels);
 
     // Add all of the nodes to the graph and store their IDs in a "node image"
-    itk::ImageRegionIterator<NodeImageType> nodeImageIterator(m_nodeImage, m_nodeImage->GetLargestPossibleRegion());
+   // itk::ImageRegionIterator<NodeImageType> nodeImageIterator(m_nodeImage, m_nodeImage->GetLargestPossibleRegion());
+    itk::ImageRegionIterator<NodeImageType> nodeImageIterator(m_nodeImage, m_region);
     nodeImageIterator.GoToBegin();
 
     while (!nodeImageIterator.IsAtEnd())
     {
         nodeImageIterator.Set(m_graph->add_node());
         ++nodeImageIterator;
+        tempOutput++;
     }
     m_clock.Stop();
     std::cout << "Add Node Cost:" << (float)m_clock.GetMean() << std::endl;
+    std::cout << "Node Number:" << tempOutput << std::endl;
+    tempOutput = 0;
     m_clock.Start();
 
     // Estimate the "camera noise"
@@ -250,9 +286,9 @@ void GraphCut<TImageType, TPixelDifferenceFunc>::CreateGraph()
     typename IteratorType::OffsetType back = { { 0,0,1 } };
     neighbors.push_back(back);
 
-    typename IteratorType::OffsetType center = { { 0,0 } };
+    typename IteratorType::OffsetType center = { { 0,0,0 } };
 
-    IteratorType iterator(radius, m_image, m_image->GetLargestPossibleRegion());
+    IteratorType iterator(radius, m_image, m_region);
     iterator.ClearActiveList();
     iterator.ActivateOffset(bottom);
     iterator.ActivateOffset(right);
@@ -286,10 +322,13 @@ void GraphCut<TImageType, TPixelDifferenceFunc>::CreateGraph()
             int node1 = m_nodeImage->GetPixel(iterator.GetIndex(center));
             int node2 = m_nodeImage->GetPixel(iterator.GetIndex(neighbors[i]));
             m_graph->add_edge(node1, node2, weight, weight);
+            tempOutput++;
         }
     }
     m_clock.Stop();
     std::cout << "Add Edge Cost:" << (float)m_clock.GetMean() << std::endl;
+    std::cout << "Edge Number:" << tempOutput << std::endl;
+    tempOutput = 0;
     m_clock.Start();
 
     ////////// Add t-edges and set t-edge weights (links from image nodes to virtual background and virtual foreground node) //////////
@@ -300,8 +339,8 @@ void GraphCut<TImageType, TPixelDifferenceFunc>::CreateGraph()
     std::cout << "Create Samples Cost:" << (float)m_clock.GetMean() << std::endl;
     m_clock.Start();
 
-    itk::ImageRegionIterator<TImageType> imageIterator(m_image, m_image->GetLargestPossibleRegion());
-    itk::ImageRegionIterator<NodeImageType> nodeIterator(m_nodeImage, m_nodeImage->GetLargestPossibleRegion());
+    itk::ImageRegionIterator<TImageType> imageIterator(m_image, m_region);
+    itk::ImageRegionIterator<NodeImageType> nodeIterator(m_nodeImage, m_region);
     imageIterator.GoToBegin();
     nodeIterator.GoToBegin();
 
@@ -315,10 +354,10 @@ void GraphCut<TImageType, TPixelDifferenceFunc>::CreateGraph()
         PixelType pixel = imageIterator.Get();
         //std::cout << "Pixels have size: " << pixel.Size() << std::endl;
        
-        HistogramType::MeasurementVectorType measurementVector(pixel.Size());
-        for (unsigned int i = 0; i < pixel.Size(); i++)
+        HistogramType::MeasurementVectorType measurementVector(Pixel1D);
+        for (unsigned int i = 0; i < Pixel1D; i++)
         {
-            measurementVector[i] = pixel[i];
+            measurementVector[i] = pixel;
         }
 
         HistogramType::IndexType backgroundIndex;
@@ -356,22 +395,27 @@ void GraphCut<TImageType, TPixelDifferenceFunc>::CreateGraph()
             -m_lambda*log(sourceHistogramValue)); // log() is the natural log
         ++imageIterator;
         ++nodeIterator;
+        tempOutput++;
     }
 
     // Set very high source weights for the pixels which were selected as foreground by the user
     for (unsigned int i = 0; i < m_sources.size(); i++)
     {
         m_graph->add_tweights(m_nodeImage->GetPixel(m_sources[i]), m_lambda * std::numeric_limits<float>::max(), 0);
+        tempOutput++;
     }
 
     // Set very high sink weights for the pixels which were selected as background by the user
     for (unsigned int i = 0; i < m_sinks.size(); i++)
     {
         m_graph->add_tweights(m_nodeImage->GetPixel(m_sinks[i]), 0, m_lambda * std::numeric_limits<float>::max());
+        tempOutput++;
     }
 
     m_clock.Stop();
     std::cout << "Add Twieght Cost:" << (float)m_clock.GetMean() << std::endl;
+    std::cout << "Twieght Number:" << tempOutput << std::endl;
+    tempOutput = 0;
     m_clock.Start();
 }
 
@@ -398,7 +442,7 @@ double GraphCut<TImageType, TPixelDifferenceFunc>::ComputeNoise()
 
     typename IteratorType::OffsetType center = { { 0,0,0 } };
 
-    IteratorType iterator(radius, m_image, m_image->GetLargestPossibleRegion());
+    IteratorType iterator(radius, m_image, m_region);
     iterator.ClearActiveList();
     iterator.ActivateOffset(bottom);
     iterator.ActivateOffset(right);

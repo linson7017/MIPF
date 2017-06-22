@@ -56,4 +56,13 @@ namespace ITKHelpers
         return dilatedPixelList;
     }
 
+    bool IndexInRegion(const itk::Index<3>& pixel, const itk::ImageRegion<3>& region)
+    {
+        itk::Size<3> size = region.GetSize();
+        itk::Index<3> index = region.GetIndex();
+        return  pixel[0] > index[0] && pixel[0]<index[0] + size[0] &&
+            pixel[1] > index[1] && pixel[1]<index[1] + size[1] &&
+            pixel[2] > index[2] && pixel[2] < index[2] + size[2];
+    }
+
 }

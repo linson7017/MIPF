@@ -24,6 +24,9 @@ public:
 
     virtual int GetInt(const char* szID, int bDef = 0);
     virtual void SetInt(const char* szID, int value);
+
+    virtual double GetDouble(const char* szID, double bDef = 0);
+    virtual void SetDouble(const char* szID, double value);
 private:
     QSettings* m_Settings;
     QF::IQF_Main* m_pMain;

@@ -27,3 +27,7 @@ add_subdirectory(Mipf_Plugin_GraphcutSegmentation)
 add_subdirectory(Mipf_Plugin_ImageCropper)
 
 add_subdirectory(Mipf_Plugin_SFLSSegmentation)
+
+add_subdirectory(Mipf_Plugin_Utils)
+
+add_subdirectory(Mipf_Plugin_BasicImageProcess)

@@ -316,6 +316,9 @@ void DataManagerWidget::CreateView()
         , this, SLOT(ShowInfoDialogForSelectedNodes(bool)));
     unknownDataNodeDescriptor->AddAction(actionShowInfoDialog);
     m_DescriptorActionList.push_back(std::pair<QmitkNodeDescriptor*, QAction*>(unknownDataNodeDescriptor, actionShowInfoDialog));
+
+
+
 }
 
 
@@ -712,5 +715,37 @@ void DataManagerWidget::ColorActionChanged()
 
 void DataManagerWidget::GlobalReinit(bool checked)
 {
-    m_pMitkRenderWindow->GetMitkStdMultiWidget()->ResetCrosshair();
+    mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(this->GetDataStorage());
+}
+
+void DataManagerWidget::SurfaceRepresentationMenuAboutToShow()
+{
+    mitk::DataNode* node = m_NodeTreeModel->GetNode(m_FilterModel->mapToSource(m_NodeTreeView->selectionModel()->currentIndex()));
+    if (!node)
+        return;
+
+    mitk::EnumerationProperty* representationProp =
+        dynamic_cast<mitk::EnumerationProperty*> (node->GetProperty("material.representation"));
+    if (!representationProp)
+        return;
+
+    // clear menu
+    m_SurfaceRepresentation->menu()->clear();
+    QAction* tmp;
+
+    // create menu entries
+    for (mitk::EnumerationProperty::EnumConstIterator it = representationProp->Begin(); it != representationProp->End()
+        ; it++)
+    {
+        tmp = m_SurfaceRepresentation->menu()->addAction(QString::fromStdString(it->second));
+        tmp->setCheckable(true);
+
+        if (it->second == representationProp->GetValueAsString())
+        {
+            tmp->setChecked(true);
+        }
+
+        QObject::connect(tmp, SIGNAL(triggered(bool))
+            , this, SLOT(SurfaceRepresentationActionToggled(bool)));
+    }
 }

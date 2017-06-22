@@ -7,6 +7,7 @@ class VolumeVisualizationWidget;
 class ImageNavigatorWidget;
 class MeasurementWidget;
 class ImageStatisticsWidget;
+class StatusBarWidget;
 
 class MitkStdWidgets_Activator : public ActivatorBase
 {
@@ -23,4 +24,6 @@ private:
     ImageNavigatorWidget* m_ImageNavigatorWidget;
     MeasurementWidget* m_pMeasurementWidget;
     ImageStatisticsWidget* m_pImageStatisticsWidget;
+
+    StatusBarWidget* m_StatusBarWidget;
 };

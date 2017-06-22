@@ -30,7 +30,7 @@ void Mipf_Plugin_GraphcutSegmentation_Activator::Register(R* pR)
     m_pGraphcutSegmentationView->InitResource(pR); 
 }
 
-void Mipf_Plugin_GraphcutSegmentation_Activator::Contructed(R* pR)
+void Mipf_Plugin_GraphcutSegmentation_Activator::Constructed(R* pR)
 {
-    m_pGraphcutSegmentationView->Contructed(pR);
+    m_pGraphcutSegmentationView->Constructed(pR);
 }

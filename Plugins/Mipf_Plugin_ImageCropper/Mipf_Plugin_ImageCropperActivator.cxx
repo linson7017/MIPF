@@ -18,7 +18,7 @@ Mipf_Plugin_ImageCropper_Activator::Mipf_Plugin_ImageCropper_Activator(QF::IQF_M
 
 bool Mipf_Plugin_ImageCropper_Activator::Init()
 {
-    mitk::RegisterBoundingShapeObjectFactory();
+    //mitk::RegisterBoundingShapeObjectFactory();
     m_pImageCropperView = new ImageCropperView(m_pMain); 
     return true; 
 }

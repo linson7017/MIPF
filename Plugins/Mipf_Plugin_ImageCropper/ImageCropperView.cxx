@@ -200,8 +200,8 @@ void ImageCropperView::DoCreateNewBoundingObject()
         m_CroppingObjectNode->SetProperty("color", mitk::ColorProperty::New(1.0, 1.0, 1.0));
         m_CroppingObjectNode->SetProperty("opacity", mitk::FloatProperty::New(0.6));
         m_CroppingObjectNode->SetProperty("layer", mitk::IntProperty::New(99));
-        m_CroppingObjectNode->AddProperty("handle size factor", mitk::DoubleProperty::New(1.0 / 40.0));
-        m_CroppingObjectNode->SetBoolProperty("pickable", true);
+       // m_CroppingObjectNode->AddProperty("handle size factor", mitk::DoubleProperty::New(1.0 / 40.0));
+        //m_CroppingObjectNode->SetBoolProperty("pickable", true);
 
         if (!m_pMitkDataManager->GetDataStorage()->Exists(m_CroppingObjectNode))
         {

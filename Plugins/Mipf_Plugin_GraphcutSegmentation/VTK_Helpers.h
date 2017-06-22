@@ -2,7 +2,8 @@
 #define VTK_Helpers_h__
 
 #pragma once
-#include <vtkImageData.h>
+
+#include <vtkMetaImageWriter.h>
 
 namespace VTKHelpers
 {
@@ -48,6 +49,70 @@ namespace VTKHelpers
             }
         }
         image->Modified();
+    }
+
+    void SaveVtkImageData(vtkImageData* im, const std::string& filename )
+    {
+        vtkSmartPointer<vtkMetaImageWriter> writer =
+            vtkSmartPointer<vtkMetaImageWriter>::New();
+        writer->SetInputData(im);
+        writer->SetFileName(filename.c_str());
+        std::string rawfilename = filename.substr(0, filename.find_last_of("."));
+        rawfilename.append(".raw");
+        writer->SetRAWFileName(rawfilename.c_str());
+        writer->Write();
+    }
+
+    template<typename PixelType>
+    bool FindVTKImageROI(vtkImageData* im, int* roi)
+    {
+        if (im->GetDataDimension()!=3)
+        {
+            return false;
+        }
+
+        int* DIMS;
+        long i, j, k, kk;
+        bool foundLabel;
+
+        DIMS = im->GetDimensions();
+        foundLabel = false;
+        //roi.resize(6);
+
+        for (i = 0; i < DIMS[0]; i++)
+            for (j = 0; j < DIMS[1]; j++)
+                for (k = 0; k < DIMS[2]; k++) {
+                    if (*(static_cast<PixelType*>(im->GetScalarPointer(i, j, k))) != 0) {
+
+                        if (!foundLabel) {
+                            roi[0] = i;  roi[3] = i;
+                            roi[1] = j;  roi[4] = j;
+                            roi[2] = k; roi[5] = k;
+                        }
+                        else {
+                            if (i < roi[0]) roi[0] = i;
+                            if (i > roi[1]) roi[1] = i;
+                            if (j < roi[2]) roi[2] = j;
+                            if (j > roi[3]) roi[3] = j;
+                            if (k < roi[4]) roi[4] = k;
+                            if (k > roi[5]) roi[5] = k;
+                        }
+                        foundLabel = true;
+                    }
+                }
+
+        // Get Editor Radius information
+        // TODO: get input from Editor
+        int radius = 17;
+        for (kk = 0; kk < 6; kk += 2) {
+            if (roi[kk] - radius >= 0) {
+                roi[kk] -= radius;
+            }
+            if (roi[kk + 1] + radius < DIMS[kk] - 1) {
+                roi[kk + 1] += radius;
+            }
+        }
+        return foundLabel;
     }
 }
 

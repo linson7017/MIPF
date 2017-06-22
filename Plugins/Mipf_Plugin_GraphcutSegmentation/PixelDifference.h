@@ -3,6 +3,20 @@
 
 #include <cmath>
 
+/** Compute the difference between two gray pixels. */
+template <typename TPixel>
+class
+    GrayPixelDifference
+{
+public:
+    float Difference(const TPixel& a, const TPixel& b)
+    {
+        // Compute the Euclidean distance between N dimensional pixels
+        return abs(a - b);
+    }
+};
+
+
 /** Compute the difference between two RGB pixels. */
 template <typename TPixel>
 class

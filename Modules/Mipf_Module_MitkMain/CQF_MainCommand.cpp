@@ -56,7 +56,7 @@ bool CQF_MainCommand::ExecuteCommand(const char* szCommandID, QF::IQF_PropertySe
             return false;
         }
         mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(pMitkDataManager->GetDataStorage());
-        pMitkReference->SetString("LastOpenDirectory", defaultOpenFilePath.toStdString().c_str());
+        pMitkReference->SetString("LastOpenDirectory", QFileInfo(fileNames.back()).absolutePath().toStdString().c_str());
         return true;
     }
     else

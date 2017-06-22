@@ -4,8 +4,10 @@
 #include "VolumeVisualizationWidget/VolumeVisualizationWidget.h"
 #include "ImageNavigatorWidget/ImageNavigatorWidget.h"
 #include "MeasurementWidget/MeasurementWidget.h"
+#include "StatusWidget/StatusBarWidget.h"
 //#include "MeasurementWidget/ImageStatisticsWidget.h"
 #include "Res/R.h"
+#include "QmitkWidgetsRegister.h"
 
 QF_API QF::IQF_Activator* QF::QF_CreatePluginActivator(QF::IQF_Main* pMain)
 {
@@ -23,6 +25,8 @@ MitkStdWidgets_Activator::MitkStdWidgets_Activator(QF::IQF_Main* pMain):Activato
 
 bool MitkStdWidgets_Activator::Init()
 {
+    RegisterQmitkWidgets();
+
     m_pDataManagerWidget = new DataManagerWidget(m_pMain);
     m_pDataManagerWidget->Init(NULL);
 
@@ -39,7 +43,10 @@ bool MitkStdWidgets_Activator::Init()
     m_pMeasurementWidget = new MeasurementWidget(m_pMain);
     m_pMeasurementWidget->Init(NULL);
 
-  //  m_pImageStatisticsWidget = new ImageStatisticsWidget(m_pMain);
+    m_StatusBarWidget = new StatusBarWidget();
+    m_StatusBarWidget->Init();
+
+ //  m_pImageStatisticsWidget = new ImageStatisticsWidget(m_pMain);
  //   m_pImageStatisticsWidget->Init(NULL);
 
     return true;
@@ -71,6 +78,8 @@ void MitkStdWidgets_Activator::Register(R* pR)
     //²âÁ¿²å¼þ
     m_pMeasurementWidget->InitResource(pR);
     pR->registerCustomWidget("MeasurementWidget", m_pMeasurementWidget);
+
+    pR->registerCustomWidget("StatusBarWidget", m_StatusBarWidget);
 
   //  m_pImageStatisticsWidget->InitResource(pR);
   //  pR->registerCustomWidget("ImageStatisticsWidget", m_pImageStatisticsWidget);

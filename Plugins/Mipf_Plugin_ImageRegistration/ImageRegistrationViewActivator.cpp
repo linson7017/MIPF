@@ -32,7 +32,7 @@ void ImageRegistrationView_Activator::Register(R* pR)
     m_pView->InitResource(pR);
 }
 
-void ImageRegistrationView_Activator::Contructed(R* pR)
+void ImageRegistrationView_Activator::Constructed(R* pR)
 {
-    m_pView->ResourceContructed(pR);
+    m_pView->ResourceConstructed(pR);
 }

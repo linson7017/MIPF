@@ -17,10 +17,10 @@
 #include "MitkMain/IQF_MitkRenderWindow.h"
 #include "MitkMain/IQF_MitkReference.h"
 
-#include "ctkPluginFrameworkLauncher.h"
-#include "ctkServiceReference.h"
-#include "ctkPluginContext.h"
-#include "ctkPluginException.h"
+//#include "ctkPluginFrameworkLauncher.h"
+//#include "ctkServiceReference.h"
+//#include "ctkPluginContext.h"
+//#include "ctkPluginException.h"
 
 #include <vtkQuaternion.h>
 #include <vtkMatrix3x3.h>
@@ -97,7 +97,7 @@ void MainWindow::OpenDicom()
         return;
     }
     mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(pMitkDataManager->GetDataStorage());
-    pMitkReference->SetString("LastOpenDirectory", defaultOpenFilePath.toStdString().c_str());
+    pMitkReference->SetString("LastOpenDirectory", QFileInfo(fileNames.back()).absolutePath().toStdString().c_str());
 }
 
 void MainWindow::OpenMetaImage()
@@ -112,11 +112,11 @@ void MainWindow::OpenMetaImage()
         return;
     }
     m_pMitkDataManager->Load(filename.toLocal8Bit().constData());
-    pMitkReference->SetString("LastOpenFilePath", filename.toStdString().c_str());
+    pMitkReference->SetString("LastOpenFilePath", QFileInfo(filename).absolutePath().toStdString().c_str());
 }
 
 void MainWindow::SetupWidgets(const char* xmlfile)
 {
     setContentView(xmlfile);
-    R::Instance()->Contructed();
+    R::Instance()->Constructed();
 }

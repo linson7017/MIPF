@@ -14,11 +14,11 @@ endif()
 
 project(WorkBench)
 
-find_package(CTK REQUIRED)
-include_directories(
-	${CTKCore_INCLUDE_DIRS}
-	${CTKPluginFramework_INCLUDE_DIRS}
-)
+# find_package(CTK REQUIRED)
+# include_directories(
+	# ${CTKCore_INCLUDE_DIRS}
+	# ${CTKPluginFramework_INCLUDE_DIRS}
+# )
 
 
 if("${VTK_QT_VERSION}" STREQUAL "")

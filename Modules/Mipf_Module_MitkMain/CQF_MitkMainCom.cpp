@@ -8,6 +8,8 @@
 #include "CQF_MainCommand.h"
 #include "internal/qf_interfacedef.h"
 
+#include "vtkObject.h"
+
 QF::IQF_Component* QF::QF_CreateComponentObject(QF::IQF_Main* pMain)
 {
     QF::IQF_Component* pComponent = new CQF_MitkMain(pMain);
@@ -33,6 +35,8 @@ void CQF_MitkMain::Release()
 
 bool CQF_MitkMain::Init()
 {
+    vtkObject::GlobalWarningDisplayOff();
+
     m_pMitkDataManager = new CQF_MitkDataManager(m_pMain);
     m_pMitkRenderWindow = new CQF_MitkRenderWindow;
     m_pMitkReference = new CQF_MitkReference(m_pMain);

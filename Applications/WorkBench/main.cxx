@@ -13,6 +13,9 @@
 //qfmain
 #include "iqf_main.h"
 #include "iqf_component.h"
+#include "Utils/QObjectFactory.h"
+#include "QmitkDataStorageComboBox.h"
+#include <QPushButton>
 
 
 #ifdef Q_WS_X11

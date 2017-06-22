@@ -43,7 +43,7 @@
 #include <usModuleInitialization.h>
 #include "ImageNavigationInteractor.h"
 
-mitk::NodePredicateBase::Pointer CreatePredicate(int type)
+mitk::NodePredicateBase::Pointer CreateUserPredicate(int type)
 {
     auto imageType = mitk::TNodePredicateDataType<mitk::Image>::New();
     auto labelSetImageType = mitk::TNodePredicateDataType<mitk::LabelSetImage>::New();
@@ -293,10 +293,10 @@ void ImageRegistrationView::InitResource(R* pR)
     IQF_MitkDataManager* m_pDataManager = (IQF_MitkDataManager*)m_pMain->GetInterfacePtr(QF_MitkMain_DataManager);
 
     mitk::NodePredicateData::Pointer predicate = mitk::NodePredicateData::New(0);
-    m_FixedDataStorageComboBox = new QmitkDataStorageComboBox(m_pDataManager->GetDataStorage(), CreatePredicate(4));
+    m_FixedDataStorageComboBox = new QmitkDataStorageComboBox(m_pDataManager->GetDataStorage(), CreateUserPredicate(4));
     connect(m_FixedDataStorageComboBox, SIGNAL(OnSelectionChanged(const mitk::DataNode *)), this, SLOT(OnFixedImageSelectionChanged(const mitk::DataNode *)));
 
-    m_MovingDataStorageComboBox = new QmitkDataStorageComboBox(m_pDataManager->GetDataStorage(), CreatePredicate(4));
+    m_MovingDataStorageComboBox = new QmitkDataStorageComboBox(m_pDataManager->GetDataStorage(), CreateUserPredicate(4));
     connect(m_MovingDataStorageComboBox, SIGNAL(OnSelectionChanged(const mitk::DataNode *)), this, SLOT(OnMovingImageSelectionChanged(const mitk::DataNode *)));
 
     m_pR->registerCustomWidget("FixedImageComboBox", m_FixedDataStorageComboBox);
@@ -304,7 +304,7 @@ void ImageRegistrationView::InitResource(R* pR)
 
 }
 
-void ImageRegistrationView::ResourceContructed(R* pR)
+void ImageRegistrationView::ResourceConstructed(R* pR)
 {
 
 }

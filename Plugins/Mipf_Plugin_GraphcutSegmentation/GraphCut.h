@@ -19,13 +19,12 @@
 
 //maxflow
 #include "maxflow/graph.h"
-#include "Mask.h"
 
 
 
 typedef Graph<double,double,double> GraphType;
 
-template <typename TImageType = Float3DImageType, typename TPixelDifferenceFunc = RGBPixelDifference<typename TImageType::PixelType>>
+template <typename TImageType = Float3DImageType, typename TPixelDifferenceFunc = GrayPixelDifference<typename TImageType::PixelType>>
 class GraphCut
 {
 public:
@@ -48,6 +47,8 @@ public:
     IndexContainer GetSources();
     IndexContainer GetSinks();
 
+    void SetRegion(itk::ImageRegion<3> region);
+
 
     UChar3DImageType* GetSegmentMask();
 
@@ -63,6 +64,7 @@ private:
     GraphType* m_graph;
 
     UChar3DImageType::Pointer m_segmentMask;
+    itk::ImageRegion<3> m_region;
 
     IndexContainer m_sources;
     IndexContainer m_sinks;
@@ -72,9 +74,9 @@ private:
     NodeImageType::Pointer m_nodeImage;
     
 
-
     typedef typename TImageType::PixelType PixelType;
-    typedef itk::Statistics::ListSample<PixelType> SampleType;
+    typedef typename  itk::FixedArray< PixelType, Pixel1D > VectorPixelType;
+    typedef itk::Statistics::ListSample<VectorPixelType> SampleType;
     typedef itk::Statistics::SampleToHistogramFilter<SampleType, HistogramType> SampleToHistogramFilterType;
 
 

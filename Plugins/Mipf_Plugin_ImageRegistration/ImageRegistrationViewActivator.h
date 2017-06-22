@@ -14,7 +14,7 @@ public:
     bool Init();
     const char* GetID();
     void Register(R* pR);
-    void Contructed(R* pR);
+    void Constructed(R* pR);
 private:
     ImageRegistrationView* m_pView;
 };

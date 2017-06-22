@@ -23,7 +23,7 @@ set(CMAKE_AUTOMOC ON)
 if (VTK_QT_VERSION VERSION_GREATER "4")
 
     add_library(Mipf_Plugin_GraphcutSegmentation SHARED ${SRCS} ${Headers}  ${UI_Srcs} ${MOC_Hdrs})
-    qt5_use_modules(Mipf_Plugin_GraphcutSegmentation Core Gui Widgets)
+    qt5_use_modules(Mipf_Plugin_GraphcutSegmentation Core Gui Widgets Concurrent)
     target_link_libraries(Mipf_Plugin_GraphcutSegmentation ${VTK_LIBRARIES} ${ITK_LIBRARIES} ${QTFRAMEWORK_LIBRARIES} ${QFMAIN_LIBRARIES} MitkQtWidgets MitkQtWidgetsExt MitkSegmentation)
 
 else()

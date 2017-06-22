@@ -13,6 +13,12 @@ typedef itk::FixedArray< int, 1 > IntVectorType1;
 
 const unsigned int Dimens3D = 3;
 const unsigned int Dimens2D = 2;
+const unsigned int Dimens1D = 1;
+
+const unsigned char Pixel1D = 1;
+const unsigned char Pixel2D = 2;
+const unsigned char Pixel3D = 3;
+const unsigned char Pixel4D = 4;
 
 //image type
 typedef itk::Image< FloatPixelType, Dimens3D >      Float3DImageType;

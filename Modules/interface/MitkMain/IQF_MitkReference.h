@@ -14,5 +14,8 @@ public:
 
     virtual int GetInt(const char* szID, int bDef = 0) = 0;
     virtual void SetInt(const char* szID, int value) = 0;
+
+    virtual double GetDouble(const char* szID, double bDef = 0)=0;
+    virtual void SetDouble(const char* szID, double value)=0;
 };
 #endif // IQF_MitkReference_h__

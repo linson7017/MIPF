@@ -108,7 +108,7 @@ const char ViewActivatorC[] = ""\
 "    return pActivator;\n"\
 "}\n"\
 "\n"\
-"const char @PluginName@_Activator_Activator_ID[] = \"@PluginName@_Activator_Activator_ID\";\n"\
+"const char @PluginName@_Activator_ID[] = \"@PluginName@_Activator_ID\";\n"\
 "\n"\
 "@PluginName@_Activator::@PluginName@_Activator(QF::IQF_Main* pMain):ActivatorBase(pMain)\n"\
 "{\n"\
@@ -123,7 +123,7 @@ const char ViewActivatorC[] = ""\
 "\n"\
 "const char* @PluginName@_Activator::GetID()\n"\
 "{\n"\
-"    return @PluginName@_Activator_Activator_ID; \n"\
+"    return @PluginName@_Activator_ID; \n"\
 "}\n"\
 "\n"\
 "void @PluginName@_Activator::Register(R* pR)\n"\

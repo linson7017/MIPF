@@ -106,27 +106,43 @@ namespace ITKVTKHelpers
 
     }
 
-    void GetNonzeroPixels(vtkImageData* const imageData, std::vector<itk::Index<3> >& pixels)
+    
+    class finder
     {
-        int* dims = imageData->GetDimensions();
-        for (int z = 0; z < dims[2]; z++)
+    public:
+        explicit finder(const itk::Index<3>& _t) :t(_t) {}
+        const bool operator()(const itk::Index<3>& __t)const 
+        { 
+            return (t.GetElement(0) == __t.GetElement(0))&&
+                (t.GetElement(1) == __t.GetElement(1)) &&
+                (t.GetElement(2) == __t.GetElement(2));
+        }
+    private:
+        itk::Index<3> t;
+    };
+    void GetNonzeroPixels(vtkImageData* const imageData, std::vector<itk::Index<3> >& pixels,int sampleFactor = 1)
+    {
+        int dims[3];
+        imageData->GetDimensions(dims);
+        for (int z = 0; z < dims[2]- sampleFactor; z+= sampleFactor)
         {
-            for (int y = 0; y < dims[1]; y++)
+            for (int y = 0; y < dims[1] - sampleFactor; y+= sampleFactor)
             {
-                for (int x = 0; x < dims[0]; x++)
+                for (int x = 0; x < dims[0] - sampleFactor; x+= sampleFactor)
                 {
                     int* pixel = static_cast<int*>(imageData->GetScalarPointer(x, y, z));
                     if (pixel[0]!=0)
                     {
                         itk::Index<3> index;
-                        index[0] = x;
-                        index[1] = y;
-                        index[2] = z;
+                        index[0] = x ;
+                        index[1] = y ;
+                        index[2] = z ;
                         pixels.push_back(index);
                     }
                 }
             }
         }
+        int size = pixels.size();
     }
 
 }

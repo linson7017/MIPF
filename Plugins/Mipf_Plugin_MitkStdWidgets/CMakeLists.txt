@@ -23,6 +23,7 @@ file (GLOB MultiViewsHeaders "./MultiViewsWidget/*.h")
 file (GLOB VolumeVisualizationHeaders "./VolumeVisualizationWidget/*.h")
 file (GLOB ImageNavigatorHeaders "./ImageNavigatorWidget/*.h")
 file (GLOB MeasurementHeaders "./MeasurementWidget/*.h")
+file (GLOB StatusHeaders "./StatusWidget/*.h")
 
 AUX_SOURCE_DIRECTORY(. DIR_SRCS)
 AUX_SOURCE_DIRECTORY(./DataManagerWidget DataManager_DIR_SRCS)
@@ -30,6 +31,7 @@ AUX_SOURCE_DIRECTORY(./MultiViewsWidget MultiViews_DIR_SRCS)
 AUX_SOURCE_DIRECTORY(./VolumeVisualizationWidget VolumeVisualization_DIR_SRCS)
 AUX_SOURCE_DIRECTORY(./ImageNavigatorWidget ImageNavigator_DIR_SRCS)
 AUX_SOURCE_DIRECTORY(./MeasurementWidget Measurement_DIR_SRCS)
+AUX_SOURCE_DIRECTORY(./StatusWidget Status_DIR_SRCS)
 
 set(CMAKE_AUTOMOC ON)
 
@@ -41,8 +43,8 @@ add_definitions(-DUS_MODULE_NAME)
 if(VTK_QT_VERSION VERSION_GREATER "4")
 
 add_library(Mipf_Plugin_MitkStdWidgets SHARED 
-	${DIR_SRCS} ${DataManager_DIR_SRCS} ${MultiViews_DIR_SRCS} ${VolumeVisualization_DIR_SRCS} ${ImageNavigator_DIR_SRCS} ${Measurement_DIR_SRCS}
-	${Headers} ${DataManagerHeaders} ${MultiViewsHeaders} ${VolumeVisualizationHeaders} ${ImageNavigatorHeaders} ${MeasurementHeaders}
+	${DIR_SRCS} ${DataManager_DIR_SRCS} ${MultiViews_DIR_SRCS} ${VolumeVisualization_DIR_SRCS} ${ImageNavigator_DIR_SRCS} ${Measurement_DIR_SRCS} ${Status_DIR_SRCS}
+	${Headers} ${DataManagerHeaders} ${MultiViewsHeaders} ${VolumeVisualizationHeaders} ${ImageNavigatorHeaders} ${MeasurementHeaders} ${StatusHeaders}
 	${UI_Srcs} 
 	${MOC_Hdrs})
 qt5_use_modules(Mipf_Plugin_MitkStdWidgets Core Gui Widgets)

@@ -66,3 +66,18 @@ void CQF_MitkReference::SetInt(const char* szID, int value)
     m_Settings->setValue(szID, value);
     m_Settings->endGroup();
 }
+
+double CQF_MitkReference::GetDouble(const char* szID, double bDef )
+{
+    m_Settings->beginGroup("config");
+    double value = m_Settings->value(szID, bDef).toDouble();
+    m_Settings->endGroup();
+    return value;
+}
+
+void CQF_MitkReference::SetDouble(const char* szID, double value)
+{
+    m_Settings->beginGroup("config");
+    m_Settings->setValue(szID, value);
+    m_Settings->endGroup();
+}

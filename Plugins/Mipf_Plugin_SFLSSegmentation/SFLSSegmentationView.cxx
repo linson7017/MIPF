@@ -194,8 +194,8 @@ void SFLSSegmentationView::ItkImageRSSSegmentation(itk::Image< TPixel, 3 >* itkI
     double intensityHomogeneity = m_Controls->dspbIntensityHomogeneity->value();
     double curvatureWeight = m_Controls->dspbCurvatureWeight->value();
     int        OuputMaskValue = 1.0;
-    double MaxRunningTime = 10;
-    double IteratorNum = 10000;
+    double MaxRunningTime = m_Controls->maxRunningTime->value();
+    double IteratorNum = m_Controls->maxIteratorNum->text().toDouble();
 
     typename CSFLSRobustStatSegmentor3DLabelMap<TPixel>::TLabelImage::Pointer InputMaskMap =
         preprocessLabelMap<typename CSFLSRobustStatSegmentor3DLabelMap<TPixel>::TLabelImage::PixelType>

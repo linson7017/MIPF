@@ -60,7 +60,7 @@ public slots:
     void TextureInterpolationToggled(bool checked) {}
     void ColormapMenuAboutToShow();
     void ColormapActionToggled(bool);
-    void SurfaceRepresentationMenuAboutToShow() {}
+    void SurfaceRepresentationMenuAboutToShow();
     void SurfaceRepresentationActionToggled(bool checked) {}
     void RemoveSelectedNodes(bool checked = false);
     void SaveSelectedNodes(bool checked = false);

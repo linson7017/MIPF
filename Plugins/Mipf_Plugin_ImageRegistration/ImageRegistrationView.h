@@ -28,7 +28,7 @@ public:
     ImageRegistrationView(QF::IQF_Main* pMain);
     ~ImageRegistrationView();
     void InitResource(R* pR);
-    void ResourceContructed(R* pR);
+    void ResourceConstructed(R* pR);
 protected:
     virtual void Update(const char* szMessage, int iValue = 0, void* pValue = 0);
 protected slots:
