@@ -37,6 +37,7 @@
 #include "RegistrationWorkStation.h"
 
 #include "QmitkStdMultiWidget.h"
+#include "QmitkPointListWidget.h"
 
 #include "usGetModuleContext.h"
 #include "usModuleContext.h"
@@ -255,6 +256,8 @@ void ImageRegistrationView::DoRegistration()
     } 
     cb = (QCheckBox*)m_pR->getObjectFromGlobalMap("ImageRegistration.BeginWithTranslation");
     m_RegistrationWorkStation->SetBeginWithTranslation(cb->isChecked());
+    m_RegistrationWorkStation->SetOnlyTranslation(GetGuiProperty("ImageRegistration.OnlyTranslation", "checked").toBool());
+
 
     m_RegistrationWorkStation->SetUseMultiResolution(useMultiResolutionCheckbox->isChecked());
     m_RegistrationThread = new QThread;

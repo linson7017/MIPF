@@ -4,6 +4,7 @@
 #include "ITKImageTypeDef.h"
 //Qt
 #include <QInputDialog>
+#include <QCheckBox>
 
 //qmitk
 #include "QmitkDataStorageComboBox.h"
@@ -40,7 +41,10 @@
 #include <vtkCleanPolyData.h>
 #include <vtkPolyDataNormals.h>
 #include <vtkQuadricDecimation.h>
+#include <vtkWindowedSincPolyDataFilter.h>
 #include <vtkPolyDataConnectivityFilter.h>
+
+#include "MitkSegmentation/IQF_MitkSurfaceTool.h"
 
 using namespace mitk;
 
@@ -66,6 +70,15 @@ void SurfaceExtractView::Constructed(R* pR)
         m_pImageSelector->SetPredicate(CreatePredicate(1));
         m_pImageSelector->SetDataStorage(m_pMitkDataManager->GetDataStorage());
     }
+
+    m_pSurfaceSelector = (QmitkDataStorageComboBox*)pR->getObjectFromGlobalMap("SurfaceExtract.SurfaceSelector");
+
+    if (m_pSurfaceSelector)
+    {
+        auto surfaceType = mitk::TNodePredicateDataType<mitk::Surface>::New();
+        m_pSurfaceSelector->SetPredicate(surfaceType);
+        m_pSurfaceSelector->SetDataStorage(m_pMitkDataManager->GetDataStorage());
+    }
 }
 
 void SurfaceExtractView::Update(const char* szMessage, int iValue, void* pValue)
@@ -73,19 +86,50 @@ void SurfaceExtractView::Update(const char* szMessage, int iValue, void* pValue)
     if (strcmp(szMessage, "SurfaceExtract.Extract") == 0)
     {
         m_SurfaceName = QInputDialog::getText(NULL, "Input Result Name", "Image Name:");
-        bool isDecimated = true;
+        if (m_SurfaceName.isEmpty())
+        {
+            return;
+        }
+        int smooth = 0;
+        bool largestConnect = false;
+        smooth = GetGuiProperty("SurfaceExtract.Smooth", "text").toString().toInt();
+        largestConnect = GetGuiProperty("SurfaceExtract.LargestConnect", "checked").toBool();
 
         mitk::Image* image = dynamic_cast<mitk::Image*>(m_pImageSelector->GetSelectedNode()->GetData());
 
-        ExtractSurface(image);
-        /*if (m_Watcher.isRunning())
+        if (m_Watcher.isRunning())
             m_Watcher.waitForFinished();
-        m_Future = QtConcurrent::run(this, &SurfaceExtractView::ExtractSurface, image);
-        m_Watcher.setFuture(m_Future);*/
+        m_Future = QtConcurrent::run(this, &SurfaceExtractView::ExtractSurface, image, smooth, largestConnect);
+        m_Watcher.setFuture(m_Future);
 
-        ShowResult();
+        //ShowResult();
         return;
         
+    }
+    else if (strcmp(szMessage, "SurfaceExtract.Smooth") == 0)
+    {
+        
+        IQF_MitkSurfaceTool* pSurfaceTool = (IQF_MitkSurfaceTool*)m_pMain->GetInterfacePtr(QF_MitkSurface_Tool);
+        if (pSurfaceTool)
+        {
+            int smootTimes = GetGuiProperty("SurfaceExtract.SmoothTimes", "text").toString().toInt();
+            mitk::Surface* surface = dynamic_cast<mitk::Surface*>(m_pSurfaceSelector->GetSelectedNode()->GetData());
+            vtkSmartPointer<vtkPolyData> smoothSurface = vtkSmartPointer<vtkPolyData>::New();
+            pSurfaceTool->SmoothTubeSurface(surface->GetVtkPolyData(), smoothSurface, smootTimes);
+
+            mitk::Surface::Pointer mitkSurface = mitk::Surface::New();
+            mitkSurface->SetVtkPolyData(smoothSurface);
+            
+            QString resultName = "Surface_Smoothed_";
+            resultName.append(GetGuiProperty("SurfaceExtract.SmoothTimes", "text").toString());
+            mitk::DataNode::Pointer result = mitk::DataNode::New();
+            result->SetData(mitkSurface);
+            result->SetName(resultName.toStdString());
+            result->SetColor(1.0,1.0,0.0);
+            GetDataStorage()->Add(result, m_pSurfaceSelector->GetSelectedNode());
+
+        }
+
     }
 }
 
@@ -455,119 +499,16 @@ void SurfaceExtractView::ExtractSmoothedSurface(mitk::Image* image)
     m_pSurface->SetVtkPolyData(computeNormals->GetOutput());
 }
 
-void SurfaceExtractView::ExtractSurface(mitk::Image* image)
+void SurfaceExtractView::ExtractSurface(mitk::Image* image, bool smooth, bool largestConnect)
 {
-    Float3DImageType::Pointer itkImage = Float3DImageType::New();
-    UChar3DImageType::Pointer itkForegroundImage = UChar3DImageType::New();
-    mitk::CastToItkImage<Float3DImageType>(image, itkImage);
-    GetForeground(itkImage, itkForegroundImage);
-    mitk::Image::Pointer mitkImage = mitk::Image::New();
-    mitk::CastToMitkImage<UChar3DImageType>(itkForegroundImage, mitkImage);
-
-    /*mitk::DataNode::Pointer foregroundNode = mitk::DataNode::New();
-    foregroundNode->SetData(mitkImage);
-    foregroundNode->SetName("Foreground");
-    foregroundNode->Update();
-    GetDataStorage()->Add(foregroundNode);*/
-   // return;
-
-
-
-    bool smooth = true;
-
-    bool applyMedian = true;
-
-    bool decimateMesh = true;
-
-    unsigned int medianKernelSize = 3;
-
-    float gaussianSD = 1.5;
-
-    float reductionRate = 0.8;
-
-    MITK_INFO << "Creating polygon model with smoothing " << smooth << " gaussianSD " << gaussianSD << " median "
-        << applyMedian << " median kernel " << medianKernelSize << " mesh reduction " << decimateMesh
-        << " reductionRate " << reductionRate;
-
-    ManualSegmentationToSurfaceFilter::Pointer surfaceFilter = ManualSegmentationToSurfaceFilter::New();
-    surfaceFilter->SetInput(mitkImage);
-    surfaceFilter->SetThreshold(0.5); // expects binary image with zeros and ones
-
-    surfaceFilter->SetUseGaussianImageSmooth(smooth); // apply gaussian to thresholded image ?
-    surfaceFilter->SetSmooth(smooth);
-    if (smooth)
+    IQF_MitkSurfaceTool* pSurfaceTool = (IQF_MitkSurfaceTool*)m_pMain->GetInterfacePtr(QF_MitkSurface_Tool);
+    if (pSurfaceTool)
     {
-        surfaceFilter->InterpolationOn();
-        surfaceFilter->SetGaussianStandardDeviation(gaussianSD);
+        vtkSmartPointer<vtkPolyData> polydata = vtkSmartPointer<vtkPolyData>::New();
+        pSurfaceTool->ExtractSurface(image,polydata, 50, largestConnect);
+        m_pSurface = mitk::Surface::New();
+        m_pSurface->SetVtkPolyData(polydata);
     }
-
-    surfaceFilter->SetMedianFilter3D(applyMedian); // apply median to segmentation before marching cubes ?
-    if (applyMedian)
-    {
-        surfaceFilter->SetMedianKernelSize(
-            medianKernelSize, medianKernelSize, medianKernelSize); // apply median to segmentation before marching cubes
-    }
-
-    // fix to avoid vtk warnings see bug #5390
-    if (image->GetDimension() > 3)
-        decimateMesh = false;
-
-    if (decimateMesh)
-    {
-        surfaceFilter->SetDecimate(ImageToSurfaceFilter::QuadricDecimation);
-        surfaceFilter->SetTargetReduction(reductionRate);
-    }
-    else
-    {
-        surfaceFilter->SetDecimate(ImageToSurfaceFilter::NoDecimation);
-    }
-    try
-    {
-        surfaceFilter->UpdateLargestPossibleRegion();
-    }
-    catch (std::exception e)
-    {
-        std::cout << "Extract Failed!" << std::endl;
-    }
-    
-
-    // calculate normals for nicer display
-    m_pSurface = surfaceFilter->GetOutput();
-
-    vtkPolyData *polyData = m_pSurface->GetVtkPolyData();
-
-    if (!polyData)
-        throw std::logic_error("Could not create polygon model");
-
-    polyData->SetVerts(0);
-    polyData->SetLines(0);
-
-    //largest connected ios
-    vtkSmartPointer<vtkPolyDataConnectivityFilter> confilter =
-        vtkSmartPointer<vtkPolyDataConnectivityFilter>::New();
-    confilter->SetInputData(polyData);
-    confilter->SetExtractionModeToLargestRegion();
-    confilter->Update();
-
-    if (smooth || applyMedian || decimateMesh)
-    {
-        vtkPolyDataNormals *normalsGen = vtkPolyDataNormals::New();
-
-        normalsGen->AutoOrientNormalsOn();
-        normalsGen->FlipNormalsOff();
-        normalsGen->SetInputData(confilter->GetOutput());
-        normalsGen->Update();
-
-        m_pSurface->SetVtkPolyData(normalsGen->GetOutput());
-
-        normalsGen->Delete();
-    }
-    else
-    {
-        m_pSurface->SetVtkPolyData(confilter->GetOutput());
-    }
-
-    return;
 }
 
 void SurfaceExtractView::GetForeground( Float3DImageType* image, UChar3DImageType* outputImage)

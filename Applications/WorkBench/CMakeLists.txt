@@ -21,6 +21,8 @@ project(WorkBench)
 # )
 
 
+
+
 if("${VTK_QT_VERSION}" STREQUAL "")
   message(FATAL_ERROR "VTK was not built with Qt")
 endif()
@@ -59,6 +61,9 @@ else()
   add_executable(WorkBench ${DIR_SRCS} ${Headers} ${UI_Srcs} ${MOC_Hdrs})
   target_link_libraries(WorkBench ${QT_LIBRARIES} ${VTK_LIBRARIES} ${QTFRAMEWORK_LIBRARIES} ${QFMAIN_LIBRARIES} CTKPluginFramework MitkQtWidgets MitkQtWidgetsExt )
 endif()
+
+#Release去控制台窗口
+#Set_Target_Properties(WorkBench PROPERTIES LINK_FLAGS_RELEASE "/SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup")
 
 # add_custom_command(TARGET WorkBench
   # POST_BUILD 

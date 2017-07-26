@@ -51,6 +51,10 @@ void RegistrationWorkStation::SlotDoRegistration(const Float3DImagePointerType f
                 return;
             }
         }
+        if (m_onlyTranslation)
+        {
+            return;
+        }
 
         if (m_useMultiResolution)
         {

@@ -200,8 +200,8 @@ void ImageCropperView::DoCreateNewBoundingObject()
         m_CroppingObjectNode->SetProperty("color", mitk::ColorProperty::New(1.0, 1.0, 1.0));
         m_CroppingObjectNode->SetProperty("opacity", mitk::FloatProperty::New(0.6));
         m_CroppingObjectNode->SetProperty("layer", mitk::IntProperty::New(99));
-       // m_CroppingObjectNode->AddProperty("handle size factor", mitk::DoubleProperty::New(1.0 / 40.0));
-        //m_CroppingObjectNode->SetBoolProperty("pickable", true);
+        m_CroppingObjectNode->AddProperty("handle size factor", mitk::DoubleProperty::New(1.0 / 40.0));
+        m_CroppingObjectNode->SetBoolProperty("pickable", true);
 
         if (!m_pMitkDataManager->GetDataStorage()->Exists(m_CroppingObjectNode))
         {
@@ -218,9 +218,9 @@ void ImageCropperView::DoCreateNewBoundingObject()
     tempDataStorage->InsertElement(0, m_CroppingObjectNode);
 
     // initialize the views to the bounding geometry
-    mitk::TimeGeometry::Pointer bounds = m_pMitkDataManager->GetDataStorage()->ComputeBoundingGeometry3D(tempDataStorage);
+    /*mitk::TimeGeometry::Pointer bounds = m_pMitkDataManager->GetDataStorage()->ComputeBoundingGeometry3D(tempDataStorage);
     mitk::RenderingManager::GetInstance()->InitializeViews(bounds);
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();*/
 }
 
 void ImageCropperView::OnComboBoxSelectionChanged(const mitk::DataNode* node)
@@ -462,10 +462,10 @@ void ImageCropperView::OnSelectionChanged(const QList<mitk::DataNode::Pointer>& 
 
                 if (image->GetPixelType().GetPixelType() == itk::ImageIOBase::SCALAR)
                 {
-                    // TODO: ImageStatistics Plugin? Min/Max Value?
-                    int minPixelValue = static_cast<int>(image->GetScalarValueMin());
+                    // Might be changed with the upcoming new image statistics plugin
+                    int minPixelValue = static_cast<int>(image->GetScalarValueMinNoRecompute());
                     //static_cast<int>image->GetStatistics()->GetScalarValueMinNoRecompute();
-                    int maxPixelValue = static_cast<int>(image->GetScalarValueMax());
+                    int maxPixelValue = static_cast<int>(image->GetScalarValueMaxNoRecompute());
                     //static_cast<int>image->GetStatistics()->GetScalarValueMaxNoRecompute();
                     m_Controls.spinBox->setEnabled(true);
                     m_Controls.spinBox->setMaximum(maxPixelValue);

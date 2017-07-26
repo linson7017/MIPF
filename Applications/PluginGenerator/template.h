@@ -29,7 +29,10 @@ const char CMakeListTemplate[] = ""\
 "    qt5_wrap_ui(ui_Files ${UI_Srcs})\n"\
 "    add_library(@PluginName@ SHARED ${DIR_SRCS} ${Headers} ${UI_Srcs} ${MOC_Hdrs})\n"\
 "    qt5_use_modules(@PluginName@ Core Gui Widgets)\n"\
-"    target_link_libraries(@PluginName@ @VTK_LIBRARIES@ @ITK_LIBRARIES@ @QTFRAMEWORK_LIBRARIES@ @QFMAIN_LIBRARIES@ @MitkQtWidgets@ @MitkQtWidgetsExt@)\n"\
+"    target_link_libraries(@PluginName@    \n"\
+"    @VTK_LIBRARIES@ @ITK_LIBRARIES@  @VMTK_LIBRARIES@ \n"\
+"    @QTFRAMEWORK_LIBRARIES@ @QFMAIN_LIBRARIES@   \n"\
+"    @MitkQtWidgets@ @MitkQtWidgetsExt@)\n"\
 "\n"\
 "else()\n"\
 ""\

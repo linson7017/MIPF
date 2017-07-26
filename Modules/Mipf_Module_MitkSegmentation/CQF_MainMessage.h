@@ -8,7 +8,7 @@ namespace QF
     class IQF_Main;
 }
 
-class CMitkSegmentation;
+class CQF_ManualSegmentation;
 class CQF_MainMessage : public QF::IQF_Message
 {
 public:
@@ -22,10 +22,10 @@ public:
     virtual const char* GetMessageID(int iIndex);
 
     virtual void OnMessage(const char* szMessage, int iValue, void *pValue) ;
-    void SetSegmentationImp(CMitkSegmentation* pSegmentation) { m_pSegmentation = pSegmentation; }
+    void SetSegmentationImp(CQF_ManualSegmentation* pSegmentation) { m_pSegmentation = pSegmentation; }
 private:
     QF::IQF_Main*  m_pMain;
-    CMitkSegmentation* m_pSegmentation;
+    CQF_ManualSegmentation* m_pSegmentation;
 };
 
 #endif // CQF_MainMessage_h__

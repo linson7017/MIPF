@@ -48,11 +48,11 @@ add_library(Mipf_Plugin_MitkStdWidgets SHARED
 	${UI_Srcs} 
 	${MOC_Hdrs})
 qt5_use_modules(Mipf_Plugin_MitkStdWidgets Core Gui Widgets)
-target_link_libraries(Mipf_Plugin_MitkStdWidgets ${VTK_LIBRARIES} ${QTFRAMEWORK_LIBRARIES} ${QFMAIN_LIBRARIES} MitkQtWidgets MitkQtWidgetsExt MitkQtWidgetsWeb)
+target_link_libraries(Mipf_Plugin_MitkStdWidgets ${VTK_LIBRARIES} ${QTFRAMEWORK_LIBRARIES} ${QFMAIN_LIBRARIES} MitkQtWidgets MitkQtWidgetsExt )
 
 else()
 
 add_library(Mipf_Plugin_MitkStdWidgets SHARED ${DIR_SRCS} ${Headers} ${UI_Srcs} ${MOC_Hdrs})
-target_link_libraries(Mipf_Plugin_MitkStdWidgets ${QT_LIBRARIES} ${VTK_LIBRARIES} ${QTFRAMEWORK_LIBRARIES} ${QFMAIN_LIBRARIES} MitkQtWidgets MitkQtWidgetsExt MitkQtWidgetsWeb)
+target_link_libraries(Mipf_Plugin_MitkStdWidgets ${QT_LIBRARIES} ${VTK_LIBRARIES} ${QTFRAMEWORK_LIBRARIES} ${QFMAIN_LIBRARIES} MitkQtWidgets MitkQtWidgetsExt )
 
 endif()

@@ -23,6 +23,7 @@ private:
     MaskImageView* m_pMaskImageView;
     ImageHoleFillingView* m_pImageHoleFillingView;
     SurfaceExtractView* m_surfaceExtractView;
+   
 };
 
 #endif // Mipf_Plugin_UtilsActivator_h__

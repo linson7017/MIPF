@@ -15,6 +15,7 @@
 		</HLayout>
 		<HLayout>
 			<CheckBox id="ImageRegistration.BeginWithTranslation" text="Begin With Translation" checked="true"/>
+			<CheckBox id="ImageRegistration.OnlyTranslation" text="Only Translation" checked="false"/>
 			<CheckBox id="ImageRegistration.DeformableRegistration" text="Deformable" />
 		</HLayout>
 		<Button text="Init" msgcommand="ImageRegistration.InitRegister"/>		
@@ -22,35 +23,8 @@
 		<Button text="Stop" msgcommand="ImageRegistration.StopRegister" itemProperty="ImageRegistration.AlignCenter:checked"/>
 		<Button text="Reset" msgcommand="ImageRegistration.ResetRegister" />
 		<Button text="End" msgcommand="ImageRegistration.EndRegister" />
-		<HLayout>
-			<Label text="Move Step:"/>
-			<LineEdit id="ImageRegistration.MoveStep" text="10.0"/>
-		</HLayout>
-		<HLayout>
-			<Button id="ImageRegistration.Btn.MoveXAdd" text="MoveX+"/>
-			<Button id="ImageRegistration.Btn.MoveYAdd" text="MoveY+"/>
-			<Button id="ImageRegistration.Btn.MoveZAdd" text="MoveZ+"/>
-		</HLayout>
-		<HLayout>
-			<Button id="ImageRegistration.Btn.MoveXSub" text="MoveX-"/>
-			<Button id="ImageRegistration.Btn.MoveYSub" text="MoveY-"/>
-			<Button id="ImageRegistration.Btn.MoveZSub" text="MoveZ-"/>
-		</HLayout>
-		<HLayout>
-			<Label text="Rotate Step:"/>
-			<LineEdit id="ImageRegistration.RotateStep" text="10.0"/>
-		</HLayout>
-		<HLayout>
-			<Button id="ImageRegistration.Btn.RotateXAdd" text="RotateX+"/>
-			<Button id="ImageRegistration.Btn.RotateYAdd" text="RotateY+"/>
-			<Button id="ImageRegistration.Btn.RotateZAdd" text="RotateZ+"/>
-		</HLayout>
-		<HLayout>
-			<Button id="ImageRegistration.Btn.RotateXSub" text="RotateX-"/>
-			<Button id="ImageRegistration.Btn.RotateYSub" text="RotateY-"/>
-			<Button id="ImageRegistration.Btn.RotateZSub" text="RotateZ-"/>
-		</HLayout>
-		
+
+
 		<Stretch size="400"/>
 	</VLayout>
 </Widget>

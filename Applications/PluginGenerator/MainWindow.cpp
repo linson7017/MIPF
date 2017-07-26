@@ -24,7 +24,8 @@ m_PluginDir(""),
 m_UseITK(false),
 m_UseVTK(false),
 m_UseMitkWidgets(false),
-m_UseMitkWidgetsExt(false)
+m_UseMitkWidgetsExt(false),
+m_UseVMTK(false)
 {
     m_pMain = (QF::IQF_Main*)app_env::getMainPtr();
     m_pMain->Attach(this);
@@ -128,6 +129,8 @@ void MainWindow::GenerateCMakeList()
     m_UseMitkWidgets = checkBox->isChecked();
     checkBox = (QCheckBox*)getViewByID("UseMitkWidgetsExt");
     m_UseMitkWidgetsExt = checkBox->isChecked();
+    checkBox = (QCheckBox*)getViewByID("UseVMTK");
+    m_UseVMTK = checkBox->isChecked();
 
     m_CMakeListText.replace("@PluginName@", m_PluginName);
     m_CMakeListText.replace("@QTFRAMEWORK_LIBRARIES@", "${QTFRAMEWORK_LIBRARIES}");
@@ -138,6 +141,8 @@ void MainWindow::GenerateCMakeList()
 
     m_CMakeListText.replace("@MitkQtWidgets@", m_UseMitkWidgets ? "MitkQtWidgets" : "");
     m_CMakeListText.replace("@MitkQtWidgetsExt@", m_UseMitkWidgetsExt ? "MitkQtWidgetsExt" : "");
+
+    m_CMakeListText.replace("@VMTK_LIBRARIES@", m_UseVMTK ? "${VMTK_LIBRARIES}" : "");
 
     std::cout << m_CMakeListText.toStdString() << std::endl;
 

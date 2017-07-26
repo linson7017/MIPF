@@ -123,3 +123,18 @@ void CQF_MitkRenderWindow::ResetCrossHair()
         m_StdMultiWidget->ResetCrosshair();
     }
 }
+
+void CQF_MitkRenderWindow::Reinit(mitk::DataNode* node)
+{
+    if (!node)
+    {
+        return;
+    }
+    mitk::BaseData::Pointer basedata = node->GetData();
+    if (basedata.IsNotNull() &&
+        basedata->GetTimeGeometry()->IsValid())
+    {
+        GetRenderingManager()->InitializeViews(
+            basedata->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true);
+    }
+}

@@ -35,6 +35,7 @@ private:
     bool m_UseVTK;
     bool m_UseMitkWidgets;
     bool m_UseMitkWidgetsExt;
+    bool m_UseVMTK;
 
 
 };

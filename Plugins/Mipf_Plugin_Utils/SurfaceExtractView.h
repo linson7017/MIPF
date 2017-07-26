@@ -24,10 +24,9 @@ public:
 protected:
     virtual void Update(const char* szMessage, int iValue = 0, void* pValue = 0);
     void OnSurfaceCalculationDone();
-
 protected slots:
     void ExtractSmoothedSurface(mitk::Image* image);
-    void ExtractSurface(mitk::Image* image);
+    void ExtractSurface(mitk::Image* image,bool smooth=false, bool largestConnect = false);
     void ShowResult();
 
 
@@ -35,6 +34,7 @@ protected slots:
 
 private:
     QmitkDataStorageComboBox* m_pImageSelector;
+    QmitkDataStorageComboBox* m_pSurfaceSelector;
     mitk::DataStorage::Pointer m_pDataStorage;
     mitk::Surface::Pointer m_pSurface;
 

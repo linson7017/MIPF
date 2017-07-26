@@ -30,6 +30,8 @@ public:
     virtual void SetCrossHairVisibility(bool state);
 
     virtual void ResetCrossHair();
+
+    virtual void Reinit(mitk::DataNode* node);
 private:
     QSet<QmitkRenderWindow*> m_RenderWindows;
     QHash<QString, QmitkRenderWindow*> m_RenderWindowMap;

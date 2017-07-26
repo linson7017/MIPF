@@ -199,8 +199,7 @@ void DataManagerWidget::CreateView()
     _OpacityWidgetLayout->addWidget(m_OpacitySlider);
     QWidget* _OpacityWidget = new QWidget;
     _OpacityWidget->setLayout(_OpacityWidgetLayout);
-    _OpacityWidget->setStyleSheet("QLabel {font-size:12px;color:white;font-weight:100}" \
-        "QWidget{background-color:#486178}");
+    _OpacityWidget->setStyleSheet(m_pR->getStyleResource("mainstyle")+QString("QLabel {font-size:12px;font-weight:100}" ) );
 
     QWidgetAction* opacityAction = new QWidgetAction(this);
     opacityAction->setDefaultWidget(_OpacityWidget);
@@ -224,8 +223,7 @@ void DataManagerWidget::CreateView()
     _ColorWidgetLayout->addWidget(m_ColorButton);
     QWidget* _ColorWidget = new QWidget;
     _ColorWidget->setLayout(_ColorWidgetLayout);
-    _ColorWidget->setStyleSheet("QLabel {font-size:12px;color:white;font-weight:100}" \
-        "QWidget{background-color:#486178}");
+    _ColorWidget->setStyleSheet(m_pR->getStyleResource("mainstyle")+ QString("QLabel {font-size:12px;font-weight:100}"));
 
     QWidgetAction* colorAction = new QWidgetAction(this);
     colorAction->setDefaultWidget(_ColorWidget);
@@ -363,6 +361,8 @@ void DataManagerWidget::NodeSelectionChanged(const QItemSelection & selected, co
     }
 
     m_DataManager->SetSelectedNode(selectedNodes);
+    std::cout << "Selected Node Num:" << selectedNodes.size() << std::endl;
+    std::cout << "Select Node Name:" << selectedNodes.front().GetPointer()->GetName() << std::endl;
 
     m_pMain->SendMessageQf(MITK_MESSAGE_SELECTION_CHANGED, selectedNodes.size(), m_DataManager);
 

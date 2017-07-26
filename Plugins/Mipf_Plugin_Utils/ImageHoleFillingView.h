@@ -4,18 +4,23 @@
 #pragma once
 #include "MitkPluginView.h"
 
+#include "ui_ImageHoleFillingView.h"
+
 class QmitkDataStorageComboBox;
-class ImageHoleFillingView : public MitkPluginView
+class ImageHoleFillingView :public QWidget, public MitkPluginView
 {
+    Q_OBJECT
 public:
-    ImageHoleFillingView(QF::IQF_Main* pMain);
+    ImageHoleFillingView();
     ~ImageHoleFillingView();
-    void Constructed(R* pR);
+    void CreateView();
+protected slots:
+    void FillHoles();
+
 protected:
     virtual void Update(const char* szMessage, int iValue = 0, void* pValue = 0);
-
 private:
-    QmitkDataStorageComboBox* m_pImageSelector;
+    Ui::Form m_ui;
 };
 
 #endif // ImageHoleFillingView_h__

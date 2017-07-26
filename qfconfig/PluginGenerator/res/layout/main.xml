@@ -15,5 +15,8 @@
 		<CheckBox id="UseMitkWidgets" text="MitkWidgets" checked="true"/>
 		<CheckBox id="UseMitkWidgetsExt" text="MitkWidgetsExt" checked="true"/>
 	</HLayout>
+	<HLayout>
+		<CheckBox id="UseVMTK" text="VMTK" checked="false"/>
+	</HLayout>
 	<Button text="Generate" msgcommand="Generate"/>
 </VLayout>

@@ -1,6 +1,7 @@
 #include "QmitkRegisterClasses.h"
 #include "MainWindow.h"
 #include <QApplication>
+#include <QStyleFactory>
 #include <itksys/SystemTools.hxx>
 
 
@@ -32,8 +33,12 @@ int main(int argc, char *argv[])
     /**************程序环境和Qt环境的初始化*******************/
     //初始化程序环境
     QString wk = qApp->applicationFilePath();
+    QVariant v;
+
+    
     app_env appenv(wk.toLocal8Bit().constData());
     appenv.setMainPtr(QF::QF_CreateMainObject(wk.toLocal8Bit().constData()));
+    qApp->setProperty("MainPtr", QVariant::fromValue(appenv.getMainPtr()));
     //指定qtframework工作目录，没指定则自动设置为可执行程序路径下ui_qtframework/app_name/目录
     //app_env::setWorkDir("G:/Projects/20160111/bin/ui_qtframework/UITestApp");
     //初始化qt环境
@@ -43,7 +48,9 @@ int main(int argc, char *argv[])
     //设置qt程序默认语言
     qt_context::setDefaultLanguage("Chinese");
     //设置qt程序风格
-    qt_context::setApplicationStyle("Fusion");
+    qt_context::setApplicationStyle("fusion");
+
+    qDebug() << QStyleFactory::keys();
 
     //添加qt插件库的搜索路径
 #if defined _WIN32 || defined WIN32 || defined __NT__ || defined __WIN32__

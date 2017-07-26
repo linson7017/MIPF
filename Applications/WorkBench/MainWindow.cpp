@@ -9,9 +9,6 @@
 #include "Utils/variant.h"
 
 #include "mitkRenderingManager.h"
-#include "QmitkDataStorageComboBox.h"
-#include "QmitkDataStorageTreeModel.h"
-#include "QmitkHistogramWidget.h"
 
 #include "MitkMain/IQF_MitkDataManager.h"
 #include "MitkMain/IQF_MitkRenderWindow.h"

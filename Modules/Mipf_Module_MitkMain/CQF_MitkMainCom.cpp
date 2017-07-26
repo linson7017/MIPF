@@ -58,7 +58,7 @@ const char* CQF_MitkMain::GetInterfaceID(int iID)
     switch (iID)
     {
     case 0:
-        return QF_INTERFACCE_MAIN_COMMAND;
+        return QF_INTERFACE_MAIN_COMMAND;
     case 1:
         return QF_MitkMain_RenderWindow;
     case 2:
@@ -73,7 +73,7 @@ const char* CQF_MitkMain::GetInterfaceID(int iID)
 
 void* CQF_MitkMain::GetInterfacePtr(const char* szInterfaceID)
 {
-    if (strcmp(szInterfaceID, QF_INTERFACCE_MAIN_COMMAND) == 0)
+    if (strcmp(szInterfaceID, QF_INTERFACE_MAIN_COMMAND) == 0)
     {
         return m_pMainCommand;
     }

@@ -12,6 +12,7 @@
 	<Command id="toggleMeasurementDockWidget" type="ToggleWidget" widgetID="main.MeasurementDocWidget"/>
 	<Command id="toggleImageRegistrationDockWidget" type="ToggleWidget" widgetID="main.ImageRegistrationDocWidget"/>
 	<Command id="toggleSegmentationDocWidget" type="ToggleWidget" widgetID="main.SegmentationDocWidget"/>
+	<Command id="toggleGraphcutSegmentationDocWidget" type="ToggleWidget" widgetID="main.GraphcutSegmentationDocWidget"/>
 	
 	<Command id="toggleNDIDockWidget" type="ToggleWidget" widgetID="main.NDIDocWidget"/>
 	

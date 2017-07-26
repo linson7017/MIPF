@@ -168,7 +168,7 @@ void MainWindow::GenerateSourceFiles()
         }
         if (!m_UseMessage)
         {
-            text.replace("#include \"CQF_@MessageName@Command.h\"", "");
+            text.replace("#include \"@MessageName@.h\"", "");
             text.replace("m_pMainMessage->Release();", "");
             text.replace("m_pMainMessage = new @MessageName@(m_pMain);", "");
             text.replace("return m_pMainMessage;", "return NULL;");

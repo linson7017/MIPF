@@ -2,6 +2,7 @@
 #define PluginView_h__
 #include "iqf_observer.h"
 #include "MitkMain/mitk_main_msg.h"
+#include "UIs/QF_Plugin.h"
 
 namespace QF
 {
@@ -9,13 +10,20 @@ namespace QF
 }
 class R;
 
-class PluginView : public QF::IQF_Observer
+class PluginView :public QF::QF_Plugin,  public QF::IQF_Observer
 {
 public:
+    PluginView() :m_pMain(0), m_pR(0), m_bActivated(false)
+    {
+    }
     PluginView(QF::IQF_Main* pMain) :m_pMain(pMain),m_pR(0), m_bActivated(false) 
     {
     }
     //override
+    virtual void SetMainPtr(QF::IQF_Main* pMain)
+    {
+        m_pMain = pMain;
+    }
 	virtual void InitResource(R* pR)
 	{
 		m_pR = pR; 

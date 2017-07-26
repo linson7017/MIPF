@@ -84,4 +84,36 @@ typedef Int2DImageType::IndexType                     Int2DImageIndexType;
 typedef UInt2DImageType::IndexType                    UInt2DImageIndexType;
 typedef UShort2DImageType::IndexType                    UShort2DImageIndexType;
 
+
+struct IndexSortCriterion {
+public:
+    bool operator() (const itk::Index<3> &a, const itk::Index<3> &b) const {
+        /*先比较名字；若名字相同，则比较年龄。小的返回true*/
+        if (a.GetElement(0) < b.GetElement(0))
+            return true;
+        else if (a.GetElement(0) == b.GetElement(0))
+        {
+            if (a.GetElement(1) < b.GetElement(1))
+            {
+                return true;
+            }
+            else if (a.GetElement(1) == b.GetElement(1))
+            {
+                if (a.GetElement(2) < b.GetElement(2))
+                {
+                    return true;
+                }
+                else
+                    return false;
+            }
+            else
+                return false;
+        }
+        else
+            return false;
+    }
+};
+
+typedef std::set<itk::Index<3>, IndexSortCriterion > IndexContainer;
+
 #endif // ITKImageTypeDef_h__

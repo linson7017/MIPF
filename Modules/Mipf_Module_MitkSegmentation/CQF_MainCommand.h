@@ -14,7 +14,7 @@
 namespace QF {
 	class IQF_Main;
 }
-class CMitkSegmentation;
+class CQF_ManualSegmentation;
 
 class CQF_MainCommand :public QF::IQF_Command
 {
@@ -26,10 +26,10 @@ public:
 	virtual int GetCommandCount();
 	virtual const char* GetCommandID(int iIndex);
 
-    void SetSegmentationImp(CMitkSegmentation* pSegmentation) { m_pSegmentation = pSegmentation; }
+    void SetSegmentationImp(CQF_ManualSegmentation* pSegmentation) { m_pSegmentation = pSegmentation; }
 private:
 	QF::IQF_Main* m_pMain;
-    CMitkSegmentation* m_pSegmentation;
+    CQF_ManualSegmentation* m_pSegmentation;
 
     mitk::DataNode* m_refNode;
     mitk::DataNode* m_workingNode;

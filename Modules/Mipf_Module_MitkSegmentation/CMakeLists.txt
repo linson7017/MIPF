@@ -19,5 +19,10 @@ AUX_SOURCE_DIRECTORY(. DIR_SRCS)
 
 FIND_PACKAGE(PocoFoundation REQUIRED)
 
+set(CMAKE_AUTOMOC ON)
+
+#add_definitions(-DUS_MODULE_NAME)
+
 add_library(Mipf_Module_MitkSegmentation SHARED ${DIR_SRCS} ${Headers} )
-target_link_libraries(Mipf_Module_MitkSegmentation ${QFMAIN_LIBRARIES} ${QFCOMMON_LIBRARIES} MitkCore MitkQtWidgets MitkQtWidgetsExt MitkSegmentation MitkSegmentationUI)
+qt5_use_modules(Mipf_Module_MitkSegmentation Core  Concurrent)
+target_link_libraries(Mipf_Module_MitkSegmentation ${QFMAIN_LIBRARIES} ${QFCOMMON_LIBRARIES} MitkCore MitkQtWidgets MitkQtWidgetsExt MitkSegmentation MitkSegmentationUI MitkMultilabel)

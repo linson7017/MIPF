@@ -6,7 +6,8 @@
 
 class CQF_MainCommand;
 class CQF_MainMessage;
-class CMitkSegmentation;
+class CQF_ManualSegmentation;
+class CQF_SurfaceTool;
 
 class CQF_MitkSegmentationCom :public QF::IQF_Component
 {
@@ -23,7 +24,8 @@ private:
     CQF_MainCommand* m_pMainCommand;
     CQF_MainMessage* m_pMainMessage;
 
-    CMitkSegmentation* m_pSegmentation;
+    CQF_ManualSegmentation* m_pSegmentation;
+    CQF_SurfaceTool* m_pSurfaceTool;
 
 	QF::IQF_Main* m_pMain;
 };

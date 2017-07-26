@@ -2,6 +2,7 @@
 #define MitkPluginView_h__
 
 #include "PluginView.h"
+#include "Res/R.h"
 
 #include "mitkRenderingManager.h"
 #include <QList>
@@ -29,13 +30,21 @@ class IQF_MitkRenderWindow;
 class MitkPluginView : public PluginView
 {
 public:
+    MitkPluginView() :PluginView()
+    {
+    }
     MitkPluginView(QF::IQF_Main* pMain):PluginView(pMain)
 	{
-		m_pMitkDataManager = (IQF_MitkDataManager*)m_pMain->GetInterfacePtr(QF_MitkMain_DataManager);
-		m_pMitkRenderWindow = (IQF_MitkRenderWindow*)m_pMain->GetInterfacePtr(QF_MitkMain_RenderWindow);
-		m_pMitkReferences = (IQF_MitkReference*)m_pMain->GetInterfacePtr(QF_MitkMain_Reference);
+        SetMainPtr(pMain);
 	}
     ~MitkPluginView() {}
+    virtual void SetMainPtr(QF::IQF_Main* pMain)
+    {
+        m_pMain = pMain;
+        m_pMitkDataManager = (IQF_MitkDataManager*)m_pMain->GetInterfacePtr(QF_MitkMain_DataManager);
+        m_pMitkRenderWindow = (IQF_MitkRenderWindow*)m_pMain->GetInterfacePtr(QF_MitkMain_RenderWindow);
+        m_pMitkReferences = (IQF_MitkReference*)m_pMain->GetInterfacePtr(QF_MitkMain_Reference);
+    }
 protected:
     void RequestRenderWindowUpdate(mitk::RenderingManager::RequestType requestType = mitk::RenderingManager::REQUEST_UPDATE_ALL)
     {
@@ -64,6 +73,40 @@ protected:
     void BusyCursorOff()
     {
         QApplication::restoreOverrideCursor();
+    }
+    QVariant GetGuiProperty(const char* guiId,const char* propertyID)
+    {
+        if (m_pR)
+        {
+            QObject* obj = (QObject*)m_pR->getObjectFromGlobalMap(guiId);
+            if (obj)
+            {
+                return obj->property(propertyID);
+            }
+            else
+            {
+                return QVariant(NULL);
+            }
+        }
+        else
+        {
+            return QVariant(NULL);
+        }
+    }
+    bool SetGuiProperty(const char* guiId, const char* propertyID, const QVariant& value)
+    {
+        if (m_pR)
+        {
+            QObject* obj = (QObject*)m_pR->getObjectFromGlobalMap(guiId);
+            if (obj)
+            {
+                obj->setProperty(propertyID, value);
+            }
+        }
+        else
+        {
+            return false;
+        }
     }
     static void CastFromStdNodesToQListNodes(std::vector<mitk::DataNode::Pointer>& stdNodes, QList<mitk::DataNode::Pointer>& qlistNodes)
 	{

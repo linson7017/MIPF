@@ -118,7 +118,7 @@ void ItkAlgorithmSetView::Update(const char* szMessage, int iValue, void* pValue
             slider->setValue(image->GetScalarValueMin());          
         }
     }
-    else if (strcmp(szMessage, "MITK_MESSAGE_MULTIWIDGET_INIT") == 0)
+    else if (strcmp(szMessage, MITK_MESSAGE_MULTIWIDGET_INIT) == 0)
     {
         IQF_MitkRenderWindow* pRenderWindow = (IQF_MitkRenderWindow*)m_pMain->GetInterfacePtr(QF_MitkMain_RenderWindow);
         if (pRenderWindow)

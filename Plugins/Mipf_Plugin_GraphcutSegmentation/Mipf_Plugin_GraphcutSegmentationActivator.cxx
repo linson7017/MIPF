@@ -27,7 +27,7 @@ const char* Mipf_Plugin_GraphcutSegmentation_Activator::GetID()
 
 void Mipf_Plugin_GraphcutSegmentation_Activator::Register(R* pR)
 {
-    m_pGraphcutSegmentationView->InitResource(pR); 
+    //m_pGraphcutSegmentationView->InitResource(pR); 
 }
 
 void Mipf_Plugin_GraphcutSegmentation_Activator::Constructed(R* pR)

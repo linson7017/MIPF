@@ -18,6 +18,8 @@
 #include <mitkContourModelSet.h>
 #include <mitkToolManager.h>
 #include <mitkToolManagerProvider.h>
+#include <mitkSurfaceBasedInterpolationController.h>
+#include <mitkMesh.h>
 
 #include <mitkImageToSurfaceFilter.h>
 #include <mitkImagePixelAccessor.h>
@@ -35,21 +37,42 @@
 
 #include <vtkPolyData.h>
 #include <vtkImageWeightedSum.h>
+#include <vtkImageDataToPointSet.h>
+#include <vtkXMLStructuredGridWriter.h>
+#include <vtkImageResample.h>
 
 #include "VTK_Helpers.h"
 #include "ITKVTK_Helpers.h"
 #include "ITK_Helpers.h"
 #include "vtkExtractVOI.h"
 #include "vtkImageMathematics.h"
+#include "itkBinaryMaskToNarrowBandPointSetFilter.h"
 
 #include <itkRescaleIntensityImageFilter.h>
 #include "itkCurvatureFlowImageFilter.h"
-#include "itkSurfaceInfoCombineImageFilter.h"
 #include "itkRegionOfInterestImageFilter.h"
+#include "itkBinaryMaskToNarrowBandPointSetFilter.h"
+#include "itkConnectedComponentImageFilter.h"
+#include "itkLabelShapeKeepNObjectsImageFilter.h"
+#include "itkRescaleIntensityImageFilter.h"
+#include  "itkWindowedSincInterpolateImageFunction.h"
+#include "itkLabelImageGaussianInterpolateImageFunction.h"
+#include "itkNearestNeighborInterpolateImageFunction.h"
+#include "itkLabelImageGenericInterpolateImageFunction.h"
+#include "itkBinaryImageToShapeLabelMapFilter.h"
+#include "itkShapeOpeningLabelMapFilter.h"
+
+#include "mitkPixelType.h"
 
 #include "mitkSurfaceToImageFilter.h"
 
-#include "mitkStatusBar.h"
+#include "MitkSegmentation/IQF_MitkSegmentationTool.h"
+#include "MitkStd/IQF_MitkPointList.h"
+#include "MitkImageUtils/IQF_MitkImageCropper.h"
+
+#include "Segmentation/IQF_SegmentationMethodFactory.h"
+
+#include "ITKBasicAlgorithms.h"
 
 
 mitk::NodePredicateBase::Pointer CreateUserPredicate(int type)
@@ -105,9 +128,15 @@ mitk::NodePredicateBase::Pointer CreateUserPredicate(int type)
 
 
 
-GraphcutSegmentationView::GraphcutSegmentationView(QF::IQF_Main* pMain) :MitkPluginView(pMain), m_bInited(false), m_tool(NULL), m_bPaintForeground(true)
-, m_SurfaceInterpolator(mitk::SurfaceInterpolationController::GetInstance())
+GraphcutSegmentationView::GraphcutSegmentationView(QF::IQF_Main* pMain) :MitkPluginView(pMain), 
+m_bInited(false), 
+m_tool(NULL), 
+m_bPaintForeground(true),
+m_sourceSinkNode(NULL)
+, m_SurfaceInterpolator(mitk::SurfaceInterpolationController::GetInstance()) ,
+m_bSampleRate(-1)
 {
+    m_currentResultName = "";
     m_pMain->Attach(this);
     m_roi[0] = 0;
     m_roi[1] = 0;
@@ -122,6 +151,11 @@ GraphcutSegmentationView::GraphcutSegmentationView(QF::IQF_Main* pMain) :MitkPlu
     /*SurfaceInterpolationInfoChangedObserverTag = m_SurfaceInterpolator->AddObserver(itk::ModifiedEvent(), command2);
     m_SurfaceInterpolator->SetDataStorage(m_pMitkDataManager->GetDataStorage());
     connect(&m_Watcher, SIGNAL(finished()), this, SLOT(OnSurfaceInterpolationFinished()));*/
+
+    m_pSegTool = (IQF_MitkSegmentationTool*)m_pMain->GetInterfacePtr(QF_MitkSegmentation_Tool);
+
+    IQF_SegmentationMethodFactory* pFactory = (IQF_SegmentationMethodFactory*)m_pMain->GetInterfacePtr(QF_Segmentation_Factory);
+    m_graphcut = pFactory->CreateGraphcutSegmentationMethod();
 }
 
 
@@ -182,7 +216,7 @@ void GraphcutSegmentationView::OnSurfaceInterpolationInfoChanged(const itk::Even
 void GraphcutSegmentationView::OnSurfaceInterpolationFinished()
 {
     mitk::Surface::Pointer interpolatedSurface = m_SurfaceInterpolator->GetInterpolationResult();
-    if (interpolatedSurface.IsNotNull() && m_sourceImageNode )
+    if (interpolatedSurface.IsNotNull() && m_sourceSinkNode )
     {
         m_InterpolatedSinkSurfaceNode->SetData(interpolatedSurface);
 
@@ -204,6 +238,20 @@ void GraphcutSegmentationView::OnSurfaceInterpolationFinished()
 
 }
 
+void GraphcutSegmentationView::EstimationSampleRate()
+{
+    mitk::Image* image = dynamic_cast<mitk::Image*>(m_refImageNode->GetData());
+    unsigned int* dimens = image->GetDimensions();
+    unsigned long imageSize = dimens[0]* dimens[1]* dimens[2];
+    std::cout << "Image Size:" << imageSize << std::endl;
+    m_bSampleRate = pow((double)imageSize/10000000,1.0/3.0);
+    if (m_bSampleRate<1)
+    {
+        m_bSampleRate = 1;
+    }
+    std::cout << "Sample Rate:" << m_bSampleRate << std::endl;
+}
+
 void GraphcutSegmentationView::Run3DInterpolation()
 {
     m_SurfaceInterpolator->Interpolate();
@@ -212,7 +260,7 @@ void GraphcutSegmentationView::Run3DInterpolation()
 void GraphcutSegmentationView::GeneratedInterpolatedSourceAndSink()
 {
     //source 
-    mitk::Image *sourceImage = dynamic_cast<mitk::Image *>(m_sourceImageNode->GetData());
+    mitk::Image *sourceImage = dynamic_cast<mitk::Image *>(m_sourceSinkNode->GetData());
     m_SurfaceInterpolator->SetCurrentInterpolationSession(sourceImage);
     m_SurfaceInterpolator->Interpolate();
     mitk::Surface::Pointer interpolatedSurface = m_SurfaceInterpolator->GetInterpolationResult();
@@ -221,22 +269,9 @@ void GraphcutSegmentationView::GeneratedInterpolatedSourceAndSink()
         m_InterpolatedSourceSurfaceNode->SetData(interpolatedSurface);
         m_InterpolatedSourceSurfaceNode->SetName("Source Surface");
         GetDataStorage()->Add(m_InterpolatedSourceSurfaceNode);
-        ConvertSurfaceToImage(interpolatedSurface, m_originMitkImage,static_cast<mitk::Image*>(m_sourceImageNode->GetData()));
+        ConvertSurfaceToImage(interpolatedSurface, m_originMitkImage,static_cast<mitk::Image*>(m_sourceSinkNode->GetData()));
     }
 
-    //sink
-    mitk::Image *sinkImage = dynamic_cast<mitk::Image *>(m_sinkImageNode->GetData());
-    m_SurfaceInterpolator->SetCurrentInterpolationSession( sinkImage);
-    m_SurfaceInterpolator->Interpolate();
-    interpolatedSurface = m_SurfaceInterpolator->GetInterpolationResult();
-    if (interpolatedSurface)
-    {
-        m_InterpolatedSinkSurfaceNode->SetData(interpolatedSurface);
-        m_InterpolatedSinkSurfaceNode->SetName("sink Surface");
-        GetDataStorage()->Add(m_InterpolatedSinkSurfaceNode);
-        ConvertSurfaceToImage(interpolatedSurface, m_originMitkImage, static_cast<mitk::Image*>(m_sinkImageNode->GetData()));
-    }
-    RequestRenderWindowUpdate();
 }
 
 void GraphcutSegmentationView::ConvertSurfaceToImage(mitk::Surface* surface, mitk::Image* referenceImage, mitk::Image* output)
@@ -270,20 +305,7 @@ void GraphcutSegmentationView::ConvertSurfaceToImage(mitk::Surface* surface, mit
 
 void GraphcutSegmentationView::Update(const char* szMessage, int iValue, void* pValue)
 {
-    if (strcmp(szMessage, "MITK_MESSAGE_GRAPHCUT_CREATE_NEW_SEGMENTATION") == 0)
-    {
-        //do what you want for the message
-        if (!m_refImageNode)
-        {
-            return;
-        }
-        mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(m_refImageNode->GetData());
-        mitk::DataNode::Pointer segNode = CreateSegmentationNode(image.GetPointer(), "", mitk::Color());
-        segNode->SetColor(1, 0, 0);
-        segNode->SetName("seg");
-        m_pMitkDataManager->GetDataStorage()->Add(segNode);
-    }
-    else if (strcmp(szMessage, "MITK_MESSAGE_GRAPHCUT_INIT") == 0)
+    if (strcmp(szMessage, "MITK_MESSAGE_GRAPHCUT_INIT") == 0)
     {
         Init();
     }
@@ -315,7 +337,6 @@ void GraphcutSegmentationView::Update(const char* szMessage, int iValue, void* p
         name.append(lineEdit->text().toStdString());
         resampleNode->SetData(mitkImage);
         resampleNode->SetName(name);
-        resampleNode->SetColor(0, 1, 0);
         resampleNode->Update();
         m_pMitkDataManager->GetDataStorage()->Add(resampleNode);
 
@@ -325,23 +346,26 @@ void GraphcutSegmentationView::Update(const char* szMessage, int iValue, void* p
         VarientMap* vm= (VarientMap*)pValue;
         variant v = variant::GetVariant(*vm, "text");
         QString vs = v.getString();
-        m_graphcut.SetLambda(vs.toDouble());
+        m_graphcut->SetLambda(vs.toDouble());
+        m_graphcut->Init();
     }
     else if (strcmp(szMessage, "MITK_MESSAGE_GRAPHCUT_HISTOGRAMBINS_CHANGED") == 0)
     {
         VarientMap* vm = (VarientMap*)pValue;
         variant v = variant::GetVariant(*vm, "text");
         QString vs = v.getString();
-        m_graphcut.SetNumberOfHistogramBins(vs.toInt());
+        m_graphcut->SetNumberOfHistogramBins(vs.toInt());
+        m_graphcut->Init();
     }
     else if (strcmp(szMessage, "MITK_MESSAGE_GRAPHCUT_PENSIZE_CHANGED") == 0)
     {
         if (m_tool)
         {
             VarientMap* vm = (VarientMap*)pValue;
-            variant v = variant::GetVariant(*vm, "text");
-            QString vs = v.getString();
-            m_tool->SetSize(vs.toDouble());
+            variant v = variant::GetVariant(*vm, "object");
+            QObject* obj = (QObject*)v.getPtr();
+            QVariant qv = obj->property("value");
+            m_tool->SetSize(qv.toInt());
         }
         
     }
@@ -362,10 +386,6 @@ void GraphcutSegmentationView::Update(const char* szMessage, int iValue, void* p
         {
             SwitchToBackground();
         }
-    }
-    else if (strcmp(szMessage, "MITK_MESSAGE_GRAPHCUT_GENERATESURFACE") == 0)
-    {
-        GenerateSurface();
     }
     else if (strcmp(szMessage, "MITK_MESSAGE_GRAPHCUT_BEGIN_PAINT") == 0)
     {
@@ -399,8 +419,117 @@ void GraphcutSegmentationView::Update(const char* szMessage, int iValue, void* p
     {
         GeneratedInterpolatedSourceAndSink();
     }
+    else if (strcmp(szMessage, "MITK_MESSAGE_GRAPHCUT_GENERATE_NARROWBAND") == 0)
+    {
+        QmitkDataStorageComboBox* coarseImageComboBox = 
+            (QmitkDataStorageComboBox*)R::Instance()->getObjectFromGlobalMap("GraphcutSegmentation.CoarseImageSelector");
+       if (coarseImageComboBox)
+       {
+           mitk::DataNode* node = coarseImageComboBox->GetSelectedNode();     
+           if (node&&node->GetData())
+           {
+
+               node->SetFloatProperty("AffineBaseDataInteractor3D.Anchor Point X", node->GetData()->GetGeometry()->GetOrigin()[0]);
+               mitk::Image* mitkImage = dynamic_cast<mitk::Image*>(node->GetData());
+               UChar3DImageType::Pointer itkImage = UChar3DImageType::New();
+               mitk::CastToItkImage<UChar3DImageType>(mitkImage, itkImage);
+               ITKHelpers::Resample<UChar3DImageType, UChar3DImageType>(itkImage, itkImage, 0.5);
+
+               UChar3DImageType::Pointer narrowBandImage = UChar3DImageType::New();
+               ITKHelpers::GenerateNarrowBandImage<UChar3DImageType, UChar3DImageType>(itkImage, narrowBandImage, 1);
+
+
+               mitk::Image::Pointer nbMitkImage = mitk::Image::New();
+               mitk::DataNode::Pointer nbMitkNode = mitk::DataNode::New();
+               mitk::CastToMitkImage(narrowBandImage, nbMitkImage);
+               nbMitkNode->SetData(nbMitkImage);
+               nbMitkNode->SetName("Narrow Band");
+               GetDataStorage()->Add(nbMitkNode);
+           }           
+       }
+    }
+    else if (strcmp(szMessage, "MITK_MESSAGE_GRAPHCUT_EXTRACT_ROI") == 0)
+    {
+        ExtractROI();
+    }
     
 }
+
+void GraphcutSegmentationView::CropImage()
+{
+    IQF_MitkImageCropper* pCropper = (IQF_MitkImageCropper*)m_pMain->GetInterfacePtr(QF_MitkImageUtils_ImageCropper);
+    mitk::DataNode::Pointer cropNode = mitk::DataNode::New();
+    pCropper->CreateBoundingBoxNode(m_refImageNode, cropNode, "crop");
+}
+
+void GraphcutSegmentationView::ExtractROI()
+{
+    CropImage();
+    return;
+
+    mitk::Image* image = dynamic_cast<mitk::Image*>(m_sourceSinkNode->GetData());
+    UShort3DImageType::Pointer itkImage;
+    mitk::CastToItkImage(image, itkImage);
+
+    typedef itk::BinaryThresholdImageFilter<UShort3DImageType, UShort3DImageType>  btImageFilterType;
+    btImageFilterType::Pointer btFilter = btImageFilterType::New();
+    btFilter->SetInput(itkImage);
+    btFilter->SetLowerThreshold(1);
+    btFilter->SetUpperThreshold(1);
+    btFilter->SetInsideValue(1);
+    btFilter->SetOutsideValue(0);
+    btFilter->Update();
+
+    typedef itk::BinaryImageToShapeLabelMapFilter<UShort3DImageType> BinaryImageToShapeLabelMapFilterType;
+    BinaryImageToShapeLabelMapFilterType::Pointer binaryImageToShapeLabelMapFilter = BinaryImageToShapeLabelMapFilterType::New();
+    binaryImageToShapeLabelMapFilter->SetInputForegroundValue(1);
+    binaryImageToShapeLabelMapFilter->SetInput(btFilter->GetOutput());
+    binaryImageToShapeLabelMapFilter->Update();
+   
+
+    std::cout << "Label Object:" << binaryImageToShapeLabelMapFilter->GetOutput()->GetNumberOfLabelObjects() << std::endl;
+    for (unsigned int i = 0; i < binaryImageToShapeLabelMapFilter->GetOutput()->GetNumberOfLabelObjects(); i++)
+    {
+        BinaryImageToShapeLabelMapFilterType::OutputImageType::LabelObjectType* labelObject = binaryImageToShapeLabelMapFilter->GetOutput()->GetNthLabelObject(i);
+        std::cout << "Object " << i << " has bounding box " << labelObject->GetBoundingBox() << std::endl;
+        std::cout << "Object " << i << "Center " << labelObject->GetCentroid().GetElement(0) <<","
+            << labelObject->GetCentroid().GetElement(1) << ","
+            << labelObject->GetCentroid().GetElement(2)<< std::endl;
+    }
+
+    //m_pCropObject = mitk::GeometryData::New();
+    //m_pCropObjectNode = mitk::GeometryData::New();
+
+    IQF_PointListFactory* pFactory = (IQF_PointListFactory*)m_pMain->GetInterfacePtr(QF_MitkStd_PointListFactory);
+    IQF_MitkPointList* pList = pFactory->CreatePointList();
+    pList->Initialize();
+    mitk::DataNode::Pointer pointsNode = mitk::DataNode::New();
+    pList->CreateNewPointSetNode(pointsNode);
+    itk::Point<double, 3> center = binaryImageToShapeLabelMapFilter->GetOutput()->GetNthLabelObject(0)->GetCentroid();
+    double width = 100;
+    double height = 100;
+    double depth = 100;
+    int temp = 1;
+    for (int i=-1;i<2;i+=2)
+    {
+        for (int j = -1; j < 2; j += 2)
+        {
+            for (int k = -1; k < 2; k += 2)
+            {
+                itk::Point<double, 3> p;
+                std::cout << "Point " << temp << ":" << center.GetElement(0) + i*width << ","
+                    << center.GetElement(1) + j*height << ","
+                    << center.GetElement(2) + k*depth << std::endl;
+                    temp++;
+                pList->InsertPoint(center.GetElement(0) + i*width,
+                    center.GetElement(1) + j*height,
+                    center.GetElement(2) + k*depth);
+            }
+        }
+    }
+
+}
+
 
 void GraphcutSegmentationView::Reset()
 {
@@ -410,8 +539,7 @@ void GraphcutSegmentationView::Reset()
     m_pMitkDataManager->GetDataStorage()->Remove(m_pMitkDataManager->GetDataStorage()->GetNamedNode("source"));
     m_pMitkDataManager->GetDataStorage()->Remove(m_pMitkDataManager->GetDataStorage()->GetNamedNode("sink"));
     m_pMitkDataManager->GetDataStorage()->Remove(m_pMitkDataManager->GetDataStorage()->GetNamedNode("Result"));
-    m_sourceImageNode=NULL;
-    m_sinkImageNode= NULL;
+    m_sourceSinkNode = NULL;
     InitSourceAndSinkNodes();
     
 }
@@ -422,6 +550,12 @@ void GraphcutSegmentationView::Init()
     {
         return;
     }
+    m_currentResultName = QInputDialog::getText(NULL, "Input Result Name", "Image Name:");
+    if (m_currentResultName.isEmpty())
+    {
+        return;
+    }
+
     m_originMitkImage = dynamic_cast<mitk::Image*>(m_refImageNode->GetData());
     mitk::BaseGeometry* originImageGeometry = m_originMitkImage->GetGeometry();
     mitk::Point3D originOrigin = m_originMitkImage->GetGeometry()->GetOrigin();
@@ -433,88 +567,43 @@ void GraphcutSegmentationView::Init()
     double range[2];
     originImage->GetScalarRange(range);
    
-    {
-        //Float3DImageType::Pointer itkImage = Float3DImageType::New();
-        //mitk::CastToItkImage<Float3DImageType>(dynamic_cast<mitk::Image *>(m_refImageNode->GetData()), itkImage);
-
-        /*typedef itk::CurvatureFlowImageFilter< Float3DImageType, Float3DImageType > diffuseFilterType;
-        diffuseFilterType::Pointer diffuseFilter = diffuseFilterType::New();
-        diffuseFilter->SetInput(itkImage);
-        diffuseFilter->SetNumberOfIterations(5);
-        diffuseFilter->SetTimeStep(0.0625);
-        try
-        {
-            diffuseFilter->Update();
-            std::cout << "Diffuse Image Complete!" << std::endl;
-        }
-        catch (itk::ExceptionObject& ex)
-        {
-            std::cout << "Diffuse Image Failed! Exception code: " << std::endl;
-            std::cout << ex.what() << std::endl;
-            return;
-        }
-
-
-        typedef itk::RescaleIntensityImageFilter<Float3DImageType, Float3DImageType> RescaleIntensityImageFilterType;
-        RescaleIntensityImageFilterType::Pointer rescale = RescaleIntensityImageFilterType::New();
-        rescale->SetInput(diffuseFilter->GetOutput());
-        rescale->SetOutputMinimum(0.0);
-        rescale->SetOutputMaximum(255);
-        rescale->Update();
-
-        typedef itk::CastImageFilter<Float3DImageType, IntArray3DImageType> CasterType;
-        CasterType::Pointer caster = CasterType::New();
-        if (0)
-        {
-           
-            Float3DImageType::Pointer downSampleImage = Float3DImageType::New();
-            ITKHelpers::DownSampleImage(rescale->GetOutput(), downSampleImage.GetPointer(), 2);
-            caster->SetInput(downSampleImage);
-        }
-        else
-        {
-            caster->SetInput(rescale->GetOutput());
-        }
-        caster->Update();*/
-
-        //m_graphcut.SetImage(caster->GetOutput());
-        //m_graphcut.SetScalarRange(/*range[0], range[1]*/0,255);
-        //m_graphcut.SetNumberOfHistogramBins(/*(range[1] - range[0])/2*/10.0);
-        //m_graphcut.SetNumberOfHistogramBins(64);
-    }
-    InitSourceAndSinkNodes();
-    InitInterpolator(m_sourceImageNode.GetPointer());
+    m_pMitkRenderWindow->Reinit(m_refImageNode);
+    m_graphcut->Init();
+    InitSourceAndSinkNodes(); 
+    //InitInterpolator(m_sourceImageNode.GetPointer());
     InitTool();
-
+    
     m_bInited = true; 
 }
 
 void GraphcutSegmentationView::InitSourceAndSinkNodes()
 {
-    if (m_bInited)
+    GetDataStorage()->Remove(m_sourceSinkNode);
+    m_sourceSinkNode = mitk::DataNode::New();
+    m_pSegTool->CreateLabelSetImageNode(m_refImageNode, m_sourceSinkNode, "seed");
+    mitk::LabelSetImage* labelImage = dynamic_cast<mitk::LabelSetImage*>(m_sourceSinkNode->GetData());
+    if (labelImage)
     {
-        return;
+        labelImage->GetActiveLabelSet()->RemoveLabel(1);
+        //add foreground label
+        mitk::Label::Pointer foregroundLabel = mitk::Label::New();
+        foregroundLabel->SetName("foreground");
+        foregroundLabel->SetValue(1);
+        float fc[3] = { 0.0,1.0,0.0 };
+        foregroundLabel->SetColor(mitk::Color(fc));
+        labelImage->GetActiveLabelSet()->AddLabel(foregroundLabel);
+
+        //add background label
+        mitk::Label::Pointer backgroundLabel = mitk::Label::New();
+        backgroundLabel->SetName("background");
+        backgroundLabel->SetValue(2);
+        float bc[3] = { 0.0,0.0,1.0 };
+        backgroundLabel->SetColor(mitk::Color(bc));
+        labelImage->GetActiveLabelSet()->AddLabel(backgroundLabel);
     }
-    if (1)
-    {
-        mitk::Color color;
-        color.SetRed(0);
-        color.SetGreen(1);
-        color.SetBlue(0);
-        m_sourceImageNode = CreateSegmentationNode(m_originMitkImage, "source", color);
-        m_pMitkDataManager->GetDataStorage()->Add(m_sourceImageNode);
-    }
-    if (1)
-    {
-        mitk::Color color;
-        color.SetRed(0);
-        color.SetGreen(0);
-        color.SetBlue(1);
-        m_sinkImageNode = CreateSegmentationNode(m_originMitkImage, "sink", color);
-        m_pMitkDataManager->GetDataStorage()->Add(m_sinkImageNode);
-    }
+    GetDataStorage()->Add(m_sourceSinkNode);
     mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
-    toolManager->SetWorkingData(m_bPaintForeground ? m_sourceImageNode : m_sinkImageNode);
+    toolManager->SetWorkingData(m_sourceSinkNode);
 }
 
 int GetToolIdByToolName(const std::string &toolName)
@@ -549,7 +638,7 @@ void GraphcutSegmentationView::InitTool()
 
     mitk::Image* patientImage = dynamic_cast<mitk::Image*>(m_refImageNode->GetData());
    
-    toolManager->SetWorkingData(m_sourceImageNode);
+    toolManager->SetWorkingData(m_sourceSinkNode);
     toolManager->SetReferenceData(m_refImageNode);
 
     // load interaction events
@@ -560,11 +649,16 @@ void GraphcutSegmentationView::InitTool()
 
 void GraphcutSegmentationView::ChangeTool(const QString& toolName)
 {
-    QLineEdit* le = (QLineEdit*)m_pR->getObjectFromGlobalMap("GraphcutSegmentation.PenSize");
+    if (!m_bInited)
+    {
+        return;
+    }
+
+    QSlider* le = (QSlider*)m_pR->getObjectFromGlobalMap("GraphcutSegmentation.PenSize");
     int size = 1.0;
     if (le)
     {
-        size = le->text().toInt();
+        size = le->value();
     }
 
     mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
@@ -574,80 +668,143 @@ void GraphcutSegmentationView::ChangeTool(const QString& toolName)
     }
     int toolID = GetToolIdByToolName(toolName.toStdString());
     m_tool = dynamic_cast<mitk::PaintbrushTool *>(toolManager->GetToolById(toolID));
-    m_tool->SetEnable3DInterpolation(false);
-    m_tool->SetSize(size);
+    if (m_tool)
+    {
+        m_tool->SetEnable3DInterpolation(false);
+        m_tool->SetSize(size);
+        //m_tool->SetFeedbackContourVisible(false);
+    }  
     toolManager->ActivateTool(toolID);
 }
 
 void GraphcutSegmentationView::SwitchToForeground()
 {
-    mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
-    toolManager->SetWorkingData(m_sourceImageNode);
-    toolManager->SetReferenceData(m_refImageNode);
+    if (!m_sourceSinkNode)
+    {
+        return;
+    }
+    mitk::LabelSetImage* labelImage = dynamic_cast<mitk::LabelSetImage*>(m_sourceSinkNode->GetData());
+    if (labelImage)
+    {
+        labelImage->GetActiveLabelSet()->SetActiveLabel(1);
+        labelImage->Modified();
+        mitk::SurfaceBasedInterpolationController *interpolator = mitk::SurfaceBasedInterpolationController::GetInstance();
+        if (interpolator)
+        {
+            interpolator->SetActiveLabel(1);
+        }
+    }
     m_bPaintForeground = true;
 }
 
 void GraphcutSegmentationView::SwitchToBackground()
 {
-    mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
-    toolManager->SetWorkingData(m_sinkImageNode);
-    toolManager->SetReferenceData(m_refImageNode);
+    if (!m_sourceSinkNode)
+    {
+        return;
+    }
+    mitk::LabelSetImage* labelImage = dynamic_cast<mitk::LabelSetImage*>(m_sourceSinkNode->GetData());
+    if (labelImage)
+    {
+        labelImage->GetActiveLabelSet()->SetActiveLabel(2);
+        labelImage->Modified();
+        mitk::SurfaceBasedInterpolationController *interpolator = mitk::SurfaceBasedInterpolationController::GetInstance();
+        if (interpolator)
+        {
+            interpolator->SetActiveLabel(2);
+        }
+    }
     m_bPaintForeground = false;
 }
 
-void GraphcutSegmentationView::ScribbleEventHandler(vtkObject* caller, long unsigned int eventId, void* callData)
-{
-    // Dilate the path and mark the path and the dilated pixels as part of the currently selected group
-    unsigned int dilateRadius = 2;
-
-}
 
 void GraphcutSegmentationView::RefreshSourceAndSink()
 {
-    if (m_sourceImageNode.IsNull()|| m_sinkImageNode.IsNull())
+    if (!m_sourceSinkNode)
     {
         return;
     }
     m_sources.clear();
     m_sinks.clear();
-    mitk::Image* mitkImage = dynamic_cast<mitk::Image*>(m_sourceImageNode->GetData());
+
+    mitk::Image* mitkImage = dynamic_cast<mitk::Image*>(m_sourceSinkNode->GetData());
+    UChar3DImageType::Pointer itkImage = UChar3DImageType::New();
+    mitk::CastToItkImage<UChar3DImageType>(mitkImage,itkImage);
+    bool downSample = GetGuiProperty("GraphcutSegmentation.DownSample","checked").toBool();
+    float sampleRate = GetGuiProperty("GraphcutSegmentation.Resample", "text").toString().toDouble();
     if (mitkImage)
     {
-        /*vtkImageData* sourceImage = mitkImage->GetVtkImageData();
-        vtkSmartPointer<vtkExtractVOI> extractVOI =
-            vtkSmartPointer<vtkExtractVOI>::New();
-        extractVOI->SetInputData(sourceImage);
-        extractVOI->SetVOI(m_roi);
-        extractVOI->Update();*/
-        ITKVTKHelpers::GetNonzeroPixels(mitkImage->GetVtkImageData(), m_sources,2);
+        if (downSample)
+        {
+            UChar3DImageType::Pointer itkResampleImage = UChar3DImageType::New();
+           // ITKHelpers::DilateImage(itkImage.GetPointer(), itkResampleImage.GetPointer(), 1);
+          //  ITKHelpers::DilateImage(itkImage.GetPointer(), itkResampleImage.GetPointer(), 1, 2);
+          //  ITKHelpers::SaveImage(itkResampleImage.GetPointer(), "D:/temp/dilateImage.mha");
+            ITKHelpers::Resample<UChar3DImageType, UChar3DImageType>(itkImage.GetPointer(), itkResampleImage.GetPointer(), sampleRate);
+          //  mitk::Image::Pointer bridgeImage = mitk::Image::New();
+           // mitk::CastToMitkImage<UChar3DImageType>(itkResampleImage, bridgeImage);
+            
+
+            /**************Points to voxel*******************/
+            //std::vector< itk::Point<double, 3> > spoints;
+            ////get sources
+            //ITKVTKHelpers::GetNonzeroPoints(mitkImage->GetVtkImageData(), spoints, 1);
+            //ITKVTKHelpers::PointsToPixels(bridgeImage->GetVtkImageData(), spoints, m_sources);
+            ////get sinks
+            //std::vector< itk::Point<double, 3> > kpoints;
+            //ITKVTKHelpers::GetNonzeroPoints(mitkImage->GetVtkImageData(), kpoints, 2);
+            //ITKVTKHelpers::PointsToPixels(bridgeImage->GetVtkImageData(), kpoints, m_sinks);
+
+            /**************DownSample*******************/
+            ITKHelpers::GetITKImageNonzeroPixels(itkResampleImage.GetPointer(), m_sources, 1);
+            ITKHelpers::GetITKImageNonzeroPixels(itkResampleImage.GetPointer(), m_sinks, 2);
+
+            /*mitk::Mesh::Pointer mesh = mitk::Mesh::New();
+            for (int i = 0; i < spoints.size(); i++)
+            {
+                mitk::Point3D point;
+                point.SetElement(0, spoints.at(i).GetElement(0));
+                point.SetElement(1, spoints.at(i).GetElement(1));
+                point.SetElement(2, spoints.at(i).GetElement(2));
+                mesh->InsertPoint(point);
+            }
+            for (int i = 0; i < kpoints.size(); i++)
+            {
+                mitk::Point3D point;
+                point.SetElement(0, kpoints.at(i).GetElement(0));
+                point.SetElement(1, kpoints.at(i).GetElement(1));
+                point.SetElement(2, kpoints.at(i).GetElement(2));
+                mesh->InsertPoint(point);
+            }*/
+
+            /*TKHelpers::SetITKImagePixel<UChar3DImageType>(itkResampleImage, m_sources, 1);
+            ITKHelpers::SetITKImagePixel<UChar3DImageType>(itkResampleImage, m_sinks, 2);*/
+            /*mitk::CastToMitkImage<UChar3DImageType>(itkResampleImage, bridgeImage);
+            GetDataStorage()->Remove(GetDataStorage()->GetNamedNode("resampled seed"));
+            mitk::DataNode::Pointer resampledSeedImageNode = mitk::DataNode::New();
+            resampledSeedImageNode->SetData(bridgeImage);
+            resampledSeedImageNode->SetName("resampled seed");
+            resampledSeedImageNode->SetOpacity(0.5);
+            GetDataStorage()->Add(resampledSeedImageNode);
+            RequestRenderWindowUpdate();*/
+        }
+        else
+        {
+            ITKHelpers::GetITKImageNonzeroPixels<UChar3DImageType>(itkImage.GetPointer(), m_sources ,1);
+            ITKHelpers::GetITKImageNonzeroPixels<UChar3DImageType>(itkImage.GetPointer(), m_sinks, 2);
+        }
     }
-    mitkImage = dynamic_cast<mitk::Image*>(m_sinkImageNode->GetData());
-    if (mitkImage)
-    {
-        /*vtkImageData* sinkImage = mitkImage->GetVtkImageData();
-        vtkSmartPointer<vtkExtractVOI> extractVOI =
-            vtkSmartPointer<vtkExtractVOI>::New();
-        extractVOI->SetInputData(sinkImage);
-        extractVOI->SetVOI(m_roi);
-        extractVOI->Update();*/
-        ITKVTKHelpers::GetNonzeroPixels(mitkImage->GetVtkImageData(), m_sinks,2);
-    }
+
+    
 
 }
 
 void GraphcutSegmentationView::RefreshROI()
 {
-    mitk::Image* mitkSourceImage = dynamic_cast<mitk::Image*>(m_sourceImageNode->GetData());
-    mitk::Image* mitkSinkImage = dynamic_cast<mitk::Image*>(m_sinkImageNode->GetData());
-    if (mitkSourceImage&&mitkSinkImage)
+    mitk::Image* mitkSourceSinkImage = dynamic_cast<mitk::Image*>(m_sourceSinkNode->GetData());
+    if (mitkSourceSinkImage)
     {
-        vtkSmartPointer<vtkImageMathematics> imageMath =
-            vtkSmartPointer<vtkImageMathematics>::New();
-        imageMath->AddInputData(0, mitkSourceImage->GetVtkImageData());
-        imageMath->AddInputData(1, mitkSinkImage->GetVtkImageData());
-        imageMath->SetOperationToAdd();
-        imageMath->Update();
-        VTKHelpers::FindVTKImageROI<int>(imageMath->GetOutput(), m_roi);
+        VTKHelpers::FindVTKImageROI(mitkSourceSinkImage->GetVtkImageData(), m_roi);
         std::cout << "ROI:" << m_roi[0] << "," << m_roi[1] << "," << m_roi[2] << "," << m_roi[3] << "," << m_roi[4] << "," << m_roi[5] << std::endl;
     }
 }
@@ -671,28 +828,49 @@ void GraphcutSegmentationView::RefreshGrapcutImage()
     region.SetIndex(start);
     region.SetSize(size);
 
-    //ITKHelpers::SaveImage(roiFilter->GetOutput(), "D:/temp/roiImage.mha");
-  /*  typedef itk::CastImageFilter<Float3DImageType, IntArray3DImageType> CasterType;
-    CasterType::Pointer caster = CasterType::New();
-    caster->SetInput(itkImage);
-    caster->Update();*/
+    /*typedef itk::RegionOfInterestImageFilter<Int3DImageType, Int3DImageType> ROIFilterType;
+    ROIFilterType::Pointer roiFilter = ROIFilterType::New();
+    roiFilter->SetInput(itkImage);
+    roiFilter->SetRegionOfInterest(region);
+    roiFilter->Update();
+    double min, max;
+    ITKHelpers::GetImageScalarRange(roiFilter->GetOutput(), min, max);*/
 
     QLineEdit* le = (QLineEdit*)m_pR->getObjectFromGlobalMap("GraphcutSegmentation.Lambda");
     if (le)
     {
-        m_graphcut.SetLambda(le->text().toDouble());
+        m_graphcut->SetLambda(le->text().toDouble());
+    }
+    le = (QLineEdit*)m_pR->getObjectFromGlobalMap("GraphcutSegmentation.HistogramBins");
+    if (le)
+    {
+        m_graphcut->SetNumberOfHistogramBins(le->text().toDouble());
     }
 
+    bool downSample = GetGuiProperty("GraphcutSegmentation.DownSample", "checked").toBool();
+    float sampleRate = GetGuiProperty("GraphcutSegmentation.Resample", "text").toString().toDouble();
+    if (downSample)
+    {
+        ITKHelpers::DownSampleImage(itkImage.GetPointer(), itkImage.GetPointer(), sampleRate);
+    }
 
-    m_graphcut.SetImage(itkImage);
-    m_graphcut.SetRegion(region);
-    m_graphcut.SetScalarRange(/*range[0], range[1]*/0,200);
-    //m_graphcut.SetNumberOfHistogramBins(/*(range[1] - range[0])/2*/32);
+    typedef itk::RescaleIntensityImageFilter<Int3DImageType, Float3DImageType> RescaleIntensityImageFilterType;
+    RescaleIntensityImageFilterType::Pointer rescale = RescaleIntensityImageFilterType::New();
+    rescale->SetInput(itkImage);
+    rescale->SetOutputMinimum(0.0);
+    rescale->SetOutputMaximum(255);
+    rescale->Update();
+
+    //m_graphcut->SetFirstTIme(true);
+    m_graphcut->SetImage(rescale->GetOutput());
+    //m_graphcut->SetRegion(region);
+    //m_graphcut->SetScalarRange(min, max);
+    //m_graphcut->SetNumberOfHistogramBins(/*(range[1] - range[0])/2*/32);
 }
 
 void GraphcutSegmentationView::SaveMask()
 {
-    UChar3DImageType* maskImage = m_graphcut.GetSegmentMask();
+    UChar3DImageType* maskImage = m_graphcut->GetSegmentMask();
     Float3DImageType::Pointer itkImage = Float3DImageType::New();
     ITKHelpers::DeepCopy(maskImage, itkImage.GetPointer());
 
@@ -705,174 +883,6 @@ void GraphcutSegmentationView::SaveMask()
 
     ITKHelpers::SaveImage(itkImage.GetPointer(), "D:/temp/maskImge.mhd");
     
-}
-
-void GraphcutSegmentationView::UpdateSelections()
-{
-    mitk::DataNode* resultNode = m_pMitkDataManager->GetDataStorage()->GetNamedNode("Result");
-    if (!resultNode)
-    {
-        return;
-    }
-
-}
-
-void GraphcutSegmentationView::GenerateSurface()
-{
-    mitk::DataNode* resultNode = m_pMitkDataManager->GetDataStorage()->GetNamedNode("Result");
-    if (!resultNode)
-    {
-        return;
-    }
-    mitk::Image* mitkImage = dynamic_cast<mitk::Image*>(resultNode->GetData());
-    UChar3DImageType::Pointer resultImage = UChar3DImageType::New();
-    mitk::CastToItkImage<UChar3DImageType>(mitkImage, resultImage);
-
-    mitkImage = dynamic_cast<mitk::Image*>(m_refImageNode->GetData());
-    Float3DImageType::Pointer originImage = Float3DImageType::New();
-    mitk::CastToItkImage<Float3DImageType>(mitkImage, originImage);
-
-    //diffuse origin image
-    typedef itk::CurvatureFlowImageFilter< Float3DImageType, Float3DImageType > diffuseFilterType;
-    diffuseFilterType::Pointer diffuseFilter = diffuseFilterType::New();
-    diffuseFilter->SetInput(originImage);
-    diffuseFilter->SetNumberOfIterations(5);
-    diffuseFilter->SetTimeStep(0.0625);
-    try
-    {
-        diffuseFilter->Update();
-    }
-    catch (itk::ExceptionObject& ex)
-    {
-        std::cout << "Diffuse Image Failed! Exception code: " << std::endl;
-        std::cout << ex.what() << std::endl;
-        return;
-    }
-    //calculate scalar range
-    typedef itk::MinimumMaximumImageCalculator <Float3DImageType>
-        imageCalculatorFilterType;
-    imageCalculatorFilterType::Pointer imageCalculatorFilter
-        = imageCalculatorFilterType::New();
-    imageCalculatorFilter->SetImage(diffuseFilter->GetOutput());
-    imageCalculatorFilter->Compute();
-    double maxScalar = imageCalculatorFilter->GetMaximum();
-    double minScalar = imageCalculatorFilter->GetMinimum();
-
-    //surface info
-    typedef itk::SurfaceInfoCombineImageFilter <UChar3DImageType, Float3DImageType, Float3DImageType>
-        algorithmProcessImageFilterType;
-    algorithmProcessImageFilterType::Pointer processFilter =
-        algorithmProcessImageFilterType::New();
-    processFilter->SetForeground(255);
-    processFilter->SetBackground(0);
-    processFilter->SetInputImage(resultImage);
-    processFilter->SetInfoImage(diffuseFilter->GetOutput());
-    processFilter->SetMaxScalar(maxScalar);
-    processFilter->SetMinScalar(minScalar);
-    try
-    {
-        processFilter->Update();
-    }
-    catch (itk::ExceptionObject& ex)
-    {
-        std::cout << "GrayScale Combine Failed! Exception code: " << std::endl;
-        std::cout << ex.what() << std::endl;
-        return;
-    }
-    m_ContourValue = processFilter->GetContourValue();
-    m_ContourValueMin = processFilter->GetContourValueMin();
-    m_ContourValueMax = processFilter->GetContourValueMax();
-    RefreshContourValueRange(m_ContourValueMin, m_ContourValueMax, m_ContourValue);
-    ////**************smooth****************//
-    //With moderate smooth
-    typedef itk::CurvatureFlowImageFilter< Float3DImageType, Float3DImageType > curvatureFlowImageFilterType;
-    curvatureFlowImageFilterType::Pointer smoothing = curvatureFlowImageFilterType::New();
-    smoothing->SetInput(processFilter->GetOutput());
-    smoothing->SetNumberOfIterations(15);
-    smoothing->SetTimeStep(0.0625);
-    try
-    {
-        smoothing->Update();
-    }
-    catch (itk::ExceptionObject& ex)
-    {
-        std::cout << "Smooth Surface Failed! Exception code: " << std::endl;
-        std::cout << ex.what() << std::endl;
-        return;
-    }
-
-    typedef itk::RescaleIntensityImageFilter<Float3DImageType, Float3DImageType> castImageFilterType;
-    castImageFilterType::Pointer outputCaster = castImageFilterType::New();
-    outputCaster->SetInput(smoothing->GetOutput());
-    outputCaster->SetOutputMinimum(minScalar);
-    outputCaster->SetOutputMaximum(maxScalar);
-    outputCaster->Update();
-
-    if (!m_resultSurfaceImageNode)
-    {
-        m_resultSurfaceImageNode = mitk::DataNode::New();
-        m_pMitkDataManager->GetDataStorage()->Add(m_resultSurfaceImageNode);
-    }
-    mitk::Image::Pointer resultSurfaceImage = mitk::Image::New();
-    mitk::CastToMitkImage<Float3DImageType>(outputCaster->GetOutput(), resultSurfaceImage);
-    m_resultSurfaceImageNode->SetData(resultSurfaceImage);
-    
-    vtkMarchingCubes *surfaceCreator = vtkMarchingCubes::New();
-    surfaceCreator->SetInputData(resultSurfaceImage->GetVtkImageData());
-    surfaceCreator->SetValue(m_ContourValue, m_ContourValue);
-    surfaceCreator->Update();
-
-    mitk::DataNode::Pointer surfaceNode = mitk::DataNode::New();
-    surfaceNode->SetName("Surface");
-    surfaceNode->SetColor(1, 1, 0);
-    mitk::Surface::Pointer surface = mitk::Surface::New();
-    surface->SetVtkPolyData(surfaceCreator->GetOutput()); 
-    surface->SetOrigin(mitkImage->GetGeometry()->GetOrigin());
-    surfaceNode->SetData(surface);
-    m_pMitkDataManager->GetDataStorage()->Add(surfaceNode);
-
-
-    RequestRenderWindowUpdate();
-}
-
-void GraphcutSegmentationView::RefreshContourValueRange(double min, double max, double value)
-{
-    if (m_contourValueSlider)
-    {
-        m_contourValueSlider->setMaximum(max);
-        m_contourValueSlider->setMinimum(min);
-        m_contourValueSlider->setValue(value);
-    }
-}
-
-void GraphcutSegmentationView::OnSelectPoint(const QVector3D& pixelIndex)
-{
-    //mitk::Image* image = dynamic_cast<mitk::Image*>(m_refImageNode->GetData());
-    //if (image)
-    //{
-    //   // VTKHelpers::MakeImageTransparent(image->GetVtkImageData());
-    //    int extent[6];
-    //    image->GetVtkImageData()->GetExtent(extent);
-    //    if (pixelIndex.x()>extent[0]&& pixelIndex.x()<extent[1]&&
-    //        pixelIndex.y()>extent[2] && pixelIndex.y()<extent[3]&&
-    //        pixelIndex.z()>extent[4] && pixelIndex.z()<extent[5])
-    //    {
-    //        QCheckBox* box = (QCheckBox*)m_pR->getObjectFromGlobalMap("main.Foreground");
-    //        itk::Index<3> index;
-    //        index[0] = pixelIndex[0];
-    //        index[1] = pixelIndex[1];
-    //        index[2] = pixelIndex[2];
-    //        if (box->isChecked())
-    //        {
-    //            m_sources.push_back(index);
-    //        }
-    //        else
-    //        {
-    //            m_sinks.push_back(index);
-    //        }
-    //    }
-    //    
-    //}
 }
 
 mitk::DataNode::Pointer GraphcutSegmentationView::CreateSegmentationNode(mitk::Image* origin, const std::string& organName, const mitk::Color& color)
@@ -970,42 +980,59 @@ mitk::DataNode::Pointer GraphcutSegmentationView::CreateSegmentationNode(mitk::I
 
 void GraphcutSegmentationView::Segment()
 {
-    RefreshROI();
+    QTime time;
+
+    time.start();
+    //RefreshROI();
+    EstimationSampleRate();
     RefreshGrapcutImage();
     RefreshSourceAndSink();
-    m_graphcut.SetSources(m_sources);
-    m_graphcut.SetSinks(m_sinks);
-    m_graphcut.PerformSegmentation();
+    m_graphcut->SetSources(m_sources);
+    m_graphcut->SetSinks(m_sinks);
+    m_graphcut->PerformSegmentation();
 
-    UChar3DImageType* maskImage = m_graphcut.GetSegmentMask();
-    Float3DImageType::Pointer itkImage = Float3DImageType::New();
-    ITKHelpers::DeepCopy(maskImage, itkImage.GetPointer());
+    UChar3DImageType::Pointer maskImage = UChar3DImageType::New();
+    maskImage->Graft(m_graphcut->GetSegmentMask());
 
-    Float3DImageType::Pointer image = Float3DImageType::New();
-    mitk::CastToItkImage<Float3DImageType>(dynamic_cast<mitk::Image *>(m_refImageNode->GetData()), image);
+    if (GetGuiProperty("GraphcutSegmentation.ConnectedDetect","checked").toBool())
+    {
+        ITKBasicAlgorithms::ExtractConnectedContainsIndex(maskImage.GetPointer(), maskImage.GetPointer(), m_sources);
+    }
+    if (GetGuiProperty("GraphcutSegmentation.SmoothResult", "checked").toBool())
+    {
+        ITKHelpers::ResampleLabelImage<UChar3DImageType, UChar3DImageType,itk::GaussianInterpolateImageFunction>(
+            maskImage.GetPointer(), maskImage.GetPointer(), 1.0/GetGuiProperty("GraphcutSegmentation.Resample","text").toDouble());
+    }
+    else
+    {
+        ITKHelpers::ResampleLabelImage<UChar3DImageType, UChar3DImageType>(
+            maskImage.GetPointer(), maskImage.GetPointer(), 1.0 / GetGuiProperty("GraphcutSegmentation.Resample", "text").toDouble());
+    }
+    
 
-    itkImage->SetOrigin(image->GetOrigin());
-    itkImage->SetDirection(image->GetDirection());
-    itkImage->SetSpacing(image->GetSpacing());
-
+    qDebug() << "Total time: " << time.elapsed() / 1000.0 << "s";
 
     mitk::Image::Pointer mitkImage = mitk::Image::New();
-    mitk::CastToMitkImage<Float3DImageType>(itkImage,mitkImage);
+    mitk::CastToMitkImage<UChar3DImageType>(maskImage,mitkImage);
 
-    m_pMitkDataManager->GetDataStorage()->Remove(m_pMitkDataManager->GetDataStorage()->GetNamedNode("Result"));
+    m_pMitkDataManager->GetDataStorage()->Remove(
+        m_pMitkDataManager->GetDataStorage()->GetNamedNode(m_currentResultName.toStdString()));
     mitk::DataNode::Pointer resultNode = mitk::DataNode::New();
-    resultNode->SetName("Result");
+    resultNode->SetName(m_currentResultName.toStdString());
     resultNode->SetColor(1, 0, 0);
     resultNode->SetData(mitkImage);
+    resultNode->SetProperty("volumerendering", mitk::BoolProperty::New(true));
     resultNode->Update();
     m_pMitkDataManager->GetDataStorage()->Add(resultNode);
     resultNode->SetOpacity(0.5);
+
     RequestRenderWindowUpdate();
 }
 
 
 void GraphcutSegmentationView::Constructed(R* pR)
 {
+    m_pR = pR;
     m_imageComboBox = (QmitkDataStorageComboBox*)R::Instance()->getObjectFromGlobalMap("GraphcutSegmentation.ImageSelector");
     if (m_imageComboBox)
     {
@@ -1014,11 +1041,11 @@ void GraphcutSegmentationView::Constructed(R* pR)
         connect(m_imageComboBox, SIGNAL(OnSelectionChanged(const mitk::DataNode *)), this, SLOT(OnImageSelectionChanged(const mitk::DataNode *)));
     }
     
-
-    m_contourValueSlider = (QSlider*)pR->getObjectFromGlobalMap("GraphcutSegmentation.ContourValueSlider");
-    if (m_contourValueSlider)
+    QmitkDataStorageComboBox* coarseImageComboBox = (QmitkDataStorageComboBox*)R::Instance()->getObjectFromGlobalMap("GraphcutSegmentation.CoarseImageSelector");
+    if (coarseImageComboBox)
     {
-        connect(m_contourValueSlider, &QSlider::valueChanged, this, &GraphcutSegmentationView::OnContourValueChanged);
+        coarseImageComboBox->SetDataStorage(GetDataStorage());
+        coarseImageComboBox->SetPredicate(CreateUserPredicate(4));
     }
 }
 
@@ -1061,6 +1088,7 @@ void GraphcutSegmentationView::OnImageSelectionChanged(const mitk::DataNode* nod
     }
     m_refImageNode = (mitk::DataNode*)node;
     m_originMitkImage = dynamic_cast<mitk::Image*>(m_refImageNode->GetData());
+    m_refImageNode->Modified();
     m_bInited = false;
 
 }

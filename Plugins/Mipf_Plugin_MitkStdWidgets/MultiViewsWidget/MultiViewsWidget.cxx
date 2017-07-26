@@ -93,6 +93,7 @@ void MultiViewsWidget::SetupWidgets()
     m_multiWidget->AddDisplayPlaneSubTree();
     m_multiWidget->AddPlanesToDataStorage();
     m_multiWidget->SetWidgetPlanesVisibility(true);
+    m_multiWidget->DisableDepartmentLogo();
 
     //set cross hair
     int crosshairgapsize = m_pMitkReferences->GetInt("Crosshair-Gap-Size", 32);

@@ -1,18 +1,37 @@
-<HLayout  activityRoot="true" id="main.main" style="@style/mainstyle">
-	<VLayout stretch="1">
-		<Button text="Load Data" command="MITK_MAIN_COMMAND_LOADDATA" />
-		<VLayout>
-			<Button text="Init Segmentation" command="MITK_MAIN_COMMAND_INIT_SEGMENTATION" row="0" col="0"/>
-			<Button text="Create New Segmentation" command="MITK_MAIN_COMMAND_CREATE_NEW_SEGMENTATION" row="0" col="0"/>
-			<Button text="Add Tool"  command="MITK_MAIN_COMMAND_TOOLADD" row="1" col="0"/>	
+<VLayout  activityRoot="true" id="main.main" style="@style/mainstyle">
+	<HLayout>
+		<VLayout stretch="1">
+			<Button text="Load Data" command="MITK_MAIN_COMMAND_LOADDATA" />
+			<SlicesInterpolator />
+			<DataManagerWidget />
+			<ImageNavigatorWidget />
 		</VLayout>
-		<ManualToolSelectionBox />
-		<SlicesInterpolator />
-		<DataManagerWidget />
-		<VolumeVisualizationWidget />
-	</VLayout>
-	<MultiViewsWidget  stretch="7"/>
-	<!-- <Holder id="@ui/GraphcutSegmentation" stretch="2.0"/> -->
-	<!-- <Holder id="@ui/ImageRegistration"  stretch="2.0"/> -->
-	<SegmentationWidget />
-</HLayout>
+		<MultiViewsWidget  stretch="5"/>
+		<ToolBox stretch="2">
+			<LandMarkExtractWidget text="Land Mark"/>
+			<Holder id="@ui/GraphcutSegmentation" text="Graphcut Segmentation"/>
+			<ImageCropperWidget  text="Image Cropper"/>
+			<CenterLineExtractWidget text="Center Line Extract"/>
+			<VesselSegmentationWidget text="Vessel Segmentation"/>
+			<BoneExtractWidget text="Bone Extract"/>
+			<!--
+			<Holder id="@id/GrowcutSegmentation" text="Growcut Segmentation" />
+			<PointListWidget text="Point List" />
+			<!-- <PointListWidget text="Point List2"/>
+			-->
+			<CenterLineExtractWidget text="Center Line"/>
+			<Holder id="@ui/SurfaceExtract" text="Surface Extract"/>
+			<Holder id="@id/AirwaySegmentation" text="Airway Segmentation" />
+			<Holder id="@ui/ImageRegistration" text="Image Registration"/>
+			<Holder id="@ui/ManualSegmentationTest" text="Manual Segmentation"/>
+			<BasicImageProcessWidget text="Basic Image Algorithms"/>
+			<VSplitter text="Utils">
+					<Holder id="@ui/LargestConnectedComponent" text="Largest Connected" />
+					<Holder id="@ui/MaskImage" text="Largest Connected" />
+			</VSplitter>
+			
+			<VolumeVisualizationWidget text="Volume Visualization"/>
+		</ToolBox>
+	</HLayout>
+	<StatusBarWidget />
+</VLayout>

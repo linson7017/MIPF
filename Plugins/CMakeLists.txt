@@ -31,3 +31,17 @@ add_subdirectory(Mipf_Plugin_SFLSSegmentation)
 add_subdirectory(Mipf_Plugin_Utils)
 
 add_subdirectory(Mipf_Plugin_BasicImageProcess)
+
+add_subdirectory(Mipf_Plugin_Growcut)
+
+add_subdirectory(Mipf_Plugin_AirwaySegmentation)
+
+add_subdirectory(Mipf_Plugin_VesselSegmentation)
+
+add_subdirectory(Mipf_Plugin_ManualSegmentationTest)
+
+add_subdirectory(Mipf_Plugin_VMTKTools)
+
+#add_subdirectory(Mipf_Plugin_MultiLabelSegmentation)
+
+#add_subdirectory(Mipf_Plugin_RegionLabelGraphcut)

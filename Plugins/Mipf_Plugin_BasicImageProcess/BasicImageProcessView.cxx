@@ -123,12 +123,12 @@ typedef itk::LinearInterpolateImageFunction< ImageType, double >                
 typedef itk::NearestNeighborInterpolateImageFunction< ImageType, double >               NearestInterpolatorType;
 
 
-BasicImageProcessView::BasicImageProcessView(QF::IQF_Main* pMain) :MitkPluginView(pMain),
+BasicImageProcessView::BasicImageProcessView() :MitkPluginView(),
 m_Controls(NULL),
 m_SelectedImageNode(NULL),
 m_TimeStepperAdapter(NULL)
 {
-    m_pMain->Attach(this);
+    
 }
 
 void BasicImageProcessView::Update(const char* szMessage, int iValue, void* pValue)
@@ -143,6 +143,7 @@ void BasicImageProcessView::Update(const char* szMessage, int iValue, void* pVal
 
 void BasicImageProcessView::CreateView()
 {
+    m_pMain->Attach(this);
     if (m_Controls == NULL)
     {
         m_Controls = new Ui::QmitkBasicImageProcessingViewControls;

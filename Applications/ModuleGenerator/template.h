@@ -108,9 +108,9 @@ const char ComC[] = ""\
 "    switch (iID)\n"\
 "    {\n"\
 "    case 0:\n"\
-"        return QF_INTERFACCE_MAIN_COMMAND;\n"\
+"        return QF_INTERFACE_MAIN_COMMAND;\n"\
 "    case 1:\n"\
-"        return QF_INTERFACCE_MAIN_MESSAGE;\n"\
+"        return QF_INTERFACE_MAIN_MESSAGE;\n"\
 "    default:\n"\
 "        break;\n"\
 "    }\n"\
@@ -119,11 +119,11 @@ const char ComC[] = ""\
 "\n"\
 "void* @ComName@::GetInterfacePtr(const char* szInterfaceID)\n"\
 "{\n"\
-"    if (strcmp(szInterfaceID, QF_INTERFACCE_MAIN_COMMAND) == 0)\n"\
+"    if (strcmp(szInterfaceID, QF_INTERFACE_MAIN_COMMAND) == 0)\n"\
 "    {\n"\
 "        return m_pMainCommand;\n"\
 "    }\n"\
-"    else if (strcmp(szInterfaceID, QF_INTERFACCE_MAIN_MESSAGE) == 0)\n"\
+"    else if (strcmp(szInterfaceID, QF_INTERFACE_MAIN_MESSAGE) == 0)\n"\
 "    {\n"\
 "        return m_pMainMessage;\n"\
 "    }\n"\

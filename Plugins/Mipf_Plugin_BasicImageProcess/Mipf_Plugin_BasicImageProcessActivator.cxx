@@ -1,6 +1,7 @@
 #include "Mipf_Plugin_BasicImageProcessActivator.h"
 #include "BasicImageProcessView.h"
 #include "Res/R.h"
+#include "Utils/QObjectFactory.h"
 
 QF_API QF::IQF_Activator* QF::QF_CreatePluginActivator(QF::IQF_Main* pMain)
 {
@@ -18,7 +19,7 @@ Mipf_Plugin_BasicImageProcess_Activator::Mipf_Plugin_BasicImageProcess_Activator
 
 bool Mipf_Plugin_BasicImageProcess_Activator::Init()
 {
-    m_pBasicImageProcessView = new BasicImageProcessView(m_pMain); 
+    //m_pBasicImageProcessView = new BasicImageProcessView(m_pMain); 
     return true; 
 }
 
@@ -29,6 +30,7 @@ const char* Mipf_Plugin_BasicImageProcess_Activator::GetID()
 
 void Mipf_Plugin_BasicImageProcess_Activator::Register(R* pR)
 {
-    m_pBasicImageProcessView->InitResource(pR); 
-    pR->registerCustomWidget("BasicImageProcessWidget", m_pBasicImageProcessView); 
+    //m_pBasicImageProcessView->InitResource(pR); 
+   // pR->registerCustomWidget("BasicImageProcessWidget", m_pBasicImageProcessView);
+    REGISTER_CLASS("BasicImageProcessWidget", BasicImageProcessView);
 }

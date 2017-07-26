@@ -9,6 +9,7 @@ class QmitkStdMultiWidget;
 namespace mitk
 {
     class RenderingManager;
+    class DataNode;
 }
 
 const char QF_MitkMain_RenderWindow[] = "QF_MitkMain_RenderWindow";
@@ -32,5 +33,7 @@ public:
 
     virtual void SetCrossHairVisibility(bool state) = 0;
     virtual void ResetCrossHair() = 0;
+
+    virtual void Reinit(mitk::DataNode* node) = 0;
 };
 #endif // IQF_MitkRenderWindow_h__

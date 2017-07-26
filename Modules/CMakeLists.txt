@@ -16,6 +16,8 @@ include_directories(
 
 add_definitions(-DQF_API_EXPORTS)
 
+add_subdirectory(ITKVTKHelpers )
+
 add_subdirectory(Mipf_Module_MitkMain)
 
 add_subdirectory(Mipf_Module_MitkSegmentation)
@@ -27,3 +29,9 @@ add_subdirectory(Mipf_Module_TubularTracking)
 add_subdirectory(Mipf_Module_MathUtil)
 
 add_subdirectory(Mipf_Module_MitkStd)
+
+add_subdirectory(Mipf_Module_Segmentation)
+
+add_subdirectory(Mipf_Module_ItkVtkBasicAlgorithms)
+
+add_subdirectory(Mipf_Module_MitkImageUtils)
