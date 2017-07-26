@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Widget id="LargestConnectedComponent">
+	<VLayout>
+		<HLayout>
+			<Label text="Select Image"/>
+			<QmitkDataStorageComboBox id="LargestConnectedComponentWidget.ImageSelector"/>
+		</HLayout>
+		<Button text="Extract" msgcommand="LargestConnectedComponentWidget.Extract"/>
+	</VLayout>
+</Widget>
+
+
+
+
+
+
+
+
+

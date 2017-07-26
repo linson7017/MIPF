@@ -1,0 +1,8 @@
+ImageCropperWidget   //图像切割
+ManualSegmentationWidget  //手动图像分割
+DataManagerWidget  //数据管理
+MultiViewsWidget	//四视图
+VolumeVisualizationWidget	//体绘制
+ImageNavigatorWidget	//图像浏览
+MeasurementWidget       //测量工具
+SFLSSegmentationWidget  //Robust Statistics Segmentation
