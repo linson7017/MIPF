@@ -18,7 +18,6 @@ public:
     CQF_MitkDataManager(QF::IQF_Main* pMain);
     ~CQF_MitkDataManager();
     virtual void Init();
-    virtual bool Load(const char* filename);
     virtual mitk::DataStorage::Pointer GetDataStorage();
 
     virtual void SetNodeSet(std::list<mitk::DataNode::Pointer> nodeSet);

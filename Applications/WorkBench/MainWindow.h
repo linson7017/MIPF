@@ -10,7 +10,6 @@ namespace QF {
     class IQF_Main;
 }
 
-class MultiViews;
 class IQF_MitkDataManager;
 
 class MainWindow : public Activity, public QF::IQF_Observer
@@ -30,7 +29,6 @@ private:
     void SetupWidgets(const char* xmlfile);
 
     QF::IQF_Main* m_pMain;
-    MultiViews* m_pMultiViews;
     IQF_MitkDataManager* m_pMitkDataManager;
 };
 

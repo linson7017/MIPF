@@ -4,9 +4,13 @@
 #include "CQF_MitkDataManager.h"
 #include "CQF_MitkRenderWindow.h"
 #include "CQF_MitkReference.h"
+#include "CQF_MitkIO.h"
 
 #include "CQF_MainCommand.h"
 #include "internal/qf_interfacedef.h"
+
+//mitk
+#include "QmitkRegisterClasses.h"
 
 #include "vtkObject.h"
 
@@ -36,10 +40,12 @@ void CQF_MitkMain::Release()
 bool CQF_MitkMain::Init()
 {
     vtkObject::GlobalWarningDisplayOff();
+    QmitkRegisterClasses();
 
     m_pMitkDataManager = new CQF_MitkDataManager(m_pMain);
     m_pMitkRenderWindow = new CQF_MitkRenderWindow;
     m_pMitkReference = new CQF_MitkReference(m_pMain);
+    m_pMitkIO = new CQF_MitkIO(m_pMain);
 
 	m_pMainCommand = new CQF_MainCommand(m_pMain);
     return true;
@@ -48,7 +54,7 @@ bool CQF_MitkMain::Init()
 
 int CQF_MitkMain::GetInterfaceCount()
 {
-    return 4;
+    return 5;
 
 }
 
@@ -65,6 +71,8 @@ const char* CQF_MitkMain::GetInterfaceID(int iID)
         return QF_MitkMain_Reference;
 	case 3:
 		return QF_MitkMain_DataManager;
+    case 4:
+        return QF_MitkMain_IO;
     default:
         break;
     }
@@ -89,6 +97,10 @@ void* CQF_MitkMain::GetInterfacePtr(const char* szInterfaceID)
 	{
 		return m_pMitkDataManager;
 	}
+    else if (strcmp(szInterfaceID, QF_MitkMain_IO) == 0)
+    {
+        return m_pMitkIO;
+    }
     else
         return NULL;
 }

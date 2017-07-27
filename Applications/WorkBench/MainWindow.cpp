@@ -8,22 +8,10 @@
 #include "Common/app_env.h"
 #include "Utils/variant.h"
 
-#include "mitkRenderingManager.h"
-
-#include "MitkMain/IQF_MitkDataManager.h"
-#include "MitkMain/IQF_MitkRenderWindow.h"
+#include "MitkMain/IQF_MitkIO.h"
 #include "MitkMain/IQF_MitkReference.h"
 
-//#include "ctkPluginFrameworkLauncher.h"
-//#include "ctkServiceReference.h"
-//#include "ctkPluginContext.h"
-//#include "ctkPluginException.h"
 
-#include <vtkQuaternion.h>
-#include <vtkMatrix3x3.h>
-
-#include "QmitkIOUtil.h"
-//#include <DataManager.h>
 
 #include "iqf_main.h"
 
@@ -70,35 +58,13 @@ void MainWindow::Update(const char* szMessage, int iValue, void* pValue)
 
 void MainWindow::OpenDicom()
 {
-    IQF_MitkDataManager* pMitkDataManager = (IQF_MitkDataManager*)m_pMain->GetInterfacePtr(QF_MitkMain_DataManager);
-    IQF_MitkRenderWindow* pMitkRenderWindow = (IQF_MitkRenderWindow*)m_pMain->GetInterfacePtr(QF_MitkMain_RenderWindow);
-    if (!pMitkDataManager|| !pMitkRenderWindow)
-    {
-        return;
-    }
-    IQF_MitkReference* pMitkReference = (IQF_MitkReference*)m_pMain->GetInterfacePtr(QF_MitkMain_Reference);
-    QString defaultOpenFilePath = pMitkReference->GetString("LastOpenDirectory");
-
-    QStringList fileNames = QFileDialog::getOpenFileNames(NULL, "Open",
-        defaultOpenFilePath,
-        QmitkIOUtil::GetFileOpenFilterString());
-    if (fileNames.empty())
-        return;
-    try
-    {
-        QmitkIOUtil::Load(fileNames, *pMitkDataManager->GetDataStorage());
-    }
-    catch (const mitk::Exception& e)
-    {
-        MITK_INFO << e;
-        return;
-    }
-    mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(pMitkDataManager->GetDataStorage());
-    pMitkReference->SetString("LastOpenDirectory", QFileInfo(fileNames.back()).absolutePath().toStdString().c_str());
+    IQF_MitkIO* pMitkIO = (IQF_MitkIO*)m_pMain->GetInterfacePtr(QF_MitkMain_IO);
+    pMitkIO->LoadFiles();
 }
 
 void MainWindow::OpenMetaImage()
 {
+    IQF_MitkIO* pMitkIO = (IQF_MitkIO*)m_pMain->GetInterfacePtr(QF_MitkMain_IO);
     IQF_MitkReference* pMitkReference = (IQF_MitkReference*)m_pMain->GetInterfacePtr(QF_MitkMain_Reference);
     QString defaultOpenFilePath = pMitkReference->GetString("LastOpenFilePath");
     QString filename = QFileDialog::getOpenFileName(this, "Select one or more files to open",
@@ -108,7 +74,7 @@ void MainWindow::OpenMetaImage()
     {
         return;
     }
-    m_pMitkDataManager->Load(filename.toLocal8Bit().constData());
+    pMitkIO->Load(filename.toLocal8Bit().constData());
     pMitkReference->SetString("LastOpenFilePath", QFileInfo(filename).absolutePath().toStdString().c_str());
 }
 

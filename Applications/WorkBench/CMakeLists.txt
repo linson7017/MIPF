@@ -14,19 +14,6 @@ endif()
 
 project(WorkBench)
 
-# find_package(CTK REQUIRED)
-# include_directories(
-	# ${CTKCore_INCLUDE_DIRS}
-	# ${CTKPluginFramework_INCLUDE_DIRS}
-# )
-
-
-
-
-if("${VTK_QT_VERSION}" STREQUAL "")
-  message(FATAL_ERROR "VTK was not built with Qt")
-endif()
-
 include_directories(
   ${CMAKE_CURRENT_BINARY_DIR}
   ${CMAKE_CURRENT_SOURCE_DIR}
@@ -48,18 +35,13 @@ if(VTK_QT_VERSION VERSION_GREATER "4")
   # CMAKE_AUTOMOC in ON so the MocHdrs will be automatically wrapped.
   add_executable(WorkBench ${DIR_SRCS} ${Headers} ${UI_Srcs} ${MOC_Hdrs})
   qt5_use_modules(WorkBench Core Gui Widgets)
-  target_link_libraries(WorkBench ${VTK_LIBRARIES} ${QTFRAMEWORK_LIBRARIES} ${QFMAIN_LIBRARIES} CTKPluginFramework MitkQtWidgets MitkQtWidgetsExt)
+  target_link_libraries(WorkBench  ${QTFRAMEWORK_LIBRARIES} ${QFMAIN_LIBRARIES} )
 else()
   find_package(Qt4 REQUIRED)
   include(${QT_USE_FILE})
-  # Use what VTK built with
-  set(QT_QMAKE_EXECUTABLE ${VTK_QT_QMAKE_EXECUTABLE} CACHE FILEPATH "")
-  set(QT_MOC_EXECUTABLE ${VTK_QT_MOC_EXECUTABLE} CACHE FILEPATH "")
-  set(QT_UIC_EXECUTABLE ${VTK_QT_UIC_EXECUTABLE} CACHE FILEPATH "")
   qt4_wrap_ui(UI_Srcs ${UIs})
-
   add_executable(WorkBench ${DIR_SRCS} ${Headers} ${UI_Srcs} ${MOC_Hdrs})
-  target_link_libraries(WorkBench ${QT_LIBRARIES} ${VTK_LIBRARIES} ${QTFRAMEWORK_LIBRARIES} ${QFMAIN_LIBRARIES} CTKPluginFramework MitkQtWidgets MitkQtWidgetsExt )
+  target_link_libraries(WorkBench ${QT_LIBRARIES}  ${QTFRAMEWORK_LIBRARIES} ${QFMAIN_LIBRARIES}) 
 endif()
 
 #Release去控制台窗口
@@ -70,6 +52,3 @@ endif()
   # COMMAND copy "$(OutDir)/$(TargetName).exe" "../qf/bin"
   # COMMENT "copy to qf bin"
  # )
- 
- 
-

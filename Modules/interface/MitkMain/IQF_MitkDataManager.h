@@ -9,9 +9,7 @@ class IQF_MitkDataManager
 {
 public:
     virtual void Init() = 0;
-    virtual bool Load(const char* filename) = 0;
     virtual mitk::DataStorage::Pointer GetDataStorage() = 0;
-
     virtual void SetSelectedNode(std::vector<mitk::DataNode::Pointer> selectNodes) = 0;
     virtual std::vector<mitk::DataNode::Pointer> GetSelectedNodes() = 0;
 

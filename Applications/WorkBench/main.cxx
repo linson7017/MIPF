@@ -1,8 +1,6 @@
-#include "QmitkRegisterClasses.h"
 #include "MainWindow.h"
 #include <QApplication>
 #include <QStyleFactory>
-#include <itksys/SystemTools.hxx>
 
 
 //qtframework
@@ -15,7 +13,6 @@
 #include "iqf_main.h"
 #include "iqf_component.h"
 #include "Utils/QObjectFactory.h"
-#include "QmitkDataStorageComboBox.h"
 #include <QPushButton>
 
 
@@ -26,9 +23,6 @@
 int main(int argc, char *argv[])
 {
     QApplication qtapplication(argc, argv);
-    //Mitk注册
-    QmitkRegisterClasses();
-
 
     /**************程序环境和Qt环境的初始化*******************/
     //初始化程序环境
@@ -39,8 +33,6 @@ int main(int argc, char *argv[])
     app_env appenv(wk.toLocal8Bit().constData());
     appenv.setMainPtr(QF::QF_CreateMainObject(wk.toLocal8Bit().constData()));
     qApp->setProperty("MainPtr", QVariant::fromValue(appenv.getMainPtr()));
-    //指定qtframework工作目录，没指定则自动设置为可执行程序路径下ui_qtframework/app_name/目录
-    //app_env::setWorkDir("G:/Projects/20160111/bin/ui_qtframework/UITestApp");
     //初始化qt环境
     qt_context context(&qtapplication);
     //设置qt程序编码
