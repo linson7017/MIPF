@@ -15,6 +15,8 @@
 #include "Utils/QObjectFactory.h"
 #include <QPushButton>
 
+#include <QLibrary>
+
 
 #ifdef Q_WS_X11
 #include <X11/Xlib.h>
@@ -41,8 +43,6 @@ int main(int argc, char *argv[])
     qt_context::setDefaultLanguage("Chinese");
     //设置qt程序风格
     qt_context::setApplicationStyle("fusion");
-
-    qDebug() << QStyleFactory::keys();
 
     //添加qt插件库的搜索路径
 #if defined _WIN32 || defined WIN32 || defined __NT__ || defined __WIN32__

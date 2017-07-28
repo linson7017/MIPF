@@ -37,7 +37,7 @@ bool CQF_SegmentationCom::Init()
 
 int CQF_SegmentationCom::GetInterfaceCount()
 {
-    return 2;
+    return 1;
 }
 
 const char* CQF_SegmentationCom::GetInterfaceID(int iID)
