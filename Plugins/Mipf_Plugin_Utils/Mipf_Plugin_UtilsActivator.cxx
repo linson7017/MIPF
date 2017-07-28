@@ -7,6 +7,7 @@
 #include "PointListView.h"
 #include "BoneExtract.h"
 #include "LankMarkExtractView.h"
+#include "SkinExtractView.h"
 
 
 
@@ -55,6 +56,7 @@ void Mipf_Plugin_Utils_Activator::Register(R* pR)
     REGISTER_CLASS("PointListWidget", PointListView);
     REGISTER_CLASS("BoneExtractWidget", BoneExtract);
     REGISTER_CLASS("LandMarkExtractWidget", LankMarkExtractView);
+    REGISTER_CLASS("SkinExtractWidget", SkinExtractView);
 }
 
 void Mipf_Plugin_Utils_Activator::Constructed(R* pR)

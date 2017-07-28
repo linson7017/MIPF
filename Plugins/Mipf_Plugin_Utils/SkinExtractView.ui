@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>SkinExtractView</class>
+ <widget class="QWidget" name="SkinExtractView">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>401</width>
+    <height>107</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <widget class="QWidget" name="verticalLayoutWidget">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>401</width>
+     <height>101</height>
+    </rect>
+   </property>
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>Image</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QmitkDataStorageComboBox" name="ImageSelector"/>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <widget class="ctkRangeWidget" name="ThresholdSlider" native="true"/>
+    </item>
+    <item>
+     <widget class="QPushButton" name="ExtractBtn">
+      <property name="text">
+       <string>Extract</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QmitkDataStorageComboBox</class>
+   <extends>QComboBox</extends>
+   <header>QmitkDataStorageComboBox.h</header>
+  </customwidget>
+  <customwidget>
+   <class>ctkRangeWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">ctkRangeWidget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

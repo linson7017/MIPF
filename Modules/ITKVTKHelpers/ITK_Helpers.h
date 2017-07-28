@@ -45,6 +45,9 @@ namespace ITKHelpers
     template <typename TInputImage, typename TOutputImage>
     void DilateImage(TInputImage* image, TOutputImage* outImage, float radius, int value = 1);
 
+    template <typename TInputImage, typename TOutputImage>
+    void OpeningBinaryImage(TInputImage* image, TOutputImage* outImage, float radius);
+
     template<typename TInputImage>
     bool  FindImageROI(const TInputImage* itkImage, int imageLabel, int* roi);
 

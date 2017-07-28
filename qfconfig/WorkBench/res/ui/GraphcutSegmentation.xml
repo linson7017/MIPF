@@ -17,26 +17,27 @@
 		</HLayout>
 		<HLayout>
 			<Label  text="Segment Organ:"/>
-			<ComboBox>
+			<ComboBox id="GraphcutSegmentation.OrganType">
 				<ComboBoxItem text="Liver"/>
 				<ComboBoxItem text="Kidney"/>
 				<ComboBoxItem text="Gallbladder" />
 				<ComboBoxItem text="Spleen" />
 				<ComboBoxItem text="Pancreas" />
 			</ComboBox>
-			<Label text="Crop Type:"/>
+			<Stretch size="100"/>
+			<!-- <Label text="Crop Type:"/>
 			<ComboBox>
 				<ComboBoxItem text="No Crop"/>
 				<ComboBoxItem text="Auto Crop"/>
 				<ComboBoxItem text="Manual Crop" />
-			</ComboBox>
+			</ComboBox> -->
 		</HLayout>
 		<VLayout>
 			<HLayout>
 				<Label text="Lambda"/>
-				<LineEdit id="GraphcutSegmentation.Lambda" text="0.08" msgcommand="MITK_MESSAGE_GRAPHCUT_LAMBDA_CHANGED" property="text"/>
+				<LineEdit id="GraphcutSegmentation.Lambda" text="-1" msgcommand="MITK_MESSAGE_GRAPHCUT_LAMBDA_CHANGED" property="text"/>
 				<Label text="Histogram Bins"/>
-				<LineEdit id="GraphcutSegmentation.HistogramBins" text="255" msgcommand="MITK_MESSAGE_GRAPHCUT_HISTOGRAMBINS_CHANGED" property="text"/>	
+				<LineEdit id="GraphcutSegmentation.HistogramBins" text="256" msgcommand="MITK_MESSAGE_GRAPHCUT_HISTOGRAMBINS_CHANGED" property="text"/>	
 			</HLayout>
 			<HLayout>
 				<CheckBox text="Connected Detect" id="GraphcutSegmentation.ConnectedDetect" checked="true"/>
@@ -65,10 +66,10 @@
 				<CheckBox text="Foreground" id="GraphcutSegmentation.Foreground" checked="true" msgcommand="MITK_MESSAGE_GRAPHCUT_FOREGROUND" property="checked"/>
 				<CheckBox text="Background" id="GraphcutSegmentation.Background" msgcommand="MITK_MESSAGE_GRAPHCUT_BACKGROUND" property="checked"/>
 			</ButtonGroup>
-			<Button text="Interpolate" msgcommand="GraphcutSegmentation.Interpolate"/>
+			<!-- <Button text="Interpolate" msgcommand="GraphcutSegmentation.Interpolate"/> -->
 		</HLayout>
 		<Button text="Generate Surface" msgcommand="MITK_MESSAGE_GRAPHCUT_GENERATESURFACE"/>
-		<Button text="Extrace ROI" msgcommand="MITK_MESSAGE_GRAPHCUT_EXTRACT_ROI" />
+		<!-- <Button text="Extrace ROI" msgcommand="MITK_MESSAGE_GRAPHCUT_EXTRACT_ROI" />
 		<HSlider id="GraphcutSegmentation.ContourValueSlider"/>
 		
 		
@@ -78,7 +79,7 @@
 			<QmitkDataStorageComboBox  id="GraphcutSegmentation.CoarseImageSelector"/>
 		</HLayout>
 		<Button text="Generate Narrow Band" msgcommand="MITK_MESSAGE_GRAPHCUT_GENERATE_NARROWBAND"/>
-		
+		 -->
 		<Stretch size="100"/>
 	
 	</VLayout>

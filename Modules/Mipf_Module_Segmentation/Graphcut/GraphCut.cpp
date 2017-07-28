@@ -192,7 +192,7 @@ void GraphCut::PerformSegmentation()
             nodeImageIterator.Set(NULL);
             ++nodeImageIterator;
         }
-        ITKHelpers::SaveImage<NodeImageType>(m_nodeImage, "D:/temp/nodeImage.mha");
+      //  ITKHelpers::SaveImage<NodeImageType>(m_nodeImage, "D:/temp/nodeImage.mha");
     }
    
 

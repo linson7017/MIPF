@@ -42,17 +42,13 @@ void MainWindow::Update(const char* szMessage, int iValue, void* pValue)
     }
     else if (strcmp(szMessage, "main.LoadData") == 0)
     {
-        VarientMap vmp = *(VarientMap*)pValue;
-        variant v = variant::GetVariant(vmp, "currentText");
-        QString name = v.getString();
-        if (name.contains("dicoms", Qt::CaseInsensitive))
-        {
-            OpenDicom();
-        }
-        else if (name.contains("meta", Qt::CaseInsensitive))
-        {
-            OpenMetaImage();
-        }
+        IQF_MitkIO* pMitkIO = (IQF_MitkIO*)m_pMain->GetInterfacePtr(QF_MitkMain_IO);
+        pMitkIO->LoadFiles();
+    }
+    else if (strcmp(szMessage, "main.SaveProject") == 0)
+    {
+        IQF_MitkIO* pMitkIO = (IQF_MitkIO*)m_pMain->GetInterfacePtr(QF_MitkMain_IO);
+        pMitkIO->SaveProject();
     }
 }
 

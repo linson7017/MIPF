@@ -12,12 +12,6 @@ add_definitions(-DQF_API_EXPORTS)
 
 add_subdirectory(Mipf_Plugin_MitkStdWidgets)
 
-add_subdirectory(Mipf_Plugin_ItkAlgorithmSet)
-
-add_subdirectory(Mipf_Plugin_SliceBySliceTracking)
-
-add_subdirectory(Mipf_Plugin_TubularTracking)
-
 add_subdirectory(Mipf_Plugin_ImageRegistration)
 
 add_subdirectory(Mipf_Plugin_MitkSegmentation)
@@ -38,10 +32,4 @@ add_subdirectory(Mipf_Plugin_AirwaySegmentation)
 
 add_subdirectory(Mipf_Plugin_VesselSegmentation)
 
-add_subdirectory(Mipf_Plugin_ManualSegmentationTest)
-
 add_subdirectory(Mipf_Plugin_VMTKTools)
-
-#add_subdirectory(Mipf_Plugin_MultiLabelSegmentation)
-
-#add_subdirectory(Mipf_Plugin_RegionLabelGraphcut)

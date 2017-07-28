@@ -361,8 +361,6 @@ void DataManagerWidget::NodeSelectionChanged(const QItemSelection & selected, co
     }
 
     m_DataManager->SetSelectedNode(selectedNodes);
-    std::cout << "Selected Node Num:" << selectedNodes.size() << std::endl;
-    std::cout << "Select Node Name:" << selectedNodes.front().GetPointer()->GetName() << std::endl;
 
     m_pMain->SendMessageQf(MITK_MESSAGE_SELECTION_CHANGED, selectedNodes.size(), m_DataManager);
 

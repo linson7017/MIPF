@@ -1,37 +1,80 @@
-<VLayout  activityRoot="true" id="main.main" style="@style/mainstyle">
-	<HLayout>
-		<VLayout stretch="1">
-			<Button text="Load Data" command="MITK_MAIN_COMMAND_LOADDATA" />
-			<SlicesInterpolator />
-			<DataManagerWidget />
-			<ImageNavigatorWidget />
-		</VLayout>
-		<MultiViewsWidget  stretch="5"/>
+<MainWindow activityRoot="true" id="main.main" style="@style/mainstyle" tabPosition="Right;Right" tabShape="T">
+	<TitleBar titleText="Algorithm"/>
+	<!-- 菜单栏 -->
+	<MenuBar >
+		<Menu p_title="QString:Files">
+			<Action text="Load Data" uicommand="@uicommand/popOpenImageDlg"/>
+			<Action text="Save Data" />
+		</Menu>
+		<Menu p_title="QString:Views">
+			<Action text="Welcom" uicommand="@uicommand/toggleWelcomDockWidget" checkable="true" checked="true"/>
+			<Action text="Data Manager" uicommand="@uicommand/toggleDataManagerDockWidget" checkable="true" checked="true"/>
+			<Action text="Image Navigator" uicommand="@uicommand/toggleImageNavigatorDockWidget" checkable="true" checked="true"/>
+			<Action text="Volume Visualization" uicommand="@uicommand/toggleVolumeVisualizationDockWidget" checkable="true" checked="true"/>
+			<MenuSeparator />		
+			<Action text="TubularTracking" uicommand="@uicommand/toggleTubularTrackingDockWidget" checkable="true" />
+			<Action text="SliceBySliceTracking" uicommand="@uicommand/toggleSliceBySliceTrackingDockWidget" checkable="true" />
+			<Action text="ITKAlgorithmSet" uicommand="@uicommand/toggleITKAlgorithmSetDockWidget" checkable="true" />
+			<Action text="Measurement" uicommand="@uicommand/toggleMeasurementDockWidget" checkable="true" />
+			<Action text="Registration" uicommand="@uicommand/toggleImageRegistrationDockWidget" checkable="true" checked="true"/>
+			<Action text="Mannul Segmentation" uicommand="@uicommand/toggleSegmentationDocWidget" checkable="true" checked="true"/>
+			<Action text="Graphcut Segmentation" uicommand="@uicommand/toggleGraphcutSegmentationDocWidget" checkable="true" checked="true"/>
+			
+			<Action text="NDI" uicommand="@uicommand/toggleNDIDockWidget" checkable="true"/>
+		</Menu>
+	</MenuBar>
+	<!-- 工具栏 -->
+	<ToolBar p_movable="Bool:true" p_iconSize="QSize:40,40" toolButtonStyle="ToolButtonTextBesideIcon" p_windowTitle="QString:File">
+		<Action text="Open" icon="@icon/open.png"  msgcommand="main.LoadData"/>
+		<Action text="Save Project" icon="@icon/SaveAs.png" msgcommand="main.SaveProject"/>
+	</ToolBar>
+	<ToolBar p_movable="Bool:false" p_iconSize="QSize:40,40" p_windowTitle="QString:Views">
+		<ActionGroup>
+			<Action text="view all" parameterIndex="int:0" msgcommand="MITK_COMMAND_MULTIVIEWS_CHANGELAYOUT" icon="@icon/widget0.png" />
+			<Action text="view1" parameterIndex="int:1" msgcommand="MITK_COMMAND_MULTIVIEWS_CHANGELAYOUT" icon="@icon/widget1.png" />
+			<Action text="view2" parameterIndex="int:2" msgcommand="MITK_COMMAND_MULTIVIEWS_CHANGELAYOUT" icon="@icon/widget2.png" />
+			<Action text="view3" parameterIndex="int:3" msgcommand="MITK_COMMAND_MULTIVIEWS_CHANGELAYOUT" icon="@icon/widget3.png" />
+			<Action text="view4" parameterIndex="int:4" msgcommand="MITK_COMMAND_MULTIVIEWS_CHANGELAYOUT" icon="@icon/widget4.png" />
+			<Action text="Reset" msgcommand="MITK_COMMAND_MULTIVIEWS_RESET" icon="@icon/btn_reset.png" />
+		</ActionGroup>
+	</ToolBar>
+	<!-- 显示窗口 -->
+	<!-- <Widget centerWidget="true" style="@style/CenterWidgetStyle" contents_margin="0">
+		<HLayout contents_margin="0"> -->
+	<MultiViewsWidget id="main_vtkMulitView" centerWidget="true"  contents_margin="0"/>
+	<!-- 	</HLayout>
+	</Widget> -->
+	
+	<!-- 停靠窗口 -->
+	<DockWidget id="main.DataManagerDocWidget" windowTitle="Data Manager">
+		<DataManagerWidget id="main.DataManager" />
+	</DockWidget>
+	<DockWidget id="main.ImageNavigatorDockWidget" height="300" windowTitle="Image Navigator">
+		<ImageNavigatorWidget id="main.ImageNavigator" />
+	</DockWidget>
+	
+	<DockWidget id="main.Plugins" windowTitle="Plugins" dockWidgetArea="RightDockWidgetArea" width="400"  visible="true">
 		<ToolBox stretch="2">
-			<LandMarkExtractWidget text="Land Mark"/>
 			<Holder id="@ui/GraphcutSegmentation" text="Graphcut Segmentation"/>
-			<ImageCropperWidget  text="Image Cropper"/>
+			<BoneExtractWidget text="Bone Extract"/>
+			<SkinExtractWidget text="Skin Extract"/>
+			<Holder id="@ui/ImageRegistration" text="Image Registration"/>
 			<CenterLineExtractWidget text="Center Line Extract"/>
 			<VesselSegmentationWidget text="Vessel Segmentation"/>
-			<BoneExtractWidget text="Bone Extract"/>
-			<!--
-			<Holder id="@id/GrowcutSegmentation" text="Growcut Segmentation" />
-			<PointListWidget text="Point List" />
-			<!-- <PointListWidget text="Point List2"/>
-			-->
-			<CenterLineExtractWidget text="Center Line"/>
+			<LandMarkExtractWidget text="Land Mark"/>		
+			<ImageCropperWidget  text="Image Cropper"/>				
 			<Holder id="@ui/SurfaceExtract" text="Surface Extract"/>
-			<Holder id="@id/AirwaySegmentation" text="Airway Segmentation" />
-			<Holder id="@ui/ImageRegistration" text="Image Registration"/>
+			<!-- <Holder id="@id/AirwaySegmentation" text="Airway Segmentation" />	
 			<Holder id="@ui/ManualSegmentationTest" text="Manual Segmentation"/>
 			<BasicImageProcessWidget text="Basic Image Algorithms"/>
 			<VSplitter text="Utils">
 					<Holder id="@ui/LargestConnectedComponent" text="Largest Connected" />
 					<Holder id="@ui/MaskImage" text="Largest Connected" />
-			</VSplitter>
-			
+			</VSplitter> -->	
 			<VolumeVisualizationWidget text="Volume Visualization"/>
 		</ToolBox>
-	</HLayout>
-	<StatusBarWidget />
-</VLayout>
+	</DockWidget>
+	
+	<!-- 状态条 -->
+	<StatusBarWidget statusBar="true"/>
+</MainWindow>

@@ -24,8 +24,15 @@
 
 class QmitkDataStorageComboBox;
 class QSlider;
-
 class IQF_MitkSegmentationTool;
+
+struct SegmentationOption
+{
+    void SetOrgan(const QString& szOrganType);
+    QString Organ;
+    double Lambda;
+    float Color[3];
+};
 
 class GraphcutSegmentationView : public QObject, public MitkPluginView
 {
@@ -58,6 +65,8 @@ protected:
 
     void OnSurfaceInterpolationInfoChanged(const itk::EventObject &);
 
+    void GenerateSurface();
+
     void ExtractROI();
     void CropImage();
 protected slots:
@@ -74,6 +83,7 @@ private:
     mitk::DataNode* m_refImageNode;
     mitk::DataNode* m_workImageNode;
     mitk::DataNode::Pointer m_sourceSinkNode;
+    mitk::DataNode* m_currentResultNode;
 
     mitk::DataNode::Pointer m_resultSurfaceImageNode;
     itk::SmartPointer<Float3DImageType> m_originImage;
@@ -121,6 +131,8 @@ private:
     mitk::GeometryData::Pointer m_pCropObject;
 
     double m_bSampleRate;
+
+    SegmentationOption m_segOption;
 
     int m_roi[6];
 };

@@ -19,4 +19,4 @@ AUX_SOURCE_DIRECTORY(. DIR_SRCS)
 
 
 add_library(Mipf_Module_MitkMain SHARED ${DIR_SRCS} ${Headers} )
-target_link_libraries(Mipf_Module_MitkMain ${VTK_LIBRARIES} ${ITK_LIBRARIES} ${QFMAIN_LIBRARIES} MitkCore MitkQtWidgets MitkQtWidgetsExt)
+target_link_libraries(Mipf_Module_MitkMain ${VTK_LIBRARIES} ${ITK_LIBRARIES} ${QFMAIN_LIBRARIES} MitkCore MitkQtWidgets MitkQtWidgetsExt MitkSceneSerialization)

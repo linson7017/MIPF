@@ -32,6 +32,4 @@ add_subdirectory(Mipf_Module_MitkStd)
 
 add_subdirectory(Mipf_Module_Segmentation)
 
-add_subdirectory(Mipf_Module_ItkVtkBasicAlgorithms)
-
 add_subdirectory(Mipf_Module_MitkImageUtils)

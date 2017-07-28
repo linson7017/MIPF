@@ -1,3 +1,6 @@
+#ifndef ITK_Helpers_hpp__
+#define ITK_Helpers_hpp__
+
 #include "ITK_Helpers.h"
 
 #include "itkBinaryBallStructuringElement.h"
@@ -14,6 +17,8 @@
 
 #include "itkLabelImageGenericInterpolateImageFunction.h"
 #include "itkNearestNeighborInterpolateImageFunction.h"
+#include "itkBinaryMorphologicalOpeningImageFilter.h"
+#include "itkBinaryBallStructuringElement.h"
 
 #include "itkImageFileWriter.h"
 
@@ -222,6 +227,26 @@ namespace ITKHelpers
         outImage->Graft(dilateFilter->GetOutput());
     }
 
+    template <typename TInputImage, typename TOutputImage>
+    void OpeningBinaryImage(TInputImage* image, TOutputImage* outImage, float radius)
+    {
+        typedef itk::BinaryBallStructuringElement<TInputImage::PixelType, TInputImage::ImageDimension>
+            StructuringElementType;
+        StructuringElementType structuringElement;
+        structuringElement.SetRadius(radius);
+        structuringElement.CreateStructuringElement();
+
+        typedef itk::BinaryMorphologicalOpeningImageFilter <TInputImage, TOutputImage, StructuringElementType>
+            BinaryMorphologicalOpeningImageFilterType;
+        BinaryMorphologicalOpeningImageFilterType::Pointer openingFilter
+            = BinaryMorphologicalOpeningImageFilterType::New();
+        openingFilter->SetInput(image);
+        openingFilter->SetKernel(structuringElement);
+        openingFilter->Update();
+        outImage->Graft(openingFilter->GetOutput());
+    }
+
+
     template<typename TInputImage>
     bool  FindImageROI(const TInputImage* itkImage, int imageLabel, int* roi)
     {
@@ -312,3 +337,4 @@ namespace ITKHelpers
         output->Graft(threshold->GetOutput());
     }
 }
+#endif // ITK_Helpers_h__
