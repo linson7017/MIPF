@@ -6,6 +6,7 @@
 
 CQF_MitkDataManager::CQF_MitkDataManager(QF::IQF_Main* pMain):m_pMain(pMain)
 {
+    Init();
 }
 
 

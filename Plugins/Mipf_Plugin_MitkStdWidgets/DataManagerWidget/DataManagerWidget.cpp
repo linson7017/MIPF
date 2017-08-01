@@ -78,7 +78,6 @@ m_CurrentRowCount(0)
 {
     m_pMain->Attach(this);
     m_DataManager = (IQF_MitkDataManager*)m_pMain->GetInterfacePtr("QF_MitkMain_DataManager");
-    m_DataManager->Init();
 }
 
 DataManagerWidget::~DataManagerWidget()

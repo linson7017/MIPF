@@ -83,11 +83,6 @@ void LankMarkExtractView::Extract()
     vecModelThree.push_back(29);
     vecModelThree.push_back(41);
     vecModelDistance.push_back(vecModelThree);
-    std::vector<double> vecModelFour;
-    vecModelFour.push_back(9);
-    vecModelFour.push_back(21);
-    vecModelFour.push_back(41);
-    vecModelDistance.push_back(vecModelFour);
 
     mitk::Image* mitkImage = dynamic_cast<mitk::Image*>(m_ui.ImageSelector->GetSelectedNode()->GetData());
     LandMarkExtractor extractor;

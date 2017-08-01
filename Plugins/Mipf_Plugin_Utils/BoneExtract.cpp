@@ -44,11 +44,6 @@ void BoneExtract::CreateView()
     m_ui.ThresholdSlider->setMaximumValue(1000);
     m_ui.ThresholdSlider->setMinimumValue(0);
 
-    connect(
-        m_ui.ThresholdSlider, SIGNAL(maximumValueChanged(double)), this, SLOT(SetUpperThresholdValue(double)));
-    connect(
-        m_ui.ThresholdSlider, SIGNAL(minimumValueChanged(double)), this, SLOT(SetLowerThresholdValue(double)));
-
     connect(m_ui.ExtractBtn, SIGNAL(clicked()), this, SLOT(Extract()));
 
     connect(m_ui.ImageSelector, SIGNAL(OnSelectionChanged(const mitk::DataNode *)), this, SLOT(SelectionChanged(const mitk::DataNode *)));
@@ -173,22 +168,27 @@ void BoneExtract::Extract()
     cropFilter->SetInput(coarseBone);
     cropFilter->SetBoundaryCropSize(cropSize);
     cropFilter->Update();
+    coarseBone->Graft(cropFilter->GetOutput());
 
-    typedef itk::BinaryBallStructuringElement<UShort3DImageType::PixelType, UShort3DImageType::ImageDimension>
-        StructuringElementType;
-    StructuringElementType structuringElementClosing;
-    structuringElementClosing.SetRadius(2.0);
-    structuringElementClosing.CreateStructuringElement();
-    typedef itk::BinaryMorphologicalClosingImageFilter <UShort3DImageType, UShort3DImageType, StructuringElementType>
-        BinaryMorphologicalClosingImageFilterType;
-    BinaryMorphologicalClosingImageFilterType::Pointer closingFilter
-        = BinaryMorphologicalClosingImageFilterType::New();
-    closingFilter->SetInput(cropFilter->GetOutput());
-    closingFilter->SetKernel(structuringElementClosing);
-    closingFilter->SetForegroundValue(1);
-    closingFilter->Update();
+    if (m_ui.Radius->value()>0)
+    {
+        typedef itk::BinaryBallStructuringElement<UShort3DImageType::PixelType, UShort3DImageType::ImageDimension>
+            StructuringElementType;
+        StructuringElementType structuringElementClosing;
+        structuringElementClosing.SetRadius(1.0);
+        structuringElementClosing.CreateStructuringElement();
+        typedef itk::BinaryMorphologicalClosingImageFilter <UShort3DImageType, UShort3DImageType, StructuringElementType>
+            BinaryMorphologicalClosingImageFilterType;
+        BinaryMorphologicalClosingImageFilterType::Pointer closingFilter
+            = BinaryMorphologicalClosingImageFilterType::New();
+        closingFilter->SetInput(cropFilter->GetOutput());
+        closingFilter->SetKernel(structuringElementClosing);
+        closingFilter->SetForegroundValue(m_ui.Radius->value());
+        closingFilter->Update();
+        coarseBone->Graft(closingFilter->GetOutput());
+    }   
 
-    ITKBasicAlgorithms::ExtractConnectedLargerThan<UShort3DImageType, UShort3DImageType>(closingFilter->GetOutput(), coarseBone.GetPointer(), 1000);
+    ITKBasicAlgorithms::ExtractConnectedLargerThan<UShort3DImageType, UShort3DImageType>(coarseBone.GetPointer(), coarseBone.GetPointer(), 1000);
 
 
     mitk::Image::Pointer resultImage = mitk::Image::New();

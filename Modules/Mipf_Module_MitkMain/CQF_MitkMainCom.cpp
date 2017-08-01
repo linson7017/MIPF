@@ -5,6 +5,7 @@
 #include "CQF_MitkRenderWindow.h"
 #include "CQF_MitkReference.h"
 #include "CQF_MitkIO.h"
+#include "CQF_MitkDisplayOption.h"
 
 #include "CQF_MainCommand.h"
 #include "internal/qf_interfacedef.h"
@@ -46,6 +47,7 @@ bool CQF_MitkMain::Init()
     m_pMitkRenderWindow = new CQF_MitkRenderWindow;
     m_pMitkReference = new CQF_MitkReference(m_pMain);
     m_pMitkIO = new CQF_MitkIO(m_pMain);
+    m_pDisplayOption = new CQF_MitkDisplayOption(m_pMain);
 
 	m_pMainCommand = new CQF_MainCommand(m_pMain);
     return true;
@@ -54,13 +56,12 @@ bool CQF_MitkMain::Init()
 
 int CQF_MitkMain::GetInterfaceCount()
 {
-    return 5;
+    return 6;
 
 }
 
 const char* CQF_MitkMain::GetInterfaceID(int iID)
 {
-
     switch (iID)
     {
     case 0:
@@ -73,6 +74,8 @@ const char* CQF_MitkMain::GetInterfaceID(int iID)
 		return QF_MitkMain_DataManager;
     case 4:
         return QF_MitkMain_IO;
+    case 5:
+        return QF_MitkMain_DisplayOption;
     default:
         break;
     }
@@ -100,6 +103,10 @@ void* CQF_MitkMain::GetInterfacePtr(const char* szInterfaceID)
     else if (strcmp(szInterfaceID, QF_MitkMain_IO) == 0)
     {
         return m_pMitkIO;
+    }
+    else if (strcmp(szInterfaceID, QF_MitkMain_DisplayOption) == 0)
+    {
+        return m_pDisplayOption;
     }
     else
         return NULL;

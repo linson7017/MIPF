@@ -57,11 +57,7 @@ void AirwaySegmentationView::Update(const char* szMessage, int iValue, void* pVa
 {
     if (strcmp(szMessage, "MITK_MESSAGE_AIRWAY_SEGMENT") == 0)
     {
-		QPushButton* btn = (QPushButton*)R::Instance()->getObjectFromGlobalMap("AirwaySegmentation.Segment");
-		if (btn)
-		{
-			btn->setText("Please wait...");
-		}
+        SetGuiProperty("AirwaySegmentation.Segment", "text","Please wait...");
 		m_future = QtConcurrent::run(this, &AirwaySegmentationView::DoSomething);
 		m_watcher.setFuture(m_future);
 		//do what you want for the message
@@ -79,11 +75,7 @@ void AirwaySegmentationView::AirwayFinished()
 	m_result->SetName("Result");
 	GetDataStorage()->Add(m_result);
 
-	QPushButton* btn = (QPushButton*)R::Instance()->getObjectFromGlobalMap("Airway.Button");
-	if (btn)
-	{
-		btn->setText("Done");
-	}	
+    SetGuiProperty("AirwaySegmentation.Segment", "text", "Done");
 	RequestRenderWindowUpdate();
 }
 

@@ -63,6 +63,7 @@
 #include "itkShapeOpeningLabelMapFilter.h"
 
 #include "mitkPixelType.h"
+#include "mitkOrganTypeProperty.h"
 
 #include "mitkSurfaceToImageFilter.h"
 
@@ -70,6 +71,7 @@
 #include "MitkSegmentation/IQF_MitkSurfaceTool.h"
 #include "MitkStd/IQF_MitkPointList.h"
 #include "MitkImageUtils/IQF_MitkImageCropper.h"
+#include "MitkMain/IQF_MitkDisplayOption.h"
 
 #include "Segmentation/IQF_SegmentationMethodFactory.h"
 
@@ -84,6 +86,8 @@ void SegmentationOption::SetOrgan(const QString& szOrganType)
         Color[0] = 0.667;
         Color[1] = 0.0;
         Color[2] = 0.0;
+        Level = 30.0;
+        Window = 400.0;
     }
     else if (Organ.compare("Kidney", Qt::CaseInsensitive) == 0)
     {
@@ -91,6 +95,8 @@ void SegmentationOption::SetOrgan(const QString& szOrganType)
         Color[0] = 1.0;
         Color[1] = 0.667;
         Color[2] = 0.0;
+        Level = 40;
+        Window = 300;
     }
     else if (Organ.compare("Spleen", Qt::CaseInsensitive) == 0)
     {
@@ -98,6 +104,8 @@ void SegmentationOption::SetOrgan(const QString& szOrganType)
         Color[0] = 0.0;
         Color[1] = 0.33;
         Color[2] = 1.0;
+        Level = 40;
+        Window = 50;
     }
     else if (Organ.compare("Gallbladder", Qt::CaseInsensitive) == 0)
     {
@@ -105,6 +113,8 @@ void SegmentationOption::SetOrgan(const QString& szOrganType)
         Color[0] = 0.0;
         Color[1] = 0.33;
         Color[2] = 0.0;
+        Level = 30;
+        Window = 400;
     }
     else if (Organ.compare("Pancreas", Qt::CaseInsensitive) == 0)
     {
@@ -112,6 +122,8 @@ void SegmentationOption::SetOrgan(const QString& szOrganType)
         Color[0] = 0.667;
         Color[1] = 0.33;
         Color[2] = 1.0;
+        Level = 40;
+        Window = 400;
     }
     else
     {
@@ -119,6 +131,8 @@ void SegmentationOption::SetOrgan(const QString& szOrganType)
         Color[0] = 1.0;
         Color[1] = 0.0;
         Color[2] = 0.0;
+        Level = 30.0;
+        Window = 400.0;
     }
 }
 
@@ -605,6 +619,11 @@ void GraphcutSegmentationView::Init()
     {
         return;
     }
+
+
+    //change level window
+    IQF_MitkDisplayOption* pDisplayOption = (IQF_MitkDisplayOption*)m_pMain->GetInterfacePtr(QF_MitkMain_DisplayOption);
+    pDisplayOption->SetLevelWindow(m_refImageNode, m_segOption.Level, m_segOption.Window);
 
     m_originMitkImage = dynamic_cast<mitk::Image*>(m_refImageNode->GetData());
     mitk::BaseGeometry* originImageGeometry = m_originMitkImage->GetGeometry();

@@ -32,6 +32,8 @@ struct SegmentationOption
     QString Organ;
     double Lambda;
     float Color[3];
+    double Level;
+    double Window;
 };
 
 class GraphcutSegmentationView : public QObject, public MitkPluginView

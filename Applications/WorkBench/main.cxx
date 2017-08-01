@@ -31,7 +31,6 @@ int main(int argc, char *argv[])
     QString wk = qApp->applicationFilePath();
     QVariant v;
 
-    
     app_env appenv(wk.toLocal8Bit().constData());
     appenv.setMainPtr(QF::QF_CreateMainObject(wk.toLocal8Bit().constData()));
     qApp->setProperty("MainPtr", QVariant::fromValue(appenv.getMainPtr()));
@@ -40,7 +39,7 @@ int main(int argc, char *argv[])
     //设置qt程序编码
     qt_context::setApplicationCoding("UTF-8");
     //设置qt程序默认语言
-    qt_context::setDefaultLanguage("Chinese");
+   // qt_context::setDefaultLanguage("Chinese");
     //设置qt程序风格
     qt_context::setApplicationStyle("fusion");
 

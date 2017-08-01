@@ -215,6 +215,7 @@ std::vector<LandMarkPoint> LandMarkExtractor::ExtractLandMarks(const mitk::Image
         landMark.ID = i;
         landMarkPoints.push_back(landMark);
     }
+    
 
     //**********Calculate Distance Map***********///
     for (int i = 0; i < landMarkPoints.size(); i++)
@@ -226,6 +227,7 @@ std::vector<LandMarkPoint> LandMarkExtractor::ExtractLandMarks(const mitk::Image
             landMarkPoints[j].InsertDistanceMap(i, distance);
         }
     }
+   //return  landMarkPoints;
 
     //**********Fit Point***********////
     double error = 1.0;
