@@ -12,6 +12,8 @@
 #include "vtkWindowedSincPolyDataFilter.h"
 #include "vtkSmoothPolyDataFilter.h"
 #include "vtkPolyDataNormals.h"
+#include "vtkDecimatePro.h"
+#include "vtkQuadricDecimation.h"
 
 
 CQF_SurfaceTool::CQF_SurfaceTool()
@@ -281,5 +283,42 @@ void CQF_SurfaceTool::ConvertSurfaceToImage(mitk::Surface* surface, mitk::Image*
     else
     {
         return;
+    }
+}
+
+void CQF_SurfaceTool::SimplifySurfaceMesh(vtkPolyData* pInput, vtkPolyData* pOutput, double dRate, int mode)
+{
+    if (!pInput ||!pOutput)
+    {
+        return;
+    }
+    if (mode == 0)
+    {
+        vtkDecimatePro *decimate = vtkDecimatePro::New();
+        decimate->SplittingOff();
+        decimate->SetErrorIsAbsolute(5);
+        decimate->SetFeatureAngle(30);
+        decimate->PreserveTopologyOn();
+        decimate->BoundaryVertexDeletionOff();
+        decimate->SetDegree(10); // std-value is 25!
+
+        decimate->SetInputData(pInput); // RC++
+        decimate->SetTargetReduction(dRate);
+        decimate->SetMaximumError(0.002);
+        decimate->Update();
+
+        pOutput->DeepCopy(decimate->GetOutput());
+        decimate->Delete();
+    }
+    else
+    {
+        vtkQuadricDecimation *decimate = vtkQuadricDecimation::New();
+        decimate->SetTargetReduction(dRate);
+
+        decimate->SetInputData(pInput);
+        decimate->Update();
+        pOutput->DeepCopy(decimate->GetOutput());
+
+        decimate->Delete();
     }
 }

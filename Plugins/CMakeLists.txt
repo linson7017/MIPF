@@ -33,3 +33,5 @@ add_subdirectory(Mipf_Plugin_AirwaySegmentation)
 add_subdirectory(Mipf_Plugin_VesselSegmentation)
 
 add_subdirectory(Mipf_Plugin_VMTKTools)
+
+add_subdirectory(Mipf_Plugin_StaticisTools)

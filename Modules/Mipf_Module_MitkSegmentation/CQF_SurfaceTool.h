@@ -16,6 +16,7 @@ public:
     virtual void SmoothTubeSurface(vtkPolyData* pInput, vtkPolyData* pOutput, int iSmooth = 30, bool bLargestConnected = false);
     virtual void SmoothTubeSurfaceUsingLaplace(vtkPolyData* pInput, vtkPolyData* pOutput, int iSmooth = 15, bool bLargestConnected = false);
     virtual void ConvertSurfaceToImage(mitk::Surface* surface, mitk::Image* referenceImage, mitk::Image* output);
+    virtual void SimplifySurfaceMesh(vtkPolyData* pInput, vtkPolyData* pOutput, double dRate, int mode=0);
 
 };
 

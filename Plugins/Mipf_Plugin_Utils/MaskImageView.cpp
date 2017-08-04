@@ -16,6 +16,10 @@
 //itk
 #include "itkMaskImageFilter.h"
 
+
+//vtk
+#include <vtkJPEGReader.h>
+
 MaskImageView::MaskImageView(QF::IQF_Main* pMain) :MitkPluginView(pMain)
 {
     m_pMain->Attach(this);
