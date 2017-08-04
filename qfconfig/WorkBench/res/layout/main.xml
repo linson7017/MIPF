@@ -18,8 +18,7 @@
 			<Action text="Measurement" uicommand="@uicommand/toggleMeasurementDockWidget" checkable="true" />
 			<Action text="Registration" uicommand="@uicommand/toggleImageRegistrationDockWidget" checkable="true" checked="true"/>
 			<Action text="Mannul Segmentation" uicommand="@uicommand/toggleSegmentationDocWidget" checkable="true" checked="true"/>
-			<Action text="Graphcut Segmentation" uicommand="@uicommand/toggleGraphcutSegmentationDocWidget" checkable="true" checked="true"/>
-			
+			<Action text="Graphcut Segmentation" uicommand="@uicommand/toggleGraphcutSegmentationDocWidget" checkable="true" checked="true"/>			
 			<Action text="NDI" uicommand="@uicommand/toggleNDIDockWidget" checkable="true"/>
 		</Menu>
 	</MenuBar>
@@ -52,29 +51,34 @@
 	<DockWidget id="main.ImageNavigatorDockWidget" height="300" windowTitle="Image Navigator">
 		<ImageNavigatorWidget id="main.ImageNavigator" />
 	</DockWidget>
-	
-	<DockWidget id="main.Plugins" windowTitle="Plugins" dockWidgetArea="RightDockWidgetArea" width="400"  visible="true">
-		<ToolBox stretch="2">
+	<DockWidget id="main.Segmentation" windowTitle="Segmentation" dockWidgetArea="RightDockWidgetArea"   visible="true">
+		<ToolBox >	
+			<Holder id="@ui/MaskImage" text="mask"/>
 			<Holder id="@ui/GraphcutSegmentation" text="Graphcut Segmentation"/>
 			<BoneExtractWidget text="Bone Extract"/>
 			<SkinExtractWidget text="Skin Extract"/>
-			<Holder id="@ui/ImageRegistration" text="Image Registration"/>
 			<CenterLineExtractWidget text="Center Line Extract"/>
 			<VesselSegmentationWidget text="Vessel Segmentation"/>
-			<LandMarkExtractWidget text="Land Mark"/>		
+			<BasicImageProcessWidget text="Basic Image Algorithms"/>			
 			<ImageCropperWidget  text="Image Cropper"/>				
 			<Holder id="@ui/SurfaceExtract" text="Surface Extract"/>
-			<!-- <Holder id="@id/AirwaySegmentation" text="Airway Segmentation" />	
-			<Holder id="@ui/ManualSegmentationTest" text="Manual Segmentation"/>
-			<BasicImageProcessWidget text="Basic Image Algorithms"/>
-			<VSplitter text="Utils">
-					<Holder id="@ui/LargestConnectedComponent" text="Largest Connected" />
-					<Holder id="@ui/MaskImage" text="Largest Connected" />
-			</VSplitter> -->	
+			<Holder id="@id/AirwaySegmentation" text="Airway Segmentation" />	
 			<VolumeVisualizationWidget text="Volume Visualization"/>
 		</ToolBox>
 	</DockWidget>
-	
+	<DockWidget id="main.Plugins" windowTitle="Plugins" tabfiedDocWidgetID="main.Segmentation" dockWidgetArea="RightDockWidgetArea"   visible="true">
+		<ToolBox >		
+			<Holder id="@ui/ImageRegistration" text="Image Registration"/>
+			<LandMarkExtractWidget text="Land Mark"/>			
+			<VolumeVisualizationWidget text="Volume Visualization"/>
+		</ToolBox>
+	</DockWidget>
+	<DockWidget id="main.Staticis" windowTitle="Staticis" tabfiedDocWidgetID="main.Plugins" dockWidgetArea="RightDockWidgetArea"  visible="true">
+		<ToolBox >
+			<HistogramWidget text="Histogram"/>
+			<ProfileGrayScaleDistributionWidget text="Profile Gray Scale Distribution"/>
+		</ToolBox>
+	</DockWidget>
 	<!-- 状态条 -->
 	<StatusBarWidget statusBar="true"/>
 </MainWindow>
