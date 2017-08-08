@@ -8,5 +8,5 @@ add_subdirectory(WorkBench)
 add_subdirectory(PluginGenerator)
 add_subdirectory(RobotControlApp)
 add_subdirectory(ModuleGenerator)
-#add_subdirectory(CTKTest)
+add_subdirectory(MapperTest)
 

@@ -2,213 +2,153 @@
 #include "iqf_main.h"
 #include "Res/R.h"
 
-//qt
-#include <QtWidgets>
-
-//mitk
-#include "mitkImage.h"
-#include "mitkImageCast.h"
-#include "mitkSurface.h"
-
-#include "MitkMain/IQF_MitkDataManager.h"
-#include "MitkMain/IQF_MitkRenderWindow.h"
-#include "Grid/Math/IQF_MathUtil.h"
-
-#include "Tracking/IQF_SliceBySliceTracking.h"
-
-#include "QmitkPointListViewWidget.h"
-#include "QmitkPointListWidget.h"
-
-#include "vtkPolyData.h"
-
-#include "itkBinaryThresholdImageFilter.h"
-
 #include "ITKImageTypeDef.h"
 
+//mitk
+#include "mitkImageCast.h"
 
-ItkAlgorithmSetView::ItkAlgorithmSetView(QF::IQF_Main* pMain):PluginView(pMain)
+#include "vtkNrrdReader.h"
+#include "vtkJPEGReader.h"
+
+//extern
+//#include "extern/itk/itkMultiScaleHessianSmoothed3DToVesselnessMeasureImageFilter.h"
+#include "itkAnisotropicDiffusionVesselEnhancementImageFilter.h"
+
+//itk
+#include "itkRGBAPixel.h"
+#include "itkConvertPixelBuffer.h"
+
+
+ItkAlgorithmSetView::ItkAlgorithmSetView():MitkPluginView()
 {
-    m_pMain->Attach(this);
 }
 
 
-void ItkAlgorithmSetView::Update(const char* szMessage, int iValue, void* pValue)
+void ItkAlgorithmSetView::CreateView()
 {
-    if (strcmp(szMessage, "ITKAlgorithmSet.BinaryThreshold") == 0)
+
+
+    vtkSmartPointer<vtkJPEGReader> reader = vtkSmartPointer<vtkJPEGReader>::New();
+    reader->SetFileName("D:/temp/UR.jpg");
+    reader->Update();
+
+    vtkImageData* image = reader->GetOutput();
+
+    int extent[6];
+    image->GetExtent(extent);
+
+    mitk::Image::Pointer mitkImage = mitk::Image::New();
+    mitkImage->Initialize(image);
+    mitkImage->GetVtkImageData()->DeepCopy(image);
+
+
+    mitk::CastToMitkImage(itkImage, mitkImage);
+
+    mitk::DataNode::Pointer node = mitk::DataNode::New();
+    node->SetData(mitkImage);
+    node->SetName("UR");
+    GetDataStorage()->Add(node);
+
+
+    m_ui.setupUi(this);
+
+    m_ui.DataSelector->SetDataStorage(GetDataStorage());
+    m_ui.DataSelector->SetPredicate(CreatePredicate(1));
+
+    //VDE
     {
-        IQF_MitkRenderWindow* pwindow = (IQF_MitkRenderWindow*)m_pMain->GetInterfacePtr(QF_MitkMain_RenderWindow);
-        QmitkRenderWindow* window = pwindow->GetActiveMitkRenderWindow();
-        IQF_MitkDataManager* pMitkDataManager = (IQF_MitkDataManager*)m_pMain->GetInterfacePtr("QF_MitkMain_DataManager");
-        if (pMitkDataManager)
-        {
-            IQF_SliceBySliceTracking* pTrakcer = (IQF_SliceBySliceTracking*)m_pMain->GetInterfacePtr(QF_Algorithm_SliceBySliceTracking);
-            
-            //Set Current Image
-            mitk::DataNode::Pointer currentNode = pMitkDataManager->GetCurrentNode();
-            mitk::Image::Pointer image = 0;
-            if (currentNode.IsNotNull())
-            {
-                image = dynamic_cast<mitk::Image *>(currentNode->GetData());
-            }
-            if (!image)
-            {
-                std::cout << "Image NULL" << std::endl;
-                return;
-            }
+        m_VEDBtn = new QPushButton("Enhance");
+        QWidget*   widget = new QWidget;
+        QVBoxLayout* layout = new QVBoxLayout;
+        widget->setLayout(layout);
+        layout->addWidget(m_VEDBtn);
 
-            QSlider* slider = (QSlider*)m_pR->getObjectFromGlobalMap("ITKAlgorithmSet.BinaryThreshold.Slider");
-            if (!slider)
-            {
-                return;
-            }
-            
-            Float3DImagePointerType itkImage = Float3DImageType::New();
-            mitk::CastToItkImage<Float3DImageType>(image, itkImage);
-
-            typedef itk::BinaryThresholdImageFilter<Float3DImageType, UChar3DImageType> binaryThresholdImageFilterType;
-            binaryThresholdImageFilterType::Pointer filter = binaryThresholdImageFilterType::New();
-            filter->SetInput(itkImage);
-            filter->SetLowerThreshold(slider->value());
-            filter->SetUpperThreshold(image->GetScalarValueMax());
-            filter->Update();
-
-            mitk::Image::Pointer outputImage = mitk::Image::New();
-            mitk::CastToMitkImage<UChar3DImageType>(filter->GetOutput(), outputImage);
-            
-            mitk::DataNode::Pointer outputNode = mitk::DataNode::New();
-            outputNode->SetData(outputImage);
-            outputNode->SetName(currentNode->GetName()+"_BinaryThreshold");
-            pMitkDataManager->GetDataStorage()->Add(outputNode);
-        }
+        connect(m_VEDBtn, SIGNAL(clicked()), this, SLOT(OnVesselEnhance()));
+        m_ui.AlgorithmContainers->insertWidget(0, widget);
     }
-    else if (strcmp(szMessage, MITK_MESSAGE_SELECTION_CHANGED) == 0)
-    {
-        IQF_MitkDataManager* pMitkDataManager = (IQF_MitkDataManager*)pValue;
-        if (!pMitkDataManager)
-        {
-            return;
-        }
-        mitk::DataNode::Pointer currentNode = pMitkDataManager->GetCurrentNode();
-        mitk::Image::Pointer image = 0;
-        if (currentNode.IsNotNull())
-        {
-            image = dynamic_cast<mitk::Image *>(currentNode->GetData());
-        }
-        if (!image)
-        {
-            std::cout << "Image NULL" << std::endl;
-            return;
-        }
-        //BinaryThreshold
+    
 
-        QSlider* slider = (QSlider*)m_pR->getObjectFromGlobalMap("ITKAlgorithmSet.BinaryThreshold.Slider");
-        QSpinBox* spinnerBox = (QSpinBox*)m_pR->getObjectFromGlobalMap("ITKAlgorithmSet.BinaryThreshold.SpinBox");
-        if (slider&&spinnerBox)
-        {
-            slider->setEnabled(true);
-            spinnerBox->setEnabled(true);
 
-            QObject::disconnect(slider, &QSlider::valueChanged, spinnerBox, &QSpinBox::setValue);
-            QObject::disconnect(spinnerBox, SIGNAL(valueChanged(int)), slider, SLOT(setValue(int)));
-            slider->setRange(image->GetScalarValueMin(), image->GetScalarValueMax());
-            spinnerBox->setRange(image->GetScalarValueMin(), image->GetScalarValueMax());
-            QObject::connect(slider, &QSlider::valueChanged, spinnerBox, &QSpinBox::setValue);
-            QObject::connect(spinnerBox, SIGNAL(valueChanged(int)), slider, SLOT(setValue(int)));
 
-            slider->setValue(image->GetScalarValueMin());          
-        }
-    }
-    else if (strcmp(szMessage, MITK_MESSAGE_MULTIWIDGET_INIT) == 0)
-    {
-        IQF_MitkRenderWindow* pRenderWindow = (IQF_MitkRenderWindow*)m_pMain->GetInterfacePtr(QF_MitkMain_RenderWindow);
-        if (pRenderWindow)
-        {
-            m_PointListWidget = new QmitkPointListWidget();
 
-            m_PointSet = mitk::PointSet::New();
-            mitk::DataNode::Pointer pointSetNode = mitk::DataNode::New();
-            pointSetNode->SetData(m_PointSet);
-            pointSetNode->SetName("seed points for tracking");
-            pointSetNode->SetProperty("helper object", mitk::BoolProperty::New(true));
-            pointSetNode->SetProperty("layer", mitk::IntProperty::New(1024));
 
-            // add the pointset to the data storage (for rendering and access by other modules)
-            IQF_MitkDataManager* pMitkDataStorage = (IQF_MitkDataManager*)m_pMain->GetInterfacePtr("QF_MitkMain_DataManager");
-            pMitkDataStorage->GetDataStorage()->Add(pointSetNode);
-            // tell the GUI widget about the point set
-            m_PointListWidget->SetPointSetNode(pointSetNode);  
-            m_PointListWidget->SetMultiWidget(pRenderWindow->GetMitkStdMultiWidget());
-            m_pR->registerCustomWidget("ItkAlgorithSetViewSeedWidget", m_PointListWidget);
-        }     
-    }
+    m_ui.AlgorithmContainers->setCurrentWidget(m_VEDBtn);
+    connect(m_ui.AlgorithmSelector, SIGNAL(currentIndexChanged(const QString &)),this,SLOT(OnAlgorithmChanged(const QString&)));
+}
+
+void ItkAlgorithmSetView::OnAlgorithmChanged(const QString &text)
+{
+     if (text.compare("Multiscale Vessel Enhance")==0)
+     {
+         m_ui.AlgorithmContainers->setCurrentWidget(0);
+     }
 }
 
 
-void ItkAlgorithmSetView::ShowResults(std::vector< std::vector<Vector3> > graph)
+void ItkAlgorithmSetView::OnVesselEnhance()
 {
-
-    IQF_MathUtil* pMathUtil = (IQF_MathUtil*)m_pMain->GetInterfacePtr(QF_Algorithm_MathUtil);
-    if (!pMathUtil)
+    mitk::Image* mitkImage = dynamic_cast<mitk::Image*>(m_ui.DataSelector->GetSelectedNode()->GetData());
+    if (!mitkImage)
     {
         return;
     }
-    int color[6][3] = { { 1.0,0.0,1.0 },
-    { 1.0,0.0,0.0 },
-    { 0.0,1.0,0.0 },
-    { 0.0,0.0,1.0 },
-    { 1.0,1.0,0.0 },
-    { 0.0,1.0,1.0 } };
 
-    for (int i = 0; i < graph.size(); i++)
+    Float3DImageType::Pointer itkImage;
+    mitk::CastToItkImage(mitkImage, itkImage);
+
+    typedef itk::AnisotropicDiffusionVesselEnhancementImageFilter< Float3DImageType,
+        Float3DImageType> VesselnessFilterType;
+
+    // Create a vesselness Filter
+    VesselnessFilterType::Pointer filter =
+        VesselnessFilterType::New();
+
+    filter->SetInput(itkImage);
+    filter->SetNumberOfIterations(20);
+
+    filter->SetSensitivity(4.0);
+    filter->SetWStrength(24.0);
+    filter->SetEpsilon(0.01);
+
+    if (fabs(filter->GetSensitivity() - 4.0) > 0.01)
     {
-        std::vector<Vector3> points = graph.at(i);
-        Vector3 center, normal;
-        pMathUtil->FitLine(points, center,normal);
-
-        vtkSmartPointer<vtkPolyData> linepolydata = vtkSmartPointer<vtkPolyData>::New();
-        vtkSmartPointer<vtkPoints> linepoints = vtkSmartPointer<vtkPoints>::New();
-        double ext = 150;
-        linepoints->InsertNextPoint(center.x()-normal.x()*ext, center.y() - normal.y()*ext, center.z() - normal.z()*ext);
-        linepoints->InsertNextPoint(center.x() + normal.x()*ext, center.y() + normal.y()*ext, center.z() + normal.z()*ext);
-        linepolydata->Allocate();
-        linepolydata->SetPoints(linepoints);
-        vtkIdType connectivity[2];
-        connectivity[0] = 0;
-        connectivity[1] = 1;
-        linepolydata->InsertNextCell(VTK_LINE, 2, connectivity);
-        
-        mitk::Surface::Pointer line = mitk::Surface::New();
-        line->SetVtkPolyData(linepolydata);
-        line->Update();
-        mitk::DataNode::Pointer lineNode = mitk::DataNode::New();
-        lineNode->SetData(line);
-        std::string name = "line";
-        char num[10];
-        name.append(itoa(i+1, num,10));
-        lineNode->SetProperty("name", mitk::StringProperty::New(name));
-        lineNode->SetProperty("color", mitk::ColorProperty::New(1.0, 1.0, 1.0));
-        lineNode->Update();
-
-
-        IQF_MitkDataManager* pMitkDataStorage = (IQF_MitkDataManager*)m_pMain->GetInterfacePtr("QF_MitkMain_DataManager");
-        if (pMitkDataStorage)
-        {
-            pMitkDataStorage->GetDataStorage()->Add(lineNode, pMitkDataStorage->GetCurrentNode());
-            mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-        }
+        std::cerr << "Error Set/Get Sensitivity" << std::endl;
+        return ;
     }
-}
 
-void ItkAlgorithmSetView::InitResource(R* pR)
-{
-    m_pR = pR;
-    //BinaryThreshold
-    QSlider* slider = (QSlider*)m_pR->getObjectFromGlobalMap("ITKAlgorithmSet.BinaryThreshold.Slider");
-    QSpinBox* spinnerBox = (QSpinBox*)m_pR->getObjectFromGlobalMap("ITKAlgorithmSet.BinaryThreshold.SpinBox");
-    if (slider&&spinnerBox)
+    if (fabs(filter->GetWStrength() - 24.0) > 0.01)
     {
-        slider->setEnabled(false);
-        spinnerBox->setEnabled(false);
+        std::cerr << "Error Set/Get Sensitivity" << std::endl;
+        return ;
     }
+
+    if (fabs(filter->GetEpsilon() - 0.01) > 0.01)
+    {
+        std::cerr << "Error Set/Get Sensitivity" << std::endl;
+        return ;
+    }
+
+    filter->SetSensitivity(5.0);
+    filter->SetWStrength(25.0);
+    filter->SetEpsilon(10e-2);
+
+
+    try
+    {
+        filter->Update();
+    }
+    catch (itk::ExceptionObject & err)
+    {
+        std::cerr << "Exception caught: " << err << std::endl;
+        return ;
+    }
+
+    mitk::Image::Pointer resultMitkImage;
+    mitk::CastToMitkImage(filter->GetOutput(),resultMitkImage);
+
+    mitk::DataNode::Pointer resultNode = mitk::DataNode::New();
+    resultNode->SetData(resultMitkImage);
+    resultNode->SetName("result");
+    GetDataStorage()->Add(resultNode);    
 }
 

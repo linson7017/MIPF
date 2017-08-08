@@ -499,13 +499,13 @@ void SurfaceExtractView::ExtractSmoothedSurface(mitk::Image* image)
     m_pSurface->SetVtkPolyData(computeNormals->GetOutput());
 }
 
-void SurfaceExtractView::ExtractSurface(mitk::Image* image, bool smooth, bool largestConnect)
+void SurfaceExtractView::ExtractSurface(mitk::Image* image, int smooth, bool largestConnect)
 {
     IQF_MitkSurfaceTool* pSurfaceTool = (IQF_MitkSurfaceTool*)m_pMain->GetInterfacePtr(QF_MitkSurface_Tool);
     if (pSurfaceTool)
     {
         vtkSmartPointer<vtkPolyData> polydata = vtkSmartPointer<vtkPolyData>::New();
-        pSurfaceTool->ExtractSurface(image,polydata, 50, largestConnect);
+        pSurfaceTool->ExtractSurface(image,polydata, smooth, largestConnect);
         m_pSurface = mitk::Surface::New();
         m_pSurface->SetVtkPolyData(polydata);
     }

@@ -56,12 +56,12 @@ public slots:
     void ComponentActionChanged() {}
     void ColorChanged();
     void ColorActionChanged();
-    void TextureInterpolationChanged() {}
-    void TextureInterpolationToggled(bool checked) {}
+    void TextureInterpolationChanged();
+    void TextureInterpolationToggled(bool checked);
     void ColormapMenuAboutToShow();
     void ColormapActionToggled(bool);
     void SurfaceRepresentationMenuAboutToShow();
-    void SurfaceRepresentationActionToggled(bool checked) {}
+    void SurfaceRepresentationActionToggled(bool checked);
     void RemoveSelectedNodes(bool checked = false);
     void SaveSelectedNodes(bool checked = false);
     void ReinitSelectedNodes(bool checked = false);

@@ -4,6 +4,7 @@
 #include "MitkPluginView.h"
 
 #include <QWidget>
+#include <QTimer>
 
 #include "mitkPointSet.h"
 
@@ -26,6 +27,8 @@ protected slots:
     void OnSelectEndPoint();
     void ProfilePlot();
 
+    void Refresh();
+
 private:
     void DrawLine();
 private:
@@ -38,6 +41,11 @@ private:
     mitk::Point3D m_endPoint;
     mitk::DataNode::Pointer m_pLineNode;
     mitk::PointSet::Pointer m_linePoints;
+
+    QTimer m_timer;
+    mitk::DataNode::Pointer m_dataNode;
+    mitk::Image::Pointer m_image;
+    QImage* m_qImage;
 };
 
 #endif // HistogramView_h__

@@ -1,5 +1,7 @@
 #include "Mipf_Plugin_AirwaySegmentationActivator.h"
 #include "AirwaySegmentationView.h"
+
+#include "Utils/QObjectFactory.h"
 #include "Res/R.h"
 
 QF_API QF::IQF_Activator* QF::QF_CreatePluginActivator(QF::IQF_Main* pMain)
@@ -18,7 +20,6 @@ Mipf_Plugin_AirwaySegmentation_Activator::Mipf_Plugin_AirwaySegmentation_Activat
 
 bool Mipf_Plugin_AirwaySegmentation_Activator::Init()
 {
-    m_pAirwaySegmentationView = new AirwaySegmentationView(m_pMain); 
     return true; 
 }
 
@@ -29,11 +30,5 @@ const char* Mipf_Plugin_AirwaySegmentation_Activator::GetID()
 
 void Mipf_Plugin_AirwaySegmentation_Activator::Register(R* pR)
 {
-    m_pAirwaySegmentationView->InitResource(pR); 
-   // pR->registerCustomWidget("AirwaySegmentationView", m_pAirwaySegmentationView); 
-}
-
-void Mipf_Plugin_AirwaySegmentation_Activator::Constructed(R* pR)
-{
-	m_pAirwaySegmentationView->Contructed(pR);
+    REGISTER_CLASS("AirwaySegmentationWidget", AirwaySegmentationView);
 }

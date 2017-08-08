@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>399</width>
-    <height>508</height>
+    <height>748</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,7 +19,7 @@
      <x>10</x>
      <y>0</y>
      <width>381</width>
-     <height>501</height>
+     <height>751</height>
     </rect>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout">
@@ -88,6 +88,13 @@
     </item>
     <item>
      <widget class="QwtPlot" name="ProfileHistogramPlot" native="true"/>
+    </item>
+    <item>
+     <widget class="QLabel" name="ImageWidget">
+      <property name="text">
+       <string>TextLabel</string>
+      </property>
+     </widget>
     </item>
    </layout>
   </widget>

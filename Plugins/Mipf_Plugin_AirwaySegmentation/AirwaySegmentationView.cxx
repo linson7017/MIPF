@@ -11,57 +11,71 @@
 
 #include "Segmentation/IQF_AirwaySegmentation.h"
 #include "Segmentation/IQF_SegmentationMethodFactory.h"
+#include "MitkStd/IQF_MitkPointList.h"
 
-AirwaySegmentationView::AirwaySegmentationView(QF::IQF_Main* pMain) :MitkPluginView(pMain), m_pSourceImageSelector(NULL)
+AirwaySegmentationView::AirwaySegmentationView() :MitkPluginView(), m_pPointList(NULL)
 {
-    m_pMain->Attach(this);
 	connect(&m_watcher, &QFutureWatcher<void>::finished, this, &AirwaySegmentationView::AirwayFinished);
 
 	m_labelimage = mitk::Image::New();
 	m_result = mitk::DataNode::New();
 
-	IQF_MitkDataManager* pdata = (IQF_MitkDataManager*)m_pMain->GetInterfacePtr(QF_MitkMain_DataManager);
-	if (pdata)
-	{
-		pdata->GetDataStorage();
-	}
+    
 }
 
-void AirwaySegmentationView::Contructed(R* pR)
+AirwaySegmentationView::~AirwaySegmentationView()
 {
-	QmitkPointListWidget* pw = (QmitkPointListWidget*)pR->getObjectFromGlobalMap("AirwaySegmentation.SeedWidget");
-	if (pw)
+    delete m_pPointList;
+}
+
+void AirwaySegmentationView::CreateView()
+{
+
+    m_ui.setupUi(this);
+  
+	if (!m_pPointList)
 	{
-		m_PointSet = mitk::PointSet::New();
-		mitk::DataNode::Pointer pointSetNode = mitk::DataNode::New();
-		pointSetNode->SetData(m_PointSet);
-		pointSetNode->SetName("seed points for tracking");
-		pointSetNode->SetProperty("helper object", mitk::BoolProperty::New(true));
-		pointSetNode->SetProperty("layer", mitk::IntProperty::New(1024));
-		// add the pointset to the data storage (for rendering and access by other modules)
-		GetDataStorage()->Add(pointSetNode);
-		// tell the GUI widget about the point set
-		pw->SetPointSetNode(pointSetNode);
-		pw->SetMultiWidget(m_pMitkRenderWindow->GetMitkStdMultiWidget());
+        IQF_PointListFactory* pFactory = (IQF_PointListFactory*)m_pMain->GetInterfacePtr(QF_MitkStd_PointListFactory);
+        m_pPointList = pFactory->CreatePointList();
 	}
 
-	m_pSourceImageSelector = (QmitkDataStorageComboBox*)R::Instance()->getObjectFromGlobalMap("AirwaySegmentation.ImageSelector");
-    if (m_pSourceImageSelector)
+    mitk::DataNode::Pointer pointSetNode = mitk::DataNode::New();
+    m_pPointList->CreateNewPointSetNode(pointSetNode);
+
+    m_ui.ImageSelector->SetDataStorage(GetDataStorage());
+    m_ui.ImageSelector->SetPredicate(CreatePredicate(1));
+
+
+    connect(m_ui.SeedSelectBtn,SIGNAL(clicked(bool)) , this, SLOT(OnSelectSeed(bool)));
+    connect(m_ui.SeedClearBtn, SIGNAL(clicked()), this, SLOT(OnClearSeed()));
+    connect(m_ui.SegmentBtn, SIGNAL(clicked()), this, SLOT(Segment()));
+
+}
+
+
+void AirwaySegmentationView::OnSelectSeed(bool bSelecting)
+{
+     if (m_pPointList)
+     {
+         m_pPointList->AddPoint(bSelecting);
+     }
+}
+
+void AirwaySegmentationView::OnClearSeed()
+{
+    if (m_pPointList)
     {
-        m_pSourceImageSelector->SetDataStorage(GetDataStorage());
-        m_pSourceImageSelector->SetPredicate(CreatePredicate(1));
+        m_pPointList->GetPointSet()->Clear();
     }
 }
 
-void AirwaySegmentationView::Update(const char* szMessage, int iValue, void* pValue)
+
+void AirwaySegmentationView::Segment()
 {
-    if (strcmp(szMessage, "MITK_MESSAGE_AIRWAY_SEGMENT") == 0)
-    {
-        SetGuiProperty("AirwaySegmentation.Segment", "text","Please wait...");
-		m_future = QtConcurrent::run(this, &AirwaySegmentationView::DoSomething);
-		m_watcher.setFuture(m_future);
-		//do what you want for the message
-    }
+    m_ui.SegmentBtn->setText("Wait...");
+    m_ui.SegmentBtn->setDisabled(true);
+	m_future = QtConcurrent::run(this, &AirwaySegmentationView::DoSomething);
+	m_watcher.setFuture(m_future);
 }
 
 void AirwaySegmentationView::AirwayFinished()
@@ -75,7 +89,8 @@ void AirwaySegmentationView::AirwayFinished()
 	m_result->SetName("Result");
 	GetDataStorage()->Add(m_result);
 
-    SetGuiProperty("AirwaySegmentation.Segment", "text", "Done");
+    m_ui.SegmentBtn->setText( "Done");
+    m_ui.SegmentBtn->setDisabled(false);
 	RequestRenderWindowUpdate();
 }
 
@@ -89,14 +104,14 @@ void AirwaySegmentationView::DoSomething()
 	typedef itk::Image<InputPixelType, DIM>  InputImageType;
 	typedef itk::Image<OutputPixelType, DIM> OutputImageType;
 
-	mitk::DataNode::Pointer sourceimage = m_pSourceImageSelector->GetSelectedNode();
+	mitk::DataNode::Pointer sourceimage = m_ui.ImageSelector->GetSelectedNode();
 	mitk::Image* mitkSourceImage = dynamic_cast<mitk::Image*>(sourceimage->GetData());
 
 
 	InputImageType::Pointer itkSourceImage = InputImageType::New();
 	mitk::CastToItkImage<InputImageType>(mitkSourceImage, itkSourceImage);
 
-	mitk::Point3D SeedPoint = m_PointSet->GetPoint(0);
+	mitk::Point3D SeedPoint = m_pPointList->GetPointSet()->GetPoint(0);
 	double seed[3];
 	seed[0] = SeedPoint[0];
 	seed[1] = SeedPoint[1];

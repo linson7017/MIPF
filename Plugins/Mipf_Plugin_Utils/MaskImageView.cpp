@@ -12,6 +12,7 @@
 //mitk
 #include "mitkImageCast.h"
 #include "mitkLabelSetImage.h"
+#include "mitkTransferFunction.h"
 
 //itk
 #include "itkMaskImageFilter.h"
@@ -48,6 +49,24 @@ void MaskImageView::Update(const char* szMessage, int iValue, void* pValue)
 {
     if (strcmp(szMessage, "MaskImage.DoMask") == 0)
     {
+        ////Set Opacity
+        //mitk::TransferFunction::Pointer tf = mitk::TransferFunction::New();
+        //tf->GetScalarOpacityFunction()->AddPoint(-643.78106689453125, 0.0);
+        //tf->GetScalarOpacityFunction()->AddPoint(-584.65887451171875, 0.26931655406951904);
+        //tf->GetScalarOpacityFunction()->AddPoint(-382.65924072265625, 0.46969130635261536);
+        //tf->GetScalarOpacityFunction()->AddPoint(-235.1552734375, 0.0);
+
+        ////Set Color
+        //tf->GetColorTransferFunction()->AddRGBPoint(-643.78106689453125, 0.0, 0.60537117719650269, 0.70577555894851685);
+        //tf->GetColorTransferFunction()->AddRGBPoint(-584.65887451171875, 0.0, 0.60537117719650269, 0.70577555894851685);
+        //tf->GetColorTransferFunction()->AddRGBPoint(-382.65924072265625, 0.0, 0.60537117719650269, 0.70577555894851685);
+        //tf->GetColorTransferFunction()->AddRGBPoint(-235.1552734375, 0.0, 0.60537117719650269, 0.70577555894851685);
+
+        ////Set Gradient
+        //m_transferFunction->GetGradientOpacityFunction()->AddPoint(560.695, 1);
+        //break;
+
+
         QString imageName = QInputDialog::getText(NULL, "Input Result Name", "Image Name:");
 
         mitk::Image* mitkImage = dynamic_cast<mitk::Image*>(m_pImageSelector->GetSelectedNode()->GetData());

@@ -746,3 +746,56 @@ void DataManagerWidget::SurfaceRepresentationMenuAboutToShow()
             , this, SLOT(SurfaceRepresentationActionToggled(bool)));
     }
 }
+
+void DataManagerWidget::SurfaceRepresentationActionToggled(bool /*checked*/)
+{
+    mitk::DataNode* node = m_NodeTreeModel->GetNode(m_FilterModel->mapToSource(m_NodeTreeView->selectionModel()->currentIndex()));
+    if (!node)
+        return;
+
+    mitk::EnumerationProperty* representationProp =
+        dynamic_cast<mitk::EnumerationProperty*> (node->GetProperty("material.representation"));
+    if (!representationProp)
+        return;
+
+    QAction* senderAction = qobject_cast<QAction*> (QObject::sender());
+
+    if (!senderAction)
+        return;
+
+    std::string activatedItem = senderAction->text().toStdString();
+
+    if (activatedItem != representationProp->GetValueAsString())
+    {
+        if (representationProp->IsValidEnumerationValue(activatedItem))
+        {
+            representationProp->SetValue(activatedItem);
+            representationProp->InvokeEvent(itk::ModifiedEvent());
+            representationProp->Modified();
+
+            mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+        }
+    }
+
+}
+
+void DataManagerWidget::TextureInterpolationChanged()
+{
+    mitk::DataNode* node = m_NodeTreeModel->GetNode(m_FilterModel->mapToSource(m_NodeTreeView->selectionModel()->currentIndex()));
+    if (node)
+    {
+        bool textureInterpolation = false;
+        node->GetBoolProperty("texture interpolation", textureInterpolation);
+        m_TextureInterpolation->setChecked(textureInterpolation);
+    }
+}
+
+void DataManagerWidget::TextureInterpolationToggled(bool checked)
+{
+    mitk::DataNode* node = m_NodeTreeModel->GetNode(m_FilterModel->mapToSource(m_NodeTreeView->selectionModel()->currentIndex()));
+    if (node)
+    {
+        node->SetBoolProperty("texture interpolation", checked);
+        mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    }
+}

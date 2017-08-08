@@ -26,6 +26,10 @@
 #include "mitkMeshMapper2D.h"
 #include "mitkContour.h"
 
+#include "CurveProjectionVtkMapper2D.h"
+#include "CurveProjectionMapper2D.h"
+#include "CustomObjectFactory.h"
+
 //common
 #include "ITKImageTypeDef.h"
 
@@ -68,6 +72,7 @@ public:
 
 ProfileGrayScaleDistributionView::ProfileGrayScaleDistributionView()
 {
+    //RegisterCustomObjectFactory();
 }
 
 
@@ -210,48 +215,32 @@ void ProfileGrayScaleDistributionView::DrawLine()
       if (m_lineNode.IsNull())
       {
           m_lineNode = mitk::DataNode::New();
-          m_lineNode->SetColor(1.0, 1.0, 0.0);
-          m_lineNode->SetProperty("show contour", mitk::BoolProperty::New(true));
-          m_lineNode->SetProperty("show distances", mitk::BoolProperty::New(true));
           m_lineNode->SetProperty("helper object", mitk::BoolProperty::New(true));
+          mitk::CurveProjectionVtkMapper2D::Pointer mapper = mitk::CurveProjectionVtkMapper2D::New();
+          mapper->SetDataNode(m_lineNode);
+          m_lineNode->SetMapper(mitk::BaseRenderer::Standard2D, mapper);
+          m_lineNode->SetProperty("2d mapper type", mitk::StringProperty::New("curve projection"));
+
+          mitk::Surface::Pointer surface = mitk::Surface::New();
+          m_lineNode->SetData(surface);
+          
           GetDataStorage()->Add(m_lineNode);
       }
-      if (m_linePoints.IsNull())
-      {
-          m_linePoints = mitk::PointSet::New();
-          m_lineNode->SetData(m_linePoints);
-      }
-      /*vtkSmartPointer<vtkLineSource> lineSource =
-          vtkSmartPointer<vtkLineSource>::New();
-      lineSource->SetPoint1(m_startPoint.GetDataPointer());
-      lineSource->SetPoint2(m_endPoint.GetDataPointer());
-      lineSource->Update();
 
-      mitk::Surface::Pointer surface = mitk::Surface::New();
-      surface->SetVtkPolyData(lineSource->GetOutput());*/
+       if (!m_ui.StartPointLE->text().isEmpty()&& !m_ui.EndPointLE->text().isEmpty())
+       {
+           vtkSmartPointer<vtkLineSource> lineSource =
+               vtkSmartPointer<vtkLineSource>::New();
+           lineSource->SetPoint1(m_startPoint.GetDataPointer());
+           lineSource->SetPoint2(m_endPoint.GetDataPointer());
+           lineSource->Update();
 
-      /*mitk::Contour::Pointer contour = mitk::Contour::New();
-      contour->AddVertex(m_startPoint);
-      contour->AddVertex(m_endPoint);
-      contour->SetWidth(2);
-      m_lineNode->SetData(contour);*/
-
-
-      m_linePoints->Clear();
-      if (!m_ui.StartPointLE->text().isEmpty())
-      {
-          m_linePoints->InsertPoint(m_startPoint);
-      }
-      if (!m_ui.EndPointLE->text().isEmpty())
-      {
-          m_linePoints->InsertPoint(m_endPoint);
-      } 
-      if (!m_ui.StartPointLE->text().isEmpty()&& !m_ui.EndPointLE->text().isEmpty())
-      {
-          m_lineNode->Modified();
-          RequestRenderWindowUpdate();
-          Plot();
-      }      
+           mitk::Surface* lineData = static_cast<mitk::Surface*>(m_lineNode->GetData());
+           lineData->SetVtkPolyData(lineSource->GetOutput());
+           m_lineNode->Modified();
+           RequestRenderWindowUpdate();
+           Plot();
+       }  
 }
 
 

@@ -26,7 +26,7 @@ protected:
     void OnSurfaceCalculationDone();
 protected slots:
     void ExtractSmoothedSurface(mitk::Image* image);
-    void ExtractSurface(mitk::Image* image,bool smooth=false, bool largestConnect = false);
+    void ExtractSurface(mitk::Image* image,int smooth=0, bool largestConnect = false);
     void ShowResult();
 
 

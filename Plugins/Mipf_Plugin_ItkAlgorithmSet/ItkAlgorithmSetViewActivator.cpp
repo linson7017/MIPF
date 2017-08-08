@@ -1,6 +1,8 @@
 #include "ItkAlgorithmSetViewActivator.h"
 #include "ItkAlgorithmSetView.h"
 
+#include "Utils/QObjectFactory.h"
+
 
 QF_API QF::IQF_Activator* QF::QF_CreatePluginActivator(QF::IQF_Main* pMain)
 {
@@ -18,7 +20,6 @@ ItkAlgorithmSetView_Activator::ItkAlgorithmSetView_Activator(QF::IQF_Main* pMain
 
 bool ItkAlgorithmSetView_Activator::Init()
 {
-    m_pView = new ItkAlgorithmSetView(m_pMain);
     return true;
 }
 
@@ -29,5 +30,5 @@ const char* ItkAlgorithmSetView_Activator::GetID()
 
 void ItkAlgorithmSetView_Activator::Register(R* pR)
 {
-    m_pView->InitResource(pR);
+    REGISTER_CLASS("ItkAlgorithmSetWidget", ItkAlgorithmSetView);
 }

@@ -63,6 +63,5 @@ void Mipf_Plugin_Utils_Activator::Constructed(R* pR)
 {
     m_pLargestConnectedComponentView->Constructed(pR);
     m_pMaskImageView->Constructed(pR);
-    //m_pImageHoleFillingView->Constructed(pR);
     m_surfaceExtractView->Constructed(pR);
 }

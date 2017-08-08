@@ -9,32 +9,36 @@
 #include <QFuture>
 #include <QtConcurrent>
 
+#include "ui_AirwaySegmentation.h"
+
 class QmitkDataStorageComboBox;
+class IQF_MitkPointList;
 
-class AirwaySegmentationView : public QObject, public MitkPluginView
+class AirwaySegmentationView : public QWidget, public MitkPluginView
 {
+    Q_OBJECT
 public:
-    AirwaySegmentationView(QF::IQF_Main* pMain);
-	void Contructed(R* pR);
-
-protected:
-    virtual void Update(const char* szMessage, int iValue = 0, void* pValue = 0);
-
-
+    AirwaySegmentationView();
+    ~AirwaySegmentationView();
+    void CreateView();
 public slots:
+    void Segment(); 
 	void DoSomething();
 	void AirwayFinished();
+    void OnSelectSeed(bool bSelecting);
+    void OnClearSeed();
 
 private:
 	QFutureWatcher<void> m_watcher;
 	QFuture<void> m_future;
 
-	mitk::PointSet::Pointer m_PointSet;
-
-	QmitkDataStorageComboBox* m_pSourceImageSelector;
-
 	mitk::DataNode::Pointer m_result;
 	mitk::Image::Pointer m_labelimage;
+
+    IQF_MitkPointList* m_pPointList;
+
+    Ui::AirwaySegmentationView m_ui;
+
 };
 
 #endif // AirwaySegmentationView_h__

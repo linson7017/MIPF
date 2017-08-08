@@ -78,6 +78,10 @@ LandMarkPoint GetLandMarkByID(std::vector< LandMarkPoint > markers, int ID)
         {
             return markers.at(i);
         }
+        else
+        {
+            return LandMarkPoint();
+        }
     }
 }
 

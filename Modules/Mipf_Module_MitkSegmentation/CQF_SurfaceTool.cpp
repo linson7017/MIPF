@@ -37,7 +37,7 @@ bool CQF_SurfaceTool::ExtractSurface(mitk::Image* pImage, vtkPolyData* pOutput, 
     float gaussianSD = 1.5;
     float reductionRate = 0.5;
     bool smooth = false;
-    if (iSmooth>0)
+    if (iSmooth>1)
     {
         applyMedian = true;
         gaussianSD = 1.73205;
