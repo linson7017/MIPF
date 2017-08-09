@@ -1,5 +1,8 @@
 #include "Mipf_Plugin_VMTKToolsActivator.h"
+
 #include "CenterLineExtractView.h"
+#include "VesselnessFilteringView.h"
+
 #include "Res/R.h"
 
 #include "Utils/QObjectFactory.h"
@@ -32,6 +35,9 @@ void Mipf_Plugin_VMTKTools_Activator::Register(R* pR)
 {
 
     REGISTER_CLASS("CenterLineExtractWidget", CenterLineExtractView);
+    REGISTER_CLASS("VesselnessFilteringWidget", VesselnessFilteringView);
+
+    
     //m_pCenterLineExtractView->InitResource(pR); 
    // pR->registerCustomWidget("CenterLineExtractView", m_pCenterLineExtractView); 
 }

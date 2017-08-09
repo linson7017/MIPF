@@ -68,7 +68,12 @@
 			</ButtonGroup>
 			<!-- <Button text="Interpolate" msgcommand="GraphcutSegmentation.Interpolate"/> -->
 		</HLayout>
-		<Button text="Generate Surface" msgcommand="MITK_MESSAGE_GRAPHCUT_GENERATESURFACE"/>
+		<HLayout>
+			<Label text="Smooth Timts:"/>
+			<LineEdit id="GraphcutSegmentation.SmoothTimes" text="40"/>
+			<Button text="Generate Surface" msgcommand="MITK_MESSAGE_GRAPHCUT_GENERATESURFACE"/>
+		</HLayout>
+		
 		<!-- <Button text="Extrace ROI" msgcommand="MITK_MESSAGE_GRAPHCUT_EXTRACT_ROI" />
 		<HSlider id="GraphcutSegmentation.ContourValueSlider"/>
 		

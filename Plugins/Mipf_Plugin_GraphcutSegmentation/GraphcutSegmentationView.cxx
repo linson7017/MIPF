@@ -1115,7 +1115,8 @@ void GraphcutSegmentationView::GenerateSurface()
        {
            IQF_MitkSurfaceTool* surfaceTool = (IQF_MitkSurfaceTool*)m_pMain->GetInterfacePtr(QF_MitkSurface_Tool);
            vtkSmartPointer<vtkPolyData> surfaceData = vtkSmartPointer<vtkPolyData>::New();
-           surfaceTool->ExtractSurface(m_currentResultNode, surfaceData, 40, GetGuiProperty("GraphcutSegmentation.ConnectedDetect","checked").toBool());
+           surfaceTool->ExtractSurface(m_currentResultNode, surfaceData, GetGuiProperty("GraphcutSegmentation.SmoothTimes", "text").toString().toInt(),
+               GetGuiProperty("GraphcutSegmentation.ConnectedDetect","checked").toBool());
            
            mitk::DataNode::Pointer surfaceNode = mitk::DataNode::New();
            mitk::Surface::Pointer surface = mitk::Surface::New();

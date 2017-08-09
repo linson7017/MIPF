@@ -62,14 +62,15 @@
 			<BasicImageProcessWidget text="Basic Image Algorithms"/>			
 			<ImageCropperWidget  text="Image Cropper"/>				
 			<Holder id="@ui/SurfaceExtract" text="Surface Extract"/>
-			<Holder id="@id/AirwaySegmentation" text="Airway Segmentation" />	
-			<VolumeVisualizationWidget text="Volume Visualization"/>
+			<AirwaySegmentationWidget text="Airway Segmentation" />	
 		</ToolBox>
 	</DockWidget>
 	<DockWidget id="main.Plugins" windowTitle="Plugins" tabfiedDocWidgetID="main.Segmentation" dockWidgetArea="RightDockWidgetArea"   visible="true">
 		<ToolBox >		
+			<ItkAlgorithmSetWidget text="Itk Algorithm Set"/>
 			<Holder id="@ui/ImageRegistration" text="Image Registration"/>
-			<LandMarkExtractWidget text="Land Mark"/>			
+			<LandMarkExtractWidget text="Land Mark"/>	
+			<VesselnessFilteringWidget text="Vesselness Filtering" />
 			<VolumeVisualizationWidget text="Volume Visualization"/>
 		</ToolBox>
 	</DockWidget>
