@@ -18,6 +18,7 @@
 #include "itkRGBAPixel.h"
 #include "itkConvertPixelBuffer.h"
 
+#include "vtkImagePlaneWidget.h"
 
 ItkAlgorithmSetView::ItkAlgorithmSetView():MitkPluginView()
 {
@@ -26,30 +27,6 @@ ItkAlgorithmSetView::ItkAlgorithmSetView():MitkPluginView()
 
 void ItkAlgorithmSetView::CreateView()
 {
-
-
-    vtkSmartPointer<vtkJPEGReader> reader = vtkSmartPointer<vtkJPEGReader>::New();
-    reader->SetFileName("D:/temp/UR.jpg");
-    reader->Update();
-
-    vtkImageData* image = reader->GetOutput();
-
-    int extent[6];
-    image->GetExtent(extent);
-
-    mitk::Image::Pointer mitkImage = mitk::Image::New();
-    mitkImage->Initialize(image);
-    mitkImage->GetVtkImageData()->DeepCopy(image);
-
-
-    mitk::CastToMitkImage(itkImage, mitkImage);
-
-    mitk::DataNode::Pointer node = mitk::DataNode::New();
-    node->SetData(mitkImage);
-    node->SetName("UR");
-    GetDataStorage()->Add(node);
-
-
     m_ui.setupUi(this);
 
     m_ui.DataSelector->SetDataStorage(GetDataStorage());
@@ -67,10 +44,6 @@ void ItkAlgorithmSetView::CreateView()
         m_ui.AlgorithmContainers->insertWidget(0, widget);
     }
     
-
-
-
-
 
     m_ui.AlgorithmContainers->setCurrentWidget(m_VEDBtn);
     connect(m_ui.AlgorithmSelector, SIGNAL(currentIndexChanged(const QString &)),this,SLOT(OnAlgorithmChanged(const QString&)));

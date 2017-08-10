@@ -1,6 +1,7 @@
 #include "MitkSegmentationPluginActivator.h"
 #include "MitkSegmentation.h"
 #include "Res/R.h"
+#include "Utils/QObjectFactory.h"
 
 QF_API QF::IQF_Activator* QF::QF_CreatePluginActivator(QF::IQF_Main* pMain)
 {
@@ -17,7 +18,6 @@ MitkSegmentationPlugin_Activator::MitkSegmentationPlugin_Activator(QF::IQF_Main*
 
 bool MitkSegmentationPlugin_Activator::Init()
 {
-    m_pMitkSegmentation = new MitkSegmentation(m_pMain); 
     return true; 
 }
 
@@ -28,6 +28,7 @@ const char* MitkSegmentationPlugin_Activator::GetID()
 
 void MitkSegmentationPlugin_Activator::Register(R* pR)
 {
-    m_pMitkSegmentation->InitResource(pR); 
-	pR->registerCustomWidget("ManualSegmentationWidget", m_pMitkSegmentation);
+    /*m_pMitkSegmentation->InitResource(pR); 
+	pR->registerCustomWidget("ManualSegmentationWidget", m_pMitkSegmentation);*/
+    REGISTER_CLASS("ManualSegmentationWidget", MitkSegmentation);
 }

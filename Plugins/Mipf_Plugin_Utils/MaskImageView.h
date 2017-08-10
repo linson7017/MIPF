@@ -4,22 +4,22 @@
 #pragma once
 
 #include "MitkPluginView.h"
+#include <QWidget>
+#include "ui_MaskImageView.h"
 
 class QmitkDataStorageComboBox;
 
-class MaskImageView : public MitkPluginView
+class MaskImageView :public QWidget, public MitkPluginView
 {
+    Q_OBJECT
 public:
-    MaskImageView(QF::IQF_Main* pMain);
+    MaskImageView();
     ~MaskImageView();
-
-    void Constructed(R* pR);
-protected:
-    virtual void Update(const char* szMessage, int iValue = 0, void* pValue = 0);
-
+    void CreateView();
+protected slots:
+    void Mask();
 private:
-    QmitkDataStorageComboBox* m_pImageSelector;
-    QmitkDataStorageComboBox* m_pMaskSelector;
+    Ui::MaskImageView m_ui;
 };
 
 #endif // MaskImageView_h__

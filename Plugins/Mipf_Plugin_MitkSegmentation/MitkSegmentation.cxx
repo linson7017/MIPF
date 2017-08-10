@@ -31,13 +31,13 @@
 
 
 
-MitkSegmentation::MitkSegmentation(QF::IQF_Main* pMain) :MitkPluginView(pMain),
+MitkSegmentation::MitkSegmentation() :MitkPluginView(),
 m_MouseCursorSet(false)
 , m_Parent(NULL)
 , m_MultiWidget(NULL)
 , m_DataSelectionChanged(false)
 {
-	m_pMain->Attach(this);
+	//m_pMain->Attach(this);
 
 	mitk::NodePredicateDataType::Pointer isDwi = mitk::NodePredicateDataType::New("DiffusionImage");
 	mitk::NodePredicateDataType::Pointer isDti = mitk::NodePredicateDataType::New("TensorImage");
@@ -1125,6 +1125,8 @@ void MitkSegmentation::CreateView()
 {
 	// setup the basic GUI of this view
 	//m_Parent = parent;
+
+    m_pMain->Attach(this);
 
 	m_Controls = new Ui::QmitkSegmentationControls;
 	m_Controls->setupUi(this);

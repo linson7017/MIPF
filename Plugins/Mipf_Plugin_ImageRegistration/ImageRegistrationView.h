@@ -49,6 +49,7 @@ private:
     void Reset();
     void Stop();
     
+    void UpdataRegistrationText(const vtkMatrix4x4& matrix);
 
     void DisableDefaultInteraction();
     void EnableDefaultInteraction();

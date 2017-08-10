@@ -341,12 +341,23 @@ void ImageRegistrationView::SlotRegistrationIterationEnd(const itk::Matrix<doubl
     static_cast<ImageNavigationInteractor*>(m_movingImageInteractor.GetPointer())->SetTransformMatrix(m_registrationMatrix);
 
     vtkMatrix4x4::Multiply4x4(transform, m_originMatrix, rm);      
+    UpdataRegistrationText(*transform);
     if (displayNode != NULL)
     {
         displayNode->GetData()->GetGeometry()->SetIndexToWorldTransformByVtkMatrix(rm);
         displayNode->Modified();
         RequestRenderWindowUpdate();
     }
+}
+
+void ImageRegistrationView::UpdataRegistrationText(const vtkMatrix4x4& matrix)
+{
+    QString matrixStr = QString("%1 %2 %3 %4\n%5 %6 %7 %8\n%9 %10 %11 %12\n%13 %14 %15 %16")
+        .arg(matrix.GetElement(0,0)).arg(matrix.GetElement(0,1)).arg(matrix.GetElement(0,2)).arg(matrix.GetElement(0,3))
+        .arg(matrix.GetElement(1,0)).arg(matrix.GetElement(1, 1)).arg(matrix.GetElement(1, 2)).arg(matrix.GetElement(1, 3))
+        .arg(matrix.GetElement(2, 0)).arg(matrix.GetElement(2, 1)).arg(matrix.GetElement(2, 2)).arg(matrix.GetElement(2, 3))
+        .arg(matrix.GetElement(3, 0)).arg(matrix.GetElement(3, 1)).arg(matrix.GetElement(3, 2)).arg(matrix.GetElement(3, 3));
+    SetGuiProperty("ImageRegistration.RegistrationMatrix", "plainText", matrixStr);
 }
 
 void ImageRegistrationView::InitRegistration(Float3DImageType* itkFixedImage, Float3DImageType* itkMovingImage)

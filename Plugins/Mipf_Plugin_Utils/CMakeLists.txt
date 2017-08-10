@@ -17,7 +17,7 @@ file(GLOB Headers "./*.h")
 file(GLOB UI_Srcs "./*.ui")
 AUX_SOURCE_DIRECTORY(. DIR_SRCS)
 
-set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTOMOC ON )
 
 if (VTK_QT_VERSION VERSION_GREATER "4")
     qt5_wrap_ui(ui_Files ${UI_Srcs})

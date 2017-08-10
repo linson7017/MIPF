@@ -8,6 +8,7 @@
 #include "BoneExtract.h"
 #include "LankMarkExtractView.h"
 #include "SkinExtractView.h"
+#include "TransformNodeView.h"
 
 
 
@@ -32,8 +33,6 @@ Mipf_Plugin_Utils_Activator::Mipf_Plugin_Utils_Activator(QF::IQF_Main* pMain):Ac
 bool Mipf_Plugin_Utils_Activator::Init()
 {
     m_pLargestConnectedComponentView = new LargestConnectedComponentView(m_pMain);
-    m_pMaskImageView = new MaskImageView(m_pMain);
-    //m_pImageHoleFillingView = new ImageHoleFillingView();
     m_surfaceExtractView = new SurfaceExtractView(m_pMain);
 
 
@@ -48,20 +47,20 @@ const char* Mipf_Plugin_Utils_Activator::GetID()
 void Mipf_Plugin_Utils_Activator::Register(R* pR)
 {
     m_pLargestConnectedComponentView->InitResource(pR);
-    m_pMaskImageView->InitResource(pR);
-    //m_pImageHoleFillingView->InitResource(pR);
-    m_surfaceExtractView->InitResource(pR);
-   // pR->registerCustomWidget("LargestConnectedComponentWidget", m_pLargestConnectedComponentView);
+    pR->registerCustomWidget("LargestConnectedComponentWidget", m_pLargestConnectedComponentView);
+    m_surfaceExtractView->InitResource(pR);   
+
+    REGISTER_CLASS("MaskImageWidget", MaskImageView);
     REGISTER_CLASS("ImageHoleFillingWidget", ImageHoleFillingView);
     REGISTER_CLASS("PointListWidget", PointListView);
     REGISTER_CLASS("BoneExtractWidget", BoneExtract);
     REGISTER_CLASS("LandMarkExtractWidget", LankMarkExtractView);
     REGISTER_CLASS("SkinExtractWidget", SkinExtractView);
+    REGISTER_CLASS("TransformNodeWidget", TransformNodeView);
 }
 
 void Mipf_Plugin_Utils_Activator::Constructed(R* pR)
 {
     m_pLargestConnectedComponentView->Constructed(pR);
-    m_pMaskImageView->Constructed(pR);
     m_surfaceExtractView->Constructed(pR);
 }

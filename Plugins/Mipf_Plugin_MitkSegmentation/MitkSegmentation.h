@@ -17,11 +17,11 @@ class MitkSegmentation :public QWidget, public MitkPluginView
 {
 	Q_OBJECT
 public:
-	MitkSegmentation(QF::IQF_Main* pMain);
+	MitkSegmentation();
 	~MitkSegmentation();
+    void CreateView();
 protected:
 	virtual void Update(const char* szMessage, int iValue = 0, void* pValue = 0);
-	void CreateView();
 public:
 
 	typedef std::map<mitk::DataNode*, unsigned long> NodeTagMapType;

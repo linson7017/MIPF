@@ -54,9 +54,14 @@ namespace VTKHelpers
             vtkSmartPointer<vtkMetaImageWriter>::New();
         writer->SetInputData(im);
         writer->SetFileName(filename.c_str());
-        std::string rawfilename = filename.substr(0, filename.find_last_of("."));
-        rawfilename.append(".raw");
-        writer->SetRAWFileName(rawfilename.c_str());
+        
+        std::string ext = filename.substr(filename.find_last_of(".")+1,filename.length()- filename.find_last_of(".")-1);
+        if (ext.compare("mhd")==0)
+        {
+            std::string rawfilename = filename.substr(0, filename.find_last_of("."));
+            rawfilename.append(".raw");
+            writer->SetRAWFileName(rawfilename.c_str());
+        }  
         writer->Write();
     }
 
