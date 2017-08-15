@@ -75,7 +75,7 @@
 
 #include "Segmentation/IQF_SegmentationMethodFactory.h"
 
-#include "ITKBasicAlgorithms.h"
+#include "ITK_Helpers.h"
 
 void SegmentationOption::SetOrgan(const QString& szOrganType)
 {
@@ -1071,7 +1071,7 @@ void GraphcutSegmentationView::Segment()
     if (GetGuiProperty("GraphcutSegmentation.ConnectedDetect", "checked").toBool())
     {
         //ITKHelpers::OpeningBinaryImage<UChar3DImageType, UChar3DImageType>(maskImage.GetPointer(), maskImage.GetPointer(), 1);
-        ITKBasicAlgorithms::ExtractConnectedContainsIndex(maskImage.GetPointer(), maskImage.GetPointer(), m_sources);
+        ITKHelpers::ExtractConnectedContainsIndex(maskImage.GetPointer(), maskImage.GetPointer(), m_sources);
     }
 
     if (GetGuiProperty("GraphcutSegmentation.SmoothResult", "checked").toBool())

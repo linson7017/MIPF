@@ -30,6 +30,14 @@ class IQF_MitkRenderWindow;
 class MitkPluginView : public PluginView
 {
 public:
+    enum PredicateType
+    {
+         Image,
+         Surface,
+         Binary,
+         Segmentation,
+         BinaryOrSegmentation
+    };
     MitkPluginView() :PluginView()
     {
     }
@@ -116,7 +124,7 @@ protected:
 			qlistNodes.append(stdNodes.at(i));
 		}
 	}
-    static mitk::NodePredicateBase::Pointer CreatePredicate(int type)
+    static mitk::NodePredicateBase::Pointer CreatePredicate(PredicateType type)
     {
         auto imageType = mitk::TNodePredicateDataType<mitk::Image>::New();
         auto surfaceType = mitk::TNodePredicateDataType<mitk::Surface>::New();
@@ -129,11 +137,20 @@ protected:
 
         switch (type)
         {
-        case 1:
+        case Image:
             returnValue = imageType.GetPointer();
             break;
-        case 2:
+        case Surface:
             returnValue = surfaceType.GetPointer();
+            break;
+        case Binary:
+            returnValue = isBinary.GetPointer();
+            break;
+        case Segmentation:
+            returnValue = isSegmentation.GetPointer();
+            break;
+        case BinaryOrSegmentation:
+            returnValue = isBinaryOrSegmentation.GetPointer();
             break;
         default:
             assert(false && "Unknown predefined predicate!");

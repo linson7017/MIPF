@@ -17,7 +17,6 @@ public:
     bool Init();
     const char* GetID();
     void Register(R* pR);
-    void Constructed(R* pR);
 private:
     LargestConnectedComponentView* m_pLargestConnectedComponentView;
     MaskImageView* m_pMaskImageView;

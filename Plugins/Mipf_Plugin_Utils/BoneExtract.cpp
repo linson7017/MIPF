@@ -15,7 +15,7 @@
 
 #include "vtkPolyData.h"
 
-#include "ITKBasicAlgorithms.h"
+#include "ITK_Helpers.h"
 
 #include "MitkSegmentation/IQF_MitkSurfaceTool.h"
 
@@ -34,7 +34,7 @@ void BoneExtract::CreateView()
     m_ui.setupUi(this);
 
     m_ui.ImageSelector->SetDataStorage(GetDataStorage());
-    m_ui.ImageSelector->SetPredicate(CreatePredicate(1));
+    m_ui.ImageSelector->SetPredicate(CreatePredicate(Image));
 
 
     m_ui.ThresholdSlider->setDecimals(1);
@@ -96,7 +96,7 @@ void BoneExtract::Extract()
     btFilter->Update();
 
     UChar3DImageType::Pointer largestConnectedImage = UChar3DImageType::New();
-    ITKBasicAlgorithms::ExtractLargestConnected<Int3DImageType, UChar3DImageType>(btFilter->GetOutput(), largestConnectedImage.GetPointer());
+    ITKHelpers::ExtractLargestConnected<Int3DImageType, UChar3DImageType>(btFilter->GetOutput(), largestConnectedImage.GetPointer());
 
 
     typedef itk::MaskImageFilter< Float3DImageType, UChar3DImageType,Int3DImageType > MaskFilterType;
@@ -153,7 +153,7 @@ void BoneExtract::Extract()
     UShort3DImageType::Pointer coarseBone = UShort3DImageType::New();
     coarseBone->Graft(padFilter->GetOutput());
 
-    ITKBasicAlgorithms::ExtractLargestConnected<UShort3DImageType, UShort3DImageType>(coarseBone.GetPointer(), coarseBone.GetPointer());
+    ITKHelpers::ExtractLargestConnected<UShort3DImageType, UShort3DImageType>(coarseBone.GetPointer(), coarseBone.GetPointer());
     
     //crop the bottom and roof
     UShort3DImageType::SizeType imageSize = coarseBone->GetLargestPossibleRegion().GetSize();
@@ -188,7 +188,7 @@ void BoneExtract::Extract()
         coarseBone->Graft(closingFilter->GetOutput());
     }   
 
-    ITKBasicAlgorithms::ExtractConnectedLargerThan<UShort3DImageType, UShort3DImageType>(coarseBone.GetPointer(), coarseBone.GetPointer(), 1000);
+    ITKHelpers::ExtractConnectedLargerThan<UShort3DImageType, UShort3DImageType>(coarseBone.GetPointer(), coarseBone.GetPointer(), 1000);
 
 
     mitk::Image::Pointer resultImage = mitk::Image::New();

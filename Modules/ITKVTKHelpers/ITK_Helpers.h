@@ -8,6 +8,8 @@
 #include "ITKImageTypeDef.h"
 #include "itkLinearInterpolateImageFunction.h"
 
+#include "itkShapeLabelObject.h"
+
 namespace ITKHelpers
 {
 
@@ -58,6 +60,15 @@ namespace ITKHelpers
     template<typename TInputImage,typename TOutputImage>
     void GenerateNarrowBandImage(TInputImage* const imageData, TOutputImage* output, int size = 1, bool inside = false, float maximum = 1);
 
+    template <class TInput, class TOutput>
+    void ExtractLargestConnected(TInput* input, TOutput* output);
+
+    template <class TInput, class TOutput, class TAttributeType = itk::ShapeLabelObject<int, 3>::AttributeType>
+    void ExtractConnectedLargerThan(TInput* input, TOutput* output, double size = 1000.0,
+        TAttributeType attributeType = itk::ShapeLabelObject<int, 3>::NUMBER_OF_PIXELS, bool reverse = false);
+
+    template <class TInput, class TOutput>
+    void ExtractConnectedContainsIndex(TInput* input, TOutput* output, IndexContainer indexes);
 
 
     QF_API std::vector<itk::Index<3> > DilatePixelList(const std::vector<itk::Index<3> >& pixelList,

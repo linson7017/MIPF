@@ -278,6 +278,7 @@ void CQF_SurfaceTool::ConvertSurfaceToImage(mitk::Surface* surface, mitk::Image*
 
     if (output && cPointer)
     {
+        output->Initialize(newSeg);
         output->SetVolume(cPointer);
     }
     else

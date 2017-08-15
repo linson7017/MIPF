@@ -30,7 +30,7 @@ ImageHoleFillingView::~ImageHoleFillingView()
 void ImageHoleFillingView::CreateView()
 {
     m_ui.setupUi(this);
-    m_ui.ImageSelector->SetPredicate(CreatePredicate(1));
+    m_ui.ImageSelector->SetPredicate(CreatePredicate(Image));
     m_ui.ImageSelector->SetDataStorage(m_pMitkDataManager->GetDataStorage());
     connect(m_ui.FillHoles, SIGNAL(clicked()), this, SLOT(FillHoles()));
 }

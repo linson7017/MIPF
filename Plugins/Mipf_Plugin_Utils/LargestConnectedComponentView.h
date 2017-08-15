@@ -2,22 +2,26 @@
 #define LargestConnectedComponentView_h__
 
 #include "MitkPluginView.h"
+#include <QWidget>
+
+#include "ui_LargestConnectedComponentExtractView.h"
 
 class QmitkDataStorageComboBox;
 
-class LargestConnectedComponentView : public MitkPluginView
+class LargestConnectedComponentView :public QWidget, public MitkPluginView
 {
+    Q_OBJECT
 public:
-    LargestConnectedComponentView(QF::IQF_Main* pMain);
+    LargestConnectedComponentView();
     ~LargestConnectedComponentView() {}
-    void Constructed(R* pR);
-protected:
-    virtual void Update(const char* szMessage, int iValue = 0, void* pValue = 0);
-
+    void CreateView();
+protected slots:
+    void Extract();
 
 
 private:
-    QmitkDataStorageComboBox* m_pImageSelector;
+    Ui::LargestConnectedComponentExtractView m_ui;
+    
 };
 
 #endif // UtilView_h__

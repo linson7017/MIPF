@@ -16,6 +16,13 @@
 
 namespace ITKVTKHelpers
 {
+    template<typename TOutputImage>
+    void ConvertVTKImageToITKImage(vtkImageData* inputImage, TOutputImage* outputImage);
+
+    template<typename TIntputImage>
+    void ConvertITKImageToVTKImage(TIntputImage* inputImage, vtkImageData* outputImage);
+
+
     QF_API std::vector<itk::Index<3> > PointsToPixelList(vtkPoints* const points);
 
     QF_API void SetPixels(vtkImageData* const VTKImage, const std::vector<itk::Index<3> >& pixels, const unsigned char color[3]);
@@ -27,6 +34,8 @@ namespace ITKVTKHelpers
     QF_API void GetNonzeroPixels(vtkImageData* const imageData, std::vector<itk::Index<3> >& pixels, int sampleFactor = 1, int* roi = NULL);
 
 }
+
+#include "ITKVTK_Helpers.hpp"
 
 
 #endif // ITKVTK_Helpers_h__

@@ -73,15 +73,7 @@
 		<!-- TabWidget -->
 		<Tab 
 			color="#FFFFFF"
-		/>
-		<TabBar 
-			sub-controls="tab" 
-			background="486178"
-		/>
-		<TabBar 
-			sub-controls="tab" 
-			states="selected" 
-			background="#4E6D8C" 
+			background-clip="border"
 		/>
 		<!-- MenuBar -->
 		<Menu

@@ -26,13 +26,14 @@ protected:
 
     double  alphaFromSuppressPlatesPercentage(double suppressPlatesPercentage);
     double  betaFromSuppressBlobsPercentage(double suppressBlobsPercentage);
-    void computeVesselnessVolume(mitk::Image* currentVolumeNode, mitk::Image*  currentOutputVolumeNode,
+    void computeVesselnessVolume(vtkImageData* currentVolumeNode, vtkImageData*  currentOutputVolumeNode,
         mitk::Point3D previewRegionCenterRAS, int previewRegionSizeVoxel = -1, double minimumDiameterMm = 0, double maximumDiameterMm = 25,
         double alpha = 0.3, double beta = 0.3, double contrastMeasure = 150);
-    mitk::Point3D ConvertFromWorldToIndex(mitk::Image* volume, const mitk::Point3D& worldPoint);
-    double calculateContrastMeasure(vtkImageData* image, mitk::Point3D ijk, double diameter);
-    double  getDiameter(vtkImageData* image, mitk::Point3D ijk);
-    void calculateParameters();
+    itk::Index<3> ConvertFromWorldToIndex(mitk::Image* volume, const mitk::Point3D& worldPoint);
+    double calculateContrastMeasure(vtkImageData* image, itk::Index<3> ijk, double diameter);
+    int  getDiameter(vtkImageData* image, itk::Index<3> ijk);
+    void performLaplaceOfGaussian(vtkImageData* image, vtkImageData* output);
+  //  void calculateParameters();
 private:
     Ui::VesselFilteringView m_ui;
     mitk::PointSet::Pointer m_seeds;

@@ -73,11 +73,9 @@
 #include <Res/R.h>
 
 
-DataManagerWidget::DataManagerWidget(QF::IQF_Main* pMain) :MitkPluginView(pMain),
+DataManagerWidget::DataManagerWidget() :MitkPluginView(),
 m_CurrentRowCount(0)
 {
-    m_pMain->Attach(this);
-    m_DataManager = (IQF_MitkDataManager*)m_pMain->GetInterfacePtr("QF_MitkMain_DataManager");
 }
 
 DataManagerWidget::~DataManagerWidget()
@@ -91,12 +89,16 @@ void DataManagerWidget::SetDataStorage(IQF_MitkDataManager* dataStorage)
 
 void DataManagerWidget::CreateView()
 {
+    m_Parent = this;
+    m_pMain->Attach(this);
+    m_DataManager = (IQF_MitkDataManager*)m_pMain->GetInterfacePtr("QF_MitkMain_DataManager");
+
     QVBoxLayout* layout = new QVBoxLayout;
     setLayout(layout);
     
     //# GUI
     m_NodeTreeModel = new QmitkDataStorageTreeModel(m_DataManager->GetDataStorage());
-    m_NodeTreeModel->setParent(m_Parent);
+    //m_NodeTreeModel->setParent(m_Parent);
     m_NodeTreeModel->SetPlaceNewNodesOnTop(true);
     m_NodeTreeModel->SetAllowHierarchyChange(false);
 
@@ -321,7 +323,7 @@ void DataManagerWidget::CreateView()
 
 void DataManagerWidget::Init(QWidget* parent)
 {
-    m_Parent = parent;
+    m_Parent = NULL;
 }
 
 void DataManagerWidget::NodeSelectionChanged(const QItemSelection & selected, const QItemSelection & deselected)

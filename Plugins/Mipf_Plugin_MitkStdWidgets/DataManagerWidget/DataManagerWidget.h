@@ -40,10 +40,11 @@ class DataManagerWidget : public QWidget, public MitkPluginView
 {
     Q_OBJECT
 public:
-    DataManagerWidget(QF::IQF_Main* pMain);
+    DataManagerWidget();
     ~DataManagerWidget();
     void Init(QWidget* parent);
     void SetDataStorage(IQF_MitkDataManager* dataStorage);
+    virtual void CreateView();
 public slots:
     void NodeSelectionChanged(const QItemSelection & selected, const QItemSelection & deselected);
     void NodeTreeViewRowsInserted(const QModelIndex & parent, int start, int end);
@@ -75,7 +76,7 @@ public slots:
 protected:
     QList<mitk::DataNode::Pointer> GetCurrentSelectionQList();
     std::list<mitk::DataNode::Pointer> GetCurrentSelection();
-    virtual void CreateView();
+    
     
 
 

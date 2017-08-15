@@ -6,7 +6,7 @@
 
 #include "itkBinaryThresholdImageFilter.h"
 #include "itkMedianImageFilter.h"
-#include "ITKBasicAlgorithms.h"
+#include "ITK_Helpers.h"
 
 #include "itkRegionOfInterestImageFilter.h"
 

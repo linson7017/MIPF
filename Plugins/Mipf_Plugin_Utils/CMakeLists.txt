@@ -17,13 +17,17 @@ file(GLOB Headers "./*.h")
 file(GLOB UI_Srcs "./*.ui")
 AUX_SOURCE_DIRECTORY(. DIR_SRCS)
 
-set(CMAKE_AUTOMOC ON )
+include_directories(${ITKVTK_HELPERS_INCLUDE_DIR})
+
+set(CMAKE_AUTOMOC ON)
 
 if (VTK_QT_VERSION VERSION_GREATER "4")
     qt5_wrap_ui(ui_Files ${UI_Srcs})
     add_library(Mipf_Plugin_Utils SHARED ${DIR_SRCS} ${Headers} ${UI_Srcs} ${MOC_Hdrs})
     qt5_use_modules(Mipf_Plugin_Utils Core Gui Widgets)
-    target_link_libraries(Mipf_Plugin_Utils ${VTK_LIBRARIES} ${ITK_LIBRARIES} ${QTFRAMEWORK_LIBRARIES} ${QFMAIN_LIBRARIES} MitkQtWidgets MitkQtWidgetsExt MitkMultilabel MitkSegmentation MitkSegmentationUI)
+    target_link_libraries(Mipf_Plugin_Utils ${VTK_LIBRARIES} ${ITK_LIBRARIES} ${ITKVTK_HELPERS_LIBRARIES}
+    ${QTFRAMEWORK_LIBRARIES} ${QFMAIN_LIBRARIES} 
+    MitkQtWidgets MitkQtWidgetsExt MitkMultilabel MitkSegmentation MitkSegmentationUI)
 
 else()
     add_library(Mipf_Plugin_Utils SHARED ${DIR_SRCS} ${Headers} ${UI_Srcs} ${MOC_Hdrs})

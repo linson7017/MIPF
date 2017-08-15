@@ -34,6 +34,9 @@
 #include "vtkvmtkPolyBallModeller.h"
 #include "vtkvmtkCapPolyData.h"
 
+//common
+#include "MitkSegmentation/IQF_MitkSurfaceTool.h"
+
 
 VesselSegmentationView::VesselSegmentationView() :MitkPluginView()
 {
@@ -206,6 +209,7 @@ void VesselSegmentationView::OnCreateVesselSurfaceFromMask()
     levelSets->SetUseImageSpacing(1);
     levelSets->Update();
 
+
     mitk::Point3D ImageOrigin = imageseed->GetGeometry()->GetOrigin();
     double* PImageOrigin = ImageOrigin.Begin();
 
@@ -218,6 +222,8 @@ void VesselSegmentationView::OnCreateVesselSurfaceFromMask()
     gaussian->UpdateInformation();
     gaussian->Update();
     gaussian->GetOutput()->SetOrigin(*PImageOrigin, *(PImageOrigin + 1), *(PImageOrigin + 2));
+
+    
 
     vtkPolyData* outPolyData3 = MarchingCubes(gaussian->GetOutput(), 1);
 
@@ -253,7 +259,26 @@ void VesselSegmentationView::OnCreateVesselSurfaceFromMask()
     Surbase3->SetVtkPolyData(outPolyData3);
     Surbase3->Update();
 
+    //convert surface to image
+    IQF_MitkSurfaceTool* pSurfaceTool = (IQF_MitkSurfaceTool*)m_pMain->GetInterfacePtr(QF_MitkSurface_Tool);
+    if (pSurfaceTool)
+    {
+        //add vessel image
+        GetDataStorage()->Remove(GetDataStorage()->GetNamedNode("Vessel Image"));
+        mitk::DataNode::Pointer vesselImageNode = mitk::DataNode::New();
+        mitk::Image::Pointer vesselImage = mitk::Image::New();
+        vesselImage->Initialize(imageseed);
+        pSurfaceTool->ConvertSurfaceToImage(Surbase3.GetPointer(), imageseed, vesselImage.GetPointer());
+        vesselImageNode->SetData(vesselImage);
+        vesselImageNode->SetColor(1.0, 0.0, 0.0);
+        vesselImageNode->SetOpacity(0.5);
+        vesselImageNode->SetName("Vessel Image");
+        GetDataStorage()->Add(vesselImageNode);
+    }
 
+
+
+    GetDataStorage()->Remove(GetDataStorage()->GetNamedNode("Vessel"));
     mitk::DataNode::Pointer outnode3 = mitk::DataNode::New();
     outnode3->SetData(Surbase3);
 

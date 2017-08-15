@@ -6,12 +6,20 @@
 #include <vtkImageCast.h>
 #include <vtkPointData.h>
 #include <vtkDataArray.h>
+#include <vtkImageGaussianSmooth.h>
+#include <vtkImageLaplacian.h>
+#include <vtkCamera.h>
 
 
 #include  <vmtk/vtkvmtkVesselnessMeasureImageFilter.h>
 #include <vmtk/vtkvmtkVesselnessMeasureImageFilter.h>
 
 #include <VTK_Helpers.h>
+#include <ITKImageTypeDef.h>
+#include <ITKVTK_Helpers.h>
+
+//mitk
+#include "mitkImageCast.h"
 
 
 VesselnessFilteringView::VesselnessFilteringView() :m_contrast(100)
@@ -28,7 +36,7 @@ void VesselnessFilteringView::CreateView()
     m_ui.setupUi(this);
 
     m_ui.ImageSelector->SetDataStorage(GetDataStorage());
-    m_ui.ImageSelector->SetPredicate(CreatePredicate(1));
+    m_ui.ImageSelector->SetPredicate(CreatePredicate(Image));
 
     m_seeds = mitk::PointSet::New();
 
@@ -47,37 +55,49 @@ void VesselnessFilteringView::Start()
 {
     mitk::Image* mitkImage = dynamic_cast<mitk::Image*>(m_ui.ImageSelector->GetSelectedNode()->GetData());
 
-
     mitk::Image::Pointer resultImage = mitk::Image::New();
 
     double spacing[3];
     mitkImage->GetVtkImageData()->GetSpacing(spacing);
     double minSpacing = min(spacing[0], min(spacing[1], spacing[2]));
 
-    double maxDimeter = 7 * minSpacing;
-    double minDimeter = 1*minSpacing;
-
     double alpha = alphaFromSuppressPlatesPercentage(0.1);
     double beta = betaFromSuppressBlobsPercentage(0.1);
 
+    m_contrast = m_ui.Contrast->text().toInt();
     if (m_seeds->GetSize()>0)
     {
-        mitk::Point3D index;
+        itk::Index<3> index;
         mitkImage->GetGeometry()->WorldToIndex(m_seeds->GetPoint(0), index);
-        double contrastMeasure = calculateContrastMeasure(mitkImage->GetVtkImageData(), index,getDiameter(mitkImage->GetVtkImageData(), index));
+        int extent[6];
+        mitkImage->GetVtkImageData()->GetExtent(extent);
+        int upDimeter = getDiameter(mitkImage->GetVtkImageData(), index);
+        m_ui.MaxDiameter->setValue(upDimeter>0 ? upDimeter : m_ui.MaxDiameter->value());
+        m_contrast = calculateContrastMeasure(mitkImage->GetVtkImageData(), index, m_ui.MaxDiameter->value());       
     }
-    
+    double maxDimeter = m_ui.MaxDiameter->value() * minSpacing;
+    double minDimeter = m_ui.MinDiameter->value() * minSpacing;
 
-    computeVesselnessVolume(mitkImage, resultImage, m_seeds->GetPoint(0), 100,
-        minDimeter, maxDimeter, alpha, beta, 100);
+    vtkSmartPointer<vtkImageData> resultVtkImage = vtkSmartPointer<vtkImageData>::New();
 
+    MITK_INFO << "Parameters:";
+    MITK_INFO << "Diameter:" << minDimeter << ", " << maxDimeter;
+    MITK_INFO << "Alpha:" << alpha;
+    MITK_INFO << "Beta:" << beta;
+    MITK_INFO << "Contrast:" << m_contrast;
+    computeVesselnessVolume(mitkImage->GetVtkImageData(), resultVtkImage.Get(), m_seeds->GetPoint(0), 100,
+        minDimeter, maxDimeter, alpha, beta, m_contrast);
+
+    Float3DImageType::Pointer itkImage = Float3DImageType::New();
+    ITKVTKHelpers::ConvertVTKImageToITKImage(resultVtkImage.GetPointer(), itkImage.GetPointer());
+    mitk::CastToMitkImage<Float3DImageType>(itkImage, resultImage);
 
     mitk::DataNode::Pointer resultNode = mitk::DataNode::New();
     resultNode->SetData(resultImage);
     resultNode->SetName("Reslut");
     resultNode->SetColor(1.0, 0.0, 0.0);
     GetDataStorage()->Add(resultNode);
-    RequestRenderWindowUpdate();
+    //m_pMitkRenderWindow->Reinit(resultNode);
 
 }
 
@@ -91,15 +111,15 @@ double  VesselnessFilteringView::betaFromSuppressBlobsPercentage(double suppress
     return 0.001 + 1.0 * pow((100.0 - suppressBlobsPercentage) / 100.0, 2);
 }
 
-mitk::Point3D VesselnessFilteringView::ConvertFromWorldToIndex(mitk::Image* volume, const mitk::Point3D& worldPoint)
+itk::Index<3> VesselnessFilteringView::ConvertFromWorldToIndex(mitk::Image* volume, const mitk::Point3D& worldPoint)
 {
-    mitk::Point3D index;
+    itk::Index<3> index;
     volume->GetGeometry()->WorldToIndex(worldPoint, index);
     return index;
 }
 
 
-void VesselnessFilteringView::computeVesselnessVolume(mitk::Image* currentVolumeNode, mitk::Image*  currentOutputVolumeNode,
+void VesselnessFilteringView::computeVesselnessVolume(vtkImageData* currentVolumeNode, vtkImageData*  currentOutputVolumeNode,
     mitk::Point3D previewRegionCenterRAS, int previewRegionSizeVoxel, double minimumDiameterMm, double maximumDiameterMm,
     double alpha, double beta, double contrastMeasure)
 {
@@ -109,7 +129,7 @@ void VesselnessFilteringView::computeVesselnessVolume(mitk::Image* currentVolume
       }
 
       auto cast = vtkSmartPointer<vtkImageCast>::New();
-      cast->SetInputData(currentVolumeNode->GetVtkImageData());
+      cast->SetInputData(currentVolumeNode);
       cast->SetOutputScalarTypeToFloat();
       cast->Update();
 
@@ -125,26 +145,13 @@ void VesselnessFilteringView::computeVesselnessVolume(mitk::Image* currentVolume
       v->SetGamma(contrastMeasure);
       v->Update();
 
-      currentOutputVolumeNode->Initialize(v->GetOutput());
-      currentOutputVolumeNode->GetGeometry()->InitializeGeometry(currentVolumeNode->GetGeometry());
-
-      std::string componentType = currentOutputVolumeNode->GetPixelType().GetComponentTypeAsString();
-
-
-      std::string scalarType = v->GetOutput()->GetScalarTypeAsString();
-      int componentNum = v->GetOutput()->GetNumberOfScalarComponents();
 
       VTKHelpers::SaveVtkImageData(v->GetOutput(), "D:/temp/vessel_enhance.mha");
 
-    //  auto outImage = vtkSmartPointer<vtkImageData>::New();
-      currentOutputVolumeNode->GetVtkImageData()->DeepCopy(v->GetOutput());
-      currentOutputVolumeNode->Modified();
-    //  outImage->GetPointData()->GetScalars()->Modified();
-
-
+      currentOutputVolumeNode->DeepCopy(v->GetOutput());
 }
 
-double calculateContrastMeasure(vtkImageData* image, mitk::Point3D ijk, double diameter)
+double VesselnessFilteringView::calculateContrastMeasure(vtkImageData* image, itk::Index<3> ijk, double diameter)
 {
     float* pixel = static_cast<float*>(image->GetScalarPointer(ijk[0], ijk[1], ijk[2]));
     float* pixelRight = static_cast<float*>(image->GetScalarPointer(ijk[0] + (2 * diameter), ijk[1], ijk[2]));
@@ -173,64 +180,85 @@ double calculateContrastMeasure(vtkImageData* image, mitk::Point3D ijk, double d
     double contrastMeasure = differenceValue / 10;
     return 2 * contrastMeasure;
 }
-    
-double  getDiameter(vtkImageData* image, mitk::Point3D ijk)
+
+void  VesselnessFilteringView::performLaplaceOfGaussian(vtkImageData* image, vtkImageData* output)
 {
-    return 0;
-//    edgeImage = self.performLaplaceOfGaussian(image)
-//
-//        foundDiameter = False
-//
-//        edgeImageSeedValue = edgeImage.GetScalarComponentAsFloat(ijk[0], ijk[1], ijk[2], 0)
-//        seedValueSign = cmp(edgeImageSeedValue, 0)  # returns 1 if > 0 or -1 if < 0
-//
-//        # the list of hits
-//# [left, right, top, bottom, front, back]
-//        hits = [False, False, False, False, False, False]
-//
-//        distanceFromSeed = 1
-//        while not foundDiameter:
-//
-//    if (distanceFromSeed >= edgeImage.GetDimensions()[0]
-//        or distanceFromSeed >= edgeImage.GetDimensions()[1]
-//        or distanceFromSeed >= edgeImage.GetDimensions()[2]) :
-//        # we are out of bounds
-//        break
-//
-//        # get the values for the lookahead directions in the edgeImage
-//        edgeValues = [edgeImage.GetScalarComponentAsFloat(ijk[0] - distanceFromSeed, ijk[1], ijk[2], 0), # left
-//        edgeImage.GetScalarComponentAsFloat(ijk[0] + distanceFromSeed, ijk[1], ijk[2], 0), # right
-//        edgeImage.GetScalarComponentAsFloat(ijk[0], ijk[1] + distanceFromSeed, ijk[2], 0), # top
-//        edgeImage.GetScalarComponentAsFloat(ijk[0], ijk[1] - distanceFromSeed, ijk[2], 0), # bottom
-//        edgeImage.GetScalarComponentAsFloat(ijk[0], ijk[1], ijk[2] + distanceFromSeed, 0), # front
-//        edgeImage.GetScalarComponentAsFloat(ijk[0], ijk[1], ijk[2] - distanceFromSeed, 0)]  # back
-//
-//        # first loop, check if we have hits
-//        for v in range(len(edgeValues)) :
-//
-//            if not hits[v] and cmp(edgeValues[v], 0) != seedValueSign :
-//                # hit
-//                hits[v] = True
-//
-//                # now check if we have two hits in opposite directions
-//                if hits[0] and hits[1]:
-//    # we have the diameter!
-//        foundDiameter = True
-//        break
-//
-//        if hits[2] and hits[3]:
-//    foundDiameter = True
-//        break
-//
-//        if hits[4] and hits[5] :
-//            foundDiameter = True
-//            break
-//
-//            # increase distance from seed for next iteration
-//            distanceFromSeed += 1
-//
-//            # we now just return the distanceFromSeed
-//# if the diameter was not detected properly, this can equal one of the image dimensions
-//            return distanceFromSeed
+    auto gaussian = vtkSmartPointer<vtkImageGaussianSmooth>::New();
+    gaussian->SetInputData(image);
+    gaussian->Update();
+
+    auto laplacian = vtkSmartPointer<vtkImageLaplacian>::New();
+    laplacian->SetInputData(gaussian->GetOutput());
+    laplacian->Update();
+
+    output->DeepCopy(laplacian->GetOutput());
+}
+    
+template <class T>
+int cmp(const T& a, const T& b)
+{
+      if (a==b)
+      {
+          return 0;
+      }
+      return a > b ? 1 : -1;
+}
+    
+int VesselnessFilteringView::getDiameter(vtkImageData* image, itk::Index<3> ijk)
+{
+   // return 0;
+    auto edgeImage = vtkSmartPointer<vtkImageData>::New();
+    performLaplaceOfGaussian(image, edgeImage);
+
+    bool foundDiameter = false;
+
+    float edgeImageSeedValue = edgeImage->GetScalarComponentAsFloat(ijk[0], ijk[1], ijk[2], 0);
+    int seedValueSign = cmp<float>(edgeImageSeedValue, 0);
+
+    // [left, right, top, bottom, front, back]
+    bool hits[] = { false, false, false, false, false, false };
+    int distanceFromSeed = 1;
+    while (!foundDiameter)
+    {
+           if (distanceFromSeed >= edgeImage->GetDimensions()[0]
+               || distanceFromSeed >= edgeImage->GetDimensions()[1]
+               || distanceFromSeed >= edgeImage->GetDimensions()[2])
+           {
+               break;
+           }
+
+           float edgeValues[] = { edgeImage->GetScalarComponentAsFloat(ijk[0] - distanceFromSeed, ijk[1], ijk[2], 0), // left
+               edgeImage->GetScalarComponentAsFloat(ijk[0] + distanceFromSeed, ijk[1], ijk[2], 0), //# right
+               edgeImage->GetScalarComponentAsFloat(ijk[0], ijk[1] + distanceFromSeed, ijk[2], 0), //# top
+               edgeImage->GetScalarComponentAsFloat(ijk[0], ijk[1] - distanceFromSeed, ijk[2], 0), //# bottom
+               edgeImage->GetScalarComponentAsFloat(ijk[0], ijk[1], ijk[2] + distanceFromSeed, 0), //# front
+               edgeImage->GetScalarComponentAsFloat(ijk[0], ijk[1], ijk[2] - distanceFromSeed, 0) };// # back
+
+           for (int i = 0; i < 6; i++)
+           {
+               if(!hits[i] && cmp<float>(edgeValues[i], 0) != seedValueSign)
+               {
+                   hits[i] = true;
+               }
+           }
+           if (hits[0] && hits[1])
+           {
+               foundDiameter = true;
+               break;
+           }
+           if (hits[2] && hits[3])
+           {
+               foundDiameter = true;
+               break;
+           }
+           if (hits[4] && hits[5])
+           {
+               foundDiameter = true;
+               break;
+           }
+           distanceFromSeed += 1;
+               
+    }
+    return distanceFromSeed;
 }
 

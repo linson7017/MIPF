@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<UICommand>	
-	<Command id="ITKAlgorithmSet.SwitchToBinaryThreshold" type="SwitchWidget" widgetID="ITKAlgorithmSet.StackedWidget" index="0"/>
-	<Command id="ITKAlgorithmSet.SwitchToOthers" type="SwitchWidget" widgetID="ITKAlgorithmSet.StackedWidget" index="1"/>
-</UICommand>
-
-

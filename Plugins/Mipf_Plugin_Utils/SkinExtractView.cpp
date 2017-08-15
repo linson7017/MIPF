@@ -24,7 +24,7 @@ void SkinExtractView::CreateView()
     m_ui.setupUi(this);
 
     m_ui.ImageSelector->SetDataStorage(GetDataStorage());
-    m_ui.ImageSelector->SetPredicate(CreatePredicate(1));
+    m_ui.ImageSelector->SetPredicate(CreatePredicate(Image));
 
 
     m_ui.ThresholdSlider->setDecimals(1);

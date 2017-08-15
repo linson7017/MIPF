@@ -21,7 +21,7 @@ void TransformNodeView::CreateView()
     m_ui.setupUi(this);
 
     m_ui.NodeSelector->SetDataStorage(GetDataStorage());   
-    m_ui.NodeSelector->SetPredicate(mitk::NodePredicateOr::New(CreatePredicate(1), CreatePredicate(2)));
+    m_ui.NodeSelector->SetPredicate(mitk::NodePredicateOr::New(CreatePredicate(Image), CreatePredicate(Surface)));
 
     connect(m_ui.TransfromBtn, SIGNAL(clicked()), this, SLOT(Transform()));
 }

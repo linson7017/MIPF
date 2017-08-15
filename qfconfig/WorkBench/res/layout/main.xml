@@ -52,9 +52,9 @@
 		<ImageNavigatorWidget id="main.ImageNavigator" />
 	</DockWidget>
 	<DockWidget id="main.Segmentation" windowTitle="Segmentation" dockWidgetArea="RightDockWidgetArea"   visible="true">
-		<ToolBox >	
-			<Holder id="@ui/MaskImage" text="mask"/>
+		<ToolBox >		
 			<Holder id="@ui/GraphcutSegmentation" text="Graphcut Segmentation"/>
+			<ManualSegmentationWidget text="Manual Segmentation"/>
 			<BoneExtractWidget text="Bone Extract"/>
 			<SkinExtractWidget text="Skin Extract"/>
 			<CenterLineExtractWidget text="Center Line Extract"/>
@@ -66,9 +66,13 @@
 		</ToolBox>
 	</DockWidget>
 	<DockWidget id="main.Plugins" windowTitle="Plugins" tabfiedDocWidgetID="main.Segmentation" dockWidgetArea="RightDockWidgetArea"   visible="true">
-		<ToolBox >		
+		<ToolBox >	
+			<Holder id="@ui/ImageRegistration" text="Image Registration"/>		
+			<MaskImageWidget text="Mask Image"/>
+			<LargestConnectedComponentExtractWidget text="Image Connected Component"/>
+			<SurfaceExtractWidget text="Surface Extract" />
 			<ItkAlgorithmSetWidget text="Itk Algorithm Set"/>
-			<Holder id="@ui/ImageRegistration" text="Image Registration"/>
+			<TransformNodeWidget text="Transform Node"/>
 			<LandMarkExtractWidget text="Land Mark"/>	
 			<VesselnessFilteringWidget text="Vesselness Filtering" />
 			<VolumeVisualizationWidget text="Volume Visualization"/>

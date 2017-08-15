@@ -43,7 +43,7 @@ void AirwaySegmentationView::CreateView()
     m_pPointList->CreateNewPointSetNode(pointSetNode);
 
     m_ui.ImageSelector->SetDataStorage(GetDataStorage());
-    m_ui.ImageSelector->SetPredicate(CreatePredicate(1));
+    m_ui.ImageSelector->SetPredicate(CreatePredicate(Image));
 
 
     connect(m_ui.SeedSelectBtn,SIGNAL(clicked(bool)) , this, SLOT(OnSelectSeed(bool)));

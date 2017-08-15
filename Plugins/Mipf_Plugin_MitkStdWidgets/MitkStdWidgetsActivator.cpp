@@ -7,6 +7,7 @@
 #include "StatusWidget/StatusBarWidget.h"
 //#include "MeasurementWidget/ImageStatisticsWidget.h"
 #include "Res/R.h"
+#include "Utils/QObjectFactory.h"
 #include "QmitkWidgetsRegister.h"
 
 QF_API QF::IQF_Activator* QF::QF_CreatePluginActivator(QF::IQF_Main* pMain)
@@ -27,8 +28,8 @@ bool MitkStdWidgets_Activator::Init()
 {
     RegisterQmitkWidgets();
 
-    m_pDataManagerWidget = new DataManagerWidget(m_pMain);
-    m_pDataManagerWidget->Init(NULL);
+  //  m_pDataManagerWidget = new DataManagerWidget(m_pMain);
+  //  m_pDataManagerWidget->Init(NULL);
 
     m_pMultiViewsWidget = new MultiViewsWidget(m_pMain);
     m_pMultiViewsWidget->Init(NULL);
@@ -60,8 +61,9 @@ const char* MitkStdWidgets_Activator::GetID()
 void MitkStdWidgets_Activator::Register(R* pR)
 {
     //数据管理插件
-    m_pDataManagerWidget->InitResource(pR);
-    pR->registerCustomWidget("DataManagerWidget", m_pDataManagerWidget);
+   // m_pDataManagerWidget->InitResource(pR);
+   // pR->registerCustomWidget("DataManagerWidget", m_pDataManagerWidget);
+    REGISTER_CLASS("DataManagerWidget", DataManagerWidget);
 
     //多视图显示插件
     m_pMultiViewsWidget->InitResource(pR);

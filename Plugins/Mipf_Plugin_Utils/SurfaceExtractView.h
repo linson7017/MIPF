@@ -4,38 +4,36 @@
 #pragma once
 
 #include "MitkPluginView.h"
-#include <QObject>
+#include <QWidget>
 #include "ITKImageTypeDef.h"
 
 #include <QFuture>
 #include <QFutureWatcher>
 #include <QtConcurrentRun>
 
+#include "ui_SurfaceExtractView.h"
+
 class QmitkDataStorageComboBox;
 
 
-class SurfaceExtractView :public QObject, public MitkPluginView
+class SurfaceExtractView :public QWidget, public MitkPluginView
 {
     Q_OBJECT
 public:
-    SurfaceExtractView(QF::IQF_Main* pMain);
+    SurfaceExtractView();
     ~SurfaceExtractView();
-    void Constructed(R* pR);
+    void CreateView();
 protected:
-    virtual void Update(const char* szMessage, int iValue = 0, void* pValue = 0);
     void OnSurfaceCalculationDone();
 protected slots:
-    void ExtractSmoothedSurface(mitk::Image* image);
+    void Extract();
+    void Smooth();
+    void Simplify();
     void ExtractSurface(mitk::Image* image,int smooth=0, bool largestConnect = false);
     void ShowResult();
-
-
     void GetForeground( Float3DImageType* image, UChar3DImageType* outputImage);
 
 private:
-    QmitkDataStorageComboBox* m_pImageSelector;
-    QmitkDataStorageComboBox* m_pSurfaceSelector;
-    mitk::DataStorage::Pointer m_pDataStorage;
     mitk::Surface::Pointer m_pSurface;
 
     QFuture<void> m_Future;
@@ -48,6 +46,8 @@ private:
     float m_decimation;
     float m_closing;
     int m_timeNr;
+
+    Ui::SurfaceExtractView m_ui;
 };
 
 #endif // SurfaceExtractView_h__

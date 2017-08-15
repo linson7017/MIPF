@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>LargestConnectedComponentExtractView</class>
+ <widget class="QWidget" name="LargestConnectedComponentExtractView">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>400</width>
+    <height>300</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <widget class="QWidget" name="verticalLayoutWidget">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>10</y>
+     <width>381</width>
+     <height>101</height>
+    </rect>
+   </property>
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>Image</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QmitkDataStorageComboBox" name="ImageSelector"/>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <item>
+       <widget class="QComboBox" name="Operator">
+        <item>
+         <property name="text">
+          <string>largest</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>&gt;</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>&lt;</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>==</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item>
+       <widget class="QComboBox" name="LambdaType">
+        <item>
+         <property name="text">
+          <string>NumberOfPixels</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>PhysicalSize</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Label</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>PerimeterOnBorder</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Elongation</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Perimeter</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Roundness</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>EquivalentSphericalRadius</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>EquivalentSphericalPerimeter</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>EquivalentEllipsoidDiameter</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Flatness</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>PerimeterOnBorderRatio</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="LambdaValue">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <widget class="QPushButton" name="ApplyBtn">
+      <property name="text">
+       <string>Apply</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QmitkDataStorageComboBox</class>
+   <extends>QComboBox</extends>
+   <header>QmitkDataStorageComboBox.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

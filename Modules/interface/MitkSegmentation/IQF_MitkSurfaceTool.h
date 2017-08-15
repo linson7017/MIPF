@@ -21,6 +21,13 @@ public:
     virtual void SmoothSurface(vtkPolyData* pInput, vtkPolyData* pOutput, int iSmooth = 30, bool bLargestConnected = false) = 0;
     virtual void SmoothTubeSurface(vtkPolyData* pInput, vtkPolyData* pOutput, int iSmooth = 15, bool bLargestConnected = false) = 0;
     virtual void ConvertSurfaceToImage(mitk::Surface* surface, mitk::Image* referenceImage, mitk::Image* output) = 0;
+    
+    /************************************************************************/
+    /* 简化面片
+    dRate: 0~1，简化程度，越高简化越多
+    mode: 0-DecimatePro  1-QuadricDecimation
+    */
+    /************************************************************************/
     virtual void SimplifySurfaceMesh(vtkPolyData* pInput, vtkPolyData* pOutput, double dRate, int mode = 0) = 0;
 };
 

@@ -88,7 +88,7 @@ void HistogramView::CreateView()
 {
     m_ui.setupUi(this);
     m_ui.DataSelector->SetDataStorage(GetDataStorage());
-    m_ui.DataSelector->SetPredicate(CreatePredicate(1));
+    m_ui.DataSelector->SetPredicate(CreatePredicate(Image));
     {
         QwtPlotCanvas *canvas = new QwtPlotCanvas();
         canvas->setPalette(Qt::gray);
@@ -167,11 +167,16 @@ void HistogramView::Refresh()
     converter->Update();
 
     vtkImageData* image = converter->GetOutput();
-                                            
+    
+
     m_image->Initialize(image);
     m_image->GetVtkImageData()->DeepCopy(image);
+    
 
-    RequestRenderWindowUpdate();
+    RequestRenderWindowUpdate(mitk::RenderingManager::REQUEST_UPDATE_3DWINDOWS);
+   // m_pMitkRenderWindow->GetMitkStdMultiWidget()->ForceImmediateUpdate();
+   // RequestRenderWindowUpdate(mitk::RenderingManager::REQUEST_UPDATE_2DWINDOWS);
+
 }
 
 void HistogramView::Plot()
@@ -277,7 +282,7 @@ void HistogramView::Plot()
     //m_pMitkRenderWindow->GetMitkStdMultiWidget()->SetGradientBackgroundColorForRenderWindow(bkcolor, bkcolor,3);
     m_pMitkRenderWindow->GetMitkStdMultiWidget()->SetGradientBackgroundColors(bkcolor, bkcolor);
 
-    m_timer.start(50);
+    m_timer.start(20);
 
     return;
 

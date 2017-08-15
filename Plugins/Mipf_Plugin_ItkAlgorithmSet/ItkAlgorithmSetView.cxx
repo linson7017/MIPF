@@ -30,7 +30,7 @@ void ItkAlgorithmSetView::CreateView()
     m_ui.setupUi(this);
 
     m_ui.DataSelector->SetDataStorage(GetDataStorage());
-    m_ui.DataSelector->SetPredicate(CreatePredicate(1));
+    m_ui.DataSelector->SetPredicate(CreatePredicate(Image));
 
     //VDE
     {

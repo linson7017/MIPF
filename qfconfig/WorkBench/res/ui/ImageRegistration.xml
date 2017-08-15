@@ -24,7 +24,7 @@
 		<Button text="Reset" msgcommand="ImageRegistration.ResetRegister" />
 		<Button text="End" msgcommand="ImageRegistration.EndRegister" />
 
-
+		<TextEdit id="ImageRegistration.RegistrationMatrix" text="1.0 0.0 0.0 0.0\n0.0 1.0 0.0 0.0\n0.0 0.0 1.0 0.0\n0.0 0.0 0.0 0.0"/>
 		<Stretch size="400"/>
 	</VLayout>
 </Widget>

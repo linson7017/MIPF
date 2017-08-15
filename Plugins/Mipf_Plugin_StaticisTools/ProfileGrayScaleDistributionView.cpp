@@ -85,7 +85,7 @@ void ProfileGrayScaleDistributionView::CreateView()
     m_ui.setupUi(this);
 
     m_ui.ImageSelector->SetDataStorage(GetDataStorage());
-    m_ui.ImageSelector->SetPredicate(CreatePredicate(1));
+    m_ui.ImageSelector->SetPredicate(CreatePredicate(Image));
     {
         QwtPlotCanvas *canvas = new QwtPlotCanvas();
         canvas->setPalette(Qt::gray);
@@ -123,8 +123,8 @@ void ProfileGrayScaleDistributionView::CreateView()
         m_maxPos = new QwtPlotMarker("Marker");
         m_maxPos->setRenderHint(QwtPlotItem::RenderAntialiased, true);
         m_maxPos->setItemAttribute(QwtPlotItem::Legend, true);
-        m_maxPos->setSymbol(new ArrowSymbol());
-        m_maxPos->setLabelAlignment(Qt::AlignRight | Qt::AlignBottom);
+        m_maxPos->setSymbol(new ArrowSymbol(false));
+        m_maxPos->setLabelAlignment(Qt::AlignRight | Qt::AlignTop);
         m_maxPos->attach(m_ui.Plot);
 
         m_maxY->setVisible(false);
@@ -150,8 +150,8 @@ void ProfileGrayScaleDistributionView::CreateView()
         m_minPos = new QwtPlotMarker("Marker");
         m_minPos->setRenderHint(QwtPlotItem::RenderAntialiased, true);
         m_minPos->setItemAttribute(QwtPlotItem::Legend, true);
-        m_minPos->setSymbol(new ArrowSymbol(false));
-        m_minPos->setLabelAlignment(Qt::AlignRight | Qt::AlignTop);
+        m_minPos->setSymbol(new ArrowSymbol());
+        m_minPos->setLabelAlignment(Qt::AlignRight | Qt::AlignBottom);
         m_minPos->attach(m_ui.Plot);
 
         m_minY->setVisible(false);

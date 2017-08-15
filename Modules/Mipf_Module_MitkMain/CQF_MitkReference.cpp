@@ -8,12 +8,13 @@
 #include "iqf_main.h"
 
 #include <QStringList>
+#include <QDebug>
 
 CQF_MitkReference::CQF_MitkReference(QF::IQF_Main* pMain)
 {
     m_pMain = pMain;
     std::string configPath = m_pMain->GetConfigPath();
-    m_Settings = new QSettings(configPath.append("/config.ini").c_str(), QSettings::IniFormat);
+    m_Settings = new QSettings(QString::fromLocal8Bit(configPath.c_str()).append("/config.ini"), QSettings::IniFormat);
 }
 
 

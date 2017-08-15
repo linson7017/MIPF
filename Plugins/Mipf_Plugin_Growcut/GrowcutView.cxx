@@ -61,7 +61,7 @@ void GrowcutView::Contructed(R* pR)
 	if (m_pSourceImageSelector)
 	{
         m_pSourceImageSelector->SetDataStorage(GetDataStorage());
-        m_pSourceImageSelector->SetPredicate(CreatePredicate(1));
+        m_pSourceImageSelector->SetPredicate(CreatePredicate(Image));
 	} 
 }
 
