@@ -62,6 +62,7 @@ protected:
     void RefreshROI();
     void EstimationSampleRate();
 
+
     void RefreshContourValueRange(double min,double max,double value);
     void Reset();
 

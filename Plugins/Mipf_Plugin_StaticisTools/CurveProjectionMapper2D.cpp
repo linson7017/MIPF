@@ -11,6 +11,7 @@ using namespace mitk;
 CurveProjectionMapper2D::CurveProjectionMapper2D()
 {
     int x = 0;
+
 }
 
 

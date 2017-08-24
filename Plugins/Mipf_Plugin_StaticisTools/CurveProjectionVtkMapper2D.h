@@ -39,7 +39,17 @@ namespace mitk
 
             // actor
             vtkSmartPointer<vtkActor2D> m_lineActor;
-            vtkSmartPointer<vtkPolyDataMapper2D> m_Mapper;
+            vtkSmartPointer<vtkActor2D> m_lineBackActor;
+            vtkSmartPointer<vtkActor2D> m_crossHairActor;
+            vtkSmartPointer<vtkActor2D> m_intersectActor;
+            vtkSmartPointer<vtkActor2D> m_extensionActor;
+
+            vtkSmartPointer<vtkPolyDataMapper2D> m_lineMapper;
+            vtkSmartPointer<vtkPolyDataMapper2D> m_lineBackMapper;
+            vtkSmartPointer<vtkPolyDataMapper2D> m_crosshairMapper;
+            vtkSmartPointer<vtkPolyDataMapper2D> m_intersectMapper;
+            vtkSmartPointer<vtkPolyDataMapper2D> m_extensionMapper;
+
 
             vtkSmartPointer<vtkPropAssembly> m_Assembly;
         };
@@ -51,6 +61,9 @@ namespace mitk
         ~CurveProjectionVtkMapper2D();
 
         virtual void GenerateDataForRenderer(mitk::BaseRenderer *renderer) override;
+        void CreateCross2D(const mitk::Point2D& crossPosition,vtkPolyData* pOutput,double size=5.0);
+        void CreateIntersect2D(const mitk::Point2D& intersectPosition, vtkPolyData* pOutput, double radius = 3.0);
+        void CreateExtensionCord(const mitk::Point3D& startPosition,const mitk::Vector3D& direction,const mitk::Vector3D& normal,double length,vtkPolyData* pOutput);
     };
 }
 

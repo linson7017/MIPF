@@ -14,8 +14,6 @@ public:
     StatusBarWidget();
     ~StatusBarWidget();
 
-    void Init();
-
     virtual void DisplayText(const char* t) override;
     virtual void DisplayText(const char* t, int ms) override;
 

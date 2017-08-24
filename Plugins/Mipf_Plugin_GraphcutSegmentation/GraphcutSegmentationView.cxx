@@ -722,14 +722,12 @@ void GraphcutSegmentationView::ChangeTool(const QString& toolName)
     {
         return;
     }
-
     QSlider* le = (QSlider*)m_pR->getObjectFromGlobalMap("GraphcutSegmentation.PenSize");
     int size = 1.0;
     if (le)
     {
         size = le->value();
     }
-
     mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
     if (toolName.isEmpty())
     {

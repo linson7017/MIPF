@@ -17,21 +17,34 @@ project(Mipf_Plugin_MitkStdWidgets)
 
 include_directories(".")
 
-file (GLOB Headers "./*.h")
-file (GLOB DataManagerHeaders "./DataManagerWidget/*.h")
-file (GLOB MultiViewsHeaders "./MultiViewsWidget/*.h")
-file (GLOB VolumeVisualizationHeaders "./VolumeVisualizationWidget/*.h")
-file (GLOB ImageNavigatorHeaders "./ImageNavigatorWidget/*.h")
-file (GLOB MeasurementHeaders "./MeasurementWidget/*.h")
-file (GLOB StatusHeaders "./StatusWidget/*.h")
 
-AUX_SOURCE_DIRECTORY(. DIR_SRCS)
-AUX_SOURCE_DIRECTORY(./DataManagerWidget DataManager_DIR_SRCS)
-AUX_SOURCE_DIRECTORY(./MultiViewsWidget MultiViews_DIR_SRCS)
-AUX_SOURCE_DIRECTORY(./VolumeVisualizationWidget VolumeVisualization_DIR_SRCS)
-AUX_SOURCE_DIRECTORY(./ImageNavigatorWidget ImageNavigator_DIR_SRCS)
-AUX_SOURCE_DIRECTORY(./MeasurementWidget Measurement_DIR_SRCS)
-AUX_SOURCE_DIRECTORY(./StatusWidget Status_DIR_SRCS)
+file(GLOB DIR_SRCS ${CMAKE_CURRENT_SOURCE_DIR}  *.h* *.c*)
+file(GLOB_RECURSE DataManager_DIR_SRCS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} 
+${CMAKE_CURRENT_SOURCE_DIR}/DataManagerWidget/*.h* 
+${CMAKE_CURRENT_SOURCE_DIR}/DataManagerWidget/*.c*)
+file(GLOB_RECURSE MultiViews_DIR_SRCS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} 
+${CMAKE_CURRENT_SOURCE_DIR}/MultiViewsWidget/*.h* 
+${CMAKE_CURRENT_SOURCE_DIR}/MultiViewsWidget/*.c* )
+file(GLOB_RECURSE VolumeVisualization_DIR_SRCS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} 
+${CMAKE_CURRENT_SOURCE_DIR}/VolumeVisualizationWidget/*.h* 
+${CMAKE_CURRENT_SOURCE_DIR}/VolumeVisualizationWidget/*.c* )
+file(GLOB_RECURSE ImageNavigator_DIR_SRCS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} 
+${CMAKE_CURRENT_SOURCE_DIR}/ImageNavigatorWidget/*.h* 
+${CMAKE_CURRENT_SOURCE_DIR}/ImageNavigatorWidget/*.c* )
+file(GLOB_RECURSE Measurement_DIR_SRCS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} 
+${CMAKE_CURRENT_SOURCE_DIR}/MeasurementWidget/*.h* 
+${CMAKE_CURRENT_SOURCE_DIR}/MeasurementWidget/*.c* )
+file(GLOB_RECURSE Status_DIR_SRCS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} 
+${CMAKE_CURRENT_SOURCE_DIR}/StatusWidget/*.h* 
+${CMAKE_CURRENT_SOURCE_DIR}/StatusWidget/*.c* )
+
+source_group(DataManager FILES  ${DataManager_DIR_SRCS})
+source_group(MultiViews FILES  ${MultiViews_DIR_SRCS})
+source_group(VolumeVisulization FILES  ${VolumeVisualization_DIR_SRCS})
+source_group(ImageNavigator FILES  ${ImageNavigator_DIR_SRCS})
+source_group(Measurement FILES  ${Measurement_DIR_SRCS})
+source_group(Status FILES  ${Status_DIR_SRCS})
+
 
 set(CMAKE_AUTOMOC ON)
 
@@ -43,8 +56,13 @@ add_definitions(-DUS_MODULE_NAME)
 if(VTK_QT_VERSION VERSION_GREATER "4")
 
 add_library(Mipf_Plugin_MitkStdWidgets SHARED 
-	${DIR_SRCS} ${DataManager_DIR_SRCS} ${MultiViews_DIR_SRCS} ${VolumeVisualization_DIR_SRCS} ${ImageNavigator_DIR_SRCS} ${Measurement_DIR_SRCS} ${Status_DIR_SRCS}
-	${Headers} ${DataManagerHeaders} ${MultiViewsHeaders} ${VolumeVisualizationHeaders} ${ImageNavigatorHeaders} ${MeasurementHeaders} ${StatusHeaders}
+	${DIR_SRCS} 
+	${DataManager_DIR_SRCS} 
+	${MultiViews_DIR_SRCS} 
+	${VolumeVisualization_DIR_SRCS} 
+	${ImageNavigator_DIR_SRCS} 
+	${Measurement_DIR_SRCS} 
+	${Status_DIR_SRCS}
 	${UI_Srcs} 
 	${MOC_Hdrs})
 qt5_use_modules(Mipf_Plugin_MitkStdWidgets Core Gui Widgets)

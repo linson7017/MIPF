@@ -21,6 +21,8 @@ include_directories(${ITKVTK_HELPERS_INCLUDE_DIR})
 
 set(CMAKE_AUTOMOC ON)
 
+add_definitions(-DUS_MODULE_NAME)
+
 if (VTK_QT_VERSION VERSION_GREATER "4")
     qt5_wrap_ui(ui_Files ${UI_Srcs})
     add_library(Mipf_Plugin_Utils SHARED ${DIR_SRCS} ${Headers} ${UI_Srcs} ${MOC_Hdrs})

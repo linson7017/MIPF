@@ -18,6 +18,10 @@ add_definitions(-DQF_API_EXPORTS)
 
 add_subdirectory(ITKVTKHelpers )
 
+add_subdirectory(MitkCoreExt )
+
+add_subdirectory(Mipf_Module_Core)
+
 add_subdirectory(Mipf_Module_MitkMain)
 
 add_subdirectory(Mipf_Module_MitkSegmentation)
@@ -33,3 +37,5 @@ add_subdirectory(Mipf_Module_MitkStd)
 add_subdirectory(Mipf_Module_Segmentation)
 
 add_subdirectory(Mipf_Module_MitkImageUtils)
+
+add_subdirectory(Mipf_Module_VesselTools)

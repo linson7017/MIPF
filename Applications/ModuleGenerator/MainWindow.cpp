@@ -132,6 +132,7 @@ void MainWindow::GenerateSourceFiles()
     {
         text = ComH;
         text.replace("@ComName@", m_ComName);
+        text.replace("@ModuleName@", m_ModuleName);
         if (!m_UseCommand)
         {
             text.replace("class @CommandName@;", "");

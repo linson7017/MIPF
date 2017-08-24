@@ -24,8 +24,9 @@ class ImageNavigatorWidget : public QWidget, public MitkPluginView
 {
     Q_OBJECT
 public:
-    ImageNavigatorWidget(QF::IQF_Main* pMain);
+    ImageNavigatorWidget();
     ~ImageNavigatorWidget() {}
+    void CreateView() override;
     virtual void Init(QWidget* parent);
     virtual void Update(const char* szMessage, int iValue = 0, void* pValue = 0);
 

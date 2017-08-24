@@ -28,6 +28,11 @@ namespace mitk
         /** \brief returns the a prop assembly */
         virtual vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) override;
 
+        void SetFusionRenderer(mitk::BaseRenderer* renderer);
+        void SetFusionDataNode(mitk::DataNode* dataNode);
+        void SetFusion(bool fusion);
+        void SetResliceDataNode(mitk::DataNode* dataNode) { m_resliceDataNode = dataNode; }
+
 
         class LocalStorage : public mitk::Mapper::BaseLocalStorage
         {
@@ -57,6 +62,11 @@ namespace mitk
 
         TransparentBackgroundMapper2D();
         ~TransparentBackgroundMapper2D();
+
+        mitk::BaseRenderer* m_fusionRenderer;
+        mitk::DataNode* m_fusionDataNode;
+        mitk::DataNode* m_resliceDataNode;
+        bool m_bFusion;
     };
 }
 

@@ -46,7 +46,7 @@ const char ComH[] = ""\
 "    virtual void Release();\n"\
 "    virtual bool Init();\n"\
 "    virtual void* GetInterfacePtr(const char* szInterfaceID);\n"\
-"    const char* GetComponentID() { return \"QF_Component_@ComName@\"; }\n"\
+"    const char* GetComponentID() { return \"QF_Component_@ModuleName@\"; }\n"\
 "    int GetInterfaceCount();\n"\
 "    const char* GetInterfaceID(int iID);\n"\
 "private:\n"\

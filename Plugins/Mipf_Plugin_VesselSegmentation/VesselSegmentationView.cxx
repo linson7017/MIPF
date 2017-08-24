@@ -36,6 +36,8 @@
 
 //common
 #include "MitkSegmentation/IQF_MitkSurfaceTool.h"
+#include "VesselTools/IQF_VesselSegmentationTool.h"
+#include "Core/IQF_ObjectFactory.h"
 
 
 VesselSegmentationView::VesselSegmentationView() :MitkPluginView()
@@ -186,117 +188,52 @@ void VesselSegmentationView::OnCreateVesselSurfaceFromMask()
     Thmin = ui.spbxLowerThreshold->value();
     Thmax = ui.spbxUpperThreshold->value();
 
-    vtkImageCast* ImageCast = vtkImageCast::New();
-    ImageCast->SetInputData(image);
-    ImageCast->SetOutputScalarTypeToFloat();
-    ImageCast->Update();
-    image = ImageCast->GetOutput();
-
-    vtkImageData *outVolumeData = ExecuteFM(ImageCast->GetOutput(), Thmin, Thmax, sourceSeedIds, targetSeedIds);
-
-    vtkvmtkGeodesicActiveContourLevelSetImageFilter* levelSets = vtkvmtkGeodesicActiveContourLevelSetImageFilter::New();
-    levelSets->SetFeatureImage(image);
-    levelSets->SetDerivativeSigma(0.0);
-    levelSets->SetAutoGenerateSpeedAdvection(1);
-    levelSets->SetPropagationScaling(100);
-    levelSets->SetCurvatureScaling(70);
-    levelSets->SetAdvectionScaling(100);
-    levelSets->SetInputData(outVolumeData);
-    levelSets->SetNumberOfIterations(10);
-    levelSets->SetIsoSurfaceValue(0.0);
-    levelSets->SetMaximumRMSError(1E-20);
-    levelSets->SetInterpolateSurfaceLocation(1);
-    levelSets->SetUseImageSpacing(1);
-    levelSets->Update();
-
-
-    mitk::Point3D ImageOrigin = imageseed->GetGeometry()->GetOrigin();
-    double* PImageOrigin = ImageOrigin.Begin();
-
-    vtkImageGaussianSmooth *gaussian = vtkImageGaussianSmooth::New();
-    gaussian->SetInputData(levelSets->GetOutput());
-    gaussian->SetDimensionality(3);
-    gaussian->SetRadiusFactor(0.49);
-    gaussian->SetStandardDeviation(3, 3, 3);
-    gaussian->ReleaseDataFlagOn();
-    gaussian->UpdateInformation();
-    gaussian->Update();
-    gaussian->GetOutput()->SetOrigin(*PImageOrigin, *(PImageOrigin + 1), *(PImageOrigin + 2));
-
-    
-
-    vtkPolyData* outPolyData3 = MarchingCubes(gaussian->GetOutput(), 1);
-
-    vtkPolyDataConnectivityFilter* connectivityFilter = vtkPolyDataConnectivityFilter::New();
-    connectivityFilter->SetInputData(outPolyData3);
-    connectivityFilter->SetExtractionModeToLargestRegion();
-    connectivityFilter->Update();
-    outPolyData3 = connectivityFilter->GetOutput();
-    outPolyData3->Modified();
-
-    //    vtkTriangleFilter* triangleFilter = vtkTriangleFilter::New();
-    //    triangleFilter->SetInput(outPolyData3);
-    //    triangleFilter->Update();
-
-    //    vtkDecimatePro* decimationFilter = vtkDecimatePro::New();
-    //    decimationFilter->SetInput(triangleFilter->GetOutput());
-    //    decimationFilter->SetTargetReduction(0.5);
-    //    decimationFilter->PreserveTopologyOn();
-    //    decimationFilter->Update();
-
-    //    vtkCleanPolyData* cleaner = vtkCleanPolyData::New();
-    //    cleaner->SetInput(decimationFilter->GetOutput());
-    //    cleaner->Update();
-
-    //    vtkTriangleFilter* triangleFilterout = vtkTriangleFilter::New();
-    //    triangleFilterout->SetInput(cleaner->GetOutput());
-    //    triangleFilterout->Update();
-
-    //    outPolyData3=triangleFilterout->GetOutput();
-    //    outPolyData3->Update();
-
-    mitk::Surface::Pointer Surbase3 = mitk::Surface::New();
-    Surbase3->SetVtkPolyData(outPolyData3);
-    Surbase3->Update();
-
-    //convert surface to image
-    IQF_MitkSurfaceTool* pSurfaceTool = (IQF_MitkSurfaceTool*)m_pMain->GetInterfacePtr(QF_MitkSurface_Tool);
-    if (pSurfaceTool)
+    IQF_ObjectFactory* pObjectFactory = (IQF_ObjectFactory*)m_pMain->GetInterfacePtr(QF_Core_ObjectFactory);
+    if (pObjectFactory)
     {
-        //add vessel image
-        GetDataStorage()->Remove(GetDataStorage()->GetNamedNode("Vessel Image"));
-        mitk::DataNode::Pointer vesselImageNode = mitk::DataNode::New();
-        mitk::Image::Pointer vesselImage = mitk::Image::New();
-        vesselImage->Initialize(imageseed);
-        pSurfaceTool->ConvertSurfaceToImage(Surbase3.GetPointer(), imageseed, vesselImage.GetPointer());
-        vesselImageNode->SetData(vesselImage);
-        vesselImageNode->SetColor(1.0, 0.0, 0.0);
-        vesselImageNode->SetOpacity(0.5);
-        vesselImageNode->SetName("Vessel Image");
-        GetDataStorage()->Add(vesselImageNode);
+        IQF_VesselSegmentationTool* pVesselSegTool = (IQF_VesselSegmentationTool*)pObjectFactory->CreateObject("VesselSegmentation");
+        auto outputSurface = vtkSmartPointer<vtkPolyData>::New();
+        pVesselSegTool->SegmentVessel(image, outputSurface.GetPointer(), Thmin, Thmax, sourceSeedIds, targetSeedIds);
+
+        vtkPolyDataConnectivityFilter* connectivityFilter = vtkPolyDataConnectivityFilter::New();
+        connectivityFilter->SetInputData(outputSurface);
+        connectivityFilter->SetExtractionModeToLargestRegion();
+        connectivityFilter->Update();
+        outputSurface = connectivityFilter->GetOutput();
+        outputSurface->Modified();
+
+        mitk::Surface::Pointer Surbase3 = mitk::Surface::New();
+        Surbase3->GetGeometry()->SetOrigin(imageseed->GetGeometry()->GetOrigin());
+        Surbase3->SetVtkPolyData(outputSurface);
+        Surbase3->Update();
+
+        //convert surface to image
+        IQF_MitkSurfaceTool* pSurfaceTool = (IQF_MitkSurfaceTool*)m_pMain->GetInterfacePtr(QF_MitkSurface_Tool);
+        if (pSurfaceTool)
+        {
+            //add vessel image
+            GetDataStorage()->Remove(GetDataStorage()->GetNamedNode(Object_ID_VesselSegmentationTool));
+            mitk::DataNode::Pointer vesselImageNode = mitk::DataNode::New();
+            mitk::Image::Pointer vesselImage = mitk::Image::New();
+            vesselImage->Initialize(imageseed);
+            pSurfaceTool->ConvertSurfaceToImage(Surbase3.GetPointer(), imageseed, vesselImage.GetPointer());
+            vesselImageNode->SetData(vesselImage);
+            vesselImageNode->SetColor(1.0, 0.0, 0.0);
+            vesselImageNode->SetOpacity(0.5);
+            vesselImageNode->SetName("Vessel Image");
+            GetDataStorage()->Add(vesselImageNode);
+        }
+
+        GetDataStorage()->Remove(GetDataStorage()->GetNamedNode("Vessel"));
+        mitk::DataNode::Pointer outnode3 = mitk::DataNode::New();
+        outnode3->SetData(Surbase3);
+        outnode3->SetProperty("name", mitk::StringProperty::New("Vessel"));
+        outnode3->SetProperty("color", mitk::ColorProperty::New(1.0, 1.0, 1.0));
+        outnode3->Update();
+
+        GetDataStorage()->Add(outnode3);
+        mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     }
-
-
-
-    GetDataStorage()->Remove(GetDataStorage()->GetNamedNode("Vessel"));
-    mitk::DataNode::Pointer outnode3 = mitk::DataNode::New();
-    outnode3->SetData(Surbase3);
-
-    outnode3->SetProperty("name", mitk::StringProperty::New("Vessel"));
-    outnode3->SetProperty("color", mitk::ColorProperty::New(1.0, 1.0, 1.0));
-    outnode3->Update();
-
-    GetDataStorage()->Add(outnode3);
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-
-    ImageCast->Delete();
-    outVolumeData->Delete();
-    levelSets->Delete();
-    gaussian->Delete();
-    //    connectivityFilter->Delete();
-    //    triangleFilter->Delete();
-    //    decimationFilter->Delete();
-    //    triangleFilterout->Delete();
 }
 
 void VesselSegmentationView::OnCreateSmoothSurface()
@@ -411,6 +348,7 @@ void VesselSegmentationView::OnCreateSmoothSurface()
 
     mitk::Surface::Pointer Surbasemodel = mitk::Surface::New();
     Surbasemodel->SetVtkPolyData(marchingCubes->GetOutput());
+    Surbasemodel->GetGeometry()->SetOrigin(ImageSurface->GetGeometry()->GetOrigin());
     Surbasemodel->Update();
 
 

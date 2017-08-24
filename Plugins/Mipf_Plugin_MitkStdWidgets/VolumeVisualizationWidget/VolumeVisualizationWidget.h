@@ -24,8 +24,9 @@ class VolumeVisualizationWidget : public QWidget, public MitkPluginView
 {
     Q_OBJECT
 public:
-    VolumeVisualizationWidget(QF::IQF_Main* pMain);
+    VolumeVisualizationWidget();
     ~VolumeVisualizationWidget() {}
+    void CreateView() override;
     virtual void Init(QWidget* parent);
     virtual void Update(const char* szMessage, int iValue = 0, void* pValue = 0);
 

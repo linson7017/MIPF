@@ -4,6 +4,8 @@
 #include "MitkMain/mitk_main_msg.h"
 #include "UIs/QF_Plugin.h"
 
+#include "iqf_main.h"
+
 namespace QF
 {
     class IQF_Main;
@@ -34,6 +36,17 @@ public:
 	virtual void Disactivate() { m_bActivated = false; }
 	void SetActivated(bool bActivated) { m_bActivated = bActivated; }
 	bool IsActivated() { return m_bActivated; }
+    void* GetInterfacePtr(const char* szInterfaceID)
+    {
+        if (m_pMain)
+        {
+            return m_pMain->GetInterfacePtr(szInterfaceID);
+        }
+        else
+        {
+            return nullptr;
+        }       
+    }
 protected:
     //override
     virtual void Update(const char* szMessage, int iValue = 0, void* pValue = 0) {}

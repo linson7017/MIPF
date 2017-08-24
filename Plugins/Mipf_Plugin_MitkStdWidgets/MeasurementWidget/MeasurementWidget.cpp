@@ -142,13 +142,18 @@ struct QmitkMeasurementViewData
     QGridLayout* m_Layout;
 };
 
-MeasurementWidget::MeasurementWidget(QF::IQF_Main* pMain) :MitkPluginView(pMain),d(new QmitkMeasurementViewData)
+MeasurementWidget::MeasurementWidget() :MitkPluginView(),d(new QmitkMeasurementViewData)
 {
     
 }
 
 MeasurementWidget::~MeasurementWidget()
 {
+}
+
+void MeasurementWidget::CreateView()
+{
+    Init(NULL);
 }
 
 void MeasurementWidget::Update(const char* szMessage, int iValue , void* pValue )
@@ -171,9 +176,8 @@ void MeasurementWidget::Update(const char* szMessage, int iValue , void* pValue 
     }
 }
 
-void MeasurementWidget::InitResource(R* pR)
+void MeasurementWidget::SetupWidget(R* pR)
 {
-    PluginView::InitResource(pR);
     //create your view
     d->m_Parent = this;
     auto selectedImageLabel = new QLabel("Reference Image: ");
@@ -254,6 +258,7 @@ void MeasurementWidget::InitResource(R* pR)
 
 void MeasurementWidget::Init(QWidget* parent)
 {    
+    SetupWidget(NULL);
 }
 
 void MeasurementWidget::CreateConnections()

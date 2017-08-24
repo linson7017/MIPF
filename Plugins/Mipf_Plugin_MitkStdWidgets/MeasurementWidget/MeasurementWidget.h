@@ -18,10 +18,11 @@ class MeasurementWidget : public QWidget, public MitkPluginView
 {
     Q_OBJECT
 public:
-    MeasurementWidget(QF::IQF_Main* pMain);
+    MeasurementWidget();
     ~MeasurementWidget();
+    void CreateView() override;
     void Init(QWidget* parent);
-    void InitResource(R* pR);
+    void SetupWidget(R* pR);
 public:
     void NodeAdded(const mitk::DataNode* node);
     void NodeChanged(const mitk::DataNode* node);

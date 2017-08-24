@@ -31,11 +31,13 @@
 //##Documentation
 //## @brief As MultiViews, but with QmitkStdMultiWidget as widget
 
-MultiViewsWidget::MultiViewsWidget(QF::IQF_Main* pMain):MitkPluginView(pMain),m_bInited(false)
+MultiViewsWidget::MultiViewsWidget():MitkPluginView(),m_bInited(false)
 {
-    m_pMain->Attach(this);
-    m_DataManager = (IQF_MitkDataManager*)m_pMain->GetInterfacePtr("QF_MitkMain_DataManager");
-    m_DataManager->Init();
+}
+
+void MultiViewsWidget::CreateView()
+{
+    Init(NULL);
 }
 
 void MultiViewsWidget::Update(const char* szMessage, int iValue, void* pValue)
@@ -73,13 +75,13 @@ void MultiViewsWidget::SetupWidgets()
     m_multiWidget = new QmitkStdMultiWidget(viewParent);
     hlayout->addWidget(m_multiWidget);
 
-    if (m_DataManager->GetDataStorage())
+    if (m_pMitkDataManager->GetDataStorage())
     {
         // Tell the multiWidget which DataStorage to render
-        m_multiWidget->SetDataStorage(m_DataManager->GetDataStorage());
+        m_multiWidget->SetDataStorage(m_pMitkDataManager->GetDataStorage());
         // Initialize views as axial, sagittal, coronar (from
         // top-left to bottom)
-        mitk::TimeGeometry::Pointer geo = m_DataManager->GetDataStorage()->ComputeBoundingGeometry3D(m_DataManager->GetDataStorage()->GetAll());
+        mitk::TimeGeometry::Pointer geo = m_pMitkDataManager->GetDataStorage()->ComputeBoundingGeometry3D(m_pMitkDataManager->GetDataStorage()->GetAll());
         mitk::RenderingManager::GetInstance()->InitializeViews(geo);
     }
 
@@ -107,6 +109,7 @@ void MultiViewsWidget::SetupWidgets()
 
 void MultiViewsWidget::Init(QWidget* parent)
 {
+    m_pMain->Attach(this);
     // setup the widgets as in the previous steps, but with an additional
     // QVBox for a button to start the segmentation
     SetupWidgets();

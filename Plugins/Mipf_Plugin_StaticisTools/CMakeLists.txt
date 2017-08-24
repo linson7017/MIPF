@@ -19,6 +19,8 @@ AUX_SOURCE_DIRECTORY(. DIR_SRCS)
 
 add_definitions(-DUS_MODULE_NAME)
 
+include_directories(${ITKVTK_HELPERS_INCLUDE_DIR})
+
 set(CMAKE_AUTOMOC ON )
 
 if (VTK_QT_VERSION VERSION_GREATER "4")
@@ -26,7 +28,7 @@ if (VTK_QT_VERSION VERSION_GREATER "4")
     add_library(Mipf_Plugin_StaticisTools SHARED ${DIR_SRCS} ${Headers} ${UI_Srcs} ${MOC_Hdrs})
     qt5_use_modules(Mipf_Plugin_StaticisTools Core Gui Widgets)
     target_link_libraries(Mipf_Plugin_StaticisTools    
-    ${VTK_LIBRARIES} ${ITK_LIBRARIES}   
+    ${VTK_LIBRARIES} ${ITK_LIBRARIES}    ${ITKVTK_HELPERS_LIBRARIES}
     ${QTFRAMEWORK_LIBRARIES} ${QFMAIN_LIBRARIES}   
     MitkQtWidgets MitkQtWidgetsExt MitkMapperExt MitkSegmentation)
 

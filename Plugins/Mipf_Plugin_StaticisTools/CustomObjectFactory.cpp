@@ -3,6 +3,7 @@
 #include "CurveProjectionVtkMapper2D.h"
 #include "CurveProjectionMapper2D.h"
 #include "TransparentBackgroundMapper2D.h"
+#include "WxAblationPlanningMapper2D.h"
 
 #include "mitkImage.h"
 

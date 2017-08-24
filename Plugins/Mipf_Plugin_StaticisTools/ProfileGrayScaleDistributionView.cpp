@@ -15,9 +15,11 @@
 
 //vtk
 #include "vtkLineSource.h"
+#include "vtkSTLReader.h"
 
 //QT
 #include <QPointF>
+#include <QMatrix4x4>
 
 
 //mitk
@@ -214,33 +216,56 @@ void ProfileGrayScaleDistributionView::DrawLine()
 {
       if (m_lineNode.IsNull())
       {
+
+          vtkSTLReader* reader = vtkSTLReader::New();
+          reader->SetFileName("D:/temp/SurgicalRoute.stl");
+          reader->Update();
+
           m_lineNode = mitk::DataNode::New();
-          m_lineNode->SetProperty("helper object", mitk::BoolProperty::New(true));
           mitk::CurveProjectionVtkMapper2D::Pointer mapper = mitk::CurveProjectionVtkMapper2D::New();
           mapper->SetDataNode(m_lineNode);
           m_lineNode->SetMapper(mitk::BaseRenderer::Standard2D, mapper);
           m_lineNode->SetProperty("2d mapper type", mitk::StringProperty::New("curve projection"));
 
           mitk::Surface::Pointer surface = mitk::Surface::New();
+          surface->SetVtkPolyData(reader->GetOutput());
+
+          QMatrix4x4 rotate;
+          rotate.setToIdentity();
+          rotate.translate(50, 50, -200);
+          rotate.rotate(45, 1, 0, 0);   
+          vtkMatrix4x4* transform = vtkMatrix4x4::New();
+          vtkMatrix4x4* rm = vtkMatrix4x4::New();
+          for (int i = 0; i < 4; i++)
+          {
+              for (int j = 0; j < 4; j++)
+              {
+                  transform->SetElement(i, j, rotate(i, j));
+              }
+          }
+          vtkMatrix4x4* matrix  = surface->GetGeometry()->GetVtkMatrix();
+          vtkMatrix4x4::Multiply4x4(transform, matrix, rm);
+          surface->GetGeometry()->SetIndexToWorldTransformByVtkMatrix(rm);
+
           m_lineNode->SetData(surface);
           
           GetDataStorage()->Add(m_lineNode);
       }
 
-       if (!m_ui.StartPointLE->text().isEmpty()&& !m_ui.EndPointLE->text().isEmpty())
-       {
-           vtkSmartPointer<vtkLineSource> lineSource =
-               vtkSmartPointer<vtkLineSource>::New();
-           lineSource->SetPoint1(m_startPoint.GetDataPointer());
-           lineSource->SetPoint2(m_endPoint.GetDataPointer());
-           lineSource->Update();
+      /*if (!m_ui.StartPointLE->text().isEmpty()&& !m_ui.EndPointLE->text().isEmpty())
+      {
+          vtkSmartPointer<vtkLineSource> lineSource =
+              vtkSmartPointer<vtkLineSource>::New();
+          lineSource->SetPoint1(m_startPoint.GetDataPointer());
+          lineSource->SetPoint2(m_endPoint.GetDataPointer());
+          lineSource->Update();
 
-           mitk::Surface* lineData = static_cast<mitk::Surface*>(m_lineNode->GetData());
-           lineData->SetVtkPolyData(lineSource->GetOutput());
-           m_lineNode->Modified();
-           RequestRenderWindowUpdate();
-           Plot();
-       }  
+          mitk::Surface* lineData = static_cast<mitk::Surface*>(m_lineNode->GetData());
+          lineData->SetVtkPolyData(lineSource->GetOutput());
+          m_lineNode->Modified();
+          RequestRenderWindowUpdate();
+          Plot();
+      }  */
 }
 
 

@@ -14,23 +14,27 @@ endif()
 
 project(Mipf_Module_Segmentation)
 
+
 include_directories(${ITKVTK_HELPERS_INCLUDE_DIR})
 
-file(GLOB Headers "./*.h")
-file(GLOB AIRWAY_Headers "./Airway/*.h")
-file(GLOB FASTGROWCUT_Headers "./FastGrowCut/*.h" "*.hxx")
-file(GLOB_RECURSE GRAPHCUT_Files "./Graphcut/" "*.h" "*.hpp" "*.hxx" "*.cpp")
 
-AUX_SOURCE_DIRECTORY(./ DIR_SRCS)
-AUX_SOURCE_DIRECTORY(./Airway AIRWAY_DIR_SRCS)
-AUX_SOURCE_DIRECTORY(./FastGrowCut FASTGROWCUT_DIR_SRCS)
+file(GLOB SRCS ${CMAKE_CURRENT_SOURCE_DIR} *.h* *.c*)
+file(GLOB_RECURSE AIRWAY_SRCS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} 
+${CMAKE_CURRENT_SOURCE_DIR}/Airway/*.h* 
+${CMAKE_CURRENT_SOURCE_DIR}/Airway/*.c*)
+file(GLOB_RECURSE FASTGROWCUT_SRCS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} 
+${CMAKE_CURRENT_SOURCE_DIR}/FastGrowCut/*.h* 
+${CMAKE_CURRENT_SOURCE_DIR}/FastGrowCut/*.c* )
+file(GLOB_RECURSE GRAPHCUT_SRCS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} 
+${CMAKE_CURRENT_SOURCE_DIR}/Graphcut/*.h* 
+${CMAKE_CURRENT_SOURCE_DIR}/Graphcut/*.c* )
 
-
-
-FIND_PACKAGE(PocoFoundation REQUIRED)
+source_group(Airway FILES  ${AIRWAY_SRCS})
+source_group(FastGrowcut FILES  ${FASTGROWCUT_SRCS})
+source_group(Graphcut FILES  ${GRAPHCUT_SRCS})
 
 add_library(Mipf_Module_Segmentation SHARED 
-			${DIR_SRCS} ${AIRWAY_DIR_SRCS} ${FASTGROWCUT_DIR_SRCS} 
-			${Headers} ${AIRWAY_Headers} ${FASTGROWCUT_Headers} ${GRAPHCUT_Files}) 
+			${SRCS} ${AIRWAY_SRCS} ${FASTGROWCUT_SRCS} ${GRAPHCUT_SRCS} ) 
+			
 target_link_libraries(Mipf_Module_Segmentation ${VTK_LIBRARIES} ${ITK_LIBRARIES} ${QTFRAMEWORK_LIBRARIES} ${QFMAIN_LIBRARIES} ${ITKVTK_HELPERS_LIBRARIES})
 

@@ -40,11 +40,13 @@ enum RenderMode
 };
 
 
-VolumeVisualizationWidget::VolumeVisualizationWidget(QF::IQF_Main* pMain):MitkPluginView(pMain)
+VolumeVisualizationWidget::VolumeVisualizationWidget():MitkPluginView()
 {
-    m_pMain->Attach(this);
-    m_DataManager = (IQF_MitkDataManager*)m_pMain->GetInterfacePtr("QF_MitkMain_DataManager");
-    m_DataManager->Init();
+}
+
+void VolumeVisualizationWidget::CreateView()
+{
+    Init(NULL);
 }
 
 void VolumeVisualizationWidget::Update(const char* szMessage, int iValue, void* pValue)
@@ -134,6 +136,7 @@ void VolumeVisualizationWidget::Update(const char* szMessage, int iValue, void* 
 
 void VolumeVisualizationWidget::Init(QWidget* parent)
 {
+    m_pMain->Attach(this);
     QVBoxLayout* vLayout = new QVBoxLayout;
     setLayout(vLayout);
 

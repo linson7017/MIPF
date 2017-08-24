@@ -6,6 +6,8 @@
 
 
 class ImageCropper;
+class ImageReslice;
+
 
 class CQF_MitkImageUtilsCom :public QF::IQF_Component
 {
@@ -21,6 +23,8 @@ public:
 private:
     
     ImageCropper* m_pImageCropper;
+    ImageReslice* m_pImageReslice;
+
 
    QF::IQF_Main* m_pMain;
 };

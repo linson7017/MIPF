@@ -9,4 +9,5 @@ add_subdirectory(PluginGenerator)
 add_subdirectory(RobotControlApp)
 add_subdirectory(ModuleGenerator)
 add_subdirectory(MapperTest)
+add_subdirectory(TestApp)
 

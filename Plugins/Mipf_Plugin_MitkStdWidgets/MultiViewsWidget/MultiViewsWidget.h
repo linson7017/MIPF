@@ -16,8 +16,9 @@ class MultiViewsWidget : public QWidget, public MitkPluginView
 {
     Q_OBJECT
 public:
-    MultiViewsWidget(QF::IQF_Main* pMain);
+    MultiViewsWidget();
     ~MultiViewsWidget() {}
+    void CreateView();
     virtual void Init(QWidget* parent);
 
     void ChangeLayout(int index);
@@ -29,7 +30,6 @@ protected:
 	virtual void hideEvent(QHideEvent *e);
 	virtual void showEvent(QShowEvent * e);
 	virtual void closeEvent(QCloseEvent *e);
-    IQF_MitkDataManager* m_DataManager;
     mitk::Image::Pointer m_currentImage;
     mitk::PointSet::Pointer m_Seeds;
     mitk::Image::Pointer m_ResultImage;

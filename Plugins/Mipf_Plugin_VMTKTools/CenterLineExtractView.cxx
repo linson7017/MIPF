@@ -30,6 +30,9 @@
 
 #include "MitkStd/IQF_MitkPointList.h"
 
+#include "VesselTools/IQF_CenterLineExtraction.h"
+#include "Core/IQF_ObjectFactory.h"
+
 
 CenterLineExtractView::CenterLineExtractView() :MitkPluginView()
 {
@@ -132,102 +135,135 @@ void CenterLineExtractView::Extract()
 {
     vtkPolyData* polyData = dynamic_cast<mitk::Surface*>(m_ui.DataSelector->GetSelectedNode()->GetData())->GetVtkPolyData();
 
-    auto preparedModel = vtkSmartPointer<vtkPolyData>::New();
-    auto model = vtkSmartPointer<vtkPolyData>::New();
-    auto network = vtkSmartPointer<vtkPolyData>::New();
-    auto voronoi = vtkSmartPointer<vtkPolyData>::New();
-
-    double  currentCoordinatesRAS[3] = {0.0,0.0,0.0};
-    currentCoordinatesRAS[0] = m_pPointSet->GetPoint(0).GetElement(0);
-    currentCoordinatesRAS[1] = m_pPointSet->GetPoint(0).GetElement(1);
-    currentCoordinatesRAS[2] = m_pPointSet->GetPoint(0).GetElement(2);
-
-    PrepareModel(polyData, preparedModel);
-    DecimateSurface(preparedModel, model);
-    OpenSurfaceAtPoint(model, model, currentCoordinatesRAS);
-    ExtractNetwork(model, network);
-
-    auto temp = vtkSmartPointer<vtkPolyData>::New();
-    temp->DeepCopy(network);
-    mitk::DataNode::Pointer tempDataNode = mitk::DataNode::New();
-    mitk::Surface::Pointer tempSurface = mitk::Surface::New();
-    tempSurface->SetVtkPolyData(temp);
-    tempDataNode->SetData(tempSurface);
-    tempDataNode->SetName("Temp");
-    tempDataNode->SetColor(0.0, 1.0, 0.0);
-    GetDataStorage()->Add(tempDataNode, m_ui.DataSelector->GetSelectedNode());
-
-    auto clippedSurface = vtkSmartPointer<vtkPolyData>::New();
-    vtkSmartPointer<vtkPoints> endpoints = ClipSurfaceAtEndPoints(network,polyData,clippedSurface);
-    ConvertVTKPointsToMitkPointSet(endpoints, m_pEndPointList->GetPointSet());
-    m_pEndPointSetNode->Modified();
-    //m_pEndPointSet->;
-
-
-    double sourcePoint[3] = { 0, 0, 0 };
-
-    std::vector<double> distancesToSeed;
-    std::vector<double*> targetPoints;
-    
-
-    for (int i=0;i<endpoints->GetNumberOfPoints();i++)
+    IQF_ObjectFactory* pObjectFactory = (IQF_ObjectFactory*)GetInterfacePtr(QF_Core_ObjectFactory);
+    if (pObjectFactory)
     {
-        auto currentPoint = endpoints->GetPoint(i);
-        auto currentDistanceToSeed = sqrt(pow((currentPoint[0] - currentCoordinatesRAS[0]), 2) +
-            pow((currentPoint[1] - currentCoordinatesRAS[1]), 2) +
-            pow((currentPoint[2] - currentCoordinatesRAS[2]), 2));
+        IQF_CenterLineExtraction* pCenterLineExtraction = (IQF_CenterLineExtraction*)pObjectFactory->CreateObject(Object_ID_CenterLineExtraction);
+        if (pCenterLineExtraction)
+        {
+            auto preparedModel = vtkSmartPointer<vtkPolyData>::New();
+            auto model = vtkSmartPointer<vtkPolyData>::New();
+            auto network = vtkSmartPointer<vtkPolyData>::New();
+            auto voronoi = vtkSmartPointer<vtkPolyData>::New();
+            auto endPoints = vtkSmartPointer<vtkPoints>::New();
 
-        targetPoints.push_back(currentPoint);
-        distancesToSeed.push_back(currentDistanceToSeed);
+            pCenterLineExtraction->ExtractCenterLineNetwork(polyData, m_pPointSet->GetPoint(0).GetDataPointer(),
+                network.Get(), endPoints.Get());
+
+            ConvertVTKPointsToMitkPointSet(endPoints, m_pEndPointList->GetPointSet());
+
+            mitk::DataNode::Pointer networkDataNode = mitk::DataNode::New();
+            mitk::Surface::Pointer networkSurface = mitk::Surface::New();
+            networkSurface->SetVtkPolyData(network.Get());
+            networkDataNode->SetData(networkSurface);
+            networkDataNode->SetName("Center Lines");
+            networkDataNode->SetColor(0.0, 1.0, 0.0);
+            GetDataStorage()->Add(networkDataNode, m_ui.DataSelector->GetSelectedNode());
+
+            RequestRenderWindowUpdate();
+        }
     }
 
-    int holePointIndex = FoundMinimumIndex(distancesToSeed);
-    RemoveIndex<double>(distancesToSeed,holePointIndex);
-    RemoveIndex<double*>(targetPoints, holePointIndex);
-
-    int sourcePointIndex = FoundMinimumIndex(distancesToSeed);
-    sourcePoint[0] = targetPoints[sourcePointIndex][0];
-    sourcePoint[1] = targetPoints[sourcePointIndex][1];
-    sourcePoint[2] = targetPoints[sourcePointIndex][2];
-    RemoveIndex<double>(distancesToSeed, sourcePointIndex);
-    RemoveIndex<double*>(targetPoints, sourcePointIndex);
-
-    auto sourceIdList = vtkSmartPointer<vtkIdList>::New();
-    auto targetIdList = vtkSmartPointer<vtkIdList>::New();
-
-    auto pointLocator = vtkSmartPointer<vtkPointLocator>::New();
-    pointLocator->SetDataSet(preparedModel);
-    pointLocator->BuildLocator();
-
-    vtkIdType sourceId = pointLocator->FindClosestPoint(sourcePoint);
-    sourceIdList->InsertNextId(sourceId);
-
-    for (int p = 0; p < targetPoints.size(); p++)
-    {
-        vtkIdType id = pointLocator->FindClosestPoint(targetPoints.at(p));
-        targetIdList->InsertNextId(id);
-    }
-        
-    ComputeCenterlines(preparedModel, sourceIdList, targetIdList, network, voronoi);
-
-    mitk::DataNode::Pointer networkDataNode = mitk::DataNode::New();
-    mitk::Surface::Pointer networkSurface = mitk::Surface::New();
-    networkSurface->SetVtkPolyData(network);
-    networkDataNode->SetData(networkSurface);
-    networkDataNode->SetName("Center Lines");
-    networkDataNode->SetColor(0.0, 1.0, 0.0);
-    GetDataStorage()->Add(networkDataNode, m_ui.DataSelector->GetSelectedNode());
 
 
-    /*mitk::DataNode::Pointer voronoiDataNode = mitk::DataNode::New();
-    mitk::Surface::Pointer voronoiSurface = mitk::Surface::New();
-    voronoiSurface->SetVtkPolyData(voronoi);
-    voronoiDataNode->SetData(voronoiSurface);
-    voronoiDataNode->SetName("Voronoi");
-    voronoiDataNode->SetColor(0.0, 1.0, 0.0);
-    GetDataStorage()->Add(voronoiDataNode, m_ui.DataSelector->GetSelectedNode());*/
 
-    RequestRenderWindowUpdate();
+
+    //auto preparedModel = vtkSmartPointer<vtkPolyData>::New();
+    //auto model = vtkSmartPointer<vtkPolyData>::New();
+    //auto network = vtkSmartPointer<vtkPolyData>::New();
+    //auto voronoi = vtkSmartPointer<vtkPolyData>::New();
+
+    //double  currentCoordinatesRAS[3] = {0.0,0.0,0.0};
+    //currentCoordinatesRAS[0] = m_pPointSet->GetPoint(0).GetElement(0);
+    //currentCoordinatesRAS[1] = m_pPointSet->GetPoint(0).GetElement(1);
+    //currentCoordinatesRAS[2] = m_pPointSet->GetPoint(0).GetElement(2);
+
+    //PrepareModel(polyData, preparedModel);
+    //DecimateSurface(preparedModel, model);
+    //OpenSurfaceAtPoint(model, model, currentCoordinatesRAS);
+    //ExtractNetwork(model, network);
+
+    //auto temp = vtkSmartPointer<vtkPolyData>::New();
+    //temp->DeepCopy(network);
+    //mitk::DataNode::Pointer tempDataNode = mitk::DataNode::New();
+    //mitk::Surface::Pointer tempSurface = mitk::Surface::New();
+    //tempSurface->SetVtkPolyData(temp);
+    //tempDataNode->SetData(tempSurface);
+    //tempDataNode->SetName("Temp");
+    //tempDataNode->SetColor(0.0, 1.0, 0.0);
+    //GetDataStorage()->Add(tempDataNode, m_ui.DataSelector->GetSelectedNode());
+
+    //auto clippedSurface = vtkSmartPointer<vtkPolyData>::New();
+    //vtkSmartPointer<vtkPoints> endpoints = ClipSurfaceAtEndPoints(network,polyData,clippedSurface);
+    //ConvertVTKPointsToMitkPointSet(endpoints, m_pEndPointList->GetPointSet());
+    //m_pEndPointSetNode->Modified();
+    ////m_pEndPointSet->;
+
+
+    //double sourcePoint[3] = { 0, 0, 0 };
+
+    //std::vector<double> distancesToSeed;
+    //std::vector<double*> targetPoints;
+    //
+
+    //for (int i=0;i<endpoints->GetNumberOfPoints();i++)
+    //{
+    //    auto currentPoint = endpoints->GetPoint(i);
+    //    auto currentDistanceToSeed = sqrt(pow((currentPoint[0] - currentCoordinatesRAS[0]), 2) +
+    //        pow((currentPoint[1] - currentCoordinatesRAS[1]), 2) +
+    //        pow((currentPoint[2] - currentCoordinatesRAS[2]), 2));
+
+    //    targetPoints.push_back(currentPoint);
+    //    distancesToSeed.push_back(currentDistanceToSeed);
+    //}
+
+    //int holePointIndex = FoundMinimumIndex(distancesToSeed);
+    //RemoveIndex<double>(distancesToSeed,holePointIndex);
+    //RemoveIndex<double*>(targetPoints, holePointIndex);
+
+    //int sourcePointIndex = FoundMinimumIndex(distancesToSeed);
+    //sourcePoint[0] = targetPoints[sourcePointIndex][0];
+    //sourcePoint[1] = targetPoints[sourcePointIndex][1];
+    //sourcePoint[2] = targetPoints[sourcePointIndex][2];
+    //RemoveIndex<double>(distancesToSeed, sourcePointIndex);
+    //RemoveIndex<double*>(targetPoints, sourcePointIndex);
+
+    //auto sourceIdList = vtkSmartPointer<vtkIdList>::New();
+    //auto targetIdList = vtkSmartPointer<vtkIdList>::New();
+
+    //auto pointLocator = vtkSmartPointer<vtkPointLocator>::New();
+    //pointLocator->SetDataSet(preparedModel);
+    //pointLocator->BuildLocator();
+
+    //vtkIdType sourceId = pointLocator->FindClosestPoint(sourcePoint);
+    //sourceIdList->InsertNextId(sourceId);
+
+    //for (int p = 0; p < targetPoints.size(); p++)
+    //{
+    //    vtkIdType id = pointLocator->FindClosestPoint(targetPoints.at(p));
+    //    targetIdList->InsertNextId(id);
+    //}
+    //    
+    //ComputeCenterlines(preparedModel, sourceIdList, targetIdList, network, voronoi);
+
+    //mitk::DataNode::Pointer networkDataNode = mitk::DataNode::New();
+    //mitk::Surface::Pointer networkSurface = mitk::Surface::New();
+    //networkSurface->SetVtkPolyData(network);
+    //networkDataNode->SetData(networkSurface);
+    //networkDataNode->SetName("Center Lines");
+    //networkDataNode->SetColor(0.0, 1.0, 0.0);
+    //GetDataStorage()->Add(networkDataNode, m_ui.DataSelector->GetSelectedNode());
+
+
+    ///*mitk::DataNode::Pointer voronoiDataNode = mitk::DataNode::New();
+    //mitk::Surface::Pointer voronoiSurface = mitk::Surface::New();
+    //voronoiSurface->SetVtkPolyData(voronoi);
+    //voronoiDataNode->SetData(voronoiSurface);
+    //voronoiDataNode->SetName("Voronoi");
+    //voronoiDataNode->SetColor(0.0, 1.0, 0.0);
+    //GetDataStorage()->Add(voronoiDataNode, m_ui.DataSelector->GetSelectedNode());*/
+
+    //RequestRenderWindowUpdate();
 }
 
 void CenterLineExtractView::PrepareModel( vtkPolyData* polyData, vtkPolyData* outputPolyData)

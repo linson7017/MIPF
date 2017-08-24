@@ -29,37 +29,31 @@
 #include "Utils/variant.h"
 
 
-ImageNavigatorWidget::ImageNavigatorWidget(QF::IQF_Main* pMain):MitkPluginView(pMain)
+ImageNavigatorWidget::ImageNavigatorWidget():MitkPluginView()
 ,m_AxialStepper(0)
 , m_SagittalStepper(0)
 , m_FrontalStepper(0)
 , m_TimeStepper(0)
 {
-    m_pMain->Attach(this);
-    m_DataManager = (IQF_MitkDataManager*)m_pMain->GetInterfacePtr("QF_MitkMain_DataManager");
-    m_DataManager->Init();
+    
+}
+
+void ImageNavigatorWidget::CreateView()
+{
+    Init(NULL);
 }
 
 void ImageNavigatorWidget::Update(const char* szMessage, int iValue, void* pValue)
 {
-    if (strcmp(szMessage, "MITK_MESSAGE_SELECTION_CHANGED") == 0)
-    {
-        IQF_MitkDataManager* pMitkDataManager = (IQF_MitkDataManager*)m_pMain->GetInterfacePtr(QF_MitkMain_DataManager);
-        if(!pMitkDataManager)
-        {
-            return;
-        }
-        std::vector<mitk::DataNode::Pointer> nodes = pMitkDataManager->GetSelectedNodes();
-       
-    }
+
 }
 
 
 void ImageNavigatorWidget::Init(QWidget* parent)
 {
+    m_pMain->Attach(this);
     QVBoxLayout* vLayout = new QVBoxLayout;
     setLayout(vLayout);
-
 
     m_AxialLabel = new QLabel("Axial");
     m_CoronalLabel = new QLabel("Coronal");

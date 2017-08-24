@@ -16,15 +16,11 @@ StatusBarWidget::StatusBarWidget()
     m_GreyValueLabel->setMaximumSize(QSize(xResolution, 50));
     m_GreyValueLabel->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Fixed);
     this->addPermanentWidget(m_GreyValueLabel);
+    mitk::StatusBar::GetInstance()->SetImplementation(this);
 }
 
 StatusBarWidget::~StatusBarWidget()
 {
-}
-
-void StatusBarWidget::Init()
-{
-    mitk::StatusBar::GetInstance()->SetImplementation(this);
 }
 /**
 * Display the text in the statusbar of the applikation

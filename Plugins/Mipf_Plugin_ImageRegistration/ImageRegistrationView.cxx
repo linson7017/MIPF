@@ -326,6 +326,7 @@ void ImageRegistrationView::OnMovingImageSelectionChanged(const mitk::DataNode* 
 
 void ImageRegistrationView::SlotRegistrationIterationEnd(const itk::Matrix<double, 4, 4>& result)
 {
+    
     mitk::DataNode* displayNode = m_pMitkDataManager->GetDataStorage()->GetNamedNode("DisplayMoving");
     if (!displayNode || !displayNode->GetData())
     {
