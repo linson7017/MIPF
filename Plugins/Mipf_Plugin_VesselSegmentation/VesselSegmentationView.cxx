@@ -37,6 +37,7 @@
 //common
 #include "MitkSegmentation/IQF_MitkSurfaceTool.h"
 #include "VesselTools/IQF_VesselSegmentationTool.h"
+#include "VesselTools/IQF_CenterLineExtraction.h"
 #include "Core/IQF_ObjectFactory.h"
 
 
@@ -191,7 +192,7 @@ void VesselSegmentationView::OnCreateVesselSurfaceFromMask()
     IQF_ObjectFactory* pObjectFactory = (IQF_ObjectFactory*)m_pMain->GetInterfacePtr(QF_Core_ObjectFactory);
     if (pObjectFactory)
     {
-        IQF_VesselSegmentationTool* pVesselSegTool = (IQF_VesselSegmentationTool*)pObjectFactory->CreateObject("VesselSegmentation");
+        IQF_VesselSegmentationTool* pVesselSegTool = (IQF_VesselSegmentationTool*)pObjectFactory->CreateObject(Object_ID_VesselSegmentationTool);
         auto outputSurface = vtkSmartPointer<vtkPolyData>::New();
         pVesselSegTool->SegmentVessel(image, outputSurface.GetPointer(), Thmin, Thmax, sourceSeedIds, targetSeedIds);
 
@@ -242,97 +243,43 @@ void VesselSegmentationView::OnCreateSmoothSurface()
 
     mitk::DataNode::Pointer node = ui.cmbbxSurfaceSelector->GetSelectedNode();
     mitk::Surface* ImageSurface = dynamic_cast<mitk::Surface*>(node->GetData());
-
-    //vtkCleanPolyData* surfaceCleaner = vtkCleanPolyData::New();
-    //surfaceCleaner->SetInput(ImageSurface->GetVtkPolyData());
-    //surfaceCleaner->Update();
-
-    //vtkTriangleFilter* surfaceTriangulator = vtkTriangleFilter::New();
-    //surfaceTriangulator->SetInput(surfaceCleaner->GetOutput());
-    //surfaceTriangulator->PassLinesOff();
-    //surfaceTriangulator->PassVertsOff();
-    //surfaceTriangulator->Update();
-
-    //vtkLinearSubdivisionFilter* subdiv = vtkLinearSubdivisionFilter::New();
-    //subdiv->SetInput(surfaceTriangulator->GetOutput());
-    //subdiv->SetNumberOfSubdivisions(1);
-    //subdiv->Update();
-
-    //vtkWindowedSincPolyDataFilter* smooth = vtkWindowedSincPolyDataFilter::New();
-    //smooth->SetInput(subdiv->GetOutput());
-    //smooth->SetNumberOfIterations(20);
-    //smooth->SetPassBand(0.1);
-    //smooth->SetBoundarySmoothing(1);
-    //smooth->Update();
-
-    //vtkPolyDataNormals* normals = vtkPolyDataNormals::New();
-    //normals->SetInput(smooth->GetOutput());
-    //normals->SetAutoOrientNormals(1);
-    //normals->SetFlipNormals(0);
-    //normals->SetConsistency(1);
-    //normals->SplittingOff();
-    //normals->Update();
-
-    //vtkvmtkCapPolyData* surfaceCapper = vtkvmtkCapPolyData::New();
-    //surfaceCapper->SetInput(normals->GetOutput());
-    //surfaceCapper->SetDisplacement(0.0);
-    //surfaceCapper->SetInPlaneDisplacement(0.0);
-    //surfaceCapper->Update();
-
-    //vtkPolyData* polyDataNew = vtkPolyData::New();
-    //polyDataNew->DeepCopy(surfaceCapper->GetOutput());
-    ////polyDataNew->DeepCopy(ImageSurface->GetVtkPolyData());
-    //polyDataNew->Update();
-
-    /////////////////////////////////////////
-    vtkIdList*  sourceSeedIds = vtkIdList::New();
-    vtkIdList*  targetSeedIds = vtkIdList::New();
-
-    for (mitk::PointSet::PointsConstIterator pointsIterator = m_SourcePointSet_re->GetPointSet()->GetPoints()->Begin(); // really nice syntax to get an interator for all points
-        pointsIterator != m_SourcePointSet_re->GetPointSet()->GetPoints()->End();
-        ++pointsIterator)
+    auto network = vtkSmartPointer<vtkPolyData>::New();
+    auto preparedModel = vtkSmartPointer<vtkPolyData>::New();
+    IQF_ObjectFactory* pObjectFactory = (IQF_ObjectFactory*)GetInterfacePtr(QF_Core_ObjectFactory);
+    if (pObjectFactory)
     {
-        mitk::Point3D seed = pointsIterator.Value();
-        MITK_INFO << seed << std::endl;
-        float* sed = (float*)seed.Begin();
-        sourceSeedIds->InsertNextId(ImageSurface->GetVtkPolyData()->FindPoint((double)*sed, (double)*(sed + 1), (double)*(sed + 2)));
+        IQF_CenterLineExtraction* pCenterLineExtraction = (IQF_CenterLineExtraction*)pObjectFactory->CreateObject(Object_ID_CenterLineExtraction);
+        if (pCenterLineExtraction)
+        {
+           
+            auto model = vtkSmartPointer<vtkPolyData>::New();
+            
+            auto voronoi = vtkSmartPointer<vtkPolyData>::New();
+            auto endPoints = vtkSmartPointer<vtkPoints>::New();
+            pCenterLineExtraction->ExtractCenterLineNetwork(ImageSurface->GetVtkPolyData(), m_SourcePointSet_re->GetPointSet()->GetPoint(0).GetDataPointer(),
+                network.Get(), endPoints.Get());
+        }
+        else
+        {
+            return;
+        }
     }
-
-    for (mitk::PointSet::PointsConstIterator pointsIterator2 = m_TargetPointSet_re->GetPointSet()->GetPoints()->Begin(); // really nice syntax to get an interator for all points
-        pointsIterator2 != m_TargetPointSet_re->GetPointSet()->GetPoints()->End();
-        ++pointsIterator2)
+    else
     {
-        mitk::Point3D seed = pointsIterator2.Value();
-        MITK_INFO << seed << std::endl;
-        float* sed = (float*)seed.Begin();
-        targetSeedIds->InsertNextId(ImageSurface->GetVtkPolyData()->FindPoint((double)*sed, (double)*(sed + 1), (double)*(sed + 2)));
+        return;
     }
-
-
-    vtkPolyData* PloyCenter = ComputeCenterLine(ImageSurface->GetVtkPolyData(), sourceSeedIds, targetSeedIds);
-
-    vtkvmtkCenterlineBranchExtractor* BranchExtractor = vtkvmtkCenterlineBranchExtractor::New();
-    BranchExtractor->SetInputData(PloyCenter);
-    BranchExtractor->SetBlankingArrayName("Blanking");
-    BranchExtractor->SetRadiusArrayName("MaximumInscribedSphereRadius");
-    BranchExtractor->SetGroupIdsArrayName("GroupIds");
-    BranchExtractor->SetCenterlineIdsArrayName("CenterlineIds");
-    BranchExtractor->SetTractIdsArrayName("TractIds");
-    BranchExtractor->Update();
 
     vtkPolyData* OutBranchPoly = vtkPolyData::New();
-    OutBranchPoly->DeepCopy(BranchExtractor->GetOutput());
+    OutBranchPoly->DeepCopy(network);
     OutBranchPoly->Modified();
 
     int ModelDim[3] = { 64,64,64 };
-    //  double Bounds[6]={1.0,1.0,1.0,1.0,1.0,1.0};
     vtkvmtkPolyBallModeller* modeller = vtkvmtkPolyBallModeller::New();
 
     modeller->SetInputData(OutBranchPoly);
-    modeller->SetRadiusArrayName("MaximumInscribedSphereRadius");
+    modeller->SetRadiusArrayName("Radius");
     modeller->UsePolyBallLineOn();
     modeller->SetSampleDimensions(ModelDim);
-    //	modeller->SetModelBounds(Bounds);
     modeller->SetNegateFunction(0);
     modeller->Update();
 
@@ -344,7 +291,6 @@ void VesselSegmentationView::OnCreateSmoothSurface()
     marchingCubes->SetInputData(InMarching);
     marchingCubes->SetValue(0, 1);
     marchingCubes->Update();
-
 
     mitk::Surface::Pointer Surbasemodel = mitk::Surface::New();
     Surbasemodel->SetVtkPolyData(marchingCubes->GetOutput());
@@ -361,15 +307,6 @@ void VesselSegmentationView::OnCreateSmoothSurface()
     GetDataStorage()->Add(outnodemodel);
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 
-    //surfaceCleaner->Delete();
-    //surfaceTriangulator->Delete();
-    //subdiv->Delete();
-    //smooth->Delete();
-    //normals->Delete();
-    //surfaceCapper->Delete();
-    //polyDataNew->Delete();
-    PloyCenter->Delete();
-    BranchExtractor->Delete();
     OutBranchPoly->Delete();
     modeller->Delete();
     InMarching->Delete();

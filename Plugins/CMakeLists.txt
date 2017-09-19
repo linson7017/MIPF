@@ -37,3 +37,7 @@ add_subdirectory(Mipf_Plugin_VMTKTools)
 add_subdirectory(Mipf_Plugin_StaticisTools)
 
 add_subdirectory(Mipf_Plugin_ItkAlgorithmSet)
+
+add_subdirectory(Mipf_Plugin_SurfaceCut)
+
+add_subdirectory(Mipf_Plugin_MapperTest)

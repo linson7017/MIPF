@@ -29,12 +29,6 @@ int main(int argc, char *argv[])
     qApp->setProperty("MainPtr", QVariant::fromValue(appenv.getMainPtr()));
     //初始化qt环境
     qt_context context(&qtapplication);
-    //设置qt程序编码
-    qt_context::setApplicationCoding("UTF-8");
-    //设置qt程序默认语言
-    // qt_context::setDefaultLanguage("Chinese");
-    //设置qt程序风格
-    qt_context::setApplicationStyle("fusion");
 
     //添加qt插件库的搜索路径
 #if defined _WIN32 || defined WIN32 || defined __NT__ || defined __WIN32__

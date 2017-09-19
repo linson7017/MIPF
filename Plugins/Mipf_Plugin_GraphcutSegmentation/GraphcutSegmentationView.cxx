@@ -1097,7 +1097,7 @@ void GraphcutSegmentationView::Segment()
     resultNode->SetName(m_currentResultName.toStdString());
     resultNode->SetColor(1, 0, 0);
     resultNode->SetData(mitkImage);
-    resultNode->SetProperty("volumerendering", mitk::BoolProperty::New(true));
+    resultNode->SetBoolProperty("volumerendering", true);
     resultNode->Update();
     m_pMitkDataManager->GetDataStorage()->Add(resultNode);
     resultNode->SetOpacity(0.8);

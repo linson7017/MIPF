@@ -30,31 +30,30 @@ CQF_MitkIO::~CQF_MitkIO()
 {
 }
 
-bool CQF_MitkIO::Load(const char* filename)
+mitk::DataNode* CQF_MitkIO::Load(const char* filename)
 {
     // Load datanode (eg. many image formats, surface formats, etc.)
     IQF_MitkDataManager* pMitkDataManager = (IQF_MitkDataManager*)m_pMain->GetInterfacePtr(QF_MitkMain_DataManager);
     if (!pMitkDataManager)
     {
-        return false;
+        return nullptr;
     }
     mitk::StandaloneDataStorage::SetOfObjects::Pointer dataNodes = mitk::IOUtil::Load(filename, *pMitkDataManager->GetDataStorage());
     if (dataNodes->empty())
     {
         fprintf(stderr, "Could not open file %s \n\n", filename);
-        return false;
+        return nullptr;
     }
-    mitk::Image::Pointer image = dynamic_cast<mitk::Image *>(dataNodes->at(0)->GetData());
-    if ((image.IsNotNull()))
+    if (dataNodes->at(0)->GetData())
     {
         mitk::TimeGeometry::Pointer geo = pMitkDataManager->GetDataStorage()->ComputeBoundingGeometry3D(pMitkDataManager->GetDataStorage()->GetAll());
         mitk::RenderingManager::GetInstance()->InitializeViews(geo);
-        return true;
+        return dataNodes->at(0);
     }
     else
     {
-        fprintf(stderr, "Image file %s is empty! \n\n", filename);
-        return false;
+        fprintf(stderr, "File %s is empty! \n\n", filename);
+        return nullptr;
     }
 }
 

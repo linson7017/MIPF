@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Menu id="menu_2d" desc="二维右键菜单">
+  <Action text="复位" command="10001" />
+  <Action text="清屏" msgcommand="10000074" />    
+    <Action text="工具">
+		<Menu>
+			<ActionGroup>
+			  <Action text="缺省" toolcommand="10025" checkable="true" checked="true"/>
+			  <Action text="放大" toolcommand="10021"   checkable="true"/>
+			  <Action text="缩小" toolcommand="10022"   checkable="true"/>
+			  <Action text="漫游" toolcommand="10004"   checkable="true"/>
+			  <Action text="移标"  toolcommand="10010"   checkable="true"/>
+			</ActionGroup>
+		</Menu>		
+  </Action>  
+</Menu>

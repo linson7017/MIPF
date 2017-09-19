@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Widget id="GrowcutSegmentation">
+	<VLayout>
+		<HLayout>
+			<Label text="Image:"/>
+			<QmitkDataStorageComboBox id="GrowcutSegmentation.ImageSelector"/>
+		</HLayout>
+		<Button text="Init" msgcommand="MITK_MESSAGE_GROWCUT_INIT"/>
+		<HSlider id="GrowcutSegmentation.PenSize" value="8" minimum="1" maximum="40" msgcommand="MITK_MESSAGE_GROWCUT_PENSIZE_CHANGED" property="object"/>
+		<HLayout>
+			<Button text="Paint" msgcommand="MITK_MESSAGE_GROWCUT_BEGIN_PAINT"/>
+			<Button text="Erase" msgcommand="MITK_MESSAGE_GROWCUT_BEGIN_WIPE"/>
+			<Button text="End" msgcommand="MITK_MESSAGE_GROWCUT_END_PAINT"/>
+		</HLayout>
+		<HLayout>
+			<ButtonGroup>	
+				<CheckBox text="Foreground" id="GrowcutSegmentation.Foreground" checked="true" msgcommand="MITK_MESSAGE_GROWCUT_FOREGROUND" property="checked"/>
+				<CheckBox text="Background" id="GrowcutSegmentation.Background" msgcommand="MITK_MESSAGE_GROWCUT_BACKGROUND" property="checked"/>
+			</ButtonGroup>
+		</HLayout>
+		
+		<Button id="GrowcutSegmentation.Segment" text="Segment" msgcommand="MITK_MESSAGE_GROWCUT_SEGMENT"/>
+		<Stretch size="100"/>
+	</VLayout>
+</Widget>
+
+
+
+
+
+
+
+
+

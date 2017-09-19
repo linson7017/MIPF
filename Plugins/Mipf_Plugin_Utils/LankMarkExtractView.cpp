@@ -30,6 +30,7 @@ void LankMarkExtractView::CreateView()
 
     m_ui.ImageSelector->SetDataStorage(GetDataStorage());
     m_ui.ImageSelector->SetPredicate(mitk::NodePredicateDataType::New("Image"));
+    connect(m_ui.ImageSelector, SIGNAL(OnSelectionChanged(const mitk::DataNode *)),this,SLOT(OnImageSelectionChanged(const mitk::DataNode *)));
 
     m_ui.PointListWidget->SetMultiWidget(m_pMitkRenderWindow->GetMitkStdMultiWidget());
 
@@ -56,11 +57,18 @@ void LankMarkExtractView::CreateView()
 
     m_ui.ThresholdSlider->setDecimals(1);
     m_ui.ThresholdSlider->setSpinBoxAlignment(Qt::AlignVCenter);
-    m_ui.ThresholdSlider->setMaximum(10000);
+    m_ui.ThresholdSlider->setMaximum(200000000);
     m_ui.ThresholdSlider->setMinimum(500);
     m_ui.ThresholdSlider->setMaximumValue(5000);
     m_ui.ThresholdSlider->setMinimumValue(1800);
 
+}
+
+void LankMarkExtractView::OnImageSelectionChanged(const mitk::DataNode *node)
+{
+    mitk::Image* mitkImage = dynamic_cast<mitk::Image*>(m_ui.ImageSelector->GetSelectedNode()->GetData());
+    m_ui.ThresholdSlider->setMaximum(mitkImage->GetScalarValueMax());
+    m_ui.ThresholdSlider->setMinimum(mitkImage->GetScalarValueMin());
 }
 
 
@@ -86,7 +94,9 @@ void LankMarkExtractView::Extract()
 
     mitk::Image* mitkImage = dynamic_cast<mitk::Image*>(m_ui.ImageSelector->GetSelectedNode()->GetData());
     LandMarkExtractor extractor;
-    std::vector<LandMarkPoint> results = LandMarkExtractor::ExtractLandMarks(mitkImage, vecModelDistance, 3.0, 1800, 5000);
+    std::vector<LandMarkPoint> results = LandMarkExtractor::ExtractLandMarks(mitkImage, vecModelDistance, 3.0, 
+        m_ui.ThresholdSlider->minimumValue(),m_ui.ThresholdSlider->maximumValue(),
+        m_ui.XCutRate->value(), m_ui.YCutRate->value(), m_ui.ZCutRate->value());
     for (int i=0;i<results.size();i++)
     {
         results[i].PrintSelf();

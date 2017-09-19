@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Widget id="ManualSegmentationTest">
+	<VLayout>
+		<HLayout>
+			<Label text="Image:"/>
+			<QmitkDataStorageComboBox id="ManualSegmentationTest.ImageSelector"/>
+		</HLayout>
+		<HLayout>
+			<Label text="Segmented Result:"/>
+			<QmitkDataStorageComboBox id="ManualSegmentationTest.SegmentResultSelector"/>
+		</HLayout>
+		<Button text="Create Segment" msgcommand="MITK_MESSAGE_MST_CREATE_SEGMENT"/>
+		<HLayout>
+			<Label text="Pen Size:"/>
+			<HSlider id="ManualSegmentationTest.PenSize" value="8" minimum="1" maximum="40" msgcommand="MITK_MESSAGE_MST_PENSIZE_CHANGED"/>
+			<LineEdit id="ManualSegmentationTest.PenSizeValue" text="8" width="50"/>
+		</HLayout>
+		<GroupBox text="Tools">
+			<VLayout>
+				<ButtonGroup>
+					<Button text="Add" msgcommand="MITK_MESSAGE_MST_CHANGETOOL" checkable="true" user_toolName="QString:Add"/>
+					<Button text="Subtract" msgcommand="MITK_MESSAGE_MST_CHANGETOOL" checkable="true" user_toolName="QString:Subtract"/>
+					<Button text="Correction" msgcommand="MITK_MESSAGE_MST_CHANGETOOL" checkable="true" user_toolName="QString:Correction"/>
+					<Button text="Paint" msgcommand="MITK_MESSAGE_MST_CHANGETOOL" checkable="true" user_toolName="QString:Paint"/>
+					<Button text="Wipe" msgcommand="MITK_MESSAGE_MST_CHANGETOOL" checkable="true" user_toolName="QString:Wipe"/>
+					<!-- <Button text="Region Growing" msgcommand="MITK_MESSAGE_MST_CHANGETOOL" checkable="true" user_toolName="QString:Region Growing"/>
+					<Button text="Fill" msgcommand="MITK_MESSAGE_MST_CHANGETOOL" checkable="true" user_toolName="QString:Fill"/>
+					<Button text="Erase" msgcommand="MITK_MESSAGE_MST_CHANGETOOL" checkable="true" user_toolName="QString:Erase"/>
+					<Button text="Live Wire" msgcommand="MITK_MESSAGE_MST_CHANGETOOL" checkable="true" user_toolName="QString:Live Wire"/> -->
+					<Button text="End" msgcommand="MITK_MESSAGE_MST_CHANGETOOL" checkable="true" checked="true" user_toolName="QString: "/>
+				</ButtonGroup>
+			</VLayout>
+		</GroupBox>
+		<CheckBox id="ManualSegmentationTest.Interpolate3D" text="Interpolate3D" msgcommand="MITK_MESSAGE_MST_INTERPOLATE3D" checked="true"/>
+		<Stretch size="100"/>
+	</VLayout>
+</Widget>
+
+
+
+
+
+
+
+
+

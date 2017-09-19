@@ -4,8 +4,7 @@
 #pragma once
 
 #include "MitkMain/IQF_MitkReference.h"
-#include <mitkStandaloneDataStorage.h>
-#include <MitkException.h>
+
 class QSettings;
 namespace QF {
     class IQF_Main;

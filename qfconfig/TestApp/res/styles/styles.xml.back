@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<styles>
+  <!--application的样式，主要有Windows，WindowsXP，Plastique，Cleanlooks等-->
+ 	<style id="Title1Style" desc="标题1样式">
+    <Label property="font-size" >30px</Label>
+    <Label property="font-weight" >300</Label>
+    <Label property="font-family" >黑体</Label>
+  </style>
+  <style id="MainStyle">
+    <Framework property="style">vista</Framework>
+  </style>
+
+  <style id="StatusAreaStyle">
+    <Label property="font-size" >15px</Label>
+    <Label property="font-weight" >300</Label>
+    <Label property="font-family" >黑体</Label>
+  </style>
+
+  <style id="CommonStyle" desc="通用样式-按钮加粗其他不加粗">
+    <Button property="background-color">#C0C0C0</Button>
+    <Spinner property="background-color">#C0C0C0</Spinner>
+    <Button property="font-size" >15px</Button>
+    <Button property="font-weight" >300</Button>
+    <Button property="font-family" >黑体</Button>
+    <LineEdit property="font-size" >15px</LineEdit>
+    <LineEdit property="font-weight" >100</LineEdit>
+    <LineEdit property="font-family" >黑体</LineEdit>
+    <Label property="font-size" >15px</Label>
+    <Label property="font-weight" >100</Label>
+    <Label property="font-family" >黑体</Label>
+    <Tab property="font-size" >14px</Tab>
+    <Tab property="font-weight" >100</Tab>
+    <Tab property="font-family" >黑体</Tab>
+    <ComboBox property="max-height">30px</ComboBox>
+    <GroupBox property="font-size" >15px</GroupBox>
+    <GroupBox property="font-weight" >100</GroupBox>
+    <GroupBox property="font-family" >黑体</GroupBox>
+    <RadioButton property="font-size" >15px</RadioButton>
+    <RadioButton property="font-weight" >100</RadioButton>
+    <RadioButton property="font-family" >黑体</RadioButton>
+  </style>
+  
+  <style id="ControlStyle" desc="控制区域样式-均加粗">
+    <Button property="background-color">#C0C0C0</Button>
+    <Spinner property="background-color">#C0C0C0</Spinner>
+    <Button property="font-size" >15px</Button>
+    <Button property="font-weight" >300</Button>
+    <Button property="font-family" >黑体</Button>
+    <LineEdit property="font-size" >15px</LineEdit>
+    <LineEdit property="font-weight" >300</LineEdit>
+    <LineEdit property="font-family" >黑体</LineEdit>
+    <Label property="font-size" >15px</Label>
+    <Label property="font-weight" >300</Label>
+    <Label property="font-family" >黑体</Label>
+    <Tab property="font-size" >14px</Tab>
+    <Tab property="font-weight" >400</Tab>
+    <Tab property="font-family" >黑体</Tab>
+    <ComboBox property="max-height">30px</ComboBox>
+    <GroupBox property="font-size" >15px</GroupBox>
+    <GroupBox property="font-weight" >500</GroupBox>
+    <GroupBox property="font-family" >黑体</GroupBox>
+    <RadioButton property="font-size" >15px</RadioButton>
+    <RadioButton property="font-weight" >400</RadioButton>
+    <RadioButton property="font-family" >黑体</RadioButton>
+  </style>
+  
+  <!--圆角按钮样式-->
+  <style id="RoundCornerButton">
+    <Button states="pressed" property="background-color" >#00ffff</Button>
+    <!--<Button states="hover" property="background-color" >#00ffff</Button>-->
+    <Button property="background-color" >#C0C0C0</Button>
+    <Button property="border-radius">5px</Button>
+    <Button property="border">1px</Button>
+    <Button property="padding">1px</Button>
+    <Button property="min-width">50px</Button>
+    <Button property="min-height">30px</Button>
+  </style>
+
+  <!--*****PPI,PS,CR,H显示按钮***********-->
+  <!--红色椭圆按钮样式-->
+  <style id="EllipseButtonRed">
+    <Button property="background-image" >@image/ellipse_flat_red.png</Button>
+    <!--<Button property="background-color" >rgb(199,122,122)</Button>-->
+    <Button property="background-clip" >border</Button>
+    <Button property="border-radius" >5px</Button>
+    <Button states="pressed" property="background-image" >@image/ellipse_flat_blue.png</Button>
+  </style>
+  <!--灰色椭圆按钮样式-->
+  <style id="EllipseButtonGray">
+    <Button property="background-image" >@image/ellipse_flat_gray.png</Button>
+    <Button property="background-clip" >border</Button>
+    <Button property="border-radius" >5px</Button>
+    <Button states="pressed" property="background-image" >@image/ellipse_flat_blue.png</Button>
+  </style>
+
+  <!--*****一次信息,实时监测,目标表格,天线阵面，领示表格显示切换按钮***********-->
+  <!--红色胖椭圆按钮样式-->
+  <style id="FatEllipseButtonRed">
+    <Button property="background-image" >@image/ellipse_fat_red.png</Button>
+    <!--<Button property="background-color" >rgb(199,122,122)</Button>-->
+    <Button property="background-clip" >border</Button>
+    <Button property="border-radius" >5px</Button>
+    <Button states="pressed" property="background-image" >@image/ellipse_fat_blue.png</Button>
+  </style>
+  <!--灰色胖椭圆按钮样式-->
+  <style id="FatEllipseButtonGray">
+    <Button property="background-image" >@image/ellipse_fat_gray.png</Button>
+    <Button property="background-clip" >border</Button>
+    <Button property="border-radius" >5px</Button>
+    <Button states="pressed" property="background-image" >@image/ellipse_fat_blue.png</Button>
+  </style>
+  
+  <!--*********互斥按钮样式**********-->
+  <!--蓝色按钮样式-->
+  <style id="BlueButtonStyle">
+    <!--<Button property="background-color" >qlineargradient(x1:0, y1:0, x2:1, y2:1,stop:0 white, stop: 0 rgb(232,232,232), stop:1 rgb(15,163,225))</Button>-->
+    <Button property="background-color" >rgb(129,211,211)</Button>
+  </style>
+  <!--绿色按钮样式-->
+  <style id="GreenButtonStyle">
+    <!--<Button property="background-color" >qlineargradient(x1:0, y1:0, x2:1, y2:1,stop:0 white, stop: 0 rgb(232,232,232), stop:1 rgb(0,255,0))</Button>-->
+    <Button property="background-color" >rgb(0,255,0)</Button>
+  </style>-->
+  <!--灰色按钮样式-->
+  <style id="GrayButtonStyle">
+    <Button property="background-color" >qlineargradient(x1:0, y1:0, x2:1, y2:1,stop:0 white, stop: 0 rgb(232,232,232), stop:1 rgb(200,200,200))</Button>
+  </style>
+  <!--紫色按钮样式-->
+  <style id="PurpleButtonStyle">
+    <Button property="background-color" >rgb(129,129,193)</Button>
+  </style>
+
+  <!--*******Buttonbox中的按钮样式************-->
+  <style id="ButtonBoxButtonStyle">
+    <Button property="background-color" >#C0C0C0</Button>
+    <Button property="height" >25px</Button>
+    <Button property="width" >400px</Button>
+    <!--<Button property="font-size" >20px</Button>
+    <Button property="font-weight" >400</Button>
+    <Button property="font-family" >宋体</Button>-->
+    <Button property="font" >bold 18px "宋体"</Button>
+    <LineEdit property="height" >25px</LineEdit>
+    <LineEdit property="font-size" >20px</LineEdit>
+    <LineEdit property="font-weight" >400</LineEdit>
+    <LineEdit property="font-family" >宋体</LineEdit>
+    <Label property="height" >25px</Label>
+    <Label property="font-size" >20px</Label>
+    <Label property="font-weight" >400</Label>
+    <Label property="font-family" >宋体</Label>
+    
+  </style>
+
+  <!--***********状态区中的Label样式**************-->
+  <style id="statesAreaStyle">
+    <Label property="height" >25px</Label>
+    <Label property="font-size" >20px</Label>
+    <Label property="font-weight" >400</Label>
+    <Label property="font-family" >黑体</Label>
+  </style>
+
+  <!--作战，训练，维护按钮样式-->
+  <style id="LargeBoldButtonStyle">
+    <Button property="border-radius" >10px</Button>
+    <Button property="border-width" >1px</Button>
+    <Button property="border-style" >solid</Button>
+    <Button property="border-color" >black</Button>
+    <Button property="background-color" >#C0C0C0</Button>
+    <Button property="font-size" >40px</Button>
+    <Button property="font-weight" >900</Button>
+    <Label property="font-family" >黑体</Label>
+    <Button states="pressed" property="background-color" >rgb(135,221,235)</Button>
+  </style>
+  <style id="LargeBoldButtonStyleSelected">
+    <Button property="border-radius" >10px</Button>
+    <Button property="border-width" >1px</Button>
+    <Button property="border-style" >solid</Button>
+    <Button property="border-color" >black</Button>
+    <Button property="background-color" >rgb(66,196,219)</Button>
+    <Button property="font-size" >40px</Button>
+    <Button property="font-weight" >900</Button>
+    <Label property="font-family" >黑体</Label>
+    <Button states="pressed" property="background-color" >rgb(135,221,235)</Button>
+  </style>
+  <style id="LargeBoldButtonStyleActived">
+    <Button property="border-radius" >10px</Button>
+    <Button property="border-width" >1px</Button>
+    <Button property="border-style" >solid</Button>
+    <Button property="border-color" >black</Button>
+    <Button property="background-color" >rgb(0,255,0)</Button>
+    <Button property="font-size" >40px</Button>
+    <Button property="font-weight" >900</Button>
+    <Label property="font-family" >黑体</Label>
+    <Button states="pressed" property="background-color" >rgb(135,221,235)</Button>
+  </style>
+
+  <!--/************悬浮框************/-->
+  <style id="MinimizeButtonStyle">
+    <Button property="background-image" >@image/min.png</Button>
+    <Button property="background-clip" >border</Button>
+    <Button property="border-width" >1px</Button>
+    <Button property="border-style" >solid</Button>
+    <Button property="border-color" >gray</Button>
+  </style>
+  <style id="MaximizeButtonStyle">
+    <Button property="background-image" >@image/max.png</Button>
+    <Button property="background-clip" >border</Button>
+    <Button property="border-width" >1px</Button>
+    <Button property="border-style" >solid</Button>
+    <Button property="border-color" >gray</Button>
+  </style>
+  <style id="CornerButtonStyle">
+    <Button property="background-image" >@image/corner.png</Button>
+    <Button property="background-clip" >border</Button>
+    <Button property="border-width" >1px</Button>
+    <Button property="border-style" >solid</Button>
+    <Button property="border-color" >gray</Button>
+  </style>
+
+
+  <style id="ArrowDownButtonStyle">
+    <Button property="background-image" >@image/button_delete_blue.png</Button>
+    <Button property="background-clip" >border</Button>
+    <Button property="border-radius" >5px</Button>
+    <Button states="pressed" property="background-image" >@image/button_delete_red.png</Button>
+  </style>
+
+  <style id="ArrowUpButtonStyle">
+    <Button property="background-image" >@image/button_add_blue.png</Button>
+    <Button property="background-clip" >border</Button>
+    <Button property="border-radius" >5px</Button>
+    <Button states="pressed" property="background-image" >@image/button_add_red.png</Button>
+  </style>
+  
+</styles>
+
+

@@ -9,6 +9,7 @@ class CQF_MitkRenderWindow;
 class CQF_MitkReference;
 class CQF_MitkIO;
 class CQF_MitkDisplayOption;
+class CQF_MitkInit;
 
 class CQF_MainCommand;
 
@@ -29,6 +30,7 @@ private:
     CQF_MitkReference* m_pMitkReference;
     CQF_MitkIO* m_pMitkIO;
     CQF_MitkDisplayOption* m_pDisplayOption;
+    CQF_MitkInit* m_pMitkInit;
 
 	CQF_MainCommand* m_pMainCommand;
 

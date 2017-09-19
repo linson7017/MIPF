@@ -16,7 +16,7 @@ class CQF_MitkIO :public IQF_MitkIO
 public:
     CQF_MitkIO(QF::IQF_Main* pMain);
     ~CQF_MitkIO();
-    virtual bool Load(const char* szFilename);
+    virtual mitk::DataNode* Load(const char* szFilename);
     virtual void LoadFiles();
     virtual void SaveProject();
     virtual void Save(const mitk::BaseData *data);

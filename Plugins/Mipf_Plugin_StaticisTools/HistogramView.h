@@ -27,11 +27,8 @@ protected slots:
     void OnSelectEndPoint();
     void ProfilePlot();
 
-    void Refresh();
-
 private:
     void DrawLine();
-    bool GetReslicePlaneImage(mitk::DataNode* imageNode,const mitk::PlaneGeometry* worldGeometry, mitk::BaseRenderer* renderer,mitk::Image* output);
 private:
     Ui::HistogramView m_ui;
     Histogram* m_histogram;

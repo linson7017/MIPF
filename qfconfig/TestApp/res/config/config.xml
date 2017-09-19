@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Properties>
+  <!--界面样式-->
+  <Property name="BackgroundColor" valueType="string">#E4E4E4</Property>
+  <Property name="ConfirmDialogPosX" valueType="int">1400</Property>
+  <Property name="ConfirmDialogPosY" valueType="int">600</Property>
+  <Property name="ShowToolTip" valueType="bool">false</Property>
+  <Property name="WidgetMinimumHeight" valueType="int">20</Property>
+  <Property name="WidgetMinimumWidth" valueType="int">40</Property>
+  <Property name="WindowTitleHeight" valueType="int">25</Property>
+  <Property name="WindowsTitleMargin" valueType="int">200</Property>
+  <Property name="propertyBool" valueType="bool">true</Property>
+  <Property name="propertyDouble" valueType="double">4.2384</Property>
+  <Property name="propertyString" valueType="string">propertyString</Property>
+  <Property name="propertyTest" valueType="string">klksflkflTest</Property>
+  <Property name="propertyTestDouble" valueType="double">3.152131</Property>
+  <Property name="propertyTestInt" valueType="int">3</Property>
+  <Property name="titleTextSize" valueType="int">20</Property>
+  <Property name="ShowToolTip" valueType="bool" desc="是否显示帮助">true</Property>
+  <Property name="ConfigDialogPosX" valueType="int">1400</Property>
+  <Property name="ConfigDialogPosY" valueType="int">1300</Property>
+</Properties>

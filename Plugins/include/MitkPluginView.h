@@ -159,6 +159,21 @@ protected:
 
         return mitk::NodePredicateAnd::New(returnValue, nonHelperObject).GetPointer();
     }
+
+    void ImportVTKImage(vtkImageData* data, const char* name, mitk::DataNode* parentNode = nullptr, mitk::BaseGeometry* geometry = nullptr)
+    {
+        mitk::DataNode::Pointer node = mitk::DataNode::New();
+        mitk::Image::Pointer image = mitk::Image::New();
+        image->Initialize(data);
+        if (geometry)
+        {
+            image->GetGeometry()->SetIndexToWorldTransformByVtkMatrix(geometry->GetVtkMatrix());
+            image->GetGeometry()->SetOrigin(geometry->GetOrigin());
+        }
+        node->SetData(image);
+        node->SetName(name);
+        GetDataStorage()->Add(node, parentNode);
+    }
 protected:
     IQF_MitkDataManager* m_pMitkDataManager;
     IQF_MitkRenderWindow* m_pMitkRenderWindow;

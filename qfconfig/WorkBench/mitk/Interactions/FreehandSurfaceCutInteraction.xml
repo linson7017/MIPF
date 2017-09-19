@@ -1,0 +1,36 @@
+<statemachine>
+    <state name="start" startstate="true">
+        <transition event_class="MousePressEvent" event_variant="StartDraw" target="MovementInitalized">
+            <action name="initMove"/>
+        </transition>
+		<transition event_class="MousePressEvent" event_variant="StartModify" target="MovementInitalized">
+            <action name="initMove"/>
+        </transition>
+		<transition event_class="InteractionKeyEvent" event_variant="UndoKey" target="start">
+            <action name="undo"/>
+        </transition>
+		<transition event_class="InteractionKeyEvent" event_variant="RedoKey" target="start">
+            <action name="redo"/>
+        </transition>
+    </state>
+    <state name="MovementInitalized">
+      <transition event_class="MouseMoveEvent" event_variant="Draw" target="MovementInitalized">
+          <action name="draw"/>
+      </transition>
+	  <transition event_class="MouseMoveEvent" event_variant="Modify" target="MovementInitalized">
+          <action name="modify"/>
+      </transition>
+      <transition event_class="MouseReleaseEvent" event_variant="EndDraw" target="start">
+         <action name="finished"/>
+      </transition>
+	  <transition event_class="MouseReleaseEvent" event_variant="EndModify" target="start">
+         <action name="finished"/>
+      </transition>
+	  <transition event_class="MouseReleaseEvent" event_variant="EndMovement" target="start">
+         <action name="finished"/>
+      </transition>	  
+	  <transition event_class="MouseMoveEvent" event_variant="FinishedMovement" target="start">
+         <action name="finishedMovement"/>
+      </transition> 
+    </state>
+</statemachine>

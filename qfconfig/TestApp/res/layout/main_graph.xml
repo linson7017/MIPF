@@ -1,0 +1,41 @@
+<VLayout  activityRoot="true" id="main.main" style="@style/mainstyle">
+	<HLayout>
+		<VLayout stretch="1">
+			<Button text="Load Data" command="MITK_MAIN_COMMAND_LOADDATA" />
+			<VLayout>
+				<Button text="Init Segmentation" command="MITK_MAIN_COMMAND_INIT_SEGMENTATION" row="0" col="0"/>
+				<Button text="Create New Segmentation" command="MITK_MAIN_COMMAND_CREATE_NEW_SEGMENTATION" row="0" col="0"/>
+				<Button text="Add Tool"  command="MITK_MAIN_COMMAND_TOOLADD" row="1" col="0"/>	
+			</VLayout>
+			<ManualToolSelectionBox />
+			<SlicesInterpolator />
+			<DataManagerWidget />
+			<VolumeVisualizationWidget />
+		</VLayout>
+		<MultiViewsWidget  stretch="7"/>
+		<!-- <VLayout>
+			<VSplitter id="main.GraphcutSegmentationGroup" p_childrenCollapsible="bool:false"  stretch="2.0">
+				<Holder id="@ui/GraphcutSegmentation" />
+				<ImageCropperWidget  stretch="2.0"/>
+				<Holder id="@ui/LargestConnectedComponent"/>			
+				<ManualSegmentationWidget />
+			</VSplitter>
+			<Button id="main.SwitchBtn1" text="Manual Segmentation" uicommand="@uicommand/SwitchToManualSegmentation"/>
+			<ManualSegmentationWidget id="main.ManualSegmentation" visible="false"/>
+			<Button id="main.SwitchBtn2" text="Graphcut Segmentation" uicommand="@uicommand/SwitchToGraphcut" visible="false"/>
+		</VLayout> -->
+		<!-- <Holder id="@ui/MaskImage"  stretch="2.0"/>
+				<Holder id="@ui/ImageHoleFilling"  stretch="2.0"/> -->
+				<!-- <Holder id="@ui/ImageRegistration"  stretch="2.0"/> -->
+		<VLayout>
+			<Holder id="@ui/GraphcutSegmentation" stretch="5"/>
+			<Holder id="@ui/LargestConnectedComponent" stretch="1"/>
+			<Holder id="@ui/SurfaceExtract"  stretch="1"/>
+			<!-- <SFLSSegmentationWidget /> -->
+			<!-- <ImageCropperWidget /> -->
+			<BasicImageProcessWidget  stretch="4"/>
+			
+		</VLayout>
+	</HLayout>
+	<StatusBarWidget />	
+</VLayout>

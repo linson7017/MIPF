@@ -19,6 +19,7 @@ public:
     ~CQF_MitkDataManager();
     virtual void Init();
     virtual mitk::DataStorage::Pointer GetDataStorage();
+    virtual void SetDataStorage(mitk::DataStorage::Pointer dataStorage);
 
     virtual void SetNodeSet(std::list<mitk::DataNode::Pointer> nodeSet);
     virtual std::list<mitk::DataNode::Pointer> GetNodeSet();
@@ -36,7 +37,7 @@ private:
     void OnNodeInteractorChanged(const mitk::DataNode* node);
 
 
-    mitk::StandaloneDataStorage::Pointer m_DataStorage;
+    mitk::DataStorage::Pointer m_DataStorage;
     std::vector<mitk::DataNode::Pointer> m_SelectedNodes;
     std::list<mitk::DataNode::Pointer> m_NodeSet;
     QF::IQF_Main* m_pMain;

@@ -1,0 +1,44 @@
+<config>
+  <event_variant class="MousePressEvent" name="StartDraw">
+    <attribute name="EventButton" value="LeftMouseButton"/>
+	<attribute name="Modifiers" value="shift"/>
+  </event_variant>
+  <event_variant class="MousePressEvent" name="StartModify">
+    <attribute name="EventButton" value="LeftMouseButton"/>
+	<attribute name="Modifiers" value="ctrl"/>
+  </event_variant>
+  
+  <event_variant class="MouseReleaseEvent" name="EndDraw">
+    <attribute name="EventButton" value="LeftMouseButton"/>
+	<attribute name="Modifiers" value="shift"/>
+  </event_variant>
+  <event_variant class="MouseReleaseEvent" name="EndModify">
+    <attribute name="EventButton" value="LeftMouseButton"/>
+	<attribute name="Modifiers" value="ctrl"/>
+  </event_variant>
+  <event_variant class="MouseReleaseEvent" name="EndMovement">
+    <attribute name="EventButton" value="LeftMouseButton"/>
+  </event_variant>
+  
+  <event_variant class="MouseMoveEvent" name="Draw">
+    <attribute name="ButtonState" value="LeftMouseButton"/>
+	<attribute name="Modifiers" value="shift"/>
+  </event_variant>
+  <event_variant class="MouseMoveEvent" name="Modify">
+    <attribute name="ButtonState" value="LeftMouseButton"/>
+	<attribute name="Modifiers" value="ctrl"/>
+  </event_variant>
+  
+  <event_variant class="MouseMoveEvent" name="FinishedMovement">
+    <attribute name="ButtonState" value="LeftMouseButton"/>
+  </event_variant>
+  
+  <event_variant class="InteractionKeyEvent" name="UndoKey">
+      <attribute name="Key" value="Z"/>
+      <attribute name="Modifiers" value="ctrl"/>
+  </event_variant>
+  <event_variant class="InteractionKeyEvent" name="RedoKey" >
+      <attribute name="Key" value="X"/>
+      <attribute name="Modifiers" value="ctrl"/>
+  </event_variant>
+</config>

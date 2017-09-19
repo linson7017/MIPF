@@ -49,7 +49,7 @@
 #include "usModuleContext.h"
 #include <usModuleInitialization.h>
 //
-US_INITIALIZE_MODULE
+//US_INITIALIZE_MODULE
 
 struct QmitkPlanarFigureData
 {

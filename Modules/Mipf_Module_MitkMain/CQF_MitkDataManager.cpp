@@ -4,9 +4,9 @@
 
 #include "iqf_main.h"
 
-CQF_MitkDataManager::CQF_MitkDataManager(QF::IQF_Main* pMain):m_pMain(pMain)
+CQF_MitkDataManager::CQF_MitkDataManager(QF::IQF_Main* pMain):m_pMain(pMain), m_DataStorage(nullptr)
 {
-    Init();
+    //Init();
 }
 
 
@@ -19,8 +19,13 @@ void CQF_MitkDataManager::Init()
     if (!m_DataStorage)
     {
         m_DataStorage = mitk::StandaloneDataStorage::New();
-        RelateDataStorage();
     }
+    RelateDataStorage();
+}
+
+void CQF_MitkDataManager::SetDataStorage(mitk::DataStorage::Pointer dataStorage)
+{
+    m_DataStorage = dataStorage;
 }
 
 void CQF_MitkDataManager::RelateDataStorage()

@@ -1,0 +1,292 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>SurfaceCutView</class>
+ <widget class="QWidget" name="SurfaceCutView">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>399</width>
+    <height>563</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <widget class="QWidget" name="verticalLayoutWidget">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>10</y>
+     <width>381</width>
+     <height>522</height>
+    </rect>
+   </property>
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>Surface:</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QmitkDataStorageComboBox" name="DataSelector"/>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <widget class="QGroupBox" name="groupBox">
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>90</height>
+       </size>
+      </property>
+      <property name="title">
+       <string>Freehand Cut</string>
+      </property>
+      <widget class="QWidget" name="verticalLayoutWidget_2">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>19</y>
+         <width>361</width>
+         <height>56</height>
+        </rect>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_2">
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_2">
+          <item>
+           <widget class="QPushButton" name="UndoBtn">
+            <property name="text">
+             <string>Undo</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="RedoBtn">
+            <property name="text">
+             <string>Redo</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="InsideOutCheckBox">
+            <property name="text">
+             <string>InsideOut</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="CloseProfileCheckBox">
+            <property name="text">
+             <string>Close Profile</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <widget class="QPushButton" name="FreehandCutBtn">
+          <property name="text">
+           <string>Start Cut</string>
+          </property>
+          <property name="checkable">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </item>
+    <item>
+     <widget class="QGroupBox" name="groupBox_2">
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>160</height>
+       </size>
+      </property>
+      <property name="title">
+       <string>Box Cut</string>
+      </property>
+      <widget class="QWidget" name="verticalLayoutWidget_3">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>20</y>
+         <width>361</width>
+         <height>131</height>
+        </rect>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_3">
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_3">
+          <item>
+           <widget class="QPushButton" name="AddBoxBtn">
+            <property name="text">
+             <string>Add Box</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="RemoveBoxBtn">
+            <property name="text">
+             <string>Remove Box</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="BoxCutInsideOutCheckBox">
+            <property name="text">
+             <string>CheckBox</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="BoxCutBtn">
+            <property name="text">
+             <string>Cut</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <widget class="QListWidget" name="BoxList"/>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </item>
+    <item>
+     <widget class="QGroupBox" name="groupBox_3">
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>230</height>
+       </size>
+      </property>
+      <property name="title">
+       <string>Geometry Cut</string>
+      </property>
+      <widget class="QWidget" name="verticalLayoutWidget_4">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>19</y>
+         <width>361</width>
+         <height>201</height>
+        </rect>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_4">
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_4">
+          <item>
+           <widget class="QLabel" name="label_2">
+            <property name="text">
+             <string>Shape</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QComboBox" name="GeometrySelector">
+            <item>
+             <property name="text">
+              <string>Sphere</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Box</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_9">
+          <item>
+           <widget class="QLabel" name="label_3">
+            <property name="text">
+             <string>anchor:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="AnchorOriginRadioBtn">
+            <property name="text">
+             <string>origin</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="AnchorCenterRadioBtn">
+            <property name="text">
+             <string>center</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="AnchorCustomRadioBtn">
+            <property name="text">
+             <string>custom</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_5">
+          <item>
+           <widget class="QPushButton" name="AddGeometryBtn">
+            <property name="text">
+             <string>Add</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="RemoveGeometryBtn">
+            <property name="text">
+             <string>Remove</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="GeometryCutBtn">
+            <property name="text">
+             <string>Cut</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <widget class="QListWidget" name="GeometryList"/>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QmitkDataStorageComboBox</class>
+   <extends>QComboBox</extends>
+   <header>QmitkDataStorageComboBox.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

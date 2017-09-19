@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Widget id="SliceBySliceTracking">
+	<VLayout>
+		<GridLayout colEqual="false">
+			<Label text="Maximum Searching Radius:" row="0" col="0"/>
+			<LineEdit id="SliceBySliceTracking.SearchingRadius" text="0.5" row="0" col="1"/>
+			
+			<Label text="Tracking Direction:" row="1" col="0"/>
+			<LineEdit id="SliceBySliceTracking.Direction" text="1.0" row="1" col="1"/>
+			
+		</GridLayout>
+		<GridLayout colEqual="false">
+			<Label text="x"  row="0" col="0"/>
+			<LineEdit id="SliceBySliceTracking.ExtentMinX" row="0" col="1"/>	
+			<Label text="-"  row="0" col="2"/>
+			<LineEdit id="SliceBySliceTracking.ExtentMaxX" row="0" col="3"/>	
+			
+			<Label text="y"  row="1" col="0"/>
+			<LineEdit id="SliceBySliceTracking.ExtentMinY" row="1" col="1"/>	
+			<Label text="-"  row="1" col="2"/>
+			<LineEdit id="SliceBySliceTracking.ExtentMaxY" row="1" col="3"/>	
+			
+			<Label text="z"  row="2" col="0"/>
+			<LineEdit id="SliceBySliceTracking.ExtentMinZ" row="2" col="1"/>	
+			<Label text="-"  row="2" col="2"/>
+			<LineEdit id="SliceBySliceTracking.ExtentMaxZ" row="2" col="3"/>	
+		</GridLayout>
+		<HLayout>
+			<Button text="Track" msgcommand="SliceBySliceTracking.Track"/>
+			<CheckBox id="SliceBySliceTracking.NeedInvert" text="Need Invert" checked="false"/>
+		</HLayout>
+		<ProgressBar value="50" />
+		<HSlider msgcommand="SliceBySliceTracking.ChangeThresold" property="value"/>
+		<SliceBySliceTrackingSeedWidget />
+	</VLayout>
+</Widget>
+
+
+
+
+
+
+
+
+

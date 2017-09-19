@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Widget id="TubularTracking">
+	<VLayout>
+		<GridLayout colEqual="false">
+			<Label text="Min Radius:" row="0" col="0"/>
+			<LineEdit id="TubularTracking.MinRadius" text="0.5" row="0" col="1"/>
+			
+			<Label text="Max Radius:" row="1" col="0"/>
+			<LineEdit id="TubularTracking.MaxRadius" text="1.0" row="1" col="1"/>
+			
+			<Label text="Max Angle:" row="2" col="0"/>
+			<LineEdit id="TubularTracking.MaxAngle" row="2" text="0.01" col="1"/>
+			
+			<Label text="Step Length:" row="3" col="0"/>
+			<LineEdit id="TubularTracking.StepLength" text="2.0" row="3" col="1"/>
+			
+			<Label text="Terminate Thresold:" row="4" col="0"/>
+			<LineEdit id="TubularTracking.TerminateThresold" text="15" row="4" col="1"/>
+			
+			<Label text="Window Size:" row="5" col="0"/>
+			<LineEdit id="TubularTracking.WindowSize" text="3.0" row="5" col="1"/>	
+		</GridLayout>
+		<GridLayout colEqual="false">
+			<Label text="x"  row="0" col="0"/>
+			<LineEdit id="TubularTracking.ExtentMinX" row="0" col="1"/>	
+			<Label text="-"  row="0" col="2"/>
+			<LineEdit id="TubularTracking.ExtentMaxX" row="0" col="3"/>	
+			
+			<Label text="y"  row="1" col="0"/>
+			<LineEdit id="TubularTracking.ExtentMinY" row="1" col="1"/>	
+			<Label text="-"  row="1" col="2"/>
+			<LineEdit id="TubularTracking.ExtentMaxY" row="1" col="3"/>	
+			
+			<Label text="z"  row="2" col="0"/>
+			<LineEdit id="TubularTracking.ExtentMinZ" row="2" col="1"/>	
+			<Label text="-"  row="2" col="2"/>
+			<LineEdit id="TubularTracking.ExtentMaxZ" row="2" col="3"/>	
+		</GridLayout>
+		<HLayout>
+			<Button text="Track" msgcommand="TubularTracking.Track"/>
+			<CheckBox id="TubularTracking.NeedInvert" text="Need Invert" checked="false"/>
+		</HLayout>
+		<TubularTrackingSeedWidget />	
+	</VLayout>
+</Widget>
+
+
+
+
+
+
+
+
+

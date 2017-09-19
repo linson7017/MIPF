@@ -7,6 +7,7 @@ FIND_PACKAGE(QFCOMMON REQUIRED)
 
 include(${VTK_USE_FILE})
 include(${ITK_USE_FILE})
+include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 set(MODULES_DIR ${CMAKE_SOURCE_DIR}/Modules)
 include_directories(

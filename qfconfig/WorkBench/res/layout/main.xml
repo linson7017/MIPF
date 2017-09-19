@@ -63,10 +63,16 @@
 			<ImageCropperWidget  text="Image Cropper"/>				
 			<Holder id="@ui/SurfaceExtract" text="Surface Extract"/>
 			<AirwaySegmentationWidget text="Airway Segmentation" />	
+			<SFLSSegmentationWidget text="SFLSSegmentationWidget" />
+			<Holder id="@ui/GrowcutSegmentation" text="grow cut" />
 		</ToolBox>
 	</DockWidget>
 	<DockWidget id="main.Plugins" windowTitle="Plugins" tabfiedDocWidgetID="main.Segmentation" dockWidgetArea="RightDockWidgetArea"   visible="true">
-		<ToolBox >	
+		<ToolBox >
+			<SurfaceCombineWidget text="Surface Combine" />
+			<SurfaceConnectedWidget text="Surface Connected" />
+			<SurfaceCutWidget text="Surface Cut"/>
+			<MapperTestWidget text="Mapper Test"/>
 			<Holder id="@ui/ImageRegistration" text="Image Registration"/>		
 			<MaskImageWidget text="Mask Image"/>
 			<LargestConnectedComponentExtractWidget text="Image Connected Component"/>
@@ -82,6 +88,7 @@
 		<ToolBox >
 			<HistogramWidget text="Histogram"/>
 			<ProfileGrayScaleDistributionWidget text="Profile Gray Scale Distribution"/>
+			<MeasurementWidget text="Measure"/>
 		</ToolBox>
 	</DockWidget>
 	<!-- 状态条 -->

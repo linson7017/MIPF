@@ -10,6 +10,7 @@
 
 #include "MitkMain/IQF_MitkIO.h"
 #include "MitkMain/IQF_MitkReference.h"
+#include "MitkMain/IQF_MitkInit.h"
 
 
 
@@ -76,6 +77,9 @@ void MainWindow::OpenMetaImage()
 
 void MainWindow::SetupWidgets(const char* xmlfile)
 {
+    IQF_MitkInit* pMitkInit = (IQF_MitkInit*)m_pMain->GetInterfacePtr(QF_MitkMain_Init);
+    pMitkInit->Init(nullptr);
+
     setContentView(xmlfile);
     R::Instance()->Constructed();
 }

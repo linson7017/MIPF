@@ -5,10 +5,15 @@
 
 const char QF_MitkMain_IO[] = "QF_MitkMain_IO";
 
+namespace mitk
+{
+    class DataNode;
+}
+
 class IQF_MitkIO
 {
 public:
-    virtual bool Load(const char* filename) = 0;
+    virtual mitk::DataNode* Load(const char* filename) = 0;
     virtual void LoadFiles() = 0;
     virtual void SaveProject() = 0;
 };
