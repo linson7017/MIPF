@@ -19,6 +19,12 @@
 #include <vtkRenderer.h>
 #include <vtkCamera.h>
 
+#include <vtkFillHolesFilter.h>
+#include <vtkPolyDataNormals.h>
+#include <vtkPointData.h>
+#include <vtkFeatureEdges.h>
+#include <vtkStripper.h>
+
 #include "Rendering/FreehandSurfaceCutMapper3D.h"
 
 FreehandSurfaceCutInteractor::FreehandSurfaceCutInteractor():m_bDrawing(false), m_bInitFlag(false), m_pSurfaceData(nullptr), m_pCurveNode(nullptr) , m_pDataStorage(nullptr)
@@ -180,6 +186,7 @@ void FreehandSurfaceCutInteractor::ProjectPointOnPlane(const mitk::Point3D& inpu
     camera->GetClippingRange(range);
 
     mitk::Vector3D normal(eyeNormal);
+
     mitk::Point3D center(focalCenter);
 
     normal.Normalize();
@@ -224,6 +231,8 @@ void FreehandSurfaceCutInteractor::Finished(mitk::StateMachineAction *, mitk::In
     clipper->SetInsideOut(m_bInsideOut);
 
     clipper->Update();
+
+
     m_pSurfaceData->GetVtkPolyData()->DeepCopy(clipper->GetOutput());
     
     

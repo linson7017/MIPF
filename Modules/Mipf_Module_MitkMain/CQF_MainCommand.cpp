@@ -6,6 +6,7 @@
 #include "MitkMain/IQF_MitkDataManager.h"
 #include "MitkMain/IQF_MitkRenderWindow.h"
 #include "MitkMain/IQF_MitkReference.h"
+#include "MitkMain/IQF_MitkIO.h"
 
 #include "mitkRenderingManager.h"
 
@@ -48,7 +49,7 @@ bool CQF_MainCommand::ExecuteCommand(const char* szCommandID, QF::IQF_PropertySe
             return false;
         try
         {
-            QmitkIOUtil::Load(fileNames, *pMitkDataManager->GetDataStorage());
+            QmitkIOUtil::Load(fileNames, *pMitkDataManager->GetDataStorage());           
         }
         catch (const mitk::Exception& e)
         {

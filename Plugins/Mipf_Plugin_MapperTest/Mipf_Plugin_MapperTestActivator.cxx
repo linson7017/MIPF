@@ -29,5 +29,5 @@ const char* Mipf_Plugin_MapperTest_Activator::GetID()
 
 void Mipf_Plugin_MapperTest_Activator::Register(R* pR)
 {
-    REGISTER_CLASS("MapperTestWidget", MapperTestView);
+    REGISTER_QOBJECT("MapperTestWidget", MapperTestView);
 }

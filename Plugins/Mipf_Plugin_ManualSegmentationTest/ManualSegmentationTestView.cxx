@@ -232,7 +232,7 @@ void ManualSegmentationTestView::Constructed(R* pR)
     if (m_pImageSelector)
     {
         m_pImageSelector->SetDataStorage(GetDataStorage());
-        m_pImageSelector->SetPredicate(CreatePredicate(1));
+        m_pImageSelector->SetPredicate(CreatePredicate(MitkPluginView::Image));
         connect(m_pImageSelector, SIGNAL(OnSelectionChanged(const mitk::DataNode *)), this, SLOT(OnImageSelectionChanged(const mitk::DataNode *)));
     }
     

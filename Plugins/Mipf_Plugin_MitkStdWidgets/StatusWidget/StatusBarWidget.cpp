@@ -8,6 +8,8 @@
 
 #include <mitkStatusBar.h>
 
+#include <mitkProgressBar.h>
+
 
 StatusBarWidget::StatusBarWidget() 
 {

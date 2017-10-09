@@ -25,7 +25,6 @@ void LankMarkExtractView::CreateView()
 {
     m_ui.setupUi(this);
 
-
     connect(m_ui.ExtractBtn, SIGNAL(clicked()), this, SLOT(Extract()));
 
     m_ui.ImageSelector->SetDataStorage(GetDataStorage());
@@ -66,6 +65,10 @@ void LankMarkExtractView::CreateView()
 
 void LankMarkExtractView::OnImageSelectionChanged(const mitk::DataNode *node)
 {
+    if (!node)
+    {
+        return;
+    }
     mitk::Image* mitkImage = dynamic_cast<mitk::Image*>(m_ui.ImageSelector->GetSelectedNode()->GetData());
     m_ui.ThresholdSlider->setMaximum(mitkImage->GetScalarValueMax());
     m_ui.ThresholdSlider->setMinimum(mitkImage->GetScalarValueMin());

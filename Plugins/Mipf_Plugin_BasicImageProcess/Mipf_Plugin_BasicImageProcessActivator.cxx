@@ -32,5 +32,5 @@ void Mipf_Plugin_BasicImageProcess_Activator::Register(R* pR)
 {
     //m_pBasicImageProcessView->InitResource(pR); 
    // pR->registerCustomWidget("BasicImageProcessWidget", m_pBasicImageProcessView);
-    REGISTER_CLASS("BasicImageProcessWidget", BasicImageProcessView);
+    REGISTER_QOBJECT("BasicImageProcessWidget", BasicImageProcessView);
 }

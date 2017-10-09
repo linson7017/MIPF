@@ -170,8 +170,20 @@ protected:
             image->GetGeometry()->SetIndexToWorldTransformByVtkMatrix(geometry->GetVtkMatrix());
             image->GetGeometry()->SetOrigin(geometry->GetOrigin());
         }
+        image->SetVolume(data->GetScalarPointer());
         node->SetData(image);
         node->SetName(name);
+        GetDataStorage()->Add(node, parentNode);
+    }
+    template<class TImageType>
+    void ImportITKImage(TImageType* itkImage, const char* name, mitk::DataNode* parentNode = nullptr)
+    {
+        mitk::Image::Pointer image;
+        mitk::CastToMitkImage(itkImage, image);
+        mitk::DataNode::Pointer node = mitk::DataNode::New();
+        node->SetData(image);
+        node->SetName(name);
+
         GetDataStorage()->Add(node, parentNode);
     }
 protected:

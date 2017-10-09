@@ -30,5 +30,5 @@ void MitkSegmentationPlugin_Activator::Register(R* pR)
 {
     /*m_pMitkSegmentation->InitResource(pR); 
 	pR->registerCustomWidget("ManualSegmentationWidget", m_pMitkSegmentation);*/
-    REGISTER_CLASS("ManualSegmentationWidget", MitkSegmentation);
+    REGISTER_QOBJECT("ManualSegmentationWidget", MitkSegmentation);
 }

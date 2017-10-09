@@ -27,7 +27,7 @@
 #include <QMessageBox>
 
 SurfaceCutView::SurfaceCutView() :MitkPluginView(),
-m_freehandCutInteractor(nullptr), m_boundingShapeInteractor(nullptr), m_geometryInteractor(nullptr)
+m_freehandCutInteractor(nullptr), m_boundingShapeInteractor(nullptr), m_geometryInteractor(nullptr), m_boxNumber(0)
 {
 
 }
@@ -122,24 +122,29 @@ void SurfaceCutView::FreehandCut(bool enableCut)
 
 void SurfaceCutView::Undo()
 {
-    static_cast<FreehandSurfaceCutInteractor*>(m_freehandCutInteractor.GetPointer())->Undo();
+    if (m_freehandCutInteractor)
+    {
+        static_cast<FreehandSurfaceCutInteractor*>(m_freehandCutInteractor.GetPointer())->Undo();
+    }
 }
 
 void SurfaceCutView::Redo()
 {
-    static_cast<FreehandSurfaceCutInteractor*>(m_freehandCutInteractor.GetPointer())->Redo();
+    if (m_freehandCutInteractor)
+    {
+        static_cast<FreehandSurfaceCutInteractor*>(m_freehandCutInteractor.GetPointer())->Redo();
+    }
 }
 
 /**************Box Cut********************/
-int boxNum = 0;
 void SurfaceCutView::AddBox()
 {
     mitk::RegisterBoundingShapeObjectFactory();
 
     mitk::BaseGeometry::Pointer surfaceGeometry = static_cast<mitk::BaseGeometry*>(m_ui.DataSelector->GetSelectedNode()->GetData()->GetGeometry());
 
-    boxNum++;
-    QString boxName = QString("box%1").arg(boxNum);
+    m_boxNumber++;
+    QString boxName = QString("box%1").arg(m_boxNumber);
 
     mitk::DataNode::Pointer boxNode = mitk::DataNode::New();
     mitk::GeometryData::Pointer pCroppingObject = mitk::GeometryData::New();

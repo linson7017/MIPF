@@ -4,8 +4,6 @@
 #pragma once
 #include "Activator_Base.h"
 
-class SFLSSegmentationView;
-
 class Mipf_Plugin_SFLSSegmentation_Activator : public ActivatorBase
 {
 public:
@@ -15,7 +13,6 @@ public:
     const char* GetID();
     void Register(R* pR);
 private:
-    SFLSSegmentationView* m_pSFLSSegmentationView;
 };
 
 #endif // Mipf_Plugin_SFLSSegmentationActivator_h__

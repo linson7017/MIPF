@@ -15,7 +15,7 @@ public:
     ~CQF_MitkInit();
 
     virtual void Init(mitk::DataStorage* dataStorage = nullptr);
-
+    virtual void SetStdMultiWidget(QmitkStdMultiWidget* stdMultiWidget);
 private:
     QF::IQF_Main* m_pMain;
 };

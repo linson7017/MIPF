@@ -7,7 +7,7 @@
 
 void RegisterQmitkWidgets()
 {
-    REGISTER_CLASS("QmitkDataStorageComboBox", QmitkDataStorageComboBox);
-    REGISTER_CLASS("QmitkPointListWidget", QmitkPointListWidget);
+    REGISTER_QOBJECT("QmitkDataStorageComboBox", QmitkDataStorageComboBox);
+    REGISTER_QOBJECT("QmitkPointListWidget", QmitkPointListWidget);
     
 }

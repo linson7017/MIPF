@@ -74,4 +74,32 @@ void* QmitkStdMultiWidget*
 */
 #define MITK_MESSAGE_MULTIWIDGET_CLOSE "MITK_MESSAGE_MULTIWIDGET_CLOSE"
 
+/**
+Reference 整型信息修改
+int     0 
+void* &std::pair<const char*,int>
+*/
+#define MITK_MESSAGE_REFERENCE_INT_CHANGED "MITK_MESSAGE_REFERENCE_INT_CHANGED"
+
+/**
+Reference 浮点型信息修改
+int     0
+void* &std::pair<const char*,double>
+*/
+#define MITK_MESSAGE_REFERENCE_DOUBLE_CHANGED "MITK_MESSAGE_REFERENCE_DOUBLE_CHANGED"
+
+/**
+Reference 布尔信息修改
+int     0
+void* &std::pair<const char*,bool>
+*/
+#define MITK_MESSAGE_REFERENCE_BOOL_CHANGED "MITK_MESSAGE_REFERENCE_BOOL_CHANGED"
+
+/**
+Reference 字符串信息修改
+int     0
+void* &std::pair<const char*,const char*>
+*/
+#define MITK_MESSAGE_REFERENCE_STRING_CHANGED "MITK_MESSAGE_REFERENCE_STRING_CHANGED"
+
 #endif // mitk_main_msg_h__

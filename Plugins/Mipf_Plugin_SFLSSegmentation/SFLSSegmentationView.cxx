@@ -119,9 +119,8 @@ UShort3DImagePointerType getFinalMask(typename itk::Image<TPixel, 3>::Pointer im
 }
 
 
-SFLSSegmentationView::SFLSSegmentationView(QF::IQF_Main* pMain) :MitkPluginView(pMain)
+SFLSSegmentationView::SFLSSegmentationView() :MitkPluginView()
 {
-    m_pMain->Attach(this);
 }
 
 void SFLSSegmentationView::Update(const char* szMessage, int iValue, void* pValue)
@@ -134,6 +133,7 @@ void SFLSSegmentationView::Update(const char* szMessage, int iValue, void* pValu
 
 void SFLSSegmentationView::CreateView()
 {
+    m_pMain->Attach(this);
     m_Controls = new Ui::WxAutoSegmentationViewControls;
     m_Controls->setupUi(this);
     if (m_Controls)

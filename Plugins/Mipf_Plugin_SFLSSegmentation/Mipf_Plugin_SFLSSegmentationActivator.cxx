@@ -1,6 +1,6 @@
 #include "Mipf_Plugin_SFLSSegmentationActivator.h"
 #include "SFLSSegmentationView.h"
-#include "Res/R.h"
+#include "Utils/PluginFactory.h"
 
 QF_API QF::IQF_Activator* QF::QF_CreatePluginActivator(QF::IQF_Main* pMain)
 {
@@ -17,8 +17,7 @@ Mipf_Plugin_SFLSSegmentation_Activator::Mipf_Plugin_SFLSSegmentation_Activator(Q
 }
 
 bool Mipf_Plugin_SFLSSegmentation_Activator::Init()
-{
-    m_pSFLSSegmentationView = new SFLSSegmentationView(m_pMain); 
+{ 
     return true; 
 }
 
@@ -29,6 +28,5 @@ const char* Mipf_Plugin_SFLSSegmentation_Activator::GetID()
 
 void Mipf_Plugin_SFLSSegmentation_Activator::Register(R* pR)
 {
-    m_pSFLSSegmentationView->InitResource(pR); 
-    pR->registerCustomWidget("SFLSSegmentationWidget", m_pSFLSSegmentationView); 
+    REGISTER_PLUGIN("SFLSSegmentationWidget", SFLSSegmentationView);
 }

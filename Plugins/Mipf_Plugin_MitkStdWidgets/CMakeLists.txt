@@ -37,6 +37,16 @@ ${CMAKE_CURRENT_SOURCE_DIR}/MeasurementWidget/*.c* )
 file(GLOB_RECURSE Status_DIR_SRCS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} 
 ${CMAKE_CURRENT_SOURCE_DIR}/StatusWidget/*.h* 
 ${CMAKE_CURRENT_SOURCE_DIR}/StatusWidget/*.c* )
+file(GLOB_RECURSE RenderWindow_DIR_SRCS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} 
+${CMAKE_CURRENT_SOURCE_DIR}/RenderWindow/*.h* 
+${CMAKE_CURRENT_SOURCE_DIR}/RenderWindow/*.c* )
+file(GLOB_RECURSE Properties_DIR_SRCS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} 
+${CMAKE_CURRENT_SOURCE_DIR}/Properties/*.h* 
+${CMAKE_CURRENT_SOURCE_DIR}/Properties/*.c* )
+file(GLOB_RECURSE Properties_UI_SRCS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} 
+${CMAKE_CURRENT_SOURCE_DIR}/Properties/*.ui)
+
+set(UI_Srcs ${Properties_UI_SRCS})
 
 source_group(DataManager FILES  ${DataManager_DIR_SRCS})
 source_group(MultiViews FILES  ${MultiViews_DIR_SRCS})
@@ -44,7 +54,8 @@ source_group(VolumeVisulization FILES  ${VolumeVisualization_DIR_SRCS})
 source_group(ImageNavigator FILES  ${ImageNavigator_DIR_SRCS})
 source_group(Measurement FILES  ${Measurement_DIR_SRCS})
 source_group(Status FILES  ${Status_DIR_SRCS})
-
+source_group(RenderWindow FILES  ${RenderWindow_DIR_SRCS})
+source_group(Properties FILES  ${Properties_DIR_SRCS} ${Properties_UI_SRCS})
 
 set(CMAKE_AUTOMOC ON)
 
@@ -53,8 +64,7 @@ include_directories()
 #使用mitk的初始化模块
 add_definitions(-DUS_MODULE_NAME)
 
-if(VTK_QT_VERSION VERSION_GREATER "4")
-
+qt5_wrap_ui(ui_Files ${UI_Srcs})
 add_library(Mipf_Plugin_MitkStdWidgets SHARED 
 	${DIR_SRCS} 
 	${DataManager_DIR_SRCS} 
@@ -63,14 +73,10 @@ add_library(Mipf_Plugin_MitkStdWidgets SHARED
 	${ImageNavigator_DIR_SRCS} 
 	${Measurement_DIR_SRCS} 
 	${Status_DIR_SRCS}
+	${RenderWindow_DIR_SRCS}
+	${Properties_DIR_SRCS}
 	${UI_Srcs} 
 	${MOC_Hdrs})
 qt5_use_modules(Mipf_Plugin_MitkStdWidgets Core Gui Widgets)
 target_link_libraries(Mipf_Plugin_MitkStdWidgets ${VTK_LIBRARIES} ${QTFRAMEWORK_LIBRARIES} ${QFMAIN_LIBRARIES} MitkQtWidgets MitkQtWidgetsExt )
 
-else()
-
-add_library(Mipf_Plugin_MitkStdWidgets SHARED ${DIR_SRCS} ${Headers} ${UI_Srcs} ${MOC_Hdrs})
-target_link_libraries(Mipf_Plugin_MitkStdWidgets ${QT_LIBRARIES} ${VTK_LIBRARIES} ${QTFRAMEWORK_LIBRARIES} ${QFMAIN_LIBRARIES} MitkQtWidgets MitkQtWidgetsExt )
-
-endif()

@@ -40,8 +40,8 @@ const char* Mipf_Plugin_SurfaceCut_Activator::GetID()
 
 void Mipf_Plugin_SurfaceCut_Activator::Register(R* pR)
 {
-    REGISTER_CLASS("SurfaceCutWidget", SurfaceCutView);
-    REGISTER_CLASS("SurfaceConnectedWidget", SurfaceConnectedView);
-    REGISTER_CLASS("SurfaceCombineWidget", SurfaceCombineView);
+    REGISTER_QOBJECT("SurfaceCutWidget", SurfaceCutView);
+    REGISTER_QOBJECT("SurfaceConnectedWidget", SurfaceConnectedView);
+    REGISTER_QOBJECT("SurfaceCombineWidget", SurfaceCombineView);
 
 }

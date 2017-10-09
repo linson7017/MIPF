@@ -28,6 +28,8 @@
 #include "itkConnectedComponentImageFilter.h"
 #include "itkRescaleIntensityImageFilter.h"
 
+#include "itkTranslationTransform.h"
+
 
 #include "itkImageFileWriter.h"
 
@@ -459,6 +461,84 @@ namespace ITKHelpers
         }
         ExtractConnectedLargerThan(input, output, label, BinaryImageToShapeLabelMapFilterType::LabelObjectType::NUMBER_OF_PIXELS);
         ExtractConnectedLargerThan(output, output, label, BinaryImageToShapeLabelMapFilterType::LabelObjectType::NUMBER_OF_PIXELS, true);
+    }
+
+    template <class TInput, class TOutput>
+    void ExtractCentroidImageWithGivenSize(TInput* input, TOutput* output, int* outputSize)
+    {
+        // Create a ShapeLabelMap from the image
+        typedef itk::BinaryImageToShapeLabelMapFilter<TInput> BinaryImageToShapeLabelMapFilterType;
+        BinaryImageToShapeLabelMapFilterType::Pointer binaryImageToShapeLabelMapFilter = BinaryImageToShapeLabelMapFilterType::New();
+        binaryImageToShapeLabelMapFilter->SetFullyConnected(true);
+        binaryImageToShapeLabelMapFilter->SetInputForegroundValue(255);
+        binaryImageToShapeLabelMapFilter->SetInput(input);
+        binaryImageToShapeLabelMapFilter->Update();
+
+        //Find the largest connected component
+        int largestConnectedLabelObject = 0;
+        int largestSize = 0;
+        for (unsigned int i = 0; i < binaryImageToShapeLabelMapFilter->GetOutput()->GetNumberOfLabelObjects(); i++)
+        {
+            BinaryImageToShapeLabelMapFilterType::OutputImageType::LabelObjectType* labelObject = binaryImageToShapeLabelMapFilter->GetOutput()->GetNthLabelObject(i);
+            if (largestSize<labelObject->GetNumberOfPixels())
+            {
+                largestSize = labelObject->GetNumberOfPixels();
+                largestConnectedLabelObject = i;
+            }
+        }
+
+        //Get the centroid of the largest connected component
+        BinaryImageToShapeLabelMapFilterType::OutputImageType::LabelObjectType::CentroidType centroid = 
+            binaryImageToShapeLabelMapFilter->GetOutput()->GetNthLabelObject(largestConnectedLabelObject)->GetCentroid();
+
+
+        TOutput::SizeType size;
+        size[0] = outputSize[0];
+        size[1] = outputSize[1];
+        size[2] = outputSize[2];
+
+        TOutput::SpacingType outputSpacing;
+        outputSpacing[0] = 4;
+        outputSpacing[1] = 4;
+        outputSpacing[2] = 4;
+
+        TOutput::PointType origin;
+        origin[0] = 0;
+        origin[1] = 0;
+        origin[2] = 0;
+
+
+        typedef itk::TranslationTransform<double, 3> TranslationTransformType;
+        TranslationTransformType::Pointer transform =
+            TranslationTransformType::New();
+        TranslationTransformType::OutputVectorType translation;
+        translation[0] = centroid[0] - outputSpacing[0] * size[0] / 2;
+        translation[1] = centroid[1] - outputSpacing[1] * size[1] / 2;
+        translation[2] = centroid[2] - outputSpacing[2] * size[2] / 2;
+        transform->Translate(translation);
+
+        typedef itk::ResampleImageFilter<TInput, TOutput> ResampleImageFilterType;
+        ResampleImageFilterType::Pointer resampleFilter = ResampleImageFilterType::New();
+       
+        typedef itk::NearestNeighborInterpolateImageFunction<
+            TInput, double > InterpolatorType;
+            InterpolatorType::Pointer interpolator = InterpolatorType::New();
+        resampleFilter->SetInterpolator(interpolator);
+        
+        resampleFilter->SetInput(input);
+        resampleFilter->SetSize(size);
+        resampleFilter->SetOutputSpacing(outputSpacing);
+        resampleFilter->SetOutputOrigin(origin);
+        resampleFilter->SetTransform(transform);
+        resampleFilter->SetDefaultPixelValue(0);
+        resampleFilter->SetOutputDirection(input->GetDirection());
+        resampleFilter->UpdateLargestPossibleRegion();
+        resampleFilter->Update();
+
+        output->Graft(resampleFilter->GetOutput());
+
+        SaveImage(output, "D:/temp/extractImage.mha") ;
+
     }
 }
 #endif // ITK_Helpers_h__

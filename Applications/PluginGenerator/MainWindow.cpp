@@ -75,6 +75,12 @@ void MainWindow::Generate()
     }
     GenerateCMakeList();
     GenerateSourceFiles();
+
+    QCheckBox* cb = (QCheckBox*)getViewByID("AddToProjectCMakeList");
+    if (cb->isChecked())
+    {
+        AddToPluginCMakeList();
+    }
     
     msgBox.setText("The Plugin "+ m_PluginName+" Has Been Generated Successfully!");
     msgBox.exec();
@@ -96,23 +102,36 @@ void MainWindow::CreateFile(QString fileName, const QString fileContent)
 
 void MainWindow::GenerateSourceFiles()
 {
-    QString text = ViewH;
+    QCheckBox* box = (QCheckBox*)getViewByID("MitkPlugin");
+    bool mitkPlugin = box->isChecked();
+    box = (QCheckBox*)getViewByID("CreateUiForm");
+    bool createUiForm = box->isChecked();
+    
+
+    QString text = mitkPlugin?MitkPluginH : ViewH;
     text.replace("@ViewName@", m_ViewName);
     CreateFile(QString(m_ViewName + ".h"), text);
 
-    text = ViewC;
+    text = mitkPlugin ? MitkPluginC : ViewC;
     text.replace("@ViewName@", m_ViewName);
     CreateFile(QString(m_ViewName + ".cxx"), text);
 
-    text = ViewActivatorH;
+    text = mitkPlugin ? MitkViewActivatorH: ViewActivatorH;
     text.replace("@PluginName@", m_PluginName);
     text.replace("@ViewName@", m_ViewName);
     CreateFile(QString(m_PluginName + "Activator.h"), text);
 
-    text = ViewActivatorC;
+    text = mitkPlugin ? MitkViewActivatorC :ViewActivatorC;
     text.replace("@PluginName@", m_PluginName);
     text.replace("@ViewName@", m_ViewName);
     CreateFile(QString(m_PluginName + "Activator.cxx"), text);
+
+    if (createUiForm)
+    {
+        text= mitkPlugin ? MitkUIForm : UIForm;
+        text.replace("@ViewName@", m_ViewName);
+        CreateFile(QString(m_ViewName + ".ui"), text);
+    }
 
 }
 
@@ -147,6 +166,24 @@ void MainWindow::GenerateCMakeList()
     std::cout << m_CMakeListText.toStdString() << std::endl;
 
     CreateFile("CMakeLists.txt", m_CMakeListText);
+
+}
+
+void MainWindow::AddToPluginCMakeList()
+{
+    QString projectPluginCMakeListsPaht = m_PluginDir + "/CMakeLists.txt";
+    QFile file(projectPluginCMakeListsPaht);
+    if (!file.exists())
+    {
+        qDebug() << "Can not found project plugin CMakeLists.txt !";
+        return;
+    }
+    if (!file.open(QIODevice::Append | QIODevice::Text))
+        return;
+    
+    QTextStream out(&file);
+    QString appendContent = QString("\n \nadd_subdirectory(%1)").arg(m_PluginName);
+    out << appendContent;
 
 }
 

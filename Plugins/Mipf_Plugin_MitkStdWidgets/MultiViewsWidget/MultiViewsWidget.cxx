@@ -31,7 +31,7 @@
 //##Documentation
 //## @brief As MultiViews, but with QmitkStdMultiWidget as widget
 
-MultiViewsWidget::MultiViewsWidget():MitkPluginView(),m_bInited(false)
+MultiViewsWidget::MultiViewsWidget():MitkPluginView(),m_bInited(false), m_multiWidget(nullptr)
 {
 }
 
@@ -44,10 +44,7 @@ void MultiViewsWidget::Update(const char* szMessage, int iValue, void* pValue)
 {
     if (strcmp(szMessage, "MITK_COMMAND_MULTIVIEWS_CHANGELAYOUT") == 0)
     {
-        VarientMap vmp = *(VarientMap*)pValue;
-        variant v = variant::GetVariant(vmp, "parameterIndex");
-        int index = v.getInt();
-        ChangeLayout(index);
+        ChangeLayout(variant::GetVariant(*(VarientMap*)pValue, "parameterIndex").getInt());
     }
     else if (strcmp(szMessage, "MITK_COMMAND_MULTIVIEWS_RESET") == 0)
     {
@@ -63,7 +60,7 @@ void MultiViewsWidget::SetupWidgets()
     // Create toplevel widget with vertical layout
     QVBoxLayout *vlayout = new QVBoxLayout(this);
     vlayout->setMargin(0);
-    vlayout->setSpacing(2);
+    vlayout->setSpacing(0);
     // Create viewParent widget with horizontal layout
     QWidget *viewParent = new QWidget(this);
     vlayout->addWidget(viewParent);
@@ -102,8 +99,6 @@ void MultiViewsWidget::SetupWidgets()
     m_multiWidget->GetWidgetPlane1()->SetIntProperty("Crosshair.Gap Size", crosshairgapsize);
     m_multiWidget->GetWidgetPlane2()->SetIntProperty("Crosshair.Gap Size", crosshairgapsize);
     m_multiWidget->GetWidgetPlane3()->SetIntProperty("Crosshair.Gap Size", crosshairgapsize);
-
-
 }
 
 

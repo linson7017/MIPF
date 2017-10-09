@@ -30,7 +30,6 @@ ${CMAKE_CURRENT_SOURCE_DIR}/Interactions/*.h*
 ${CMAKE_CURRENT_SOURCE_DIR}/Interactions/*.c*)
 source_group(Interactions FILES  ${INTERACTIONS_DIR_SRCS})
 
-
 set(MitkCoreExt_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/"  CACHE INTERNAL "MitkCoreExt headers")
 
 set(MitkCoreExt_LIBRARIES 
@@ -42,4 +41,7 @@ add_definitions(-DUS_MODULE_NAME)
 
 add_library(MitkCoreExt SHARED ${DIR_SRCS}
 ${RENDERING_DIR_SRCS} ${INTERACTIONS_DIR_SRCS})
-target_link_libraries(MitkCoreExt ${VTK_LIBRARIES} ${ITK_LIBRARIES} ${QFMAIN_LIBRARIES} MitkCore MitkDataTypesExt)
+target_link_libraries(MitkCoreExt ${VTK_LIBRARIES} ${ITK_LIBRARIES}
+${QFMAIN_LIBRARIES} 
+MitkCore MitkDataTypesExt
+)

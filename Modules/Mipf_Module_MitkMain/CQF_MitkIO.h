@@ -18,6 +18,7 @@ public:
     ~CQF_MitkIO();
     virtual mitk::DataNode* Load(const char* szFilename);
     virtual void LoadFiles();
+    virtual void OpenProject();
     virtual void SaveProject();
     virtual void Save(const mitk::BaseData *data);
     virtual void Save(const std::vector<const mitk::BaseData *> &data);

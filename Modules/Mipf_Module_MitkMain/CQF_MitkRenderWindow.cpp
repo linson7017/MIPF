@@ -45,8 +45,9 @@ void CQF_MitkRenderWindow::SetMitkStdMultiWidget(QmitkStdMultiWidget* stdMultiWi
 
 mitk::RenderingManager* CQF_MitkRenderWindow::GetRenderingManager(QString name)
 {
-    QmitkRenderWindow* renderWindow = GetActiveMitkRenderWindow();
-    
+    return mitk::RenderingManager::GetInstance();
+    /*QmitkRenderWindow* renderWindow = GetActiveMitkRenderWindow();
+
     if (renderWindow)
     {
         return renderWindow->GetRenderer()->GetRenderingManager();
@@ -54,7 +55,7 @@ mitk::RenderingManager* CQF_MitkRenderWindow::GetRenderingManager(QString name)
     else
     {
         return NULL;
-    }
+    }*/
 }
 
 QmitkRenderWindow* CQF_MitkRenderWindow::GetActiveMitkRenderWindow()

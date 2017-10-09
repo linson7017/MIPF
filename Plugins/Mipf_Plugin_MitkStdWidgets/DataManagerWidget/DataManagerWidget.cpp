@@ -363,8 +363,10 @@ void DataManagerWidget::NodeSelectionChanged(const QItemSelection & selected, co
 
     m_DataManager->SetSelectedNode(selectedNodes);
 
-    m_pMain->SendMessageQf(MITK_MESSAGE_SELECTION_CHANGED, selectedNodes.size(), m_DataManager);
-
+    if (selectedNodes.size()>0)
+    {
+        m_pMain->SendMessageQf(MITK_MESSAGE_SELECTION_CHANGED, selectedNodes.size(), m_DataManager);
+    }
 }
 
 void DataManagerWidget::NodeTreeViewDataChanged(const QModelIndex &/*topLeft*/, const QModelIndex &/*bottomRight*/, const QVector<int> &/*roles*/)

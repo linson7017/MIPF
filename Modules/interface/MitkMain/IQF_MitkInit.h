@@ -9,10 +9,13 @@ namespace mitk
     class DataStorage;
 }
 
+class QmitkStdMultiWidget;
+
 class IQF_MitkInit
 {
 public:
     virtual void Init(mitk::DataStorage* dataStorage = nullptr) = 0;
+    virtual void SetStdMultiWidget(QmitkStdMultiWidget* stdMultiWidget) = 0;
 };
 
 

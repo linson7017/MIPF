@@ -1,8 +1,8 @@
 #ifndef MultiViews_H
 #define MultiViews_H
 #include "MitkPluginView.h"
-
 #include <QWidget>
+
 #include <mitkImage.h>
 #include <mitkPointSet.h>
 #include <mitkStandaloneDataStorage.h>
@@ -12,9 +12,8 @@
 class QmitkStdMultiWidget;
 class IQF_MitkDataManager;
 
-class MultiViewsWidget : public QWidget, public MitkPluginView
+class MultiViewsWidget:public QWidget, public MitkPluginView
 {
-    Q_OBJECT
 public:
     MultiViewsWidget();
     ~MultiViewsWidget() {}

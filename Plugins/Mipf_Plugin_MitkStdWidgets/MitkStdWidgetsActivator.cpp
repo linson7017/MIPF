@@ -5,9 +5,13 @@
 #include "ImageNavigatorWidget/ImageNavigatorWidget.h"
 #include "MeasurementWidget/MeasurementWidget.h"
 #include "StatusWidget/StatusBarWidget.h"
+#include "RenderWindow/RenderWindow.h"
+#include "Properties/QmitkPropertyTreeView.h"
+#include "StatusWidget/ProgressBarWidget.h"
 //#include "MeasurementWidget/ImageStatisticsWidget.h"
 #include "Res/R.h"
 #include "Utils/QObjectFactory.h"
+#include "Utils/PluginFactory.h"
 #include "QmitkWidgetsRegister.h"
 
 QF_API QF::IQF_Activator* QF::QF_CreatePluginActivator(QF::IQF_Main* pMain)
@@ -39,22 +43,32 @@ const char* MitkStdWidgets_Activator::GetID()
 void MitkStdWidgets_Activator::Register(R* pR)
 {
     //数据管理插件
-    REGISTER_CLASS("DataManagerWidget", DataManagerWidget);
+    REGISTER_QOBJECT("DataManagerWidget", DataManagerWidget);
 
     //多视图显示插件
-    REGISTER_CLASS("MultiViewsWidget", MultiViewsWidget);
+    REGISTER_QOBJECT("MultiViewsWidget", MultiViewsWidget);
 
     //体绘制插件
-    REGISTER_CLASS("VolumeVisualizationWidget", VolumeVisualizationWidget);
+    REGISTER_QOBJECT("VolumeVisualizationWidget", VolumeVisualizationWidget);
 
     //图像浏览插件
-    REGISTER_CLASS("ImageNavigatorWidget", ImageNavigatorWidget);
+    REGISTER_QOBJECT("ImageNavigatorWidget", ImageNavigatorWidget);
 
     //测量插件
-    REGISTER_CLASS("MeasurementWidget", MeasurementWidget);
+    REGISTER_QOBJECT("MeasurementWidget", MeasurementWidget);
 
     //状态条
-    REGISTER_CLASS("StatusBarWidget", StatusBarWidget);
+    REGISTER_QOBJECT("StatusBarWidget", StatusBarWidget);
+
+    REGISTER_QOBJECT("ProgressBarWidget", ProgressBarWidget);
+
+
+
+    REGISTER_PLUGIN("RenderWindowWidget", RenderWindow);
+
+    REGISTER_QOBJECT("PropertiesWidget", QmitkPropertyTreeView);
+
+
 
   //  m_pImageStatisticsWidget->InitResource(pR);
   //  pR->registerCustomWidget("ImageStatisticsWidget", m_pImageStatisticsWidget);

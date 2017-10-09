@@ -22,6 +22,7 @@ private:
     void Generate();
     void GenerateCMakeList();
     void GenerateSourceFiles();
+    void AddToPluginCMakeList();
 
     void CreateFile(QString fileName, const QString fileContent);
     void CheckAndCreateDirectory(const QString path);

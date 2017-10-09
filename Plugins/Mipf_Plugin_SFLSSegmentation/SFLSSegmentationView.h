@@ -11,12 +11,13 @@ class SFLSSegmentationView : public QWidget,public MitkPluginView
 {
     Q_OBJECT
 public:
-    SFLSSegmentationView(QF::IQF_Main* pMain);
+    SFLSSegmentationView();
 protected:
     virtual void Update(const char* szMessage, int iValue = 0, void* pValue = 0);
     virtual void SetFocus();
 
     void CreateView();
+    WndHandle GetPluginHandle() { return this; }
     public slots:
 
     void ApplySegment();

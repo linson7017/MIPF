@@ -16,6 +16,7 @@ public:
     virtual mitk::DataNode* Load(const char* filename) = 0;
     virtual void LoadFiles() = 0;
     virtual void SaveProject() = 0;
+    virtual void OpenProject() = 0;
 };
 
 #endif // IQF_MitkIO_h__

@@ -70,6 +70,8 @@ namespace ITKHelpers
     template <class TInput, class TOutput>
     void ExtractConnectedContainsIndex(TInput* input, TOutput* output, IndexContainer indexes);
 
+    template <class TInput, class TOutput>
+    void ExtractCentroidImageWithGivenSize(TInput* input, TOutput* output, int* outputSize);
 
     QF_API std::vector<itk::Index<3> > DilatePixelList(const std::vector<itk::Index<3> >& pixelList,
         const itk::ImageRegion<3>& region, const unsigned int radius);

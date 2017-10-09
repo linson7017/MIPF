@@ -32,5 +32,5 @@ void Mipf_Plugin_VesselSegmentation_Activator::Register(R* pR)
 {
    // m_pVesselSegmentationView->InitResource(pR); 
    // pR->registerCustomWidget("VesselSegmentationView", m_pVesselSegmentationView); 
-    REGISTER_CLASS("VesselSegmentationWidget", VesselSegmentationView);
+    REGISTER_QOBJECT("VesselSegmentationWidget", VesselSegmentationView);
 }

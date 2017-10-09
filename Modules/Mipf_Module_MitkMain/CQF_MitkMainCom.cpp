@@ -41,9 +41,6 @@ void CQF_MitkMain::Release()
 
 bool CQF_MitkMain::Init()
 {
-    //vtkObject::GlobalWarningDisplayOff();
-    QmitkRegisterClasses();
-
     m_pMitkDataManager = new CQF_MitkDataManager(m_pMain);
     m_pMitkRenderWindow = new CQF_MitkRenderWindow;
     m_pMitkReference = new CQF_MitkReference(m_pMain);

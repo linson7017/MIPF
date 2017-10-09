@@ -31,6 +31,6 @@ const char* Mipf_Plugin_StaticisTools_Activator::GetID()
 
 void Mipf_Plugin_StaticisTools_Activator::Register(R* pR)
 {
-    REGISTER_CLASS("HistogramWidget", HistogramView);
-    REGISTER_CLASS("ProfileGrayScaleDistributionWidget", ProfileGrayScaleDistributionView);
+    REGISTER_QOBJECT("HistogramWidget", HistogramView);
+    REGISTER_QOBJECT("ProfileGrayScaleDistributionWidget", ProfileGrayScaleDistributionView);
 }

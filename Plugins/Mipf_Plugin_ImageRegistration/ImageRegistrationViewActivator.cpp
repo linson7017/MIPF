@@ -1,6 +1,8 @@
 #include "ImageRegistrationViewActivator.h"
 #include "ImageRegistrationView.h"
 
+#include "Utils/QObjectFactory.h"
+
 
 QF_API QF::IQF_Activator* QF::QF_CreatePluginActivator(QF::IQF_Main* pMain)
 {
@@ -18,7 +20,7 @@ ImageRegistrationView_Activator::ImageRegistrationView_Activator(QF::IQF_Main* p
 
 bool ImageRegistrationView_Activator::Init()
 {
-    m_pView = new ImageRegistrationView(m_pMain);
+    //m_pView = new ImageRegistrationView(m_pMain);
     return true;
 }
 
@@ -29,10 +31,12 @@ const char* ImageRegistrationView_Activator::GetID()
 
 void ImageRegistrationView_Activator::Register(R* pR)
 {
-    m_pView->InitResource(pR);
+    //m_pView->InitResource(pR);
+    REGISTER_QOBJECT("ImageRegistrationWidget", ImageRegistrationView);
+
 }
 
 void ImageRegistrationView_Activator::Constructed(R* pR)
 {
-    m_pView->ResourceConstructed(pR);
+   // m_pView->ResourceConstructed(pR);
 }

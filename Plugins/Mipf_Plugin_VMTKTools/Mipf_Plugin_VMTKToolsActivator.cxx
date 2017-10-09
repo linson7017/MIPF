@@ -34,8 +34,8 @@ const char* Mipf_Plugin_VMTKTools_Activator::GetID()
 void Mipf_Plugin_VMTKTools_Activator::Register(R* pR)
 {
 
-    REGISTER_CLASS("CenterLineExtractWidget", CenterLineExtractView);
-    REGISTER_CLASS("VesselnessFilteringWidget", VesselnessFilteringView);
+    REGISTER_QOBJECT("CenterLineExtractWidget", CenterLineExtractView);
+    REGISTER_QOBJECT("VesselnessFilteringWidget", VesselnessFilteringView);
 
     
     //m_pCenterLineExtractView->InitResource(pR); 

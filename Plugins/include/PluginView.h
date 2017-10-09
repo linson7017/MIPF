@@ -34,6 +34,7 @@ public:
 	}
 	virtual void Activate() { m_bActivated = true; }
 	virtual void Disactivate() { m_bActivated = false; }
+    virtual WndHandle GetPluginHandle() { return nullptr; }
 	void SetActivated(bool bActivated) { m_bActivated = bActivated; }
 	bool IsActivated() { return m_bActivated; }
     void* GetInterfacePtr(const char* szInterfaceID)
@@ -46,6 +47,29 @@ public:
         {
             return nullptr;
         }       
+    }
+    const char* GetAttribute(const char* attributeName)
+    {
+        std::map<std::string, std::string>::iterator it = m_attributes.find(attributeName);
+        if (it != m_attributes.end())
+        {
+            return it->second.c_str();
+        }
+        else
+        {
+            return "";
+        }
+    }
+    bool HasAttribute(const char* attributeName)
+    {
+        if (m_attributes.count(attributeName))
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 protected:
     //override

@@ -44,62 +44,11 @@
 #include <usModuleInitialization.h>
 #include "ImageNavigationInteractor.h"
 
-mitk::NodePredicateBase::Pointer CreateUserPredicate(int type)
-{
-    auto imageType = mitk::TNodePredicateDataType<mitk::Image>::New();
-    auto labelSetImageType = mitk::TNodePredicateDataType<mitk::LabelSetImage>::New();
-    auto surfaceType = mitk::TNodePredicateDataType<mitk::Surface>::New();
-    auto contourModelType = mitk::TNodePredicateDataType<mitk::ContourModel>::New();
-    auto contourModelSetType = mitk::TNodePredicateDataType<mitk::ContourModelSet>::New();
-    auto nonLabelSetImageType = mitk::NodePredicateAnd::New(imageType, mitk::NodePredicateNot::New(labelSetImageType));
-    auto nonHelperObject = mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object"));
-    auto isBinary = mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(true));
-    auto isSegmentation = mitk::NodePredicateProperty::New("segmentation", mitk::BoolProperty::New(true));
-    auto isBinaryOrSegmentation = mitk::NodePredicateOr::New(isBinary, isSegmentation);
 
-    mitk::NodePredicateBase::Pointer returnValue;
-
-    switch (type)
-    {
-    case 1:
-        returnValue = mitk::NodePredicateAnd::New(
-            mitk::NodePredicateNot::New(isBinaryOrSegmentation),
-            nonLabelSetImageType).GetPointer();
-        break;
-
-    case 2:
-        returnValue = mitk::NodePredicateOr::New(
-            mitk::NodePredicateAnd::New(imageType, isBinaryOrSegmentation),
-            labelSetImageType).GetPointer();
-        break;
-
-    case 3:
-        returnValue = surfaceType.GetPointer();
-        break;
-
-    case 4:
-        returnValue = imageType.GetPointer();
-        break;
-
-    case 5:
-        returnValue = mitk::NodePredicateOr::New(
-            contourModelSetType,
-            contourModelSetType).GetPointer();
-        break;
-
-    default:
-        assert(false && "Unknown predefined predicate!");
-        return nullptr;
-    }
-
-    return mitk::NodePredicateAnd::New(returnValue, nonHelperObject).GetPointer();
-}
-
-
-ImageRegistrationView::ImageRegistrationView(QF::IQF_Main* pMain):MitkPluginView(pMain), m_FixedImageNode(NULL),m_MovingImageNode(NULL), m_bInited(false),
+ImageRegistrationView::ImageRegistrationView():MitkPluginView(), m_FixedImageNode(NULL),m_MovingImageNode(NULL), m_bInited(false),
 m_EventConfig("DisplayConfigMITK.xml"), m_ScrollEnabled(true)
 {
-    m_pMain->Attach(this);
+
     m_registrationMatrix.setToIdentity();
 
     qRegisterMetaType<QfResult>("QfResult");
@@ -110,71 +59,32 @@ ImageRegistrationView::~ImageRegistrationView()
 
 }
 
+void ImageRegistrationView::CreateView()
+{
+    m_pMain->Attach(this);
+
+    m_ui.setupUi(this);
+
+    m_ui.FixedImageComboBox->SetDataStorage(GetDataStorage());
+    m_ui.MovingImageComboBox->SetDataStorage(GetDataStorage());
+    m_ui.FixedImageComboBox->SetPredicate(CreatePredicate(MitkPluginView::Image));
+    m_ui.MovingImageComboBox->SetPredicate(CreatePredicate(MitkPluginView::Image));
+
+    connect(m_ui.FixedImageComboBox, SIGNAL(OnSelectionChanged(const mitk::DataNode *)), this, SLOT(OnFixedImageSelectionChanged(const mitk::DataNode *)));
+    connect(m_ui.MovingImageComboBox, SIGNAL(OnSelectionChanged(const mitk::DataNode *)), this, SLOT(OnMovingImageSelectionChanged(const mitk::DataNode *)));
+
+    connect(m_ui.InitRegisterBtn, SIGNAL(clicked()), this, SLOT(InitRegistration()));
+    connect(m_ui.RegisterBtn, SIGNAL(clicked()), this, SLOT(DoRegistration()));
+    connect(m_ui.StopRegisterBtn, SIGNAL(clicked()), this, SLOT(Stop()));
+    connect(m_ui.ResetRegisterBtn, SIGNAL(clicked()), this, SLOT(Reset()));
+    connect(m_ui.EndRegisterBtn, SIGNAL(clicked()), this, SLOT(EndRegistration()));
+
+}
+
 
 void ImageRegistrationView::Update(const char* szMessage, int iValue, void* pValue)
 {
-    if (strcmp(szMessage, "ImageRegistration.Register") == 0)
-    {
-        DoRegistration();
-    }
-    else if (strcmp(szMessage, "ImageRegistration.AlignCenter") == 0)
-    {
-        
-       // mitk::Point3D movingImageCenter = m_MovingImageNode->GetData()->GetGeometry()->GetCenter();
-        //mitk::Point3D fixedImageCenter = m_FixedImageNode->GetData()->GetGeometry()->GetCenter();
-
-        //mitk::Vector3D translate;
-        //translate[0] = +fixedImageCenter[0] - movingImageCenter[0];
-        //translate[1] = +fixedImageCenter[1] - movingImageCenter[1];
-        //translate[2] = +fixedImageCenter[2] - movingImageCenter[2];
-        //m_MovingImageNode->GetData()->GetGeometry()->Translate(translate);
-        //mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-    }
-    else if (strcmp(szMessage, "ImageRegistration.InitRegister") == 0)
-    {
-        IQF_MitkDataManager* pDataManager = (IQF_MitkDataManager*)m_pMain->GetInterfacePtr(QF_MitkMain_DataManager);
-        //Set Current Image
-        if (!m_FixedImageNode || !m_MovingImageNode)
-        {
-            return;
-        }
-        mitk::Point3D origin;
-        origin.SetElement(0, 0);
-        origin.SetElement(1, 0);
-        origin.SetElement(2, 0);
-
-        Float3DImagePointerType itkFixedImage = Float3DImageType::New();
-        mitk::CastToItkImage<Float3DImageType>(dynamic_cast<mitk::Image *>(m_FixedImageNode->GetData()), itkFixedImage);
-
-        Float3DImagePointerType itkMovingImage = Float3DImageType::New();
-        mitk::CastToItkImage<Float3DImageType>(dynamic_cast<mitk::Image *>(m_MovingImageNode->GetData()), itkMovingImage);
-
-        if (!m_bInited)
-        {
-            InitRegistration(itkFixedImage, itkMovingImage);
-        }
-    }
-    else if (strcmp(szMessage, "ImageRegistration.ResetRegister") == 0)
-    {
-        Reset();
-    }
-    else if (strcmp(szMessage, "ImageRegistration.StopRegister") == 0)
-    {
-        Stop();
-    }
-    else if (strcmp(szMessage, "ImageRegistration.EndRegister") == 0)
-    {
-        EndRegistration();
-    }
-    else if (strcmp(szMessage, MITK_MESSAGE_NODE_REMOVED) == 0)
-    {
-        mitk::DataNode* removedNode = (mitk::DataNode*)pValue;
-        if (removedNode== m_pMitkDataManager->GetDataStorage()->GetNamedNode("DisplayMoving")||
-            removedNode == m_pMitkDataManager->GetDataStorage()->GetNamedNode("DisplayFixed"))
-        {
-            m_bInited = false;
-        }
-    }
+    
 }
 
 void ImageRegistrationView::DoRegistration()
@@ -186,10 +96,7 @@ void ImageRegistrationView::DoRegistration()
         return;
     }
     //correct the origin of the fixed image
-    bool correctCenter = false;
-    QCheckBox* cb = (QCheckBox*)m_pR->getObjectFromGlobalMap("ImageRegistration.CorrectFixedCenter");
-    correctCenter = cb->isChecked();
-    if (correctCenter)
+    if (m_ui.CorrectFixedCenterCB->checkState()==Qt::Checked)
     {
         mitk::Point3D preFixedOrigin = m_FixedImageNode->GetData()->GetGeometry()->GetOrigin();
         mitk::Point3D preMovingOrigin = m_MovingImageNode->GetData()->GetGeometry()->GetOrigin();
@@ -214,19 +121,16 @@ void ImageRegistrationView::DoRegistration()
 
     if (!m_bInited || !m_pMitkDataManager->GetDataStorage()->GetNamedNode("DisplayMoving") || !m_pMitkDataManager->GetDataStorage()->GetNamedNode("DisplayFixed"))
     {
-        InitRegistration(itkFixedImage, itkMovingImage);
+        InitRegistration();
     }
 
 
     //init matrix
     QMatrix4x4 qm;
     qm.setToIdentity();
-    bool alignCenter = false;
-    cb = (QCheckBox*)m_pR->getObjectFromGlobalMap("ImageRegistration.AlignCenter");
-    alignCenter = cb->isChecked();
     //QMatrix4x4 initMatrix = m_registrationMatrix;
     QMatrix4x4 initMatrix = static_cast<ImageNavigationInteractor*>(m_movingImageInteractor.GetPointer())->GetTransformMatrix();
-    if (alignCenter)
+    if (m_ui.AlignCenterCB->isChecked())
     {
         initMatrix.setToIdentity();
         mitk::Point3D movingImageCenter = m_MovingImageNode->GetData()->GetGeometry()->GetCenter();
@@ -236,17 +140,13 @@ void ImageRegistrationView::DoRegistration()
             fixedImageCenter[2] - movingImageCenter[2]);
     }
 
-    //use multi resolution
-    QCheckBox* useMultiResolutionCheckbox = (QCheckBox*)m_pR->getObjectFromGlobalMap("ImageRegistration.UseMultiResolution");
-
     ///////////////Normal Version///////////////////////////
     /* RegistrationMI<Float3DImageType, Float3DImageType> rm;
     rm.Start(itkFixedImage.GetPointer(), itkMovingImage.GetPointer(), itkResultImage.GetPointer(), m);*/
 
     ///////////MultiThread Version////////////////////////
-    cb = (QCheckBox*)m_pR->getObjectFromGlobalMap("ImageRegistration.DeformableRegistration");
     m_RegistrationWorkStation = new RegistrationWorkStation;
-    if (cb->isChecked())
+    if (m_ui.DeformableRegistrationCB->isChecked())
     {
         m_RegistrationWorkStation->SetRegistrationType(RegistrationWorkStation::SFD);
     }
@@ -254,12 +154,11 @@ void ImageRegistrationView::DoRegistration()
     {
         m_RegistrationWorkStation->SetRegistrationType(RegistrationWorkStation::MI);
     } 
-    cb = (QCheckBox*)m_pR->getObjectFromGlobalMap("ImageRegistration.BeginWithTranslation");
-    m_RegistrationWorkStation->SetBeginWithTranslation(cb->isChecked());
-    m_RegistrationWorkStation->SetOnlyTranslation(GetGuiProperty("ImageRegistration.OnlyTranslation", "checked").toBool());
+    m_RegistrationWorkStation->SetBeginWithTranslation(m_ui.BeginWithTranslationCB->isChecked());
+    m_RegistrationWorkStation->SetOnlyTranslation(m_ui.OnlyTranslationCB->isChecked());
 
 
-    m_RegistrationWorkStation->SetUseMultiResolution(useMultiResolutionCheckbox->isChecked());
+    m_RegistrationWorkStation->SetUseMultiResolution(m_ui.UseMultiResolutionCB->isChecked());
     m_RegistrationThread = new QThread;
     m_RegistrationWorkStation->moveToThread(m_RegistrationThread);
     disconnect(m_RegistrationThread, &QThread::finished,
@@ -288,28 +187,6 @@ void ImageRegistrationView::DoRegistration()
     //start registration
     m_RegistrationThread->start();
     emit SignalDoRegistration(itkFixedImage, itkMovingImage, initMatrix.inverted());
-}
-
-void ImageRegistrationView::InitResource(R* pR)
-{
-    m_pR = pR;
-    IQF_MitkDataManager* m_pDataManager = (IQF_MitkDataManager*)m_pMain->GetInterfacePtr(QF_MitkMain_DataManager);
-
-    mitk::NodePredicateData::Pointer predicate = mitk::NodePredicateData::New(0);
-    m_FixedDataStorageComboBox = new QmitkDataStorageComboBox(m_pDataManager->GetDataStorage(), CreateUserPredicate(4));
-    connect(m_FixedDataStorageComboBox, SIGNAL(OnSelectionChanged(const mitk::DataNode *)), this, SLOT(OnFixedImageSelectionChanged(const mitk::DataNode *)));
-
-    m_MovingDataStorageComboBox = new QmitkDataStorageComboBox(m_pDataManager->GetDataStorage(), CreateUserPredicate(4));
-    connect(m_MovingDataStorageComboBox, SIGNAL(OnSelectionChanged(const mitk::DataNode *)), this, SLOT(OnMovingImageSelectionChanged(const mitk::DataNode *)));
-
-    m_pR->registerCustomWidget("FixedImageComboBox", m_FixedDataStorageComboBox);
-    m_pR->registerCustomWidget("MovingImageComboBox", m_MovingDataStorageComboBox);
-
-}
-
-void ImageRegistrationView::ResourceConstructed(R* pR)
-{
-
 }
 
 void ImageRegistrationView::OnFixedImageSelectionChanged(const mitk::DataNode* node)
@@ -358,11 +235,32 @@ void ImageRegistrationView::UpdataRegistrationText(const vtkMatrix4x4& matrix)
         .arg(matrix.GetElement(1,0)).arg(matrix.GetElement(1, 1)).arg(matrix.GetElement(1, 2)).arg(matrix.GetElement(1, 3))
         .arg(matrix.GetElement(2, 0)).arg(matrix.GetElement(2, 1)).arg(matrix.GetElement(2, 2)).arg(matrix.GetElement(2, 3))
         .arg(matrix.GetElement(3, 0)).arg(matrix.GetElement(3, 1)).arg(matrix.GetElement(3, 2)).arg(matrix.GetElement(3, 3));
-    SetGuiProperty("ImageRegistration.RegistrationMatrix", "plainText", matrixStr);
+    m_ui.RegistrationMatrixTE->setPlainText(matrixStr);
 }
 
-void ImageRegistrationView::InitRegistration(Float3DImageType* itkFixedImage, Float3DImageType* itkMovingImage)
+void ImageRegistrationView::InitRegistration()
 {
+    if (m_bInited)
+    {
+        return;
+    }
+
+    //Set Current Image
+    if (!m_FixedImageNode || !m_MovingImageNode)
+    {
+        return;
+    }
+    mitk::Point3D origin;
+    origin.SetElement(0, 0);
+    origin.SetElement(1, 0);
+    origin.SetElement(2, 0);
+
+    Float3DImagePointerType itkFixedImage = Float3DImageType::New();
+    mitk::CastToItkImage<Float3DImageType>(dynamic_cast<mitk::Image *>(m_FixedImageNode->GetData()), itkFixedImage);
+
+    Float3DImagePointerType itkMovingImage = Float3DImageType::New();
+    mitk::CastToItkImage<Float3DImageType>(dynamic_cast<mitk::Image *>(m_MovingImageNode->GetData()), itkMovingImage);
+
     //set resource image invisible
     m_FixedImageNode->SetVisibility(false);
     m_MovingImageNode->SetVisibility(false);

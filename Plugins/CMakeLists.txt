@@ -1,4 +1,3 @@
-
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 include_directories(${PROJECT_SOURCE_DIR}/Modules/include)
 include_directories(${PROJECT_SOURCE_DIR}/Modules/interface)
@@ -41,3 +40,9 @@ add_subdirectory(Mipf_Plugin_ItkAlgorithmSet)
 add_subdirectory(Mipf_Plugin_SurfaceCut)
 
 add_subdirectory(Mipf_Plugin_MapperTest)
+
+add_subdirectory(Mipf_Plugin_ManualSegmentationTest)
+
+add_subdirectory(Mipf_Plugin_VolumeCut)
+ 
+add_subdirectory(Mipf_Plugin_ASM)

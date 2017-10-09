@@ -1,7 +1,10 @@
 #include "ItkAlgorithmSetViewActivator.h"
 #include "ItkAlgorithmSetView.h"
+#include "SigmoidImageView.h"
+#include "FastMarchingView.h"
 
 #include "Utils/QObjectFactory.h"
+#include "Utils/PluginFactory.h"
 
 
 QF_API QF::IQF_Activator* QF::QF_CreatePluginActivator(QF::IQF_Main* pMain)
@@ -30,5 +33,10 @@ const char* ItkAlgorithmSetView_Activator::GetID()
 
 void ItkAlgorithmSetView_Activator::Register(R* pR)
 {
-    REGISTER_CLASS("ItkAlgorithmSetWidget", ItkAlgorithmSetView);
+    REGISTER_QOBJECT("ItkAlgorithmSetWidget", ItkAlgorithmSetView);
+
+    REGISTER_PLUGIN("SigmoidImageWidget", SigmoidImageView);
+
+    REGISTER_PLUGIN("FastMarchingWidget", FastMarchingView);
+
 }

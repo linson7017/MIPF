@@ -10,6 +10,8 @@
 #include <mitkNodePredicateProperty.h>
 #include <mitkProperties.h>
 
+#include "MitkProjectIO.h"
+
 
 #include <QFileDialog>
 #include <QMessageBox>
@@ -86,6 +88,51 @@ void CQF_MitkIO::LoadFiles()
     pMitkReference->SetString("LastOpenDirectory", QFileInfo(fileNames.back()).absolutePath().toStdString().c_str());
 }
 
+void CQF_MitkIO::OpenProject()
+{
+    try
+    {
+        IQF_MitkReference* pMitkReference = (IQF_MitkReference*)m_pMain->GetInterfacePtr(QF_MitkMain_Reference);
+        IQF_MitkDataManager* pMitkDataManager = (IQF_MitkDataManager*)m_pMain->GetInterfacePtr(QF_MitkMain_DataManager);
+        IQF_MitkRenderWindow* pMitkRenderWindow = (IQF_MitkRenderWindow*)m_pMain->GetInterfacePtr(QF_MitkMain_RenderWindow);
+        QString defaultOpenFilePath = pMitkReference->GetString("LastOpenDirectory");
+
+        QString fileName = QFileDialog::getOpenFileName(NULL, "Open",
+            defaultOpenFilePath,
+            QmitkIOUtil::GetFileOpenFilterString());
+        if (fileName.isEmpty())
+            return;
+
+        MitkProjectIO::Pointer sceneIO = MitkProjectIO::New();
+
+        mitk::ProgressBar::GetInstance()->AddStepsToDo(2);
+
+        mitk::DataStorage* storage = pMitkDataManager->GetDataStorage();
+
+        if (!sceneIO->LoadScene(fileName.toStdString(),pMitkDataManager->GetDataStorage()) )
+        {
+            QMessageBox::information(NULL,
+                "Scene saving",
+                "Scene could not be written completely. Please check the log.",
+                QMessageBox::Ok);
+
+        }
+        mitk::ProgressBar::GetInstance()->Progress(2);
+
+        int size = pMitkDataManager->GetDataStorage()->GetAll()->Size();
+
+        mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(pMitkDataManager->GetDataStorage());
+        pMitkReference->SetString("LastOpenDirectory", QFileInfo(fileName).absolutePath().toStdString().c_str());
+
+    }
+    catch (std::exception& e)
+    {
+        MITK_ERROR << "Exception caught during scene opening: " << e.what();
+    }
+
+    
+}
+
 void CQF_MitkIO::SaveProject()
 {
     try
@@ -127,7 +174,7 @@ void CQF_MitkIO::SaveProject()
         if (fileName.right(5) != ".mitk")
             fileName += ".mitk";
 
-        mitk::SceneIO::Pointer sceneIO = mitk::SceneIO::New();
+        MitkProjectIO::Pointer sceneIO = MitkProjectIO::New();
 
         mitk::ProgressBar::GetInstance()->AddStepsToDo(2);
 

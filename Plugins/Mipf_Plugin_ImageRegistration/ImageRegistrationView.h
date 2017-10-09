@@ -14,6 +14,8 @@
 
 #include "QfResult.h"
 
+#include "ui_ImageRegistrationView.h"
+
 class QPushButton;
 class QLineEdit;
 
@@ -21,14 +23,13 @@ class QLineEdit;
 class QmitkDataStorageComboBox;
 class RegistrationWorkStation;
 
-class ImageRegistrationView :public QObject,public MitkPluginView
+class ImageRegistrationView :public QWidget,public MitkPluginView
 {
     Q_OBJECT
 public:
-    ImageRegistrationView(QF::IQF_Main* pMain);
+    ImageRegistrationView();
     ~ImageRegistrationView();
-    void InitResource(R* pR);
-    void ResourceConstructed(R* pR);
+    void CreateView() override;
 protected:
     virtual void Update(const char* szMessage, int iValue = 0, void* pValue = 0);
 protected slots:
@@ -39,17 +40,19 @@ protected slots:
     void SlotRegistrationFinished(const QfResult& result);
     void SlotReslutImageGenerated(const Float3DImagePointerType resultImage);
 
-signals:
-    void SignalDoRegistration(const Float3DImagePointerType fixedImage, const Float3DImagePointerType movingImage, QMatrix4x4 initTransformMatrix);
-    void SignalStopRegistration();
-private:
-    void InitRegistration(Float3DImageType* itkFixedImage, Float3DImageType* itkMovingImage);
+    void InitRegistration();
     void DoRegistration();
     void EndRegistration();
     void Reset();
     void Stop();
-    
+
     void UpdataRegistrationText(const vtkMatrix4x4& matrix);
+
+signals:
+    void SignalDoRegistration(const Float3DImagePointerType fixedImage, const Float3DImagePointerType movingImage, QMatrix4x4 initTransformMatrix);
+    void SignalStopRegistration();
+private:
+    
 
     void DisableDefaultInteraction();
     void EnableDefaultInteraction();
@@ -73,6 +76,10 @@ private:
     std::map<us::ServiceReferenceU, mitk::EventConfig> m_DisplayInteractorConfigs;
     std::string m_EventConfig;
     bool m_ScrollEnabled;
+
+
+
+    Ui::ImageRegistrationView  m_ui;
 };
 
 

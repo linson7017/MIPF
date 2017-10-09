@@ -47,6 +47,8 @@ protected:
     mitk::DataInteractor::Pointer m_boundingShapeInteractor;
     mitk::DataInteractor::Pointer m_geometryInteractor;
 
+    int m_boxNumber;
+
     std::map< std::string, vtkSmartPointer<vtkImplicitFunction> > m_geometryClipFunctions;
 
 };
