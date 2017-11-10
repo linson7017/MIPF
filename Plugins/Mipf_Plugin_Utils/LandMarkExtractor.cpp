@@ -124,7 +124,7 @@ void LandMarkPoint::SortDistanceMap()
 
 void LandMarkPoint::PrintSelf()
 {
-    std::cout << "ID:" << ID << std::endl;
+    std::cout <<std::endl << "ID:" << ID << std::endl;
     std::cout << "Coordinate:" << Coord[0] << ", " << Coord[1] << ", " << Coord[2] << std::endl;
     std::cout << "Centric Point:" << Centric << std::endl;
     std::cout << "Group Member:";
@@ -228,7 +228,7 @@ std::vector<LandMarkPoint> LandMarkExtractor::ExtractLandMarks(const mitk::Image
             landMarkPoints[j].InsertDistanceMap(i, distance);
         }
     }
-   //return  landMarkPoints;
+   return  landMarkPoints;
 
     //**********Fit Point***********////
     double error = 1.0;

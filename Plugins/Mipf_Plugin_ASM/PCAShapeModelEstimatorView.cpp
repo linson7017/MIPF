@@ -2,6 +2,7 @@
 
 //qt
 #include <QFileDialog>
+#include <QTextStream>
 
 //itk
 #include "itkImage.h"
@@ -24,10 +25,10 @@
 //mipf
 #include "MitkMain/IQF_MitkDataManager.h"
 #include "MitkMain/IQF_MitkRenderWindow.h"
+#include "ITK_Helpers.h"
 
 //qf
 #include "iqf_main.h"
-
 
 #include "dcmtk/dcmdata/dctk.h"
 
@@ -37,6 +38,7 @@ PCAShapeModelEstimatorView::PCAShapeModelEstimatorView(QF::IQF_Main* pMain, QWid
     m_ui.setupUi(this);
     m_ui.ImageList->setHeaderLabels(QStringList() << "Name" << "Path");
     connect(m_ui.BrowseBtn, &QPushButton::clicked, this, &PCAShapeModelEstimatorView::BrowseFile);
+    connect(m_ui.OutDirBrowseBtn, &QPushButton::clicked, this, &PCAShapeModelEstimatorView::BrowseOutDir);
     connect(m_ui.ApplyBtn, &QPushButton::clicked, this, &PCAShapeModelEstimatorView::Apply);
 
 }
@@ -114,7 +116,22 @@ void PCAShapeModelEstimatorView::Apply()
             name = QString("PCAImage_%1").arg(i);
         }
         AddITKImageNode(model->GetOutput(i), name.toStdString().c_str());
+
+        name.prepend(m_ui.OutDirLE->text() + "/");
+        name.append(".mha");
+        ITKHelpers::SaveImage(model->GetOutput(i), name.toStdString().c_str());
     }
+    QFile file(m_ui.OutDirLE->text() + "/eigenValues.txt");
+    if (!file.open(QIODevice::ReadWrite | QIODevice::Text))
+        return;
+    QTextStream out(&file);
+    vnl_vector<double> eigenValues(NUMPC);
+    eigenValues = model->GetEigenValues();
+    for (int i=0;i<NUMPC;i++)
+    {
+        out << eigenValues[i] <<"   ";
+    }
+    
     
 
     IQF_MitkRenderWindow* pRenderWindow = (IQF_MitkRenderWindow*)m_pMain->GetInterfacePtr(QF_MitkMain_RenderWindow);
@@ -134,6 +151,16 @@ void PCAShapeModelEstimatorView::AddITKImageNode(TImage* itkImage, const char* n
     pDataManager->GetDataStorage()->Add(node);
 }
 
+
+void PCAShapeModelEstimatorView::BrowseOutDir()
+{
+    QString dirStr = QFileDialog::getExistingDirectory(this, "Select An Directory To Save Result.");
+    if (dirStr.isEmpty())
+    {
+        return;
+    }
+    m_ui.OutDirLE->setText(dirStr);
+}
 
 void PCAShapeModelEstimatorView::BrowseFile()
 {

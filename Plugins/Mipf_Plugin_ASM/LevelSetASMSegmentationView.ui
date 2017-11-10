@@ -38,20 +38,6 @@
      </layout>
     </item>
     <item>
-     <layout class="QHBoxLayout" name="horizontalLayout_3">
-      <item>
-       <widget class="QLabel" name="label_3">
-        <property name="text">
-         <string>FMImage</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QmitkDataStorageComboBox" name="FMImageSelector"/>
-      </item>
-     </layout>
-    </item>
-    <item>
      <layout class="QHBoxLayout" name="horizontalLayout_2">
       <item>
        <widget class="QLabel" name="label_2">
@@ -64,6 +50,13 @@
        <widget class="QmitkDataStorageComboBox" name="MeanImageSelector"/>
       </item>
      </layout>
+    </item>
+    <item>
+     <widget class="QPushButton" name="CenterImageBtn">
+      <property name="text">
+       <string>Center Image</string>
+      </property>
+     </widget>
     </item>
     <item>
      <widget class="QGroupBox" name="groupBox">

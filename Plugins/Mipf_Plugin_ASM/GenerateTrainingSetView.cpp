@@ -13,6 +13,7 @@
 
 //itk
 #include <itkImage.h>
+#include <itkChangeInformationImageFilter.h>
 
 //mitk
 #include "mitkImage.h"
@@ -83,7 +84,7 @@ void GenerateTrainingSetView::Apply()
 
     for (int i=0;i<m_ui.ImageList->topLevelItemCount();i++)
     {
-        QString resultName = QString("Result%1").arg(i);
+        QString resultName = QString("TrainData%1").arg(i);
         mitk::DataNode* node = pIO->Load(m_ui.ImageList->topLevelItem(i)->text(1).toStdString().c_str());
         if (!node)
         {
@@ -95,16 +96,27 @@ void GenerateTrainingSetView::Apply()
 
         UChar3DImageType::Pointer output = UChar3DImageType::New();
 
-        int size[3] = { 128,128,128 };
-        ITKHelpers::ExtractCentroidImageWithGivenSize(itkImage.GetPointer(), output.GetPointer(), size);
+        int size[3] = { 256,128,256 };
+        double spacing[3] = {2,4,2};
+        ITKHelpers::ExtractCentroidImageWithGivenSize(itkImage.GetPointer(), output.GetPointer(), size, spacing);
+
+        typedef itk::ChangeInformationImageFilter<
+            UChar3DImageType >  CenterFilterType;
+        CenterFilterType::Pointer center = CenterFilterType::New();
+        center->CenterImageOn();
+        center->SetInput(output);
+        center->Update();
+
 
         mitk::Image::Pointer image;
-        mitk::CastToMitkImage(output, image);
+        mitk::CastToMitkImage(center->GetOutput(), image);
         mitk::DataNode::Pointer on = mitk::DataNode::New();
         on->SetData(image);
         on->SetName(resultName.toStdString().c_str());
 
         pDataManager->GetDataStorage()->Add(on);
         pDataManager->GetDataStorage()->Remove(node);
+
+        ITKHelpers::SaveImage(center->GetOutput(), m_ui.OutputDirLE->text().append("/%1.mha").arg(resultName).toStdString());
     }
 }

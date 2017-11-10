@@ -52,6 +52,16 @@
           <string>LevelSet PCA Segmentation</string>
          </property>
         </item>
+        <item>
+         <property name="text">
+          <string>Shape Drawer</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>LevelSet Segmentation</string>
+         </property>
+        </item>
        </widget>
       </item>
      </layout>

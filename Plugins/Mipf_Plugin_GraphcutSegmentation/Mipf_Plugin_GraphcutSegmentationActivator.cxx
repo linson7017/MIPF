@@ -1,5 +1,8 @@
 #include "Mipf_Plugin_GraphcutSegmentationActivator.h"
 #include "GraphcutSegmentationView.h"
+#include "GraphcutSegmentationViewUi.h"
+
+#include "Utils/PluginFactory.h"
 
 QF_API QF::IQF_Activator* QF::QF_CreatePluginActivator(QF::IQF_Main* pMain)
 {
@@ -28,6 +31,7 @@ const char* Mipf_Plugin_GraphcutSegmentation_Activator::GetID()
 void Mipf_Plugin_GraphcutSegmentation_Activator::Register(R* pR)
 {
     //m_pGraphcutSegmentationView->InitResource(pR); 
+    REGISTER_PLUGIN("GraphcutSegmentationWidget", GraphcutSegmentationViewUi);
 }
 
 void Mipf_Plugin_GraphcutSegmentation_Activator::Constructed(R* pR)

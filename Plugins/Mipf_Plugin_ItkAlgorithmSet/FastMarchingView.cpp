@@ -11,9 +11,9 @@
 
 #include "mitkImageCast.h"
 
-#include "ITKImageTypeDef.h"
 
-FastMarchingView::FastMarchingView()
+
+FastMarchingView::FastMarchingView() :m_pResultNode(nullptr)
 {
 }
 
@@ -94,6 +94,8 @@ void FastMarchingView::CreateView()
         itk::SimpleMemberCommand<FastMarchingView>::New();
     pointRemovedCommand->SetCallbackFunction(this, &FastMarchingView::SeedPointsChanged);
     m_pPointSet->AddObserver(mitk::PointSetRemoveEvent(), pointRemovedCommand);
+
+    connect(m_ui.ThresholdValueSlider, SIGNAL(valuesChanged(double, double)), this, SLOT(ThresholdChanged(double, double)));
 
 }
 
@@ -197,6 +199,9 @@ void FastMarchingView::SeedPointsChanged()
      try
      {
          m_ThresholdFilter->Update();
+         m_pFastMarchingResult = m_FastMarchingFilter->GetOutput();
+         /*m_pFastMarchingResult = Float3DImageType::New();
+         m_pFastMarchingResult->Graft(m_FastMarchingFilter->GetOutput());*/
      }
      catch (itk::ExceptionObject &excep)
      {
@@ -205,5 +210,43 @@ void FastMarchingView::SeedPointsChanged()
          return;
      }
 
-     ImportITKImage(m_ThresholdFilter->GetOutput(), "fm", m_ui.DataSelector->GetSelectedNode());
+     if (!m_pResultNode)
+     {
+         m_pResultNode = mitk::DataNode::New();
+         mitk::Image::Pointer image;
+         mitk::CastToMitkImage(m_ThresholdFilter->GetOutput(), image);
+         m_pResultNode->SetName("result");
+         m_pResultNode->SetColor(1.0, 0.0, 0.0);
+         m_pResultNode->SetData(image);
+         GetDataStorage()->Add(m_pResultNode, m_ui.DataSelector->GetSelectedNode());
+     }
+     else
+     {
+         mitk::Image::Pointer image;
+         mitk::CastToMitkImage(m_ThresholdFilter->GetOutput(), image);
+         m_pResultNode->SetData(image);
+     }
+
+     ImportITKImage(m_pFastMarchingResult.GetPointer(), "fm", m_ui.DataSelector->GetSelectedNode());
+}
+
+void FastMarchingView::ThresholdChanged(double min, double max)
+{
+    if (m_pResultNode)
+    {
+        typedef itk::BinaryThresholdImageFilter<Float3DImageType, UChar3DImageType> ThresholdingFilterType;
+        auto m_ThresholdFilter = ThresholdingFilterType::New();
+        m_ThresholdFilter->SetLowerThreshold(min);
+        m_ThresholdFilter->SetUpperThreshold(max);
+        m_ThresholdFilter->SetOutsideValue(0);
+        m_ThresholdFilter->SetInsideValue(1.0);
+        m_ThresholdFilter->SetInput(m_pFastMarchingResult);
+        m_ThresholdFilter->Update();
+
+        mitk::Image::Pointer image;
+        mitk::CastToMitkImage(m_ThresholdFilter->GetOutput(), image);
+        m_pResultNode->SetData(image);
+        m_pResultNode->Modified();
+        RequestRenderWindowUpdate();
+    }
 }

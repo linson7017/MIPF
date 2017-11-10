@@ -24,6 +24,8 @@ void CSFLSRobustStatSegmentor3DLabelMap<TPixel>::basicInit()
     m_inputImageIntensityMin = 0;
     m_inputImageIntensityMax = 0;
 
+    m_bStopSegmentation = false;
+
     return;
 }
 
@@ -267,6 +269,7 @@ void CSFLSRobustStatSegmentor3DLabelMap<TPixel>::computeFeatureAt(TIndex idx, st
 template <typename TPixel>
 void CSFLSRobustStatSegmentor3DLabelMap<TPixel>::doSegmenation()
 {
+    m_bStopSegmentation = false;
     double startingTime = clock();
 
     getThingsReady();
@@ -275,6 +278,10 @@ void CSFLSRobustStatSegmentor3DLabelMap<TPixel>::doSegmenation()
 
     for( unsigned int it = 0; it < this->m_numIter; ++it )
     {
+        if (m_bStopSegmentation)
+        {
+            break;
+        }
         std::cout << "In iteration " << it << std::endl << std::flush;
 
         // keep current zero contour as history is required
@@ -290,6 +297,8 @@ void CSFLSRobustStatSegmentor3DLabelMap<TPixel>::doSegmenation()
         this->normalizeForce();
 
         this->oneStepLevelSetEvolution();
+
+        emit SignalInteractionEnd(mp_phi,it);
 
         /*----------------------------------------------------------------------
         If the level set stops growing, stop */
@@ -319,6 +328,7 @@ void CSFLSRobustStatSegmentor3DLabelMap<TPixel>::doSegmenation()
         }
 
     }
+    emit SignalSegmentationFinished();
     return;
 }
 

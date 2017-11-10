@@ -27,6 +27,7 @@ public:
     void AddITKImageNode(TImage* itkImage,const char* name);
 protected slots:
     void BrowseFile();
+    void BrowseOutDir();
     void Apply();
 private:
     Ui::PCAShapeModelEstimatorView m_ui;

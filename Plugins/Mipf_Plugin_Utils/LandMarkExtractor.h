@@ -23,7 +23,7 @@ struct LandMarkPoint
     typedef std::vector<int> GroupMemberType;
     GroupMemberType GroupMember;       //组的其他点
 
-    double CentricGrade = 0.0;       //点为组中心的评价值，有方差的倒数定义
+    double CentricGrade = 0.0;       //点为组中心的评价值，由方差的倒数定义
 
     void InsertDistanceMap(int id, double distance);    
     void SortDistanceMap();

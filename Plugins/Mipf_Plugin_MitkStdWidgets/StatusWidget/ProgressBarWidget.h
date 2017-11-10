@@ -41,6 +41,7 @@ private:
     //##Documentation
     //## @brief Reset the progress bar. The progress bar "rewinds" and shows no progress.
     void Reset() override;
+    void showInCenterOfParent();
 
    int m_TotalSteps;
 

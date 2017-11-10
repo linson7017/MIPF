@@ -3,6 +3,8 @@
 #include "PCAShapeModelEstimatorView.h"
 #include "GenerateTrainingSetView.h"
 #include "LevelSetASMSegmentationView.h"
+#include "ShapeDrawerView.h"
+#include "LevelSetSegmentationView.h"
   
 ASMView::ASMView() :MitkPluginView() 
 {
@@ -24,6 +26,12 @@ void ASMView::CreateView()
 
     LevelSetASMSegmentationView* lsaView = new LevelSetASMSegmentationView(m_pMain, this);
     m_ui.stackedWidget->insertWidget(2, lsaView);
+
+    ShapeDrawerView* sdView = new ShapeDrawerView(m_pMain, this);
+    m_ui.stackedWidget->insertWidget(3, sdView);
+
+    LevelSetSegmentationView* levelsetView = new LevelSetSegmentationView(m_pMain, this);
+    m_ui.stackedWidget->insertWidget(4, levelsetView);
 
     m_ui.stackedWidget->setCurrentIndex(0);
 

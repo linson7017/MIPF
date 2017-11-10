@@ -46,3 +46,5 @@ add_subdirectory(Mipf_Plugin_ManualSegmentationTest)
 add_subdirectory(Mipf_Plugin_VolumeCut)
  
 add_subdirectory(Mipf_Plugin_ASM)
+ 
+add_subdirectory(Mipf_Plugin_Mevislab)

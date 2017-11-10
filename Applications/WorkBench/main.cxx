@@ -13,9 +13,9 @@
 #include "iqf_main.h"
 #include "iqf_component.h"
 #include "Utils/QObjectFactory.h"
-#include <QPushButton>
 
-#include <QLibrary>
+
+#include <QSettings>
 
 
 #ifdef Q_WS_X11
@@ -50,7 +50,13 @@ int main(int argc, char *argv[])
     qt_context::addLibraryPath(wk.append("/plugins/linux").toLocal8Bit().constData());
 #endif   
 
-    MainWindow mainWidget("main.xml");
+    std::string path = appenv.getConfigResDir();
+    QSettings set(QString(static_cast<QF::IQF_Main*>(appenv.getMainPtr())->GetConfigPath()).append("/config.ini"), QSettings::IniFormat);
+    set.beginGroup("config");
+    std::string value = set.value("start-xml-file", "main.xml").toString().toStdString();
+    set.endGroup();
+
+    MainWindow mainWidget(value.c_str());
     mainWidget.setShowMode(Activity::MAXIMIZED);
     mainWidget.active();
 

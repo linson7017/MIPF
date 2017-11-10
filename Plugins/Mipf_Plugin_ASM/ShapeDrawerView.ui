@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>MaskImageView</class>
- <widget class="QWidget" name="MaskImageView">
+ <class>ShapeDrawerView</class>
+ <widget class="QWidget" name="ShapeDrawerView">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>310</height>
+    <height>438</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,7 +19,7 @@
      <x>10</x>
      <y>10</y>
      <width>381</width>
-     <height>111</height>
+     <height>281</height>
     </rect>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout">
@@ -28,12 +28,12 @@
       <item>
        <widget class="QLabel" name="label">
         <property name="text">
-         <string>Image</string>
+         <string>Mean Image</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QmitkDataStorageComboBox" name="ImageSelector"/>
+       <widget class="QmitkDataStorageComboBox" name="MeanImageSelector"/>
       </item>
      </layout>
     </item>
@@ -42,12 +42,26 @@
       <item>
        <widget class="QLabel" name="label_2">
         <property name="text">
-         <string>Mask</string>
+         <string>PCA Image</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QmitkDataStorageComboBox" name="MaskSelector"/>
+       <widget class="QmitkDataStorageComboBox" name="PCAImageSelector"/>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_4">
+      <item>
+       <widget class="QLabel" name="label_4">
+        <property name="text">
+         <string>Eigen Value</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="EigenValueLE"/>
       </item>
      </layout>
     </item>
@@ -56,33 +70,33 @@
       <item>
        <widget class="QLabel" name="label_3">
         <property name="text">
-         <string>BackgroundValue</string>
+         <string>Threshold</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="BackgroundValueLE">
-        <property name="text">
-         <string>0.0</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QCheckBox" name="UseMinimumValueCB">
-        <property name="text">
-         <string>Minimum value</string>
-        </property>
-       </widget>
+       <widget class="ctkRangeWidget" name="ThresholdSlider" native="true"/>
       </item>
      </layout>
     </item>
     <item>
-     <widget class="QPushButton" name="MaskBtn">
+     <layout class="QHBoxLayout" name="horizontalLayout_6">
+      <item>
+       <widget class="QLabel" name="label_5">
+        <property name="text">
+         <string>Standard Deviation</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="ctkSliderWidget" name="StandardDeviationSlider" native="true"/>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <widget class="QPushButton" name="ApplyBtn">
       <property name="text">
-       <string>Mask</string>
+       <string>Apply</string>
       </property>
      </widget>
     </item>
@@ -90,6 +104,18 @@
   </widget>
  </widget>
  <customwidgets>
+  <customwidget>
+   <class>ctkRangeWidget</class>
+   <extends>QWidget</extends>
+   <header>ctkRangeWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>ctkSliderWidget</class>
+   <extends>QWidget</extends>
+   <header>ctkSliderWidget.h</header>
+   <container>1</container>
+  </customwidget>
   <customwidget>
    <class>QmitkDataStorageComboBox</class>
    <extends>QComboBox</extends>

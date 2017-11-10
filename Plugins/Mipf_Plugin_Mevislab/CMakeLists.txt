@@ -12,7 +12,7 @@ if (POLICY CMP0053)
 cmake_policy(SET CMP0053 NEW) # CMake 3.1
 endif()
 
-project(Mipf_Plugin_SFLSSegmentation)
+project(Mipf_Plugin_Mevislab)
 file(GLOB Headers "./*.h")
 file(GLOB UI_Srcs "./*.ui")
 AUX_SOURCE_DIRECTORY(. DIR_SRCS)
@@ -20,9 +20,10 @@ AUX_SOURCE_DIRECTORY(. DIR_SRCS)
 set(CMAKE_AUTOMOC ON)
 
 qt5_wrap_ui(ui_Files ${UI_Srcs})
-add_library(Mipf_Plugin_SFLSSegmentation SHARED ${DIR_SRCS} ${Headers} ${UI_Srcs} ${MOC_Hdrs})
-qt5_use_modules(Mipf_Plugin_SFLSSegmentation Core Gui Widgets)
-target_link_libraries(Mipf_Plugin_SFLSSegmentation 
-${VTK_LIBRARIES} ${ITK_LIBRARIES} 
-${QTFRAMEWORK_LIBRARIES} ${QFMAIN_LIBRARIES} 
-MitkQtWidgets MitkQtWidgetsExt MitkSegmentation MitkSegmentationUI)
+add_library(Mipf_Plugin_Mevislab SHARED ${DIR_SRCS} ${Headers} ${UI_Srcs} ${MOC_Hdrs})
+qt5_use_modules(Mipf_Plugin_Mevislab Core Gui Widgets)
+target_link_libraries(Mipf_Plugin_Mevislab    
+${VTK_LIBRARIES} ${ITK_LIBRARIES}   
+${QTFRAMEWORK_LIBRARIES} ${QFMAIN_LIBRARIES}   
+MitkQtWidgets MitkQtWidgetsExt)
+

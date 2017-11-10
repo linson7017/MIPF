@@ -464,7 +464,7 @@ namespace ITKHelpers
     }
 
     template <class TInput, class TOutput>
-    void ExtractCentroidImageWithGivenSize(TInput* input, TOutput* output, int* outputSize)
+    void ExtractCentroidImageWithGivenSize(TInput* input, TOutput* output, int* outputSize,double* outputSpacing)
     {
         // Create a ShapeLabelMap from the image
         typedef itk::BinaryImageToShapeLabelMapFilter<TInput> BinaryImageToShapeLabelMapFilterType;
@@ -497,10 +497,10 @@ namespace ITKHelpers
         size[1] = outputSize[1];
         size[2] = outputSize[2];
 
-        TOutput::SpacingType outputSpacing;
-        outputSpacing[0] = 4;
-        outputSpacing[1] = 4;
-        outputSpacing[2] = 4;
+        TOutput::SpacingType spacing;
+        spacing[0] = outputSpacing[0];
+        spacing[1] = outputSpacing[1];
+        spacing[2] = outputSpacing[2];
 
         TOutput::PointType origin;
         origin[0] = 0;
@@ -512,9 +512,9 @@ namespace ITKHelpers
         TranslationTransformType::Pointer transform =
             TranslationTransformType::New();
         TranslationTransformType::OutputVectorType translation;
-        translation[0] = centroid[0] - outputSpacing[0] * size[0] / 2;
-        translation[1] = centroid[1] - outputSpacing[1] * size[1] / 2;
-        translation[2] = centroid[2] - outputSpacing[2] * size[2] / 2;
+        translation[0] = centroid[0] - spacing[0] * size[0] / 2;
+        translation[1] = centroid[1] - spacing[1] * size[1] / 2;
+        translation[2] = centroid[2] - spacing[2] * size[2] / 2;
         transform->Translate(translation);
 
         typedef itk::ResampleImageFilter<TInput, TOutput> ResampleImageFilterType;
@@ -527,7 +527,7 @@ namespace ITKHelpers
         
         resampleFilter->SetInput(input);
         resampleFilter->SetSize(size);
-        resampleFilter->SetOutputSpacing(outputSpacing);
+        resampleFilter->SetOutputSpacing(spacing);
         resampleFilter->SetOutputOrigin(origin);
         resampleFilter->SetTransform(transform);
         resampleFilter->SetDefaultPixelValue(0);
@@ -536,8 +536,6 @@ namespace ITKHelpers
         resampleFilter->Update();
 
         output->Graft(resampleFilter->GetOutput());
-
-        SaveImage(output, "D:/temp/extractImage.mha") ;
 
     }
 }

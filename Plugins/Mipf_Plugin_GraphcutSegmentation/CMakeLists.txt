@@ -14,6 +14,7 @@ endif()
 
 project(Mipf_Plugin_GraphcutSegmentation)
 file(GLOB Headers "./*.h" "*.hpp")
+file(GLOB UI_Srcs "./*.ui")
 AUX_SOURCE_DIRECTORY(. DIR_SRCS)
 AUX_SOURCE_DIRECTORY(./maxflow GRAPH_CUT_SRCS)
 SET(SRCS ${DIR_SRCS} ${GRAPH_CUT_SRCS} ${Headers})
@@ -23,7 +24,7 @@ include_directories(${ITKVTK_HELPERS_INCLUDE_DIR})
 set(CMAKE_AUTOMOC ON)
 
 if (VTK_QT_VERSION VERSION_GREATER "4")
-
+    qt5_wrap_ui(ui_Files ${UI_Srcs})
     add_library(Mipf_Plugin_GraphcutSegmentation SHARED ${SRCS} ${Headers}  ${UI_Srcs} ${MOC_Hdrs})
     qt5_use_modules(Mipf_Plugin_GraphcutSegmentation Core Gui Widgets Concurrent)
     target_link_libraries(Mipf_Plugin_GraphcutSegmentation ${VTK_LIBRARIES} ${ITK_LIBRARIES} ${QTFRAMEWORK_LIBRARIES} ${QFMAIN_LIBRARIES} ${ITKVTK_HELPERS_LIBRARIES}

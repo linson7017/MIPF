@@ -5,10 +5,28 @@
 
 #include <list>
 #include <vector>
+#include <QObject>
 
+
+class DSFSSegmentorNotifer :public QObject
+{
+    Q_OBJECT
+public:
+    DSFSSegmentorNotifer(){}
+    ~DSFSSegmentorNotifer() {}
+    virtual void DoSegmentationExt() = 0;
+    virtual void StopSegmentationExt() = 0;
+public :
+    void SlotDoSegmentation() { DoSegmentationExt(); }
+    void SlotStopSegmentation() { StopSegmentationExt(); }
+
+signals:
+    void SignalInteractionEnd(const itk::Image<float,3>::Pointer& image,unsigned int currentInteraction);
+    void SignalSegmentationFinished();
+};
 
 template <typename TPixel>
-class CSFLSRobustStatSegmentor3DLabelMap : public CSFLSSegmentor3D<TPixel>
+class CSFLSRobustStatSegmentor3DLabelMap :public DSFSSegmentorNotifer, public CSFLSSegmentor3D<TPixel>
 {
 public:
     typedef CSFLSSegmentor3D<TPixel> SuperClassType;
@@ -23,6 +41,16 @@ public:
         basicInit();
     }
 
+    virtual void DoSegmentationExt() override
+    { 
+        std::cout << "Start Segmentation !" << std::endl;
+        doSegmenation(); 
+    }
+    virtual void StopSegmentationExt() override
+    {
+        std::cout << "Stop Segmentation !" << std::endl;
+        m_bStopSegmentation = true;
+    }
 
     void basicInit();
 
@@ -47,7 +75,6 @@ public:
     void setKernelWidthFactor(double f);
 
     void setIntensityHomogeneity(double h);
-
 protected:
 
     TLabelImagePointer              m_inputLabelImage;
@@ -99,6 +126,7 @@ protected:
 
     double kernelEvaluationUsingPDF(const std::vector<double>& newFeature);
 
+    bool m_bStopSegmentation;
 };
 
 #include "SFLSRobustStatSegmentor3DLabelMap_single.cpp"

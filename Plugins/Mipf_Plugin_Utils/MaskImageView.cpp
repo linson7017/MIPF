@@ -40,9 +40,12 @@ MaskImageView::~MaskImageView()
 void MaskImageView::CreateView()
 {
     m_ui.setupUi(this);
-    m_ui.ImageSelector->SetPredicate(CreatePredicate(Image));
+    m_ui.ImageSelector->SetPredicate(mitk::TNodePredicateDataType<mitk::Image>::New());
     m_ui.ImageSelector->SetDataStorage(GetDataStorage());
-    m_ui.MaskSelector->SetPredicate(CreatePredicate(Image));
+    m_ui.MaskSelector->SetPredicate(mitk::NodePredicateAnd::New(
+        mitk::TNodePredicateDataType < mitk::Image>::New(),
+        mitk::NodePredicateProperty::New("binary",mitk::BoolProperty::New(true))
+    ));
     m_ui.MaskSelector->SetDataStorage(GetDataStorage());
     connect(m_ui.MaskBtn, SIGNAL(clicked()), this, SLOT(Mask()));
 }
@@ -50,154 +53,57 @@ void MaskImageView::CreateView()
 
 void MaskImageView::Mask()
 {
-    
-
-
-   // mitk::DataNode* node = m_ui.ImageSelector->GetSelectedNode();
-   // mitk::DataNode::Pointer planeNode = m_pMitkRenderWindow->GetMitkStdMultiWidget()->GetRenderWindow1()->GetRenderer()->GetCurrentWorldPlaneGeometryNode();
-   // mitk::ImageVtkMapper2D *imageMapper =
-   //     dynamic_cast<mitk::ImageVtkMapper2D *>(node->GetMapper(1));
-   // if (!imageMapper && node->GetMapper(1))
-   // { //... check if it is the composite mapper
-   //     std::string cname(node->GetMapper(1)->GetNameOfClass());
-   //     if (!cname.compare("CompositeMapper")) // string.compare returns 0 if the two strings are equal.
-   //     {
-   //         // get the standard image mapper.
-   //         // This is a special case in MITK and does only work for the CompositeMapper.
-   //         imageMapper = dynamic_cast<mitk::ImageVtkMapper2D *>(node->GetMapper(3));
-   //     }
-   // }
-   // if (imageMapper)
-   // {
-   //    // imageMapper->GetLocalStorage()->m_Texture;
-   // }
-   //// return;
-
-   //  
     QString imageName = QInputDialog::getText(NULL, "Input Result Name", "Image Name:");
 
     mitk::Image* mitkImage = dynamic_cast<mitk::Image*>(m_ui.ImageSelector->GetSelectedNode()->GetData());
-
-   // const mitk::DataNode* planeGeometryNode = m_pMitkRenderWindow->GetMitkStdMultiWidget()->GetRenderWindow1()->GetRenderer()->GetCurrentWorldGeometry2DNode();
-   // const mitk::PlaneGeometry* planeGeometry = m_pMitkRenderWindow->GetMitkStdMultiWidget()->GetRenderWindow1()->GetRenderer()->GetCurrentWorldPlaneGeometry();
-   // mitk::PlaneGeometryData* planeGeometryNodeData = dynamic_cast<mitk::PlaneGeometryData*>(planeGeometryNode->GetData());
-
-   // MITK_INFO << "Extent: " << planeGeometryNodeData->GetPlaneGeometry()->GetExtent(0)<<","
-   //     << planeGeometryNodeData->GetPlaneGeometry()->GetExtent(1) << ","
-   //     << planeGeometryNodeData->GetPlaneGeometry()->GetExtent(2);
-
-   // //mitk::ExtractSliceFilter::Pointer  reslicer = mitk::ExtractSliceFilter::New();
-   // //reslicer->SetInput(mitkImage);
-   // //reslicer->SetWorldGeometry(planeGeometry);
-   // //reslicer->SetResliceTransformByGeometry(
-   // //    mitkImage->GetGeometry());
-   // //reslicer->SetInterpolationMode(mitk::ExtractSliceFilter::RESLICE_NEAREST);
-   // //reslicer->SetVtkOutputRequest(true);
-
-   // //reslicer->SetOutputDimensionality(2);
-   // //reslicer->SetOutputSpacingZDirection(1.0);
-   // //reslicer->SetOutputExtentZDirection(0, 0);
-
-   // //reslicer->Modified();
-   // //// start the pipeline with updating the largest possible, needed if the geometry of the input has changed
-   // //reslicer->UpdateLargestPossibleRegion();
-   // // vtkImageData* vim = reslicer->GetVtkOutput();
-
-   // vtkSmartPointer<vtkImageReslice> reslicer = vtkSmartPointer<vtkImageReslice>::New();
-   // reslicer->SetInputData(mitkImage->GetVtkImageData());
-   // reslicer->SetOutputExtent(0, planeGeometryNodeData->GetGeometry()->GetExtent(0),
-   //     0, planeGeometryNodeData->GetGeometry()->GetExtent(1),
-   //     0, planeGeometryNodeData->GetGeometry()->GetExtent(2));
-   // reslicer->SetResliceAxes(planeGeometryNodeData->GetGeometry()->GetVtkMatrix());
-   // reslicer->Update();
-   //
-   // vtkImageData* vim = reslicer->GetOutput();
-
-
-   // mitk::Image::Pointer mIm = mitk::Image::New();
-   // mIm->Initialize(vim);
-   // vtkMatrix4x4* tm = planeGeometryNodeData->GetGeometry()->GetVtkMatrix();
-   // vtkMatrix4x4* rm = vtkMatrix4x4::New();
-   // vtkMatrix4x4::Multiply4x4(tm, mIm->GetGeometry()->GetVtkMatrix(), rm);
-   // mIm->GetGeometry()->SetIndexToWorldTransformByVtkMatrix(rm);
-
-   // mIm->GetGeometry()->SetOrigin(planeGeometryNodeData->GetGeometry()->GetOrigin());
-
-   // mIm->SetVolume(vim->GetScalarPointer());
-   // mitk::DataNode::Pointer mNode = mitk::DataNode::New();
-   // mNode->SetData(mIm);
-   // 
-   // mNode->SetName(imageName.toStdString());
-   // GetDataStorage()->Add(mNode);
-
-   // return;
-
-
-
-    Float3DImageType::Pointer itkImage;
-    mitk::CastToItkImage<Float3DImageType>(mitkImage, itkImage);
-
     mitk::Image* mitkMask = dynamic_cast<mitk::Image*>(m_ui.MaskSelector->GetSelectedNode()->GetData());
-    UChar3DImageType::Pointer itkMask;
-    mitk::CastToItkImage<UChar3DImageType>(mitkMask, itkMask);
 
-   // //check if the size is different
-   // bool useSmallestRegion = true;
-   // itk::ImageRegion<3> imageRegion = itkImage->GetLargestPossibleRegion();
-   // itk::ImageRegion<3> maskRegion = itkMask->GetLargestPossibleRegion();
-   // if (imageRegion!=maskRegion)
-   // {
-   //     if (useSmallestRegion)
-   //     {
-   //         itk::ImageRegion<3> croppedRegion;
-   //         if (imageRegion.Crop(maskRegion))
-   //         {
-   //             croppedRegion = imageRegion;
-   //         }
-   //         else if(maskRegion.Crop(imageRegion))
-   //         {
-   //             croppedRegion = maskRegion;
-   //         }
-   //         else
-   //         {
-   //             return;
-   //         }
-   //         typedef itk::ExtractImageFilter< Float3DImageType, Float3DImageType > ImageFilterType;
-   //         ImageFilterType::Pointer imagefilter = ImageFilterType::New();
-   //         imagefilter->SetExtractionRegion(croppedRegion);
-   //         imagefilter->SetInput(itkImage);
-   //         imagefilter->SetDirectionCollapseToIdentity(); // This is required.
-   //         imagefilter->Update();
-   //         itkImage->Graft(imagefilter->GetOutput());
+    vtkImageData* image = mitkImage->GetVtkImageData();
+    vtkImageData* mask = mitkMask->GetVtkImageData();
 
-   //         typedef itk::ExtractImageFilter< UChar3DImageType, UChar3DImageType > MaskeFilterType;
-   //         MaskeFilterType::Pointer maskfilter = MaskeFilterType::New();
-   //         maskfilter->SetExtractionRegion(croppedRegion);
-   //         maskfilter->SetInput(itkMask);
-   //         maskfilter->SetDirectionCollapseToIdentity(); // This is required.
-   //         maskfilter->Update();
-   //         itkMask->Graft(maskfilter->GetOutput());
-   //     }
-   //     else
-   //     {
-   //         std::cerr << "Image and mask have different size! " << std::endl;
-   //         return;
-   //     }
-   // }
+    int outputExtent[6];
+    GetMinExtent(image->GetExtent(), mask->GetExtent(),outputExtent);
 
-
-    typedef itk::MaskImageFilter< Float3DImageType, UChar3DImageType > MaskFilterType;
-    MaskFilterType::Pointer maskFilter = MaskFilterType::New();
-    maskFilter->SetInput(itkImage);
-    maskFilter->SetMaskImage(itkMask);
-    maskFilter->Update();
+    auto outputImage = vtkSmartPointer<vtkImageData>::New();
+    outputImage->DeepCopy(image);
+    float backgroundValue = m_ui.BackgroundValueLE->text().toFloat();
+    if (m_ui.UseMinimumValueCB->isChecked())
+    {
+        backgroundValue = image->GetScalarTypeMin();
+    }
+    
+    for (int i = outputExtent[0]; i <= outputExtent[1]; i++)
+    {
+        for (int j = outputExtent[2]; j <= outputExtent[3]; j++)
+        {
+            for (int k = outputExtent[4]; k <= outputExtent[5]; k++)
+            {
+                if (static_cast<unsigned short>(mask->GetScalarComponentAsFloat(i, j, k, 0))==0)
+                {
+                    outputImage->SetScalarComponentFromDouble(i, j, k, 0, backgroundValue);
+                }             
+            }
+        }
+    }
 
     mitk::DataNode::Pointer maskedImageNode = mitk::DataNode::New();
     mitk::Image::Pointer maskedMitkImage = mitk::Image::New();
-    mitk::CastToMitkImage(maskFilter->GetOutput(), maskedMitkImage);
+    maskedMitkImage->Initialize(mitkImage);
+    maskedMitkImage->SetImportVolume(outputImage->GetScalarPointer());
     maskedImageNode->SetData(maskedMitkImage);
     maskedImageNode->SetColor(1, 1, 1);
     maskedImageNode->SetName(imageName.toStdString());
 
     m_pMitkDataManager->GetDataStorage()->Add(maskedImageNode);
+}
+
+
+void MaskImageView::GetMinExtent(int* e1, int* e2, int* out)
+{
+    out[0] = e1[0] > e2[0] ? e1[0] : e2[0];
+    out[1] = e1[1] < e2[1] ? e1[1] : e2[1];
+    out[2] = e1[2] > e2[2] ? e1[2] : e2[2];
+    out[3] = e1[3] < e2[3] ? e1[3] : e2[3];
+    out[4] = e1[4] > e2[4] ? e1[4] : e2[4];
+    out[5] = e1[5] < e2[5] ? e1[5] : e2[5];
 }

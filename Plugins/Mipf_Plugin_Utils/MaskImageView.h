@@ -19,6 +19,7 @@ public:
 protected slots:
     void Mask();
 private:
+    void GetMinExtent(int* e1, int* e2, int* out);
     Ui::MaskImageView m_ui;
 };
 

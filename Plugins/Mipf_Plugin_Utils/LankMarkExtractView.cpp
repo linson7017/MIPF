@@ -80,19 +80,19 @@ void LankMarkExtractView::Extract()
     std::vector<std::vector<double>>  vecModelDistance;
 
     std::vector<double> vecModelOne;
+    vecModelOne.push_back(7);
     vecModelOne.push_back(9);
-    vecModelOne.push_back(13);
-    vecModelOne.push_back(33);
+    vecModelOne.push_back(11);
     vecModelDistance.push_back(vecModelOne);
     std::vector<double> vecModelTwo;
-    vecModelTwo.push_back(17);
-    vecModelTwo.push_back(21);
-    vecModelTwo.push_back(37);
+    vecModelTwo.push_back(10);
+    vecModelTwo.push_back(12);
+    vecModelTwo.push_back(14);
     vecModelDistance.push_back(vecModelTwo);
     std::vector<double> vecModelThree;
-    vecModelThree.push_back(25);
-    vecModelThree.push_back(29);
-    vecModelThree.push_back(41);
+    vecModelThree.push_back(7);
+    vecModelThree.push_back(12);
+    vecModelThree.push_back(11);
     vecModelDistance.push_back(vecModelThree);
 
     mitk::Image* mitkImage = dynamic_cast<mitk::Image*>(m_ui.ImageSelector->GetSelectedNode()->GetData());

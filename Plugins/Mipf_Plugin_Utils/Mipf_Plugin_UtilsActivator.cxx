@@ -11,6 +11,7 @@
 #include "TransformNodeView.h"
 #include "GeometryInformationView.h"
 #include "SurfaceToImageView.h"
+#include "ImageInteractionView.h"
 
 #include "Res/R.h"
 #include "Utils/QObjectFactory.h"
@@ -55,5 +56,6 @@ void Mipf_Plugin_Utils_Activator::Register(R* pR)
 
     REGISTER_PLUGIN("GeometryInformationWidget", GeometryInformationView);
     REGISTER_PLUGIN("SurfaceToImageWidget", SurfaceToImageView);
+    REGISTER_PLUGIN("ImageInteractionWidget", ImageInteractionView);
 
 }
