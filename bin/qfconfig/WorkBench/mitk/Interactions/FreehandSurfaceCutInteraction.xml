@@ -4,14 +4,11 @@
             <action name="initMove"/>
         </transition>
 		<transition event_class="MousePressEvent" event_variant="StartModify" target="MovementInitalized">
-            <action name="initMove"/>
+            <action name="initModify"/>
         </transition>
-		<transition event_class="InteractionKeyEvent" event_variant="UndoKey" target="start">
-            <action name="undo"/>
-        </transition>
-		<transition event_class="InteractionKeyEvent" event_variant="RedoKey" target="start">
-            <action name="redo"/>
-        </transition>
+<!-- 		<transition event_class="MouseMoveEvent" event_variant="MoveBeforeModify" target="start">
+            <action name="moveBeforeModify"/>
+        </transition> -->
     </state>
     <state name="MovementInitalized">
       <transition event_class="MouseMoveEvent" event_variant="Draw" target="MovementInitalized">

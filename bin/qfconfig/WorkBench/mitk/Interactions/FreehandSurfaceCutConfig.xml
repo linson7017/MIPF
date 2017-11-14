@@ -28,17 +28,14 @@
     <attribute name="ButtonState" value="LeftMouseButton"/>
 	<attribute name="Modifiers" value="ctrl"/>
   </event_variant>
+<!--   <event_variant class="MouseMoveEvent" name="MoveBeforeModify">
+	<attribute name="Modifiers" value="ctrl"/>
+  </event_variant> -->
+<!--   <event_variant class="InteractionKeyEvent" name="EnterModify">
+      <attribute name="Modifiers" value="ctrl"/>
+  </event_variant> -->
   
   <event_variant class="MouseMoveEvent" name="FinishedMovement">
     <attribute name="ButtonState" value="LeftMouseButton"/>
-  </event_variant>
-  
-  <event_variant class="InteractionKeyEvent" name="UndoKey">
-      <attribute name="Key" value="Z"/>
-      <attribute name="Modifiers" value="ctrl"/>
-  </event_variant>
-  <event_variant class="InteractionKeyEvent" name="RedoKey" >
-      <attribute name="Key" value="X"/>
-      <attribute name="Modifiers" value="ctrl"/>
   </event_variant>
 </config>

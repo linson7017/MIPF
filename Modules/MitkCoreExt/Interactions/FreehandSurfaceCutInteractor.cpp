@@ -19,16 +19,14 @@
 #include <vtkRenderer.h>
 #include <vtkCamera.h>
 
-#include <vtkFillHolesFilter.h>
-#include <vtkPolyDataNormals.h>
-#include <vtkPointData.h>
-#include <vtkFeatureEdges.h>
-#include <vtkStripper.h>
-
 #include "Rendering/FreehandSurfaceCutMapper3D.h"
 
-FreehandSurfaceCutInteractor::FreehandSurfaceCutInteractor():m_bDrawing(false), m_bInitFlag(false), m_pSurfaceData(nullptr), m_pCurveNode(nullptr) , m_pDataStorage(nullptr)
-, m_currentSurfaceIndex(0), m_bInsideOut(false), m_pRenderer(nullptr)
+#include <limits>
+#include <iostream>
+#include <cmath>
+
+FreehandSurfaceCutInteractor::FreehandSurfaceCutInteractor() :m_bDrawing(false), m_bInitFlag(false), m_pSurfaceData(nullptr), m_pCurveNode(nullptr), m_pDataStorage(nullptr)
+, m_currentSurfaceIndex(0), m_bInsideOut(false), m_bModify(false)
 {
 }
 
@@ -90,6 +88,7 @@ void FreehandSurfaceCutInteractor::Init()
         m_pDataStorage->Add(m_pCurveNode);
 
         m_pCurvePoints = vtkSmartPointer<vtkPoints>::New();
+		m_pCurvePointsBeforeModify = vtkSmartPointer<vtkPoints>::New();
 
         m_vSurface.clear();
 
@@ -109,7 +108,8 @@ void FreehandSurfaceCutInteractor::ConnectActionsAndFunctions()
     CONNECT_FUNCTION("finished", Finished);
     CONNECT_FUNCTION("undo", Undo);
     CONNECT_FUNCTION("redo", Redo);
-
+	CONNECT_FUNCTION("initModify", InitModify);
+    
 }
 
 void FreehandSurfaceCutInteractor::InitMove(mitk::StateMachineAction *, mitk::InteractionEvent *interactionEvent)
@@ -118,9 +118,59 @@ void FreehandSurfaceCutInteractor::InitMove(mitk::StateMachineAction *, mitk::In
     if (positionEvent == NULL)
         return;
     m_LastPoint = positionEvent->GetPositionInWorld();
-    m_bDrawing = true;
-    m_pCurvePoints->Reset();
-    m_pCurveData->Reset();
+    
+	m_bDrawing = true;
+	m_pCurvePoints->Reset();
+	m_pCurveData->Reset();    
+}
+
+void FreehandSurfaceCutInteractor::InitModify(mitk::StateMachineAction *, mitk::InteractionEvent *interactionEvent)
+{
+  MITK_INFO << "Begin Modify";
+  mitk::InteractionPositionEvent *positionEvent = dynamic_cast<mitk::InteractionPositionEvent *>(interactionEvent);
+  if (positionEvent == NULL)
+	return;
+  m_LastPoint = positionEvent->GetPositionInWorld();
+
+  ProjectPointOnPlane(m_LastPoint, positionEvent->GetSender()->GetVtkRenderer()->GetActiveCamera(), m_LastPoint);
+  double minDistance = DistanceBetweenPointAndPoints(m_LastPoint, m_pCurvePoints.GetPointer());
+  if (minDistance <= 5)
+  {
+	m_bModify = true;
+	Undo();	
+  }
+  else
+  {
+	m_bModify = false;
+  }
+}
+
+void FreehandSurfaceCutInteractor::Modify(mitk::StateMachineAction *, mitk::InteractionEvent *interactionEvent)
+{
+  if (m_bModify&&m_bInitFlag)
+  {
+	m_pCurveNode->SetColor(1, 0, 0);
+	mitk::InteractionPositionEvent *positionEvent = dynamic_cast<mitk::InteractionPositionEvent *>(interactionEvent);
+	if (positionEvent != NULL)
+	{
+	  mitk::Point3D newPoint;
+	  newPoint = positionEvent->GetPositionInWorld();
+	  ProjectPointOnPlane(newPoint, positionEvent->GetSender()->GetVtkRenderer()->GetActiveCamera(), newPoint);
+	  mitk::Vector3D dirVector = newPoint - m_LastPoint;
+	  double maxDistance = dirVector.GetVnlVector().two_norm();
+	  dirVector.Normalize();
+	  for (int i = 0; i < m_pCurvePointsBeforeModify.GetPointer()->GetNumberOfPoints(); ++i)
+	  {
+		mitk::Point3D tempPoint = m_pCurvePointsBeforeModify.GetPointer()->GetPoint(i);
+		
+		double DistanceNeedToMove = maxDistance * exp(-m_vDistanceBetweenPointsAndPoint[i]* m_vDistanceBetweenPointsAndPoint[i] / 555);
+		tempPoint = tempPoint + dirVector*DistanceNeedToMove;
+		m_pCurvePoints->SetPoint(i, tempPoint[0], tempPoint[1], tempPoint[2]);
+	  }
+	  RefreshCurve();
+	  mitk::RenderingManager::GetInstance()->RequestUpdate(positionEvent->GetSender()->GetRenderWindow());
+	}
+  }
 }
 
 void FreehandSurfaceCutInteractor::Draw(mitk::StateMachineAction *, mitk::InteractionEvent *interactionEvent)
@@ -159,21 +209,7 @@ void FreehandSurfaceCutInteractor::RefreshCurve()
 
     m_pCurveData->SetPoints(m_pCurvePoints);
     m_pCurveData->SetLines(cells);
-}
 
-void FreehandSurfaceCutInteractor::Modify(mitk::StateMachineAction *, mitk::InteractionEvent *interactionEvent)
-{
-    if (m_bDrawing&&m_bInitFlag)
-    {
-        mitk::InteractionPositionEvent *positionEvent = dynamic_cast<mitk::InteractionPositionEvent *>(interactionEvent);
-        if (positionEvent != NULL)
-        {
-            mitk::Point3D newPoint, resultPoint;
-            newPoint = positionEvent->GetPositionInWorld();
-            mitk::Vector3D dirVector = newPoint - m_LastPoint;
-
-        }
-    }
 }
 
 void FreehandSurfaceCutInteractor::ProjectPointOnPlane(const mitk::Point3D& input, vtkCamera* camera, mitk::Point3D& output)
@@ -186,7 +222,6 @@ void FreehandSurfaceCutInteractor::ProjectPointOnPlane(const mitk::Point3D& inpu
     camera->GetClippingRange(range);
 
     mitk::Vector3D normal(eyeNormal);
-
     mitk::Point3D center(focalCenter);
 
     normal.Normalize();
@@ -214,7 +249,6 @@ void FreehandSurfaceCutInteractor::Finished(mitk::StateMachineAction *, mitk::In
     {
         return;
     }
-
     auto clipFunction = vtkSmartPointer<vtkImplicitSelectionLoop>::New();
     clipFunction->SetLoop(m_pCurvePoints.GetPointer());
 
@@ -231,8 +265,6 @@ void FreehandSurfaceCutInteractor::Finished(mitk::StateMachineAction *, mitk::In
     clipper->SetInsideOut(m_bInsideOut);
 
     clipper->Update();
-
-
     m_pSurfaceData->GetVtkPolyData()->DeepCopy(clipper->GetOutput());
     
     
@@ -241,6 +273,10 @@ void FreehandSurfaceCutInteractor::Finished(mitk::StateMachineAction *, mitk::In
     m_currentSurfaceIndex++;
 
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+	if (m_bModify)
+	{
+	  m_pCurveNode->SetColor(0, 1, 0);
+	}
 
 }
 
@@ -310,8 +346,39 @@ void FreehandSurfaceCutInteractor::Finished()
     m_currentSurfaceIndex = 0;
     m_pCurveData->Reset();
     m_pCurvePoints->Reset();
-
-    End();
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+	End();
 
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+}
+
+double FreehandSurfaceCutInteractor::DistanceBetweenPointAndPoints(mitk::Point3D &point, vtkPoints *vtkpoints)
+{
+  double minDistance = std::numeric_limits<double>::max();
+  mitk::Point3D m_NearestPoint;
+  for (int i = 0; i < vtkpoints->GetNumberOfPoints(); ++i)
+  {
+	mitk::Point3D vtkpoint = vtkpoints->GetPoint(i);
+	double newDistance = sqrt((point[0] - vtkpoint[0])*(point[0] - vtkpoint[0]) + (point[1] - vtkpoint[1])*(point[1] - vtkpoint[1]) + (point[2] - vtkpoint[2])*(point[2] - vtkpoint[2]));
+	if (newDistance < minDistance)
+	{
+	  minDistance = newDistance;
+	  m_NearestPoint = vtkpoint;
+	}  
+  }
+  //存储修改前各点到最近点的距离
+  m_vDistanceBetweenPointsAndPoint.clear();
+  for (int i = 0; i < vtkpoints->GetNumberOfPoints(); ++i)
+  {
+	mitk::Point3D vtkpoint = vtkpoints->GetPoint(i);
+	double newDistance = sqrt((m_NearestPoint[0] - vtkpoint[0])*(m_NearestPoint[0] - vtkpoint[0]) + (m_NearestPoint[1] - vtkpoint[1])*(m_NearestPoint[1] - vtkpoint[1]) + (m_NearestPoint[2] - vtkpoint[2])*(m_NearestPoint[2] - vtkpoint[2]));
+	m_vDistanceBetweenPointsAndPoint.push_back(newDistance);
+  }
+  //存储修改前曲线上的各个点的坐标
+  m_pCurvePointsBeforeModify->Reset();
+  for (int i = 0; i < vtkpoints->GetNumberOfPoints(); ++i)
+  {
+	m_pCurvePointsBeforeModify->InsertNextPoint(vtkpoints->GetPoint(i));
+  }
+  return minDistance;
 }

@@ -55,12 +55,12 @@ protected:
 
 private:
     virtual void InitMove(mitk::StateMachineAction *, mitk::InteractionEvent *interactionEvent);
+	virtual void InitModify(mitk::StateMachineAction *, mitk::InteractionEvent *interactionEvent);
     virtual void Draw(mitk::StateMachineAction *, mitk::InteractionEvent *interactionEvent);
     virtual void Modify(mitk::StateMachineAction *, mitk::InteractionEvent *interactionEvent);
     virtual void Finished(mitk::StateMachineAction *, mitk::InteractionEvent *interactionEvent);
     virtual void Undo(mitk::StateMachineAction *, mitk::InteractionEvent *interactionEvent);
     virtual void Redo(mitk::StateMachineAction *, mitk::InteractionEvent *interactionEvent);
-
 
     void Init();
 
@@ -68,7 +68,7 @@ private:
 
     void RefreshCurrentSurface();
     void RefreshCurve();
-
+	double DistanceBetweenPointAndPoints(mitk::Point3D&, vtkPoints*);
 
     mitk::Surface* m_pSurfaceData;
     mitk::DataStorage* m_pDataStorage;
@@ -78,18 +78,20 @@ private:
 
     vtkSmartPointer<vtkPolyData> m_pCurveData;
     vtkSmartPointer<vtkPoints> m_pCurvePoints;
-
+	vtkSmartPointer<vtkPoints> m_pCurvePointsBeforeModify;
   
     mitk::Point3D m_LastPoint;
     mitk::Vector3D m_SumVec;
     mitk::Point3D m_originCenter;
 
     std::vector< vtkSmartPointer<vtkPolyData> >  m_vSurface;
+	std::vector<double> m_vDistanceBetweenPointsAndPoint;
     int m_currentSurfaceIndex;
 
     bool m_bDrawing;
     bool m_bInitFlag;
     bool m_bInsideOut;
+	bool m_bModify;
 };
 
 #endif // FreehandSurfaceCutInteractor_h__
