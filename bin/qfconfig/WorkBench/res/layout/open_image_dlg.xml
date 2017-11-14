@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Widget id="LoadDataDlg" activityRoot="true"  contents_margin="0" size="300,150"  pos="800,400"  style="@style/mainstyle">
+	<VLayout>
+		<HLayout>
+			<Label text="Image Type "/>
+			<ComboBox id="open_image_dlg.image_type">
+				<ComboBoxItem text="DICOMS DIRECTORY"/>
+				<ComboBoxItem text="META IMAGE"/>
+			</ComboBox>
+	  </HLayout>
+	  <HLayout>
+		<Button text="OK" msgcommand="main.LoadData"  uicommand="@uicommand/closeLoadDataDlg" itemProperty="open_image_dlg.image_type:currentText"/>
+		<Button text="Cancel" uicommand="@uicommand/closeLoadDataDlg" />
+	  </HLayout>
+	</VLayout>
+</Widget>
+
+

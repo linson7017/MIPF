@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<UICommand>	
+	<Command id="switch_to_select" type="SwitchWidget" widgetID="MainStacked" index="1"/>
+</UICommand>
+
+

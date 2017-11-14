@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Widget id="ITKAlgorithmSet">
+	<VLayout>
+		<HLayout>
+			<Label text="Algorithm"/>
+			<ComboBox id="ITKAlgorithmSet.Algorithm">
+				<ComboBoxItem text="Binary Threshold" uicommand="@uicommand/ITKAlgorithmSet.SwitchToBinaryThreshold"/>
+				<ComboBoxItem text="Others" uicommand="@uicommand/ITKAlgorithmSet.SwitchToOthers"/>
+			</ComboBox>
+		</HLayout>
+		<GroupBox>
+			<VLayout>
+				<StackedWidget id="ITKAlgorithmSet.StackedWidget">
+					<!-- BinaryThreshold -->
+					<Widget index="0">
+						<VLayout>
+							<HLayout>
+								<Label text="Lower Threshold:" stretch="3"/>
+								<HSlider id="ITKAlgorithmSet.BinaryThreshold.Slider" stretch="6"/>
+								<Spinner id="ITKAlgorithmSet.BinaryThreshold.SpinBox"/>
+							</HLayout>				
+							<Button text="Apply" align="AlignBottom" msgcommand="ITKAlgorithmSet.BinaryThreshold"/>
+						</VLayout>
+					</Widget>
+					<!-- Others -->
+					<Widget index="1">
+						<VLayout>
+							<Button text="A2"/>
+						</VLayout>
+					</Widget>
+		</StackedWidget>
+			</VLayout>
+		</GroupBox>			
+	</VLayout>
+</Widget>
+
+
+
+
+
+
+
+
+

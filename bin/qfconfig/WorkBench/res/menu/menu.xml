@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Menu id="menu_test">
+  <Action text="弹出对话框" uicommand="@uicommand/popDialogFromXML_uicommand"/>
+  <MenuSeparator/>
+  <Action text="量程">
+    <Menu>
+      <ActionGroup>
+        <Action text="50" command="10000023"  checked="true"/>
+        <Action text="100" command="10000024"  checkable="true"/>
+        <Action text="150" command="10000025"  checkable="true"/>
+        <Action text="375" command="10000026"  checkable="true"/>
+        <Action text="750"  command="10000027"  checkable="true"/>
+        <Action text="1500" command="10000028"  checkable="true"/>
+      </ActionGroup>
+    </Menu>
+  </Action>
+  <Action text="地图"  command="10000064"  checkable="true"/>
+</Menu>

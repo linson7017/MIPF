@@ -52,3 +52,10 @@ endif()
   # COMMAND copy "$(OutDir)/$(TargetName).exe" "../qf/bin"
   # COMMENT "copy to qf bin"
  # )
+
+InstallQfConfig(${PROJECT_NAME})
+ 
+
+ 
+ 
+ 

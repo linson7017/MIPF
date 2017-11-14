@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Menu id="menu_taridencurve" desc="特征识别图右键菜单">
+	<ActionGroup>
+		<Action text="复位" msgcommand="10000126"/>
+		<Action text="缺省工具" toolcommand="10025" checkable="true" checked="true"/>
+		<Action text="放大工具" toolcommand="10021"   checkable="true"/>
+		<Action text="缩小工具" toolcommand="10022"   checkable="true"/>
+		<Action text="漫游工具" toolcommand="10004"   checkable="true"/>			  
+	</ActionGroup>  
+</Menu>

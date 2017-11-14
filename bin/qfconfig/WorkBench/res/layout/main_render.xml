@@ -1,0 +1,29 @@
+<VLayout  activityRoot="true" id="main.main" style="@style/mainstyle">
+	<Button text="Load Data" width="50" align="left" command="MITK_MAIN_COMMAND_LOADDATA"/>
+	<GridLayout>
+		<RenderWindowWidget mapperID="Standard2D" direction="Axial" cornerText0="window1&#xA;0,0" row="0" col="0"/>
+		<!-- <RenderWindowWidget mapperID="Standard2D" direction="Axial"  cornerText0="window2&#xA;0,1" row="0" col="1"/>
+		<RenderWindowWidget mapperID="Standard2D" direction="Axial"  cornerText0="window3&#xA;0,2" row="0" col="2"/>
+		<RenderWindowWidget mapperID="Standard2D" direction="Axial"  cornerText0="window4&#xA;0,3" row="0" col="3"/>
+
+		<RenderWindowWidget mapperID="Standard2D" direction="Sagittal"  cornerText0="window5&#xA;1,0" row="1" col="0"/>
+		<RenderWindowWidget mapperID="Standard2D" direction="Sagittal"  cornerText0="window6&#xA;1,1" row="1" col="1"/>
+		<RenderWindowWidget mapperID="Standard2D" direction="Sagittal"  cornerText0="window7&#xA;1,2" row="1" col="2"/>
+		<RenderWindowWidget mapperID="Standard2D" direction="Sagittal"  cornerText0="window8&#xA;1,3" row="1" col="3"/>
+		
+		<RenderWindowWidget mapperID="Standard2D" direction="Frontal"  cornerText0="window9&#xA;2,0" row="2" col="0"/>
+		<RenderWindowWidget mapperID="Standard2D" direction="Frontal"  cornerText0="window10&#xA;2,1" row="2" col="1"/>
+		<RenderWindowWidget mapperID="Standard2D" direction="Frontal"  cornerText0="window11&#xA;2,2" row="2" col="2"/>
+		<RenderWindowWidget mapperID="Standard2D" direction="Frontal"  cornerText0="window12&#xA;2,3" row="2" col="3"/>
+		
+		<RenderWindowWidget mapperID="Standard3D"  cornerText0="window13&#xA;3,0" row="3" col="0"/>
+		<RenderWindowWidget mapperID="Standard3D"  cornerText0="window14&#xA;3,1" row="3" col="1"/>
+		<RenderWindowWidget mapperID="Standard3D"  cornerText0="window15&#xA;3,2" row="3" col="2"/> -->	
+		<RenderWindowWidget mapperID="Standard3D"  cornerText0="window16&#xA;3,3" row="3" col="3"/>
+	</GridLayout>
+	<VLayout>
+		<DockWidget windowTitle="1"/>
+		<DockWidget windowTitle="2"/>
+	</VLayout>
+	<StatusBarWidget />
+</VLayout>

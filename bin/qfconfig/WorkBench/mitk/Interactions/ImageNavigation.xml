@@ -1,0 +1,39 @@
+<statemachine>
+    <!-- <state name="start" startstate="true">
+        <transition event_class="MouseMoveEvent" event_variant="CheckSelected" target="selected">
+            <action name="selectImage"/>
+        </transition>
+    </state> -->
+    <state name="start" startstate="true">
+        <transition event_class="MouseMoveEvent" event_variant="CheckSelected" target="start">
+            <condition name="isoverpoint" inverted="true"/>
+            <action name="unselectAll"/>
+        </transition>
+        <transition event_class="MousePressEvent" event_variant="DeletePoint" target="start">
+            <action name="removePoint"/>
+        </transition>
+        <transition event_class="MousePressEvent" event_variant="StartMove" target="MovementInitalized">
+            <action name="initMove"/>
+        </transition>
+		<transition event_class="MousePressEvent" event_variant="StartRotate" target="MovementInitalized">
+            <action name="initMove"/>
+        </transition>
+    </state>
+    <state name="MovementInitalized">
+      <transition event_class="MouseMoveEvent" event_variant="ImageMove" target="MovementInitalized">
+          <action name="moveImage"/>
+      </transition>
+	  <transition event_class="MouseMoveEvent" event_variant="ImageRotate" target="MovementInitalized">
+          <action name="rotateImage"/>
+      </transition>
+      <transition event_class="MouseReleaseEvent" event_variant="EndMove" target="start">
+         <action name="finishMovement"/>
+      </transition>
+	  <transition event_class="MouseReleaseEvent" event_variant="EndRotate" target="start">
+         <action name="finishMovement"/>
+      </transition>
+	  <transition event_class="MouseReleaseEvent" event_variant="EndMovement" target="start">
+         <action name="finishMovement"/>
+      </transition>
+    </state>
+</statemachine>

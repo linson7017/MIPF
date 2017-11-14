@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Widget id="GraphcutSegmentation">
+	<VLayout  stretch="1.5">
+		<HLayout>
+			<Label text="Image"/>
+			<QmitkDataStorageComboBox id="GraphcutSegmentation.ImageSelector"/>
+		</HLayout>
+		<!-- <HLayout>
+			<Label text="Seg Image"/>
+			<WorkImageComboBox  stretch="2"/>
+			<Button text=".." msgcommand="MITK_MESSAGE_GRAPHCUT_CREATE_NEW_SEGMENTATION"/>
+		</HLayout> -->
+		<HLayout>
+			<Button text="Resample" msgcommand="MITK_MESSAGE_GRAPHCUT_RESAMPLE"/>
+			<LineEdit id="GraphcutSegmentation.Resample" text="2"/>
+		</HLayout>
+		<HLayout>
+			<Label  text="Segment Organ:"/>
+			<ComboBox id="GraphcutSegmentation.OrganType">
+				<ComboBoxItem text="Liver"/>
+				<ComboBoxItem text="Kidney"/>
+				<ComboBoxItem text="Gallbladder" />
+				<ComboBoxItem text="Spleen" />
+				<ComboBoxItem text="Pancreas" />
+			</ComboBox>
+			<Stretch size="100"/>
+			<!-- <Label text="Crop Type:"/>
+			<ComboBox>
+				<ComboBoxItem text="No Crop"/>
+				<ComboBoxItem text="Auto Crop"/>
+				<ComboBoxItem text="Manual Crop" />
+			</ComboBox> -->
+		</HLayout>
+		<VLayout>
+			<HLayout>
+				<Label text="Lambda"/>
+				<LineEdit id="GraphcutSegmentation.Lambda" text="-1" msgcommand="MITK_MESSAGE_GRAPHCUT_LAMBDA_CHANGED" property="text"/>
+				<Label text="Histogram Bins"/>
+				<LineEdit id="GraphcutSegmentation.HistogramBins" text="256" msgcommand="MITK_MESSAGE_GRAPHCUT_HISTOGRAMBINS_CHANGED" property="text"/>	
+			</HLayout>
+			<HLayout>
+				<CheckBox text="Connected Detect" id="GraphcutSegmentation.ConnectedDetect" checked="true"/>
+				<CheckBox text="DownSample" id="GraphcutSegmentation.DownSample" checked="true"/>
+				<CheckBox text="Smooth Result" id="GraphcutSegmentation.SmoothResult" checked="false"/> 
+			</HLayout>
+		</VLayout>	
+		
+		<Button text="Init" msgcommand="MITK_MESSAGE_GRAPHCUT_INIT"/>
+		<Button text="Remove All" msgcommand="MITK_MESSAGE_GRAPHCUT_REMOVEALL"/>
+		<Button text="Segment" msgcommand="MITK_MESSAGE_GRAPHCUT_SEGMENT"/>
+		<Button text="Save Mask" msgcommand="MITK_MESSAGE_GRAPHCUT_SAVEMASK"/>
+		<VLayout>
+			<HLayout>
+				<Label text="Pen Size"/>
+				<HSlider id="GraphcutSegmentation.PenSize" value="5" minimum="1" maximum="40" msgcommand="MITK_MESSAGE_GRAPHCUT_PENSIZE_CHANGED" property="object"/>
+			</HLayout>
+			<HLayout>
+				<Button text="Paint" msgcommand="MITK_MESSAGE_GRAPHCUT_BEGIN_PAINT"/>
+				<Button text="Erase" msgcommand="MITK_MESSAGE_GRAPHCUT_BEGIN_WIPE"/>
+				<Button text="End" msgcommand="MITK_MESSAGE_GRAPHCUT_END_PAINT"/>
+			</HLayout>
+		</VLayout>
+		<HLayout>
+			<ButtonGroup>	
+				<CheckBox text="Foreground" id="GraphcutSegmentation.Foreground" checked="true" msgcommand="MITK_MESSAGE_GRAPHCUT_FOREGROUND" property="checked"/>
+				<CheckBox text="Background" id="GraphcutSegmentation.Background" msgcommand="MITK_MESSAGE_GRAPHCUT_BACKGROUND" property="checked"/>
+			</ButtonGroup>
+			<!-- <Button text="Interpolate" msgcommand="GraphcutSegmentation.Interpolate"/> -->
+		</HLayout>
+		<HLayout>
+			<Label text="Smooth Times:"/>
+			<LineEdit id="GraphcutSegmentation.SmoothTimes" text="40"/>
+			<Button text="Generate Surface" msgcommand="MITK_MESSAGE_GRAPHCUT_GENERATESURFACE"/>
+		</HLayout>
+		
+		<!-- <Button text="Extrace ROI" msgcommand="MITK_MESSAGE_GRAPHCUT_EXTRACT_ROI" />
+		<HSlider id="GraphcutSegmentation.ContourValueSlider"/>
+		
+		
+		<Spacing size="30"/>
+		<HLayout>
+			<Label text="Coarse Image"/>
+			<QmitkDataStorageComboBox  id="GraphcutSegmentation.CoarseImageSelector"/>
+		</HLayout>
+		<Button text="Generate Narrow Band" msgcommand="MITK_MESSAGE_GRAPHCUT_GENERATE_NARROWBAND"/>
+		 -->
+		<Stretch size="100"/>
+	
+	</VLayout>
+</Widget>
+
+
+
+
+
+
+
+
+

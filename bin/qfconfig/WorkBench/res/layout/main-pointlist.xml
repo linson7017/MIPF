@@ -1,0 +1,15 @@
+<HLayout  activityRoot="true" id="main.main" style="@style/mainstyle">
+	<VLayout stretch="1">
+		<Button text="Load Data" command="MITK_MAIN_COMMAND_LOADDATA" />
+		<DataManagerWidget />
+		<ImageNavigatorWidget />
+	</VLayout>
+	<MultiViewsWidget  stretch="5"/>
+	<VLayout  stretch="2">
+		<Button text="Init PointList" command="MITK_MAIN_COMMAND_INITPOINTLIST"/>
+		<Button text="Start Add Points" command="MITK_MAIN_COMMAND_STARTPICKPOINT"/>
+		<Button text="End Add Points" command="MITK_MAIN_COMMAND_ENDPICKPOINIT"/>
+		<Button text="Save Points" command="MITK_MAIN_COMMAND_SAVEPOINTS"/>
+		<Stretch size="100"/>
+	</VLayout>
+</HLayout>

@@ -32,7 +32,7 @@ int main(int argc, char *argv[])
     QVariant v;
 
     app_env appenv(wk.toLocal8Bit().constData());
-    appenv.setMainPtr(QF::QF_CreateMainObject(wk.toLocal8Bit().constData()));
+    appenv.setMainPtr(QF::QF_CreateMainObject(wk.toLocal8Bit().constData(), qApp->applicationDirPath().toStdString().c_str()));
     qApp->setProperty("MainPtr", QVariant::fromValue(appenv.getMainPtr()));
     //初始化qt环境
     qt_context context(&qtapplication);

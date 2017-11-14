@@ -277,14 +277,14 @@ void MapperTestView::Redo()
 
 }
 
-#include <QMatrix4x4>
-#include <QQuaternion>
-#include <QVector3D>
-
-QMatrix4x4  CaculateTransformMatrix(const QMatrix4x4& vm,const QMatrix4x4& m,const QVector3D& positionInImage)
-{
-    QMatrix4x4 am = vm.inverted();
-    QVector3D t = positionInImage.toVector4D -am*m.column(3).toVector3D();
-    am.setColumn(3, QVector4D(t, 1));
-    return am;
-}
+//#include <QMatrix4x4>
+//#include <QQuaternion>
+//#include <QVector3D>
+//
+//QMatrix4x4  CaculateTransformMatrix(const QMatrix4x4& vm,const QMatrix4x4& m,const QVector3D& positionInImage)
+//{
+//    QMatrix4x4 am = vm.inverted();
+//    QVector3D t = positionInImage.toVector4D -am*m.column(3).toVector3D();
+//    am.setColumn(3, QVector4D(t, 1));
+//    return am;
+//}

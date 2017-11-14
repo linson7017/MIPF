@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<ToolPanel id="panel" size="300,300">
+	<Tool icon="@image/jww.png">
+		<ToolPanel>
+			<Tool text="linson">
+				<ToolPanel>
+					<Tool></Tool>
+					<Tool></Tool>
+					<Tool></Tool>
+				</ToolPanel>
+			</Tool>
+			<Tool text="linson"></Tool>
+			<Tool></Tool>
+		</ToolPanel>
+	</Tool>
+	<Tool icon="@image/standardbutton-delete-32.png" checkable="true">
+	</Tool>
+	<Tool icon="@image/quit.png">
+		<ToolPanel>
+			<Tool></Tool>
+			<Tool></Tool>
+			<Tool></Tool>
+		</ToolPanel>
+	</Tool>
+	<Tool icon="@image/recover.png"/>
+	<Tool icon="@image/record.png" />
+	<Tool icon="@image/harddrive-32.png"/>
+</ToolPanel>
+
+

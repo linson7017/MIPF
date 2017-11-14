@@ -20,7 +20,7 @@ CQF_MitkInit::~CQF_MitkInit()
 
 void CQF_MitkInit::Init(mitk::DataStorage* dataStorager)
 {
-    vtkObject::GlobalWarningDisplayOn();
+    vtkObject::GlobalWarningDisplayOff();
     QmitkRegisterClasses();
     IQF_MitkDataManager* pDataManager = (IQF_MitkDataManager*)m_pMain->GetInterfacePtr(QF_MitkMain_DataManager);
     if (pDataManager)

@@ -44,6 +44,8 @@ else()
   target_link_libraries(PluginGenerator ${QT_LIBRARIES}  ${QTFRAMEWORK_LIBRARIES} ${QFMAIN_LIBRARIES}  )
 endif()
 
+InstallQfConfig(${PROJECT_NAME})
+
  
  
 
