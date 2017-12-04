@@ -31,7 +31,9 @@ add_subdirectory(Mipf_Plugin_AirwaySegmentation)
 
 add_subdirectory(Mipf_Plugin_VesselSegmentation)
 
+if(USE_VMTK)
 add_subdirectory(Mipf_Plugin_VMTKTools)
+endif()
 
 add_subdirectory(Mipf_Plugin_StaticisTools)
 
@@ -48,3 +50,7 @@ add_subdirectory(Mipf_Plugin_VolumeCut)
 add_subdirectory(Mipf_Plugin_ASM)
  
 add_subdirectory(Mipf_Plugin_Mevislab)
+ 
+if(USE_PCL)
+add_subdirectory(Mipf_Plugin_PCL)
+endif()

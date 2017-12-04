@@ -106,11 +106,13 @@ set(CMAKE_MODULE_PATH
 	mark_as_advanced(CMAKE_ARCHIVE_OUTPUT_DIRECTORY)
 	mark_as_advanced(CMAKE_LIBRARY_OUTPUT_DIRECTORY)
 	mark_as_advanced(CMAKE_RUNTIME_OUTPUT_DIRECTORY)
-	message(${CMAKE_ARCHIVE_OUTPUT_DIRECTORY})
+	#message(${CMAKE_ARCHIVE_OUTPUT_DIRECTORY})
 	message(${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
 	message(${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 #endforeach()
 
+
+set(CMAKE_PREFIX_PATH "${CMAKE_PREFIX_PATH}" CACHE PATH "")
 
 
 #-----------------------------------------------------------------------------
@@ -127,6 +129,23 @@ endif()
 
 link_directories(${MITK_LINK_DIRECTORIES})
 
+#-----------------------------------------------------------------------------
+# CMake Function(s) and Macro(s)
+#-----------------------------------------------------------------------------
+
+set(CMAKE_MODULE_PATH
+  ${MITK_SOURCE_DIR}/CMake
+  ${CMAKE_MODULE_PATH}
+  )
+
+include(mitkFunctionCheckCompilerFlags)
+include(mitkFunctionGetGccVersion)
+include(mitkFunctionGetVersion)
+
+#-----------------------------------------------------------------------------
+# Set project specific options and variables (NOT available during superbuild)
+#-----------------------------------------------------------------------------
+
 set(${PROJECT_NAME}_VERSION_MAJOR "0")
 set(${PROJECT_NAME}_VERSION_MINOR "1")
 set(${PROJECT_NAME}_VERSION_PATCH "1")
@@ -138,6 +157,33 @@ find_package(Doxygen)
 # Ask the user if a console window should be shown with the applications
 option(${PROJECT_NAME}_SHOW_CONSOLE_WINDOW "Use this to enable or disable the console window when starting GUI Applications" ON)
 mark_as_advanced(${PROJECT_NAME}_SHOW_CONSOLE_WINDOW)
+
+if(NOT UNIX AND NOT MINGW)
+  set(MITK_WIN32_FORCE_STATIC "STATIC")
+endif()
+
+set(${PROJECT_NAME}_MODULES_PACKAGE_DEPENDS_DIR "${PROJECT_SOURCE_DIR}/CMake/PackageDepends")
+list(APPEND MODULES_PACKAGE_DEPENDS_DIRS ${${PROJECT_NAME}_MODULES_PACKAGE_DEPENDS_DIR})
+
+#-----------------------------------------------------------------------------
+# Get project version info
+#-----------------------------------------------------------------------------
+
+mitkFunctionGetVersion(${PROJECT_SOURCE_DIR} ${PROJECT_NAME})
+
+
+#-----------------------------------------------------------------------------
+# Installation preparation
+#
+# These should be set before any MITK install macros are used
+#-----------------------------------------------------------------------------
+
+# on Mac OSX all CTK plugins get copied into every
+# application bundle (.app directory) specified here
+set(MACOSX_BUNDLE_NAMES)
+if(APPLE)
+  list(APPEND MACOSX_BUNDLE_NAMES ${MY_APP_NAME})
+endif(APPLE)
 
 #-----------------------------------------------------------------------------
 # Set symbol visibility Flags
@@ -162,6 +208,29 @@ if(WITH_COVERAGE)
 endif()
 
 #-----------------------------------------------------------------------------
+# Project C/CXX Flags
+#-----------------------------------------------------------------------------
+
+set(${PROJECT_NAME}_C_FLAGS "${MITK_C_FLAGS} ${COVERAGE_C_FLAGS}")
+set(${PROJECT_NAME}_C_FLAGS_DEBUG ${MITK_C_FLAGS_DEBUG})
+set(${PROJECT_NAME}_C_FLAGS_RELEASE ${MITK_C_FLAGS_RELEASE})
+set(${PROJECT_NAME}_CXX_FLAGS "${MITK_CXX_FLAGS} ${VISIBILITY_CXX_FLAGS} ${COVERAGE_CXX_FLAGS}")
+set(${PROJECT_NAME}_CXX_FLAGS_DEBUG ${MITK_CXX_FLAGS_DEBUG})
+set(${PROJECT_NAME}_CXX_FLAGS_RELEASE ${MITK_CXX_FLAGS_RELEASE})
+
+set(${PROJECT_NAME}_EXE_LINKER_FLAGS ${MITK_EXE_LINKER_FLAGS})
+set(${PROJECT_NAME}_SHARED_LINKER_FLAGS ${MITK_SHARED_LINKER_FLAGS})
+set(${PROJECT_NAME}_MODULE_LINKER_FLAGS ${MITK_MODULE_LINKER_FLAGS})
+
+# Add custom project flags here (e.g. for C++11 support)
+
+if(CMAKE_COMPILER_IS_GNUCXX)
+  # Get the gcc version. Some MITK CMake macros rely on the CMake
+  # variable GCC_VERSION being set.
+  mitkFunctionGetGccVersion(${CMAKE_CXX_COMPILER} GCC_VERSION)
+endif()
+
+#-----------------------------------------------------------------------------
 # Set C/CXX Flags
 #-----------------------------------------------------------------------------
 
@@ -175,6 +244,41 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${${PROJECT_NAME}_CXX_FL
 set(CMAKE_EXE_LINKER_FLAGS ${${PROJECT_NAME}_EXE_LINKER_FLAGS})
 set(CMAKE_SHARED_LINKER_FLAGS ${${PROJECT_NAME}_SHARED_LINKER_FLAGS})
 set(CMAKE_MODULE_LINKER_FLAGS ${${PROJECT_NAME}_MODULE_LINKER_FLAGS})
+
+#-----------------------------------------------------------------------------
+# Testing
+#-----------------------------------------------------------------------------
+
+if(BUILD_TESTING)
+  enable_testing()
+  include(CTest)
+  mark_as_advanced(TCL_TCLSH DART_ROOT)
+
+  # Setup file for setting custom ctest vars
+  configure_file(
+    CMake/CTestCustom.cmake.in
+    ${CMAKE_CURRENT_BINARY_DIR}/CTestCustom.cmake
+    @ONLY
+    )
+
+  # Configuration for the CMake-generated test driver
+  set(CMAKE_TESTDRIVER_EXTRA_INCLUDES "#include <stdexcept>")
+  set(CMAKE_TESTDRIVER_BEFORE_TESTMAIN "
+    try
+      {")
+  set(CMAKE_TESTDRIVER_AFTER_TESTMAIN " }
+      catch( std::exception & excp )
+        {
+        fprintf(stderr,\"%s\\n\",excp.what());
+        return EXIT_FAILURE;
+        }
+      catch( ... )
+        {
+        printf(\"Exception caught in the test driver\\n\");
+        return EXIT_FAILURE;
+        }
+      ")
+endif()
 
 #-----------------------------------------------------------------------------
 # ${MIPF_PROJECT_NAME}_SUPERBUILD_BINARY_DIR
@@ -196,6 +300,46 @@ if(MITK_USE_QT)
   add_definitions(-DQWT_DLL)
 endif()
 
+#-----------------------------------------------------------------------------
+# MITK modules
+#-----------------------------------------------------------------------------
+
+# This project's directory holding module config files
+set(${PROJECT_NAME}_MODULES_CONF_DIR "${PROJECT_BINARY_DIR}/${MODULES_CONF_DIRNAME}")
+
+# Append this projects's module config directory to the global list
+# (This is used to get include directories for the <module_name>Exports.h files right)
+list(APPEND MODULES_CONF_DIRS ${${PROJECT_NAME}_MODULES_CONF_DIR})
+
+# Clean the modulesConf directory. This ensures that modules are sorted
+# according to their dependencies in the Modules/CMakeLists.txt file
+file(GLOB _modules_conf_files ${${PROJECT_NAME}_MODULES_CONF_DIR}/*.cmake)
+if(_modules_conf_files)
+  file(REMOVE ${_modules_conf_files})
+endif()
+
+add_subdirectory(Modules)
+
+add_subdirectory(Plugins)
+
+#-----------------------------------------------------------------------------
+# CTK plugins
+#-----------------------------------------------------------------------------
+
+# The CMake code in this section *must* be in the top-level CMakeLists.txt file
+
+macro(GetMyTargetLibraries all_target_libraries varname)
+  set(re_ctkplugin "^my_awesomeproject_[a-zA-Z0-9_]+$")
+  set(_tmp_list)
+  list(APPEND _tmp_list ${all_target_libraries})
+  ctkMacroListFilter(_tmp_list re_ctkplugin OUTPUT_VARIABLE ${varname})
+endmacro()
+
+# Get infos about application directories and build options
+set(_apps_fullpath )
+foreach(_app ${PROJECT_APPS})
+  list(APPEND _apps_fullpath "${CMAKE_CURRENT_SOURCE_DIR}/${_app}")
+endforeach()
 
 #Use External Libraries
 if(NOT USE_VMTK)
@@ -207,21 +351,39 @@ if(NOT USE_PCL)
 endif()
 
 #-----------------------------------------------------------------------------
-# Add modules
-#-----------------------------------------------------------------------------
-
-add_subdirectory(Modules)
-#-----------------------------------------------------------------------------
-# Add plugins
-#-----------------------------------------------------------------------------
-
-add_subdirectory(Plugins)
-
-#-----------------------------------------------------------------------------
 # Add subdirectories
 #-----------------------------------------------------------------------------
+
 add_subdirectory(Applications)
 
+#-----------------------------------------------------------------------------
+# Installation
+#-----------------------------------------------------------------------------
+
+# set MITK cpack variables
+include(mitkSetupCPack)
+
+# Customize CPack variables for this project
+#include(CPackSetup)
+
+list(APPEND CPACK_CREATE_DESKTOP_LINKS "${MY_APP_NAME}")
+
+configure_file(${MITK_SOURCE_DIR}/MITKCPackOptions.cmake.in
+               ${PROJECT_BINARY_DIR}/${PROJECT_NAME}CPackOptions.cmake @ONLY)
+set(CPACK_PROJECT_CONFIG_FILE "${PROJECT_BINARY_DIR}/${PROJECT_NAME}CPackOptions.cmake")
+
+# include CPack model once all variables are set
+include(CPack)
+
+# Additional installation rules
+include(mitkInstallRules)
+
+#-----------------------------------------------------------------------------
+# Last configuration steps
+#-----------------------------------------------------------------------------
+
+# If we are under Windows, create two batch files which correctly
+# set up the environment for the application and for Visual Studio
 if(WIN32)
   include(mitkFunctionCreateWindowsBatchScript)
 
@@ -232,6 +394,4 @@ if(WIN32)
       ${VS_BUILD_TYPE})
   endforeach()
 endif(WIN32)
-
-
 

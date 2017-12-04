@@ -39,4 +39,6 @@ add_subdirectory(Mipf_Module_Segmentation)
 
 add_subdirectory(Mipf_Module_MitkImageUtils)
 
+if(USE_VMTK)
 add_subdirectory(Mipf_Module_VesselTools)
+endif()

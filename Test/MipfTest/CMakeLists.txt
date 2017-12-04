@@ -14,10 +14,15 @@ endif()
 
 project(TestApp)
 
-set(MIPF_INTERFACE_DIR "S:/Codes/MIPF/Modules/interface")
+#Set the mipf interface directory. For instance in .../Mipf/Modules/interface
+if(NOT MIPF_INTERFACE_DIR)
+	set(MIPF_INTERFACE_DIR "MIPF_INTERFACE_DIR-NOTFOUND" CACHE PATH "Mipf interface directory")
+    message(SEND_ERROR "Unable to find the mipf interface directory")
+endif()
 
-FIND_PACKAGE(QTFRAMEWORK REQUIRED)
-FIND_PACKAGE(QFMAIN REQUIRED)
+#Find the depend package
+find_package(QTFRAMEWORK REQUIRED)
+find_package(QFMAIN REQUIRED)
 find_package(MITK 2016.03.0 REQUIRED)
 
 include_directories(
@@ -31,13 +36,13 @@ file (GLOB Headers "./*.h")
 AUX_SOURCE_DIRECTORY(. DIR_SRCS)
 
 # Instruct CMake to run moc automatically when needed.
+# CMAKE_AUTOMOC in ON so the MocHdrs will be automatically wrapped.
 set(CMAKE_AUTOMOC ON)
 
 
 find_package(Qt5 COMPONENTS Widgets REQUIRED QUIET)
 qt5_wrap_ui(UI_Srcs ${UIs})
 
-# CMAKE_AUTOMOC in ON so the MocHdrs will be automatically wrapped.
 add_executable(TestApp ${DIR_SRCS} ${Headers} ${UI_Srcs} ${MOC_Hdrs})
 qt5_use_modules(TestApp Core Gui Widgets)
 target_link_libraries(TestApp  ${QTFRAMEWORK_LIBRARIES} ${QFMAIN_LIBRARIES} MitkCore)
