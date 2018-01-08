@@ -79,6 +79,7 @@ void CenterLineExtractView::CreateView()
 
     connect(m_ui.ApplyBtn, SIGNAL(clicked()), this, SLOT(Extract()));
     connect(m_ui.SelectEndPointBtn, SIGNAL(clicked(bool)), this, SLOT(SelectEndPoint(bool)));
+    connect(m_ui.SmoothBtn, SIGNAL(clicked()), this, SLOT(Smooth()));
     
 }
 
@@ -131,6 +132,45 @@ void RemoveIndex(std::vector<T>& v, int index)
     }
 }
 
+void CenterLineExtractView::Smooth()
+{
+    vtkPolyData* polyData = dynamic_cast<mitk::Surface*>(m_ui.DataSelector->GetSelectedNode()->GetData())->GetVtkPolyData();
+
+    IQF_ObjectFactory* pObjectFactory = (IQF_ObjectFactory*)GetInterfacePtr(QF_Core_ObjectFactory);
+    if (pObjectFactory)
+    {
+        IQF_CenterLineExtraction* pCenterLineExtraction = (IQF_CenterLineExtraction*)pObjectFactory->CreateObject(Object_ID_CenterLineExtraction);
+        if (pCenterLineExtraction)
+        {
+            auto preparedModel = vtkSmartPointer<vtkPolyData>::New();
+            auto model = vtkSmartPointer<vtkPolyData>::New();
+            auto network = vtkSmartPointer<vtkPolyData>::New();
+            auto voronoi = vtkSmartPointer<vtkPolyData>::New();
+            auto endPoints = vtkSmartPointer<vtkPoints>::New();
+
+            //   pCenterLineExtraction->ExtractCenterLineNetwork(polyData, m_pPointSet->GetPoint(0).GetDataPointer(),
+            //      network.Get(), endPoints.Get());
+            //do not input start point
+            pCenterLineExtraction->ExtractCenterLineNetwork(polyData, nullptr,
+                network.Get(), endPoints.Get());
+
+            auto smoothedVessel = vtkSmartPointer<vtkPolyData>::New();
+            pCenterLineExtraction->ReconstructTubularSurfaceByCenterLine(network.Get(), smoothedVessel.Get());
+
+            //Display Data
+            mitk::DataNode::Pointer smoothedSurfaceDataNode = mitk::DataNode::New();
+            mitk::Surface::Pointer smoothedSurface = mitk::Surface::New();
+            smoothedSurface->SetVtkPolyData(smoothedVessel.Get());
+            smoothedSurfaceDataNode->SetData(smoothedSurface);
+            smoothedSurfaceDataNode->SetName("Smoothed Surface");
+            smoothedSurfaceDataNode->SetColor(0.0, 1.0, 0.0);
+            GetDataStorage()->Add(smoothedSurfaceDataNode, m_ui.DataSelector->GetSelectedNode());
+
+            RequestRenderWindowUpdate();
+        }
+    }
+}
+
 void CenterLineExtractView::Extract()
 {
     vtkPolyData* polyData = dynamic_cast<mitk::Surface*>(m_ui.DataSelector->GetSelectedNode()->GetData())->GetVtkPolyData();
@@ -147,8 +187,11 @@ void CenterLineExtractView::Extract()
             auto voronoi = vtkSmartPointer<vtkPolyData>::New();
             auto endPoints = vtkSmartPointer<vtkPoints>::New();
 
-            pCenterLineExtraction->ExtractCenterLineNetwork(polyData, m_pPointSet->GetPoint(0).GetDataPointer(),
-                network.Get(), endPoints.Get());
+         //   pCenterLineExtraction->ExtractCenterLineNetwork(polyData, m_pPointSet->GetPoint(0).GetDataPointer(),
+          //      network.Get(), endPoints.Get());
+            //do not input start point
+            pCenterLineExtraction->ExtractCenterLineNetwork(polyData, nullptr,
+                      network.Get(), endPoints.Get());
 
             ConvertVTKPointsToMitkPointSet(endPoints, m_pEndPointList->GetPointSet());
 

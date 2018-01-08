@@ -5,6 +5,15 @@
 //mitk
 #include "mitkBoundingShapeInteractor.h"
 #include "mitkBoundingShapeObjectFactory.h"
+//qmitk
+#include "QmitkStdMultiWidget.h"
+#include "QmitkRenderWindow.h"
+
+
+//mitkCoreExt
+#include "Interactions/FreehandCutInteractor.h"
+#include "Interactions/FreehandCutInteractor.h"
+#include "Interactions/FreehandVolumeCutImplementation.h"
   
 VolumeCutView::VolumeCutView() :MitkPluginView(), m_boxNumber(0)
 {
@@ -21,11 +30,73 @@ void VolumeCutView::CreateView()
     m_ui.DataSelector->SetDataStorage(GetDataStorage());
     m_ui.DataSelector->SetPredicate(mitk::TNodePredicateDataType<mitk::Image>::New());
 
+    m_ui.ModelSelector->SetDataStorage(GetDataStorage());
+    m_ui.ModelSelector->SetPredicate(mitk::TNodePredicateDataType<mitk::Surface>::New());
+
     connect(m_ui.AddBoxBtn, SIGNAL(clicked()), this, SLOT(AddBox()));
     connect(m_ui.RemoveBoxBtn, SIGNAL(clicked()), this, SLOT(RemoveBox()));
     connect(m_ui.BoxCutBtn, SIGNAL(clicked()), this, SLOT(BoxCut()));
     connect(m_ui.BoxList, SIGNAL(currentItemChanged(QListWidgetItem *, QListWidgetItem *)), this, SLOT(BoxSelected(QListWidgetItem *, QListWidgetItem *)));
+
+   
+    connect(m_ui.ModelCutBtn, SIGNAL(clicked(bool)), this, SLOT(ModelCut(bool)));
+    connect(m_ui.UndoBtn, SIGNAL(clicked()), this, SLOT(Undo()));
+    connect(m_ui.RedoBtn, SIGNAL(clicked()), this, SLOT(Redo()));
+
 } 
+
+void VolumeCutView::Undo()
+{
+    if (m_freehandCutInteractor.IsNotNull())
+    {
+        static_cast<FreehandCutInteractor*>(m_freehandCutInteractor.GetPointer())->Undo();
+    }
+}
+
+void VolumeCutView::Redo()
+{
+    if (m_freehandCutInteractor.IsNotNull())
+    {
+        static_cast<FreehandCutInteractor*>(m_freehandCutInteractor.GetPointer())->Redo();
+    }
+}
+
+void VolumeCutView::ModelCut(bool b)
+{
+    mitk::DataNode* node = m_ui.DataSelector->GetSelectedNode();
+    if (!node)
+    {
+        return;
+    }
+    if (b)
+    {
+        if (m_freehandCutInteractor.IsNull())
+        {
+            m_freehandCutInteractor = FreehandCutInteractor::New();
+            static_cast<FreehandCutInteractor*>(m_freehandCutInteractor.GetPointer())->SetImplementation(new FreehandVolumeCutImplementation());
+            static_cast<FreehandCutInteractor*>(m_freehandCutInteractor.GetPointer())->SetDataStorage(GetDataStorage());
+            static_cast<FreehandCutInteractor*>(m_freehandCutInteractor.GetPointer())->SetRenderer(
+                m_pMitkRenderWindow->GetMitkStdMultiWidget()->GetRenderWindow4()->GetRenderer()->GetVtkRenderer());
+
+            
+            std::string configPath = m_pMain->GetConfigPath();
+            configPath.append("/mitk/Interactions/");
+            m_freehandCutInteractor->LoadStateMachine(configPath + "FreehandSurfaceCutInteraction.xml");
+            m_freehandCutInteractor->SetEventConfig(configPath + "FreehandSurfaceCutConfig.xml");
+
+            m_freehandCutInteractor->SetDataNode(node);
+        }
+        node->SetDataInteractor(m_freehandCutInteractor);
+        static_cast<FreehandCutInteractor*>(m_freehandCutInteractor.GetPointer())->Start();
+        RequestRenderWindowUpdate();
+    }
+    else
+    {
+        static_cast<FreehandCutInteractor*>(m_freehandCutInteractor.GetPointer())->Finished();
+        node->SetDataInteractor(nullptr);
+        RequestRenderWindowUpdate();
+    }
+}
  
 WndHandle VolumeCutView::GetPluginHandle() 
 {

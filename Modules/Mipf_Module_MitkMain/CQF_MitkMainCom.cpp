@@ -31,6 +31,13 @@ CQF_MitkMain::CQF_MitkMain(QF::IQF_Main* pMain):m_pMain(pMain)
 
 CQF_MitkMain::~CQF_MitkMain()
 {
+    delete m_pMitkDataManager;
+    delete m_pMitkRenderWindow;
+    delete m_pMitkReference;
+    delete m_pMitkIO;
+    delete m_pDisplayOption;
+    delete m_pMitkInit;
+    delete m_pMainCommand;
 }
 
 

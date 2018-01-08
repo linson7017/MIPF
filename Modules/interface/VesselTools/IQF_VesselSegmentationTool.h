@@ -1,7 +1,8 @@
 #ifndef IQF_VesselSegmentationTool_h__
 #define IQF_VesselSegmentationTool_h__
 
-#pragma once
+#include "iconfig.h"
+#include "IQF_Object.h"
 
 class vtkImageData;
 class vtkIdList;
@@ -19,8 +20,9 @@ class vtkPolyData;
 */
 /************************************************************************/
 const char Object_ID_VesselSegmentationTool[] = "Object_ID_VesselSegmentationTool";
-class IQF_VesselSegmentationTool
+class IQF_VesselSegmentationTool  : public IQF_Object
 {
+    BUILD_INTERFACE(IQF_VesselSegmentationTool)
 public:
     virtual void SegmentVessel(vtkImageData* pInput, vtkPolyData* pOutput,
         double dLowerThreshold, double dHigherThreshold, vtkIdList*  pSourceSeedIds, vtkIdList* pTargetSeedIds, int iInitializeMode = 0) = 0;

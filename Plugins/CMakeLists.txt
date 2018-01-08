@@ -49,8 +49,16 @@ add_subdirectory(Mipf_Plugin_VolumeCut)
  
 add_subdirectory(Mipf_Plugin_ASM)
  
-add_subdirectory(Mipf_Plugin_Mevislab)
+#add_subdirectory(Mipf_Plugin_Mevislab)
  
 if(USE_PCL)
 add_subdirectory(Mipf_Plugin_PCL)
 endif()
+ 
+add_subdirectory(Mipf_Plugin_ImageBatchProcessing)
+ 
+if(USE_PYTHON)
+add_subdirectory(Mipf_Plugin_DeepMedic)
+endif()
+ 
+add_subdirectory(Mipf_Plugin_ModelExporter)

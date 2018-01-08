@@ -282,9 +282,11 @@ void ImageRegistrationView::InitRegistration()
     m_movingImageInteractor = displayMovingNode->GetDataInteractor();
     if (m_movingImageInteractor.IsNull())
     {
+        std::string configpath = m_pMain->GetConfigPath();
+        configpath.append("/mitk/Interactions/");
         m_movingImageInteractor = ImageNavigationInteractor::New();
-        m_movingImageInteractor->LoadStateMachine("S:/Codes/MIPF/Plugins/Mipf_Plugin_ImageRegistration/resource/Interactions/ImageNavigation.xml");
-        m_movingImageInteractor->SetEventConfig("S:/Codes/MIPF/Plugins/Mipf_Plugin_ImageRegistration/resource/Interactions/ImageNavigationConfig.xml");
+        m_movingImageInteractor->LoadStateMachine(configpath + "ImageNavigation.xml");
+        m_movingImageInteractor->SetEventConfig(configpath + "ImageNavigationConfig.xml");
         m_movingImageInteractor->SetDataNode(displayMovingNode);
         displayMovingNode->SetDataInteractor(m_movingImageInteractor);
     }

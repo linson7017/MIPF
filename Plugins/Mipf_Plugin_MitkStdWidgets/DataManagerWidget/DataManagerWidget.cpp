@@ -164,22 +164,22 @@ void DataManagerWidget::CreateView()
     QmitkNodeDescriptor* surfaceDataNodeDescriptor =
         QmitkNodeDescriptorManager::GetInstance()->GetDescriptor("Surface");
 
-    QAction* globalReinitAction = new QAction(QIcon(R::Instance()->getImageResourceUrl("@icon/Refresh_48.png")), "Global Reinit", this);
+    QAction* globalReinitAction = new QAction(QIcon(R::Instance()->getImageResourceUrl("@icon/Refresh_48.png").c_str()), "Global Reinit", this);
     QObject::connect(globalReinitAction, SIGNAL(triggered(bool)), this, SLOT(GlobalReinit(bool)));
     unknownDataNodeDescriptor->AddAction(globalReinitAction);
     m_DescriptorActionList.push_back(std::pair<QmitkNodeDescriptor*, QAction*>(unknownDataNodeDescriptor, globalReinitAction));
 
-    QAction* saveAction = new QAction(QIcon(R::Instance()->getImageResourceUrl("@icon/Save_48.png")), "Save File", this); 
+    QAction* saveAction = new QAction(QIcon(R::Instance()->getImageResourceUrl("@icon/Save_48.png").c_str()), "Save File", this);
     QObject::connect(saveAction, SIGNAL(triggered(bool)), this, SLOT(SaveSelectedNodes(bool)));
     unknownDataNodeDescriptor->AddAction(saveAction);
     m_DescriptorActionList.push_back(std::pair<QmitkNodeDescriptor*, QAction*>(unknownDataNodeDescriptor, saveAction));
 
-    QAction* removeAction = new QAction(QIcon(R::Instance()->getImageResourceUrl("@icon/Remove_48.png")), "Remove", this);
+    QAction* removeAction = new QAction(QIcon(R::Instance()->getImageResourceUrl("@icon/Remove_48.png").c_str()), "Remove", this);
     QObject::connect(removeAction, SIGNAL(triggered(bool)), this, SLOT(RemoveSelectedNodes(bool)));
     unknownDataNodeDescriptor->AddAction(removeAction);
     m_DescriptorActionList.push_back(std::pair<QmitkNodeDescriptor*, QAction*>(unknownDataNodeDescriptor, removeAction));
 
-    QAction* reinitAction = new QAction(QIcon(R::Instance()->getImageResourceUrl("@icon/Refresh_48.png")), "Reinit", this);
+    QAction* reinitAction = new QAction(QIcon(R::Instance()->getImageResourceUrl("@icon/Refresh_48.png").c_str()), "Reinit", this);
     QObject::connect(reinitAction, SIGNAL(triggered(bool)), this, SLOT(ReinitSelectedNodes(bool)));
     unknownDataNodeDescriptor->AddAction(reinitAction);
     m_DescriptorActionList.push_back(std::pair<QmitkNodeDescriptor*, QAction*>(unknownDataNodeDescriptor, reinitAction));
@@ -293,7 +293,7 @@ void DataManagerWidget::CreateView()
     m_DescriptorActionList.push_back(std::pair<QmitkNodeDescriptor*, QAction*>(surfaceDataNodeDescriptor, m_SurfaceRepresentation));
 
     QAction* showOnlySelectedNodes
-        = new QAction(QIcon(R::Instance()->getImageResourceUrl("@icon/ShowSelectedNode_48.png"))
+        = new QAction(QIcon(R::Instance()->getImageResourceUrl("@icon/ShowSelectedNode_48.png").c_str())
             , "Show only selected nodes", this);
     QObject::connect(showOnlySelectedNodes, SIGNAL(triggered(bool))
         , this, SLOT(ShowOnlySelectedNodes(bool)));
@@ -301,7 +301,7 @@ void DataManagerWidget::CreateView()
     m_DescriptorActionList.push_back(std::pair<QmitkNodeDescriptor*, QAction*>(unknownDataNodeDescriptor, showOnlySelectedNodes));
 
     QAction* toggleSelectedVisibility
-        = new QAction(QIcon(R::Instance()->getImageResourceUrl("@icon/InvertShowSelectedNode_48.png"))
+        = new QAction(QIcon(R::Instance()->getImageResourceUrl("@icon/InvertShowSelectedNode_48.png").c_str())
             , "Toggle visibility", this);
     QObject::connect(toggleSelectedVisibility, SIGNAL(triggered(bool))
         , this, SLOT(ToggleVisibilityOfSelectedNodes(bool)));
@@ -309,7 +309,7 @@ void DataManagerWidget::CreateView()
     m_DescriptorActionList.push_back(std::pair<QmitkNodeDescriptor*, QAction*>(unknownDataNodeDescriptor, toggleSelectedVisibility));
 
     QAction* actionShowInfoDialog
-        = new QAction(QIcon(R::Instance()->getImageResourceUrl("@icon/ShowDataInfo_48.png"))
+        = new QAction(QIcon(R::Instance()->getImageResourceUrl("@icon/ShowDataInfo_48.png").c_str())
             , "Details...", this);
     QObject::connect(actionShowInfoDialog, SIGNAL(triggered(bool))
         , this, SLOT(ShowInfoDialogForSelectedNodes(bool)));

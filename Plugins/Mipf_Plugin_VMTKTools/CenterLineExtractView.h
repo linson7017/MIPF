@@ -30,6 +30,7 @@ protected:
 protected slots:
     void Extract();
     void SelectEndPoint(bool bSelecting);
+    void Smooth();
 private:
     Ui::CenterLineExtractView m_ui;
 

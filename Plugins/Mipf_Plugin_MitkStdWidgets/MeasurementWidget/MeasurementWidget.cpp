@@ -189,47 +189,47 @@ void MeasurementWidget::SetupWidget(R* pR)
     d->m_DrawActionsGroup = new QActionGroup(this);
     d->m_DrawActionsGroup->setExclusive(true);
 
-    auto* currentAction = d->m_DrawActionsToolBar->addAction(QIcon(R::Instance()->getImageResourceUrl("@icon/line.png")), "Draw Line");
+    auto* currentAction = d->m_DrawActionsToolBar->addAction(QIcon(R::Instance()->getImageResourceUrl("@icon/line.png").c_str()), "Draw Line");
     currentAction->setCheckable(true);
     d->m_DrawLine = currentAction;
 
-    currentAction = d->m_DrawActionsToolBar->addAction(QIcon(R::Instance()->getImageResourceUrl("@icon/path.png")), "Draw Path");
+    currentAction = d->m_DrawActionsToolBar->addAction(QIcon(R::Instance()->getImageResourceUrl("@icon/path.png").c_str()), "Draw Path");
     currentAction->setCheckable(true);
     d->m_DrawPath = currentAction;
 
-    currentAction = d->m_DrawActionsToolBar->addAction(QIcon(R::Instance()->getImageResourceUrl("@icon/angle.png")), "Draw Angle");
+    currentAction = d->m_DrawActionsToolBar->addAction(QIcon(R::Instance()->getImageResourceUrl("@icon/angle.png").c_str()), "Draw Angle");
     currentAction->setCheckable(true);
     d->m_DrawAngle = currentAction;
 
-    currentAction = d->m_DrawActionsToolBar->addAction(QIcon(R::Instance()->getImageResourceUrl("@icon/four-point-angle.png")), "Draw Four Point Angle");
+    currentAction = d->m_DrawActionsToolBar->addAction(QIcon(R::Instance()->getImageResourceUrl("@icon/four-point-angle.png").c_str()), "Draw Four Point Angle");
     currentAction->setCheckable(true);
     d->m_DrawFourPointAngle = currentAction;
 
-    currentAction = d->m_DrawActionsToolBar->addAction(QIcon(R::Instance()->getImageResourceUrl("@icon/circle.png")), "Draw Circle");
+    currentAction = d->m_DrawActionsToolBar->addAction(QIcon(R::Instance()->getImageResourceUrl("@icon/circle.png").c_str()), "Draw Circle");
     currentAction->setCheckable(true);
     d->m_DrawCircle = currentAction;
 
-    currentAction = d->m_DrawActionsToolBar->addAction(QIcon(R::Instance()->getImageResourceUrl("@icon/ellipse.png")), "Draw Ellipse");
+    currentAction = d->m_DrawActionsToolBar->addAction(QIcon(R::Instance()->getImageResourceUrl("@icon/ellipse.png").c_str()), "Draw Ellipse");
     currentAction->setCheckable(true);
     d->m_DrawEllipse = currentAction;
 
-    currentAction = d->m_DrawActionsToolBar->addAction(QIcon(R::Instance()->getImageResourceUrl("@icon/doubleellipse.png")), "Draw Double Ellipse");
+    currentAction = d->m_DrawActionsToolBar->addAction(QIcon(R::Instance()->getImageResourceUrl("@icon/doubleellipse.png").c_str()), "Draw Double Ellipse");
     currentAction->setCheckable(true);
     d->m_DrawDoubleEllipse = currentAction;
 
-    currentAction = d->m_DrawActionsToolBar->addAction(QIcon(R::Instance()->getImageResourceUrl("@icon/rectangle.png")), "Draw Rectangle");
+    currentAction = d->m_DrawActionsToolBar->addAction(QIcon(R::Instance()->getImageResourceUrl("@icon/rectangle.png").c_str()), "Draw Rectangle");
     currentAction->setCheckable(true);
     d->m_DrawRectangle = currentAction;
 
-    currentAction = d->m_DrawActionsToolBar->addAction(QIcon(R::Instance()->getImageResourceUrl("@icon/polygon.png")), "Draw Polygon");
+    currentAction = d->m_DrawActionsToolBar->addAction(QIcon(R::Instance()->getImageResourceUrl("@icon/polygon.png").c_str()), "Draw Polygon");
     currentAction->setCheckable(true);
     d->m_DrawPolygon = currentAction;
 
-    currentAction = d->m_DrawActionsToolBar->addAction(QIcon(R::Instance()->getImageResourceUrl("@icon/beziercurve.png")), "Draw Bezier Curve");
+    currentAction = d->m_DrawActionsToolBar->addAction(QIcon(R::Instance()->getImageResourceUrl("@icon/beziercurve.png").c_str()), "Draw Bezier Curve");
     currentAction->setCheckable(true);
     d->m_DrawBezierCurve = currentAction;
 
-    currentAction = d->m_DrawActionsToolBar->addAction(QIcon(R::Instance()->getImageResourceUrl("@icon/subdivisionpolygon.png")), "Draw Subdivision Polygon");
+    currentAction = d->m_DrawActionsToolBar->addAction(QIcon(R::Instance()->getImageResourceUrl("@icon/subdivisionpolygon.png").c_str()), "Draw Subdivision Polygon");
     currentAction->setCheckable(true);
     d->m_DrawSubdivisionPolygon = currentAction;
 

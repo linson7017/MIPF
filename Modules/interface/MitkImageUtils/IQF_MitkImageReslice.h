@@ -1,7 +1,7 @@
 #ifndef IQF_MitkImageReslice_h__
 #define IQF_MitkImageReslice_h__
 
-#pragma once
+#include "iconfig.h"
 
 const char QF_MitkImageUtils_ImageReslice[] = "QF_MitkImageUtils_ImageReslice";
 
@@ -17,6 +17,7 @@ class vtkImageData;
 
 class IQF_MitkImageReslice
 {
+    BUILD_INTERFACE(IQF_MitkImageReslice)
 public:
     virtual bool GetReslicePlaneImageWithLevelWindow(mitk::DataNode* imageNode, const mitk::PlaneGeometry* worldGeometry, mitk::BaseRenderer* renderer, vtkImageData* output) = 0;
 

@@ -88,7 +88,6 @@ typedef UShort2DImageType::IndexType                    UShort2DImageIndexType;
 struct IndexSortCriterion {
 public:
     bool operator() (const itk::Index<3> &a, const itk::Index<3> &b) const {
-        /*先比较名字；若名字相同，则比较年龄。小的返回true*/
         if (a.GetElement(0) < b.GetElement(0))
             return true;
         else if (a.GetElement(0) == b.GetElement(0))

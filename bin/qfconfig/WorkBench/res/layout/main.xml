@@ -97,6 +97,7 @@
 	</DockWidget>
 	<DockWidget id="main.Test" windowTitle="Test" tabfiedDocWidgetID="main.Staticis" dockWidgetArea="RightDockWidgetArea"   visible="true">
 		<ToolBox>
+			<ModelExporterWidget text="Model Exporter"/>
 			<ASMWidget text="ASM" />
 			<FastMarchingWidget text="Fast Marching" />
 			<SigmoidImageWidget text="Sigmoid" />

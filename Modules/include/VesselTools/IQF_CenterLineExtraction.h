@@ -1,7 +1,8 @@
 #ifndef IQF_CenterLineExtraction_h__
 #define IQF_CenterLineExtraction_h__
 
-#pragma once
+#include "iconfig.h"
+#include "IQF_Object.h"
 
 class vtkPolyData;
 class vtkPoints;
@@ -19,11 +20,13 @@ class vtkPoints;
 */
 /************************************************************************/
 const char  Object_ID_CenterLineExtraction[] = "Object_ID_CenterLineExtraction";
-class IQF_CenterLineExtraction
+class IQF_CenterLineExtraction :public IQF_Object
 {
+    BUILD_INTERFACE(IQF_CenterLineExtraction)
 public:
     virtual void ExtractCenterLineNetwork(vtkPolyData* pInput, double* vStartPoint, vtkPolyData* pOutputNetwork, 
         vtkPoints* pOutputEndpoints = nullptr, vtkPolyData* pOutputVoronoi = nullptr) = 0;
+    virtual void ReconstructTubularSurfaceByCenterLine(vtkPolyData* pCenterLine, vtkPolyData* pOutputData) = 0;
 };
 
 

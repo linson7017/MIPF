@@ -206,6 +206,13 @@ if(NOT USE_PCL)
 	set(USE_PCL ON CACHE BOOL "use pcl plugin")
 endif()
 
+if(NOT USE_PYTHON)
+	set(USE_PYTHON ON CACHE BOOL "use python plugin")
+endif()
+if(USE_PYTHON)
+	find_package(PythonLibs REQUIRED)
+endif()
+
 #-----------------------------------------------------------------------------
 # Add modules
 #-----------------------------------------------------------------------------

@@ -18,6 +18,8 @@ public:
         double dLowerThreshold, double dHigherThreshold, vtkIdList*  pSourceSeedIds, vtkIdList* pTargetSeedIds, int iInitializeMode = 0);
 
     virtual void GenerateVesselSurface(vtkImageData* pInput, vtkPolyData* pOutput, double dThreshold);
+
+    virtual void Release() { delete this; }
 protected:
     void SegmentationInitialize(vtkImageData* pInput, vtkImageData* pOutput, 
         double dLowerThreshold, double dHigherThreshold, vtkIdList*  pSourceSeedIds, vtkIdList* pTargetSeedIds, int mode=0);

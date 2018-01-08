@@ -23,6 +23,7 @@ CQF_MathUtil::~CQF_MathUtil()
 
 void CQF_MathUtil::Release()
 {
+    delete m_mathUtil;
     delete this;
 }
 

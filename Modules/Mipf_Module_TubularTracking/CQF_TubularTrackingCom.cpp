@@ -15,7 +15,7 @@ CQF_TubularTrackingCom::CQF_TubularTrackingCom()
 
 CQF_TubularTrackingCom::~CQF_TubularTrackingCom()
 {
-
+    delete m_pTubularTracing;
 }
 
 void CQF_TubularTrackingCom::Release()

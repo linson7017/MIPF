@@ -17,6 +17,7 @@ CQF_SliceBySliceTracking::CQF_SliceBySliceTracking()
 
 CQF_SliceBySliceTracking::~CQF_SliceBySliceTracking()
 {
+    delete m_pSliceBySliceTracing;
 }
 
 

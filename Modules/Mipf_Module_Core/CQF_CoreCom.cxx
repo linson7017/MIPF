@@ -26,6 +26,7 @@ CQF_CoreCom::~CQF_CoreCom()
 
 void CQF_CoreCom::Release()
 {
+    delete m_pObjectFactory;
     delete this;
 }
 

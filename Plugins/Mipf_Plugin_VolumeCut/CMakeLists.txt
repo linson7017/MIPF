@@ -17,6 +17,8 @@ file(GLOB Headers "./*.h")
 file(GLOB UI_Srcs "./*.ui")
 AUX_SOURCE_DIRECTORY(. DIR_SRCS)
 
+include_directories(${MitkCoreExt_INCLUDE_DIR})
+
 set(CMAKE_AUTOMOC ON)
 
 qt5_wrap_ui(ui_Files ${UI_Srcs})
@@ -28,5 +30,6 @@ qt5_use_modules(Mipf_Plugin_VolumeCut Core Gui Widgets)
 target_link_libraries(Mipf_Plugin_VolumeCut    
 ${VTK_LIBRARIES} ${ITK_LIBRARIES}   
 ${QTFRAMEWORK_LIBRARIES} ${QFMAIN_LIBRARIES}   
+${MitkCoreExt_LIBRARIES}  
 MitkQtWidgets MitkQtWidgetsExt MitkBoundingShape)
 

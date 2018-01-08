@@ -2,9 +2,11 @@
 #define IQF_FastGrowCutSegmentation_h__
 
 #include "IQF_Object.h"
+#include "iconfig.h"
 
 class IQF_FastGrowCutSegmentation:public IQF_Object
 {
+    BUILD_INTERFACE(IQF_FastGrowCutSegmentation)
 public:
 	//设置原图像
 	virtual void SetSourceImage(vtkImageData* vtkSourceImage)=0;
@@ -20,6 +22,7 @@ public:
 	virtual void DoSegmentation()=0;
 	//将结果图像存放于形参图像中
 	virtual void GetForegroundmage(vtkImageData* vtkResultImage)=0;
+
 };
 
 #endif // IQF_AirwaySegmentation_h__

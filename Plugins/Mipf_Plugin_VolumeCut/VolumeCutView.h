@@ -6,6 +6,8 @@
 #include "MitkPluginView.h" 
 
 #include "ui_VolumeCutView.h"
+
+#include "mitkDataInteractor.h"
  
 class VolumeCutView : public  QWidget, public MitkPluginView  
 {  
@@ -21,6 +23,9 @@ void AddBox();
 void RemoveBox();
 void BoxCut();
 void BoxSelected(QListWidgetItem *, QListWidgetItem *);
+void ModelCut(bool b);
+void Undo();
+void Redo();
 
 private:
     mitk::Geometry3D::Pointer InitializeWithSurfaceGeometry(mitk::BaseGeometry::Pointer geometry);
@@ -29,7 +34,7 @@ private:
 private:
     Ui::VolumeCutView m_ui;
 
-
+    mitk::DataInteractor::Pointer m_freehandCutInteractor;
     mitk::DataInteractor::Pointer m_boundingShapeInteractor;
     int m_boxNumber;
 };

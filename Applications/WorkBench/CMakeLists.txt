@@ -27,13 +27,14 @@ AUX_SOURCE_DIRECTORY(. DIR_SRCS)
 # Instruct CMake to run moc automatically when needed.
 set(CMAKE_AUTOMOC ON)
 
+MipfGetQfConfig(WorkBench QfConfigFiles)
+#source_group_by_dir(QfConfigFiles)
 
 if(VTK_QT_VERSION VERSION_GREATER "4")
   find_package(Qt5 COMPONENTS Widgets REQUIRED QUIET)
   qt5_wrap_ui(UI_Srcs ${UIs})
-
   # CMAKE_AUTOMOC in ON so the MocHdrs will be automatically wrapped.
-  add_executable(WorkBench ${DIR_SRCS} ${Headers} ${UI_Srcs} ${MOC_Hdrs})
+  add_executable(WorkBench ${DIR_SRCS} ${Headers} ${UI_Srcs} ${MOC_Hdrs} ${QfConfigFiles})
   qt5_use_modules(WorkBench Core Gui Widgets)
   target_link_libraries(WorkBench  ${QTFRAMEWORK_LIBRARIES} ${QFMAIN_LIBRARIES} )
 else()
@@ -53,4 +54,4 @@ endif()
   # COMMENT "copy to qf bin"
  # )
  
- InstallQfConfig(${PROJECT_NAME})
+InstallQfConfig(${PROJECT_NAME})

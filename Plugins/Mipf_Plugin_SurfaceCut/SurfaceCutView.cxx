@@ -4,7 +4,9 @@
 
 #include "Rendering/ObjectFactoryExt.h"
 #include "Rendering/TexturedVtkMapper3D.h"
-#include "Interactions/FreehandSurfaceCutInteractor.h"
+#include "Interactions/FreehandCutInteractor.h"
+#include "Interactions/FreehandCutInteractor.h"
+#include "Interactions/FreehandSurfaceCutImplementation.h"
 #include "Interactions/GeometryInteractor.h"
 
 #include "MitkMain/IQF_MitkRenderWindow.h"
@@ -77,7 +79,7 @@ void SurfaceCutView::InsideOut(bool flag)
 {
     if (m_freehandCutInteractor)
     {
-        static_cast<FreehandSurfaceCutInteractor*>(m_freehandCutInteractor.GetPointer())->SetInsideOut(flag);
+        static_cast<FreehandCutInteractor*>(m_freehandCutInteractor.GetPointer())->SetInsideOut(flag);
     }
 }
 
@@ -92,10 +94,11 @@ void SurfaceCutView::FreehandCut(bool enableCut)
     {
         if (m_freehandCutInteractor.IsNull())
         {
-            m_freehandCutInteractor = FreehandSurfaceCutInteractor::New();
-            static_cast<FreehandSurfaceCutInteractor*>(m_freehandCutInteractor.GetPointer())->SetDataStorage(GetDataStorage());
-            static_cast<FreehandSurfaceCutInteractor*>(m_freehandCutInteractor.GetPointer())->SetInsideOut(m_ui.InsideOutCheckBox->isChecked());
-            static_cast<FreehandSurfaceCutInteractor*>(m_freehandCutInteractor.GetPointer())->SetRenderer(
+            m_freehandCutInteractor = FreehandCutInteractor::New();
+            static_cast<FreehandCutInteractor*>(m_freehandCutInteractor.GetPointer())->SetImplementation(new FreehandSurfaceCutImplementation());
+            static_cast<FreehandCutInteractor*>(m_freehandCutInteractor.GetPointer())->SetDataStorage(GetDataStorage());
+            static_cast<FreehandCutInteractor*>(m_freehandCutInteractor.GetPointer())->SetInsideOut(m_ui.InsideOutCheckBox->isChecked());
+            static_cast<FreehandCutInteractor*>(m_freehandCutInteractor.GetPointer())->SetRenderer(
                 m_pMitkRenderWindow->GetMitkStdMultiWidget()->GetRenderWindow4()->GetRenderer()->GetVtkRenderer());
 
             std::string configpath = m_pMain->GetConfigPath();
@@ -109,12 +112,12 @@ void SurfaceCutView::FreehandCut(bool enableCut)
             m_freehandCutInteractor->SetDataNode(node);
         }
         node->SetDataInteractor(m_freehandCutInteractor);
-        static_cast<FreehandSurfaceCutInteractor*>(m_freehandCutInteractor.GetPointer())->Start();
+        static_cast<FreehandCutInteractor*>(m_freehandCutInteractor.GetPointer())->Start();
         RequestRenderWindowUpdate();
     }
     else
     {
-        static_cast<FreehandSurfaceCutInteractor*>(m_freehandCutInteractor.GetPointer())->Finished();
+        static_cast<FreehandCutInteractor*>(m_freehandCutInteractor.GetPointer())->Finished();
         node->SetDataInteractor(nullptr);
         RequestRenderWindowUpdate();
     }
@@ -124,7 +127,7 @@ void SurfaceCutView::Undo()
 {
     if (m_freehandCutInteractor)
     {
-        static_cast<FreehandSurfaceCutInteractor*>(m_freehandCutInteractor.GetPointer())->Undo();
+        static_cast<FreehandCutInteractor*>(m_freehandCutInteractor.GetPointer())->Undo();
     }
 }
 
@@ -132,7 +135,7 @@ void SurfaceCutView::Redo()
 {
     if (m_freehandCutInteractor)
     {
-        static_cast<FreehandSurfaceCutInteractor*>(m_freehandCutInteractor.GetPointer())->Redo();
+        static_cast<FreehandCutInteractor*>(m_freehandCutInteractor.GetPointer())->Redo();
     }
 }
 

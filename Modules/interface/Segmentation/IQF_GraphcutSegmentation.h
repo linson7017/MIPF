@@ -2,6 +2,7 @@
 #define IQF_GraphcutSegmentation_h__
 
 #include "ITKImageTypeDef.h"
+#include "iconfig.h"
 
 /********Demo**********/
 /*
@@ -27,6 +28,7 @@
 
 class IQF_GraphcutSegmentation
 {
+    BUILD_INTERFACE(IQF_GraphcutSegmentation)
 public:
     virtual void Init()=0;
     virtual void PerformSegmentation() = 0;

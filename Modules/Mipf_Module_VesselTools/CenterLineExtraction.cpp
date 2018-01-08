@@ -16,12 +16,19 @@
 #include "vtkPolyDataConnectivityFilter.h"
 #include "vtkSphereSource.h"
 #include "vtkMath.h"
+#include "vtkImageData.h"             
+#include "vtkMarchingCubes.h"
 
 //vmkt
 #include "vmtk/vtkvmtkPolyDataCenterlines.h"
 #include "vmtk/vtkvmtkPolyDataNetworkExtraction.h"
 #include "vmtk/vtkvmtkCapPolyData.h"
 #include "vmtk/vtkvmtkPolyBall.h"
+
+#include "vmtk/vtkvmtkCenterlineBranchExtractor.h"
+#include "vmtk/vtkvmtkPolyDataCenterlines.h"
+#include "vmtk/vtkvmtkPolyBallModeller.h"
+#include "vmtk/vtkvmtkCapPolyData.h"
 
 
 CenterLineExtraction::CenterLineExtraction()
@@ -67,6 +74,36 @@ void RemoveIndex(std::vector<T>& v, int index)
         i++;
     }
 }
+
+void CenterLineExtraction::ReconstructTubularSurfaceByCenterLine(vtkPolyData* pCenterLine, vtkPolyData* pOutputData)
+{
+    if (!pCenterLine||!pOutputData)
+    {
+        return;
+    }
+
+    int ModelDim[3] = { 64,64,64 };
+    auto modeller = vtkSmartPointer<vtkvmtkPolyBallModeller>::New();
+
+    modeller->SetInputData(pCenterLine);
+    modeller->SetRadiusArrayName("Radius");
+    modeller->UsePolyBallLineOn();
+    modeller->SetSampleDimensions(ModelDim);
+    modeller->SetNegateFunction(0);
+    modeller->Update();
+
+    auto InMarching = vtkSmartPointer<vtkImageData>::New();
+    InMarching->DeepCopy(modeller->GetOutput());
+    InMarching->Modified();
+
+    auto marchingCubes = vtkSmartPointer<vtkMarchingCubes>::New();
+    marchingCubes->SetInputData(InMarching);
+    marchingCubes->SetValue(0, 1);
+    marchingCubes->Update();
+
+    pOutputData->DeepCopy(marchingCubes->GetOutput());
+}
+
 
 void CenterLineExtraction::ExtractCenterLineNetwork(vtkPolyData* pInput, double* vStartPoint, vtkPolyData* pOutputNetwork, vtkPoints* pOutputEndpoints, vtkPolyData* pOutputVoronoi)
 {
@@ -214,9 +251,16 @@ void CenterLineExtraction::OpenSurfaceAtPoint(vtkPolyData* polyData, vtkPolyData
     pointLocator->SetDataSet(polyData);
     pointLocator->BuildLocator();
 
-    vtkIdType id = pointLocator->FindClosestPoint(seed);
-
-    seed = polyData->GetPoint(id);
+    if (seed)
+    {
+        vtkIdType id = pointLocator->FindClosestPoint(seed);
+        seed = polyData->GetPoint(id);
+    }
+    else
+    {
+        seed = polyData->GetPoint(0);
+    }
+    
 
     vtkSmartPointer<vtkSphere> sphere = vtkSmartPointer<vtkSphere>::New();
     sphere->SetCenter(seed[0], seed[1], seed[2]);
