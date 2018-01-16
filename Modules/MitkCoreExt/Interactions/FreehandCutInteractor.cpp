@@ -27,7 +27,7 @@
 
 #include "CutImplementation.h"
 
-FreehandCutInteractor::FreehandCutInteractor() :m_bDrawing(false), m_bInitFlag(false), m_pCurveNode(nullptr), m_pDataStorage(nullptr), m_bModify(false)
+FreehandCutInteractor::FreehandCutInteractor() :m_bDrawing(false), m_bInitFlag(false), m_pCurveNode(nullptr), m_pDataStorage(nullptr), m_bModify(false) , m_bCanBeModified(false)
 {
 
 }
@@ -35,11 +35,7 @@ FreehandCutInteractor::FreehandCutInteractor() :m_bDrawing(false), m_bInitFlag(f
 
 FreehandCutInteractor::~FreehandCutInteractor()
 {
-    if (m_implementation!=nullptr)
-    {
-        m_implementation->Release();
-        m_implementation = nullptr;
-    }
+    ReleaseEvent.Send();
 }
 
 void FreehandCutInteractor::SetDataNode(mitk::DataNode *dataNode)
@@ -73,7 +69,7 @@ void FreehandCutInteractor::End()
 
 void FreehandCutInteractor::Init()
 {
-    if (m_implementation&&m_pDataStorage)
+    if (1&&m_pDataStorage)
     {
         m_bInitFlag = true;
         m_pCurveNode = mitk::DataNode::New();
@@ -95,8 +91,7 @@ void FreehandCutInteractor::Init()
         m_pCurvePoints = vtkSmartPointer<vtkPoints>::New();
         m_pCurvePointsBeforeModify = vtkSmartPointer<vtkPoints>::New();
 
-        m_implementation->SetDataNode(GetDataNode());
-        m_implementation->Init();
+        InitEvent.Send(GetDataNode());
     }
 }
 
@@ -128,7 +123,10 @@ void FreehandCutInteractor::InitMove(mitk::StateMachineAction *, mitk::Interacti
 
 void FreehandCutInteractor::InitModify(mitk::StateMachineAction *, mitk::InteractionEvent *interactionEvent)
 {
-    MITK_INFO << "Begin Modify";
+    if (!m_bCanBeModified)
+    {
+        return;
+    }
     mitk::InteractionPositionEvent *positionEvent = dynamic_cast<mitk::InteractionPositionEvent *>(interactionEvent);
     if (positionEvent == NULL)
         return;
@@ -149,7 +147,7 @@ void FreehandCutInteractor::InitModify(mitk::StateMachineAction *, mitk::Interac
 
 void FreehandCutInteractor::Modify(mitk::StateMachineAction *, mitk::InteractionEvent *interactionEvent)
 {
-    if (m_bModify&&m_bInitFlag)
+    if (m_bModify&&m_bInitFlag&&m_bCanBeModified)
     {
         m_pCurveNode->SetColor(1, 0, 0);
         mitk::InteractionPositionEvent *positionEvent = dynamic_cast<mitk::InteractionPositionEvent *>(interactionEvent);
@@ -245,51 +243,51 @@ void FreehandCutInteractor::Finished(mitk::StateMachineAction *, mitk::Interacti
     {
         return;
     }
+    ProcessEvent.Send(m_pCurvePoints.Get(), interactionEvent);
 
-    m_implementation->Cut(m_pCurvePoints.Get(),interactionEvent);
-
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-    if (m_bModify)
+    if(m_bCanBeModified&&m_bModify)
     {
-        m_pCurveNode->SetColor(0, 1, 0);
+         m_pCurveNode->SetColor(0, 1, 0);
     }
-
+    else
+    {
+        m_pCurvePoints->Reset();
+        m_pCurveData->Reset();
+    }
+  
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void FreehandCutInteractor::Undo(mitk::StateMachineAction *, mitk::InteractionEvent *interactionEvent)
 {
+    
     Undo();
 }
 
 void  FreehandCutInteractor::Redo(mitk::StateMachineAction *, mitk::InteractionEvent *interactionEvent)
 {
+    
     Redo();
-}
-
-
-void FreehandCutInteractor::SetInsideOut(bool flag)
-{
-    m_implementation->InsideOut = flag;
 }
 
 void  FreehandCutInteractor::Undo()
 {
-    m_implementation->Undo();
+    UndoEvent.Send();
 }
 
 void  FreehandCutInteractor::Redo()
 {
-    m_implementation->Redo();
+    RedoEvent.Send();
 }
 
 void  FreehandCutInteractor::Reset()
 {
-    m_implementation->Reset();
+    ResetEvent.Send();
 }
 
 void FreehandCutInteractor::Finished()
 {
-    m_implementation->Finished();
+    FinishedEvent.Send();
     m_pCurveData->Reset();
     m_pCurvePoints->Reset();
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
@@ -312,7 +310,7 @@ double FreehandCutInteractor::DistanceBetweenPointAndPoints(mitk::Point3D &point
             m_NearestPoint = vtkpoint;
         }
     }
-    //存储修改前各点到最近点的距离
+
     m_vDistanceBetweenPointsAndPoint.clear();
     for (int i = 0; i < vtkpoints->GetNumberOfPoints(); ++i)
     {
@@ -320,7 +318,7 @@ double FreehandCutInteractor::DistanceBetweenPointAndPoints(mitk::Point3D &point
         double newDistance = sqrt((m_NearestPoint[0] - vtkpoint[0])*(m_NearestPoint[0] - vtkpoint[0]) + (m_NearestPoint[1] - vtkpoint[1])*(m_NearestPoint[1] - vtkpoint[1]) + (m_NearestPoint[2] - vtkpoint[2])*(m_NearestPoint[2] - vtkpoint[2]));
         m_vDistanceBetweenPointsAndPoint.push_back(newDistance);
     }
-    //存储修改前曲线上的各个点的坐标
+
     m_pCurvePointsBeforeModify->Reset();
     for (int i = 0; i < vtkpoints->GetNumberOfPoints(); ++i)
     {

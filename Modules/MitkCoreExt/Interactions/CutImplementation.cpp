@@ -1,5 +1,7 @@
 #include "CutImplementation.h"
 
+#include <vtkMetaImageWriter.h>
+
 CutImplementation::CutImplementation() :m_pDataNode(nullptr), InsideOut(false) 
 {
 
@@ -12,8 +14,24 @@ void CutImplementation::Release()
     delete this;
 }
 
-void CutImplementation::Init()
+void CutImplementation::Cut(vtkObject* pCutData, mitk::InteractionEvent * interactionEvent)
 {
+    auto result = CutImpl(pCutData, interactionEvent);
+    if (result)
+    {
+        m_undoList.push(result);
+        ClearRedo();
+        Refresh();
+    }   
+}
+
+void CutImplementation::Init(mitk::DataNode* pDataNode)
+{
+    if (!pDataNode)
+    {
+        return;
+    }
+    m_pDataNode = pDataNode;
     ClearUndo();
     ClearRedo();
     if (GetDataObject())
@@ -147,5 +165,6 @@ void CutImplementation::Reset()
 
 void CutImplementation::Finished()
 {
-    Init();
+    ClearRedo();
+    ClearUndo();
 }

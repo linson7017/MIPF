@@ -12,28 +12,32 @@
 #include "vtkSmartPointer.h"
 #include "vtkDataObject.h"
 #include <stack>
+#include "qf_config.h"
 
-class CutImplementation
+class QF_API CutImplementation
 {
 public:
     CutImplementation();
     virtual ~CutImplementation()
     {
     }
-    virtual void Cut(vtkObject* pCutData, mitk::InteractionEvent * interactionEvent) = 0;
-    void SetDataNode(mitk::DataNode::Pointer pDataNode) { m_pDataNode = pDataNode; }
+    void Cut(vtkObject* pCutData, mitk::InteractionEvent * interactionEvent);
+    void SetInsideOut(bool b) { InsideOut = b; }
 
-    void Init();
+    void Init(mitk::DataNode* pDataNode);
     void Finished();
     void Reset();
     void Undo();
     void Redo();
+
+
     void Release();
 
     bool InsideOut;
     bool InitFlag;
 protected:
     //implement by  subclass
+    virtual vtkSmartPointer<vtkDataObject> CutImpl(vtkObject* pCutData, mitk::InteractionEvent * interactionEvent) = 0;
     virtual vtkDataObject* GetDataObject() = 0;
     virtual vtkSmartPointer<vtkDataObject> GetCopyOfDataObject() = 0;
     virtual void Refresh()=0;

@@ -24,7 +24,7 @@ Purpose:
 
 class vtkCamera;
 class vtkRenderer;
-class CutImplementation;
+
 
 class QF_API FreehandCutInteractor : public mitk::DataInteractor
 {
@@ -39,14 +39,26 @@ public:
     void SetRenderer(vtkRenderer* renderer);
     void Start();
     void End();
-    void SetInsideOut(bool flag);
+    void EnableModify(bool enable=true) { m_bCanBeModified = enable; }
 
     //implementation
     void Undo();
     void Redo();
     void Reset();
     void Finished();
-    void SetImplementation(CutImplementation* implementation) { m_implementation = implementation; }
+
+public:
+    typedef mitk::Message<> ImplementEventType;
+    typedef mitk::Message1<mitk::DataNode*> InitEventType;
+    typedef mitk::Message2<vtkObject*,mitk::InteractionEvent *> InteractionImplementEventType;
+    InitEventType InitEvent;
+    ImplementEventType UndoEvent;
+    ImplementEventType RedoEvent;
+    ImplementEventType FinishedEvent;
+    ImplementEventType ResetEvent;
+    ImplementEventType ReleaseEvent;
+    InteractionImplementEventType ProcessEvent;
+
 protected:
     FreehandCutInteractor();
     ~FreehandCutInteractor();
@@ -85,7 +97,7 @@ private:
     bool m_bInitFlag;
     bool m_bModify;
 
-    CutImplementation* m_implementation;
+    bool m_bCanBeModified;
 };
 
 #endif // FreehandCutInteractor_h__

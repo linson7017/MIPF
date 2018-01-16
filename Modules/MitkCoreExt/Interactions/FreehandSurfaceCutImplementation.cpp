@@ -51,18 +51,18 @@ void FreehandSurfaceCutImplementation::Refresh()
         auto poly = dynamic_cast<vtkPolyData*>(TopOfUndo().Get());
         if (pData&&poly)
         {
-            pData->GetVtkPolyData()->DeepCopy(poly);
+            pData->SetVtkPolyData(poly);
             mitk::RenderingManager::GetInstance()->RequestUpdateAll();
         }
 }
 
-void FreehandSurfaceCutImplementation::Cut(vtkObject* pCutData, mitk::InteractionEvent * interactionEvent)
+vtkSmartPointer<vtkDataObject> FreehandSurfaceCutImplementation::CutImpl(vtkObject* pCutData, mitk::InteractionEvent * interactionEvent)
 {
     vtkPoints* curvePoints = dynamic_cast<vtkPoints*>(pCutData);
     mitk::InteractionPositionEvent *positionEvent = dynamic_cast<mitk::InteractionPositionEvent *>(interactionEvent);
     if (!positionEvent||!curvePoints)
     {
-        return;
+        return nullptr;
     }
     auto clipFunction = vtkSmartPointer<vtkImplicitSelectionLoop>::New();
     clipFunction->SetLoop(curvePoints);
@@ -80,9 +80,10 @@ void FreehandSurfaceCutImplementation::Cut(vtkObject* pCutData, mitk::Interactio
     clipper->SetInsideOut(InsideOut);
 
     clipper->Update();
-    pSurfaceData->GetVtkPolyData()->DeepCopy(clipper->GetOutput());
+    
 
-    ClearRedo();
-    m_undoList.push(clipper->GetOutput());
+    auto result = vtkSmartPointer<vtkPolyData>::New();
+    result->DeepCopy(clipper->GetOutput());
+    return result;
 
 }

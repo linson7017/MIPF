@@ -65,9 +65,9 @@ void SliceBySliceBlobTracking::fitOneSlice(int sliceIndex, int startSlice, int* 
     cv::Mat mat(abs(extent[1] - extent[0]), abs(extent[3] - extent[2]), CV_32FC1);
     mat.setTo(Scalar(0));
     Scalar vv = mat.at<float>(1, 1);
-    for (size_t j = extent[0]; j < extent[1]; j++)
+    for (int j = extent[0]; j < extent[1]; j++)
     {
-        for (size_t k = extent[2]; k < extent[3]; k++)
+        for (int k = extent[2]; k < extent[3]; k++)
         {
             float value = sliceImage->GetScalarComponentAsFloat(j, k, sliceIndex, 0);
             //note: the cv mat is organized using row and colume, so we should transpose the image to match it

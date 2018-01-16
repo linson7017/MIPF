@@ -55,20 +55,19 @@ void FreehandVolumeCutImplementation::Refresh()
     auto img = dynamic_cast<vtkImageData*>(TopOfUndo().Get());
     if (pData&&img)
     {
-        pData->GetVtkImageData()->DeepCopy(img);
-        pData->Modified();
+        pData->SetVolume(img->GetScalarPointer());
         mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     }
 }
 
 
-void FreehandVolumeCutImplementation::Cut(vtkObject* pCutData, mitk::InteractionEvent * interactionEvent)
+vtkSmartPointer<vtkDataObject> FreehandVolumeCutImplementation::CutImpl(vtkObject* pCutData, mitk::InteractionEvent * interactionEvent)
 {
     vtkPoints* curvePoints = dynamic_cast<vtkPoints*>(pCutData);
     mitk::InteractionPositionEvent *positionEvent = dynamic_cast<mitk::InteractionPositionEvent *>(interactionEvent);
     if (!positionEvent|| !curvePoints)
     {
-        return;
+        return nullptr;
     }
     mitk::Image* data = dynamic_cast<mitk::Image*>(m_pDataNode->GetData());
 
@@ -115,13 +114,11 @@ void FreehandVolumeCutImplementation::Cut(vtkObject* pCutData, mitk::Interaction
         vtkSmartPointer<vtkImageStencil>::New();
     imgstenc->SetInputData(img);
     imgstenc->SetStencilConnection(pol2stenc->GetOutputPort());
-    imgstenc->SetReverseStencil(InsideOut);
+    imgstenc->SetReverseStencil(!InsideOut);
     imgstenc->SetBackgroundValue(data->GetScalarValueMin());
     imgstenc->Update();
 
-    ClearRedo();
-    m_undoList.push(imgstenc->GetOutput());
-
-    Refresh();
-
+    auto result = vtkSmartPointer<vtkImageData>::New();
+    result->DeepCopy(imgstenc->GetOutput());
+    return result;    
 }

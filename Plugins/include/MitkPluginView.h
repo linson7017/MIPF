@@ -186,6 +186,18 @@ protected:
 
         GetDataStorage()->Add(node, parentNode);
     }
+    mitk::DataNode::Pointer ImportVtkPolyData(vtkPolyData* polydata, const char* name, mitk::DataNode* parentNode = nullptr)
+    {
+        mitk::Surface::Pointer surface = mitk::Surface::New();
+        surface->SetVtkPolyData(polydata);
+        mitk::DataNode::Pointer node = mitk::DataNode::New();
+        node->SetData(surface);
+        node->SetName(name);
+
+        GetDataStorage()->Add(node, parentNode);
+        return node;
+
+    }
 protected:
     IQF_MitkDataManager* m_pMitkDataManager;
     IQF_MitkRenderWindow* m_pMitkRenderWindow;

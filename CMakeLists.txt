@@ -213,6 +213,8 @@ if(USE_PYTHON)
 	find_package(PythonLibs REQUIRED)
 endif()
 
+add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+
 #-----------------------------------------------------------------------------
 # Add modules
 #-----------------------------------------------------------------------------

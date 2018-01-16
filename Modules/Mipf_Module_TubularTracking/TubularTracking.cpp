@@ -655,10 +655,7 @@ void TubularTracking::_getImageData(InternalImageType &imData, BinaryImageType &
   imData.AllocateScalars(VTK_FLOAT, 1);
   clearImage(&imData);
   // Copy image data
-  try{
-      copySubImage(&imData, imgProps.getImage());
-  }
-  catch(int x){};
+  copySubImage(&imData, imgProps.getImage());
   //vtkMetaImageWriter* writer = vtkMetaImageWriter::New();
   //writer->SetInputData(&imData);
  // writer->SetRAWFileName("D:/imdata/imdata.raw");

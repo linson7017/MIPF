@@ -77,9 +77,9 @@ void SurfaceCutView::CreateView()
 /**************Freehand Cut********************/
 void SurfaceCutView::InsideOut(bool flag)
 {
-    if (m_freehandCutInteractor)
+    if (m_pImplementation)
     {
-        static_cast<FreehandCutInteractor*>(m_freehandCutInteractor.GetPointer())->SetInsideOut(flag);
+        m_pImplementation->SetInsideOut(flag);
     }
 }
 
@@ -92,23 +92,35 @@ void SurfaceCutView::FreehandCut(bool enableCut)
     }
     if (enableCut)
     {
+        //create implementation
+        if (!m_pImplementation)
+        {
+            m_pImplementation = new FreehandSurfaceCutImplementation();
+            m_pImplementation->SetInsideOut(m_ui.InsideOutCheckBox->isChecked());     
+        }
+        m_pImplementation->Init(node);
+        //create interactor
         if (m_freehandCutInteractor.IsNull())
         {
-            m_freehandCutInteractor = FreehandCutInteractor::New();
-            static_cast<FreehandCutInteractor*>(m_freehandCutInteractor.GetPointer())->SetImplementation(new FreehandSurfaceCutImplementation());
+            m_freehandCutInteractor = FreehandCutInteractor::New();         
+            //connect 
+            FreehandCutInteractor* pInteractor = static_cast<FreehandCutInteractor*>(m_freehandCutInteractor.GetPointer());
+            pInteractor->UndoEvent.AddListener(mitk::MessageDelegate<CutImplementation>(m_pImplementation, &CutImplementation::Undo));
+            pInteractor->RedoEvent.AddListener(mitk::MessageDelegate<CutImplementation>(m_pImplementation, &CutImplementation::Redo));
+            pInteractor->FinishedEvent.AddListener(mitk::MessageDelegate<CutImplementation>(m_pImplementation, &CutImplementation::Finished));
+            pInteractor->ResetEvent.AddListener(mitk::MessageDelegate<CutImplementation>(m_pImplementation, &CutImplementation::Reset));
+            pInteractor->ReleaseEvent.AddListener(mitk::MessageDelegate<CutImplementation>(m_pImplementation, &CutImplementation::Release));
+            pInteractor->ProcessEvent.AddListener(mitk::MessageDelegate2<CutImplementation, vtkObject*, mitk::InteractionEvent *>(m_pImplementation, &CutImplementation::Cut));
+
+            //
             static_cast<FreehandCutInteractor*>(m_freehandCutInteractor.GetPointer())->SetDataStorage(GetDataStorage());
-            static_cast<FreehandCutInteractor*>(m_freehandCutInteractor.GetPointer())->SetInsideOut(m_ui.InsideOutCheckBox->isChecked());
             static_cast<FreehandCutInteractor*>(m_freehandCutInteractor.GetPointer())->SetRenderer(
                 m_pMitkRenderWindow->GetMitkStdMultiWidget()->GetRenderWindow4()->GetRenderer()->GetVtkRenderer());
 
             std::string configpath = m_pMain->GetConfigPath();
             configpath.append("/mitk/Interactions/");
-
-           m_freehandCutInteractor->LoadStateMachine(configpath + "FreehandSurfaceCutInteraction.xml");
-           m_freehandCutInteractor->SetEventConfig(configpath + "FreehandSurfaceCutConfig.xml");
-           
-          //  m_freehandCutInteractor->LoadStateMachine( "FreehandSurfaceCutInteraction.xml", us::GetModuleContext()->GetModule("1"));
-          //  m_freehandCutInteractor->SetEventConfig( "FreehandSurfaceCutConfig.xml", us::GetModuleContext()->GetModule("1"));
+            m_freehandCutInteractor->LoadStateMachine(configpath + "FreehandSurfaceCutInteraction.xml");
+            m_freehandCutInteractor->SetEventConfig(configpath + "FreehandSurfaceCutConfig.xml");
             m_freehandCutInteractor->SetDataNode(node);
         }
         node->SetDataInteractor(m_freehandCutInteractor);

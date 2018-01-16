@@ -109,6 +109,7 @@ bool PointList::InsertPoint(const double x, const double y, const double z)
             point[2] = z;
             pointSet->InsertPoint(point);
             m_PointSetNode->Modified();
+            return true;
         }
         else
         {

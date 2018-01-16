@@ -280,6 +280,7 @@ bool CQF_ManualSegmentation::CreateLabelSetImageNode(const mitk::Image* pOriginI
     }
     catch (mitk::Exception &e)
     {
+        MITK_ERROR << e.GetDescription();
         return false;
     }
 

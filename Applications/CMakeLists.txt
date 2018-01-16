@@ -47,6 +47,7 @@ macro(MipfGetQfConfig projectname QfConfigFiles)
 	${qfconfig_qtframework_ui_files}
 	${qfconfig_qtframework_styles_files}
 	${qfconfig_qtframework_uicommands_files})
+	source_group("qfconfig" FILES ${QfConfigFiles} )
 endmacro(MipfGetQfConfig)
 
 #拷贝qfconfig文件到运行目录下

@@ -104,7 +104,7 @@ public:
     {
         _markerList.clear();
     }
-    int size(){return _markerList.size();}
+    size_t size(){return _markerList.size();}
     XMarker& getItemAt(int index){return _markerList.at(index);}
 
 private:

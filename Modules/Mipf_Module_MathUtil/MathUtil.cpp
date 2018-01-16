@@ -10,7 +10,7 @@ void MathUtil::FitLine(const std::vector<Vector3>& pointsList, Vector3& center, 
     }
     //calculate average point as the center point
     double sumX, sumY, sumZ = 0;
-    int pointSize = pointsList.size();
+    size_t pointSize = pointsList.size();
     for (size_t i = 0; i < pointSize; i++)
     {
         sumX += pointsList[i].x();
@@ -49,11 +49,11 @@ double MathUtil::CalculateIntersectionPoint(const Vector3& center1, const Vector
     u.normalize();
     v.normalize();
     //w.normalize();
-    float    a = Vector3::dotProduct(u, u);
-    float    b = Vector3::dotProduct(u, v);
-    float    c = Vector3::dotProduct(v, v);
-    float    d = Vector3::dotProduct(u, w);
-    float    e = Vector3::dotProduct(v, w);
+    float    a = (float)Vector3::dotProduct(u, u);
+    float    b = (float)Vector3::dotProduct(u, v);
+    float    c = (float)Vector3::dotProduct(v, v);
+    float    d = (float)Vector3::dotProduct(u, w);
+    float    e = (float)Vector3::dotProduct(v, w);
     float    D = a*c - b*b;        // always >= 0
     float    sc, tc;
 

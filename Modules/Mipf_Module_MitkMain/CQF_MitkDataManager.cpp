@@ -30,6 +30,7 @@ void CQF_MitkDataManager::SetDataStorage(mitk::DataStorage::Pointer dataStorage)
 
 void CQF_MitkDataManager::RelateDataStorage()
 {
+
     m_DataStorage->ChangedNodeEvent.AddListener(
         mitk::MessageDelegate1<CQF_MitkDataManager, const mitk::DataNode *>(this, &CQF_MitkDataManager::OnNodeChanged));
     m_DataStorage->RemoveNodeEvent.AddListener(

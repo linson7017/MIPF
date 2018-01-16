@@ -19,7 +19,8 @@ class QF_API FreehandVolumeCutImplementation :public CutImplementation
 public:
     FreehandVolumeCutImplementation();
     virtual ~FreehandVolumeCutImplementation();
-    void Cut(vtkObject* pCutData, mitk::InteractionEvent * interactionEvent);
+protected:
+    vtkSmartPointer<vtkDataObject> CutImpl(vtkObject* pCutData, mitk::InteractionEvent * interactionEvent);
     vtkDataObject* GetDataObject();
     vtkSmartPointer<vtkDataObject> GetCopyOfDataObject();
     void Refresh();

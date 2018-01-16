@@ -18,7 +18,8 @@ class QF_API FreehandSurfaceCutImplementation :public CutImplementation
 public:
     FreehandSurfaceCutImplementation();
     virtual ~FreehandSurfaceCutImplementation();
-    void Cut(vtkObject* pCutData, mitk::InteractionEvent * interactionEvent);
+protected:
+    virtual vtkSmartPointer<vtkDataObject> CutImpl(vtkObject* pCutData, mitk::InteractionEvent * interactionEvent);
     vtkDataObject* GetDataObject();
     vtkSmartPointer<vtkDataObject> GetCopyOfDataObject();
     void Refresh();

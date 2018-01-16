@@ -154,6 +154,13 @@
            </widget>
           </item>
           <item>
+           <widget class="QCheckBox" name="InsideOutCheckBox">
+            <property name="text">
+             <string>InsideOut</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QPushButton" name="UndoBtn">
             <property name="text">
              <string>Undo</string>

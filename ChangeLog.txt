@@ -1,3 +1,6 @@
+20180108
+更改CutInteractor实现方式，增加CutImplementation
+
 20171204
 优化CMake配置，增加PCL点云配准插件
 

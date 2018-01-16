@@ -9,6 +9,8 @@
 
 class vtkImplicitFunction;
 
+class CutImplementation;
+
 class SurfaceCutView :public QWidget, public MitkPluginView
 {
     Q_OBJECT
@@ -44,6 +46,8 @@ protected:
     Ui::SurfaceCutView m_ui;
 
     mitk::DataInteractor::Pointer m_freehandCutInteractor;
+    CutImplementation* m_pImplementation;
+
     mitk::DataInteractor::Pointer m_boundingShapeInteractor;
     mitk::DataInteractor::Pointer m_geometryInteractor;
 

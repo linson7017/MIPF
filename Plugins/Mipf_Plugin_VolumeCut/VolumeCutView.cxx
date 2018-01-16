@@ -11,11 +11,13 @@
 
 
 //mitkCoreExt
-#include "Interactions/FreehandCutInteractor.h"
+#include "Interactions/FreehandVolumeCutInteractor.h"
 #include "Interactions/FreehandCutInteractor.h"
 #include "Interactions/FreehandVolumeCutImplementation.h"
+
+
   
-VolumeCutView::VolumeCutView() :MitkPluginView(), m_boxNumber(0)
+VolumeCutView::VolumeCutView() :MitkPluginView(), m_boxNumber(0) , m_pImplementation(nullptr),m_freehandCutInteractor(nullptr)
 {
 
 }
@@ -42,6 +44,7 @@ void VolumeCutView::CreateView()
     connect(m_ui.ModelCutBtn, SIGNAL(clicked(bool)), this, SLOT(ModelCut(bool)));
     connect(m_ui.UndoBtn, SIGNAL(clicked()), this, SLOT(Undo()));
     connect(m_ui.RedoBtn, SIGNAL(clicked()), this, SLOT(Redo()));
+    connect(m_ui.InsideOutCheckBox, SIGNAL(clicked(bool)), this, SLOT(InsideOutChanged(bool)));
 
 } 
 
@@ -61,6 +64,15 @@ void VolumeCutView::Redo()
     }
 }
 
+
+void VolumeCutView::InsideOutChanged(bool checked)
+{
+     if (m_pImplementation)
+     {
+         m_pImplementation->SetInsideOut(checked);
+     }
+}
+
 void VolumeCutView::ModelCut(bool b)
 {
     mitk::DataNode* node = m_ui.DataSelector->GetSelectedNode();
@@ -70,10 +82,25 @@ void VolumeCutView::ModelCut(bool b)
     }
     if (b)
     {
+        if (!m_pImplementation)
+        {
+            m_pImplementation = new FreehandVolumeCutImplementation;
+            m_pImplementation->SetInsideOut(m_ui.InsideOutCheckBox->isChecked());
+        }
+        m_pImplementation->Init(node);
+
         if (m_freehandCutInteractor.IsNull())
         {
             m_freehandCutInteractor = FreehandCutInteractor::New();
-            static_cast<FreehandCutInteractor*>(m_freehandCutInteractor.GetPointer())->SetImplementation(new FreehandVolumeCutImplementation());
+
+            FreehandCutInteractor* pInteractor = static_cast<FreehandCutInteractor*>(m_freehandCutInteractor.GetPointer());
+            pInteractor->UndoEvent.AddListener(mitk::MessageDelegate<CutImplementation>(m_pImplementation, &CutImplementation::Undo));
+            pInteractor->RedoEvent.AddListener(mitk::MessageDelegate<CutImplementation>(m_pImplementation, &CutImplementation::Redo));
+            pInteractor->FinishedEvent.AddListener(mitk::MessageDelegate<CutImplementation>(m_pImplementation, &CutImplementation::Finished));
+            pInteractor->ResetEvent.AddListener(mitk::MessageDelegate<CutImplementation>(m_pImplementation, &CutImplementation::Reset));
+            pInteractor->ReleaseEvent.AddListener(mitk::MessageDelegate<CutImplementation>(m_pImplementation, &CutImplementation::Release));
+            pInteractor->ProcessEvent.AddListener(mitk::MessageDelegate2<CutImplementation, vtkObject*, mitk::InteractionEvent *>(m_pImplementation, &CutImplementation::Cut));
+
             static_cast<FreehandCutInteractor*>(m_freehandCutInteractor.GetPointer())->SetDataStorage(GetDataStorage());
             static_cast<FreehandCutInteractor*>(m_freehandCutInteractor.GetPointer())->SetRenderer(
                 m_pMitkRenderWindow->GetMitkStdMultiWidget()->GetRenderWindow4()->GetRenderer()->GetVtkRenderer());
@@ -84,8 +111,8 @@ void VolumeCutView::ModelCut(bool b)
             m_freehandCutInteractor->LoadStateMachine(configPath + "FreehandSurfaceCutInteraction.xml");
             m_freehandCutInteractor->SetEventConfig(configPath + "FreehandSurfaceCutConfig.xml");
 
-            m_freehandCutInteractor->SetDataNode(node);
         }
+        m_freehandCutInteractor->SetDataNode(node);
         node->SetDataInteractor(m_freehandCutInteractor);
         static_cast<FreehandCutInteractor*>(m_freehandCutInteractor.GetPointer())->Start();
         RequestRenderWindowUpdate();
