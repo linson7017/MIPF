@@ -21,6 +21,7 @@
 #include <vtkPoints.h>
 #include <vtkLine.h>
 #include <vtkPolyData.h>
+#include <vtkSphereSource.h>
 
 QMatrix4x4 CaculateMatrix(QList<QVector3D> points, QList<QVector3D> offset)
 {
@@ -39,45 +40,6 @@ QMatrix4x4 CaculateMatrix(QList<QVector3D> points, QList<QVector3D> offset)
     m(3, 3) = 1.0;
 
     return m;
-}
-
-static void QMatrixToVtkMatrix(const QMatrix4x4& qm, vtkMatrix4x4* vm)
-{
-    vm->Identity();
-    for (int i = 0; i < 4; i++)
-    {
-        for (int j = 0; j < 4; j++)
-        {
-            vm->SetElement(i, j, qm(i, j));
-        }
-    }
-}
-
-void TransformNode(mitk::DataNode* node,QMatrix4x4 transform)
-{
-    vtkMatrix4x4* matrix = node->GetData()->GetGeometry()->GetVtkMatrix();
-    auto tm =  vtkSmartPointer<vtkMatrix4x4>::New();
-    auto rm = vtkSmartPointer<vtkMatrix4x4>::New();
-
-    QMatrixToVtkMatrix(transform, tm.Get());
-    vtkMatrix4x4::Multiply4x4(tm.Get(), matrix, rm.Get());
-    node->GetData()->GetGeometry()->SetIndexToWorldTransformByVtkMatrix(rm);
-}
-
-void Use()
-{
-    //计算坐标系变换矩阵
-    QMatrix4x4 initImgCoord = CaculateMatrix();   //计算图像坐标系下磁定位片矩阵
-    QMatrix4x4 initMagCoord;  //磁定位坐标系下此定位片矩阵
-    QMatrix4x4 transform = initImgCoord*initMagCoord.inverted();  //获得两个坐标系的变换矩阵
-    
-    //根据当前磁定位器矩阵计算图像的变换矩阵
-    mitk::DataNode::Pointer node;
-    QMatrix4x4 currentMagCoord;
-    QMatrix4x4 currentImageCoord = transform * currentMagCoord;
-    QMatrix4x4 currentImageTransform = currentImageCoord * initImgCoord.inverted();
-    TransformNode(node, currentImageTransform);
-
 }
 
 
@@ -144,14 +106,28 @@ void LankMarkExtractView::OnImageSelectionChanged(const mitk::DataNode *node)
 }
 
 
+double Distance(double* p1,double* p2)
+{
+    return sqrt((p1[0]-p2[0])*(p1[0] - p2[0])+
+        (p1[1] - p2[1])*(p1[1] - p2[1])+
+        (p1[2] - p2[2])*(p1[2] - p2[2]));
+
+}
+
 void LankMarkExtractView::Extract()
 {
     std::vector<std::vector<double>>  vecModelDistance;
 
+    double p0[] = { -19.0,-9.7,0 };
+    double p1[] = { 16.5,-3.7,0 };
+    double p2[] = { 0,-12.7,21.5 };
+    double p3[] = { 0,-6.7,-18 };
+
+
     std::vector<double> vecModelOne;
-    vecModelOne.push_back(7);
-    vecModelOne.push_back(12);
-    vecModelOne.push_back(11);
+    vecModelOne.push_back(Distance(p0,p1));
+    vecModelOne.push_back(Distance(p0, p2));
+    vecModelOne.push_back(Distance(p0, p3));
     vecModelDistance.push_back(vecModelOne);
     std::vector<double> vecModelTwo;
     vecModelTwo.push_back(10);
@@ -193,62 +169,34 @@ void LankMarkExtractView::Extract()
     QVector3D pz = origin + m.column(2).toVector3D() * 10;
 
 
+    for (int i=0;i<4;i++)
+    {
+        /* vtkSmartPointer<vtkPoints> pts =
+             vtkSmartPointer<vtkPoints>::New();
+         vtkSmartPointer<vtkCellArray> vertices =
+             vtkSmartPointer<vtkCellArray>::New();
+         vtkIdType pid[1];
+         pid[0] = pts->InsertNextPoint(results[i].Coord.GetElement(0), results[i].Coord.GetElement(1), results[i].Coord.GetElement(2));
+         vertices->InsertNextCell(1, pid);
+ */
+ // Add the points to the polydata container
+      /*  auto pointPolyData = vtkSmartPointer<vtkPolyData>::New();
+        pointPolyData->SetPoints(pts);
+        pointPolyData->SetVerts(vertices);*/
+
+        vtkSmartPointer<vtkSphereSource> sphereSource =
+            vtkSmartPointer<vtkSphereSource>::New();
+        sphereSource->SetCenter(results[i].Coord.GetElement(0), results[i].Coord.GetElement(1), results[i].Coord.GetElement(2));
+        sphereSource->SetRadius(1.0);
+        sphereSource->Update();
+
+        
+
+        QString pointName = QString("Point%1").arg(i);
+        mitk::DataNode::Pointer node = ImportVtkPolyData(sphereSource->GetOutput(), pointName.toStdString().c_str());
+    }
     // Create a vtkPoints container and store the points in it
-    vtkSmartPointer<vtkPoints> pts =
-        vtkSmartPointer<vtkPoints>::New();
-    pts->InsertNextPoint(origin.x(),origin.y(),origin.z());
-    pts->InsertNextPoint(px.x(), px.y(), px.z());
-    pts->InsertNextPoint(py.x(), py.y(), py.z());
-    pts->InsertNextPoint(pz.x(), pz.y(), pz.z());
-
-    // Add the points to the polydata container
-    linesPolyData->SetPoints(pts);
-
-    // Create the first line (between Origin and P0)
-    vtkSmartPointer<vtkLine> line0 =
-        vtkSmartPointer<vtkLine>::New();
-    line0->GetPointIds()->SetId(0, 0); // the second 0 is the index of the Origin in linesPolyData's points
-    line0->GetPointIds()->SetId(1, 1); // the second 1 is the index of P0 in linesPolyData's points
-
-                                       // Create the second line (between Origin and P1)
-    vtkSmartPointer<vtkLine> line1 =
-        vtkSmartPointer<vtkLine>::New();
-    line1->GetPointIds()->SetId(0, 0); // the second 0 is the index of the Origin in linesPolyData's points
-    line1->GetPointIds()->SetId(1, 2); // 2 is the index of P1 in linesPolyData's points
-
-                                       // Create the second line (between Origin and P1)
-    vtkSmartPointer<vtkLine> line2 =
-        vtkSmartPointer<vtkLine>::New();
-    line2->GetPointIds()->SetId(0, 0); // the second 0 is the index of the Origin in linesPolyData's points
-    line2->GetPointIds()->SetId(1, 3); // 2 is the index of P1 in linesPolyData's points
-
-                                       // Create a vtkCellArray container and store the lines in it
-    vtkSmartPointer<vtkCellArray> lines =
-        vtkSmartPointer<vtkCellArray>::New();
-    lines->InsertNextCell(line0);
-    lines->InsertNextCell(line1);
-    lines->InsertNextCell(line2);
-
-
-    // Add the lines to the polydata container
-    linesPolyData->SetLines(lines);
-
-    unsigned char red[3] = { 255, 0, 0 };
-    unsigned char green[3] = { 0, 255, 0 };
-    unsigned char blue[3] = { 0, 0, 255 };
-
-
-    // Create a vtkUnsignedCharArray container and store the colors in it
-    vtkSmartPointer<vtkUnsignedCharArray> colors =
-        vtkSmartPointer<vtkUnsignedCharArray>::New();
-    colors->SetNumberOfComponents(3);
-    colors->InsertNextTupleValue(red);
-    colors->InsertNextTupleValue(green);
-    colors->InsertNextTupleValue(blue);
-
-    linesPolyData->GetCellData()->SetScalars(colors);
-
-    mitk::DataNode::Pointer node = ImportVtkPolyData(linesPolyData, "coord");
+    
 
     ////////////////////////////
 

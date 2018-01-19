@@ -81,8 +81,9 @@ void ModelExporterView ::Apply()
     {
         return;
     }
-
-    m_sceneViewer->AddPolyData(surface->GetVtkPolyData(), m_ui.DataSelector->GetSelectedNode()->GetName());
+    m_sceneViewer->AddPolyData(surface->GetVtkPolyData(), m_ui.DataSelector->GetSelectedNode()->GetName(),
+        m_ui.DataSelector->GetSelectedNode(),
+        m_pMitkRenderWindow->GetMitkStdMultiWidget()->GetRenderWindow4()->GetRenderer());
     m_sceneViewer->show();
 
     return;

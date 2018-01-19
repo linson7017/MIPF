@@ -11,7 +11,10 @@
 #include <QVTKWidget.h>
 #include <vtkRenderer.h>
 #include <vtkPolyData.h>
+#include <vtkPolyDataMapper.h>
 #include <vtkSmartPointer.h>
+
+#include <mitkDataNode.h>
 
 namespace QF
 {
@@ -27,9 +30,11 @@ public:
     VTKSceneViwer(QF::IQF_Main* pMain,QWidget* parent=0);
     ~VTKSceneViwer();
     vtkRenderWindow* GetRenderWindow() { return m_vtkWidget->GetRenderWindow(); }
-    void AddPolyData(vtkPolyData* polyData,const std::string& name="");
+    void AddPolyData(vtkPolyData* polyData, const std::string& name = "", mitk::DataNode* propertyNode = nullptr,mitk::BaseRenderer* renderer=nullptr);
 protected slots:
     void Apply();
+
+    void Remove();
 
     void ChangeColor();
     void ChangeAmbientColor();
@@ -48,23 +53,19 @@ protected slots:
     void ShadingChanged(int state);
     void LightingChanged(int state);
 
-    void ActorSelectionChanged(int row);
+    void ActorSelectionChanged(QListWidgetItem *current, QListWidgetItem *previous);
+
+    void ApplyProperties(vtkActor* actor,vtkPolyDataMapper* mapper, mitk::DataNode* node, mitk::BaseRenderer* renderer);
 
 private:
     void UpdateCurrentActor();
     vtkActor* CurrentActor();
-    void GetLargestBounds(double* largestBounds);
-    void GetBoundsCenter(double* center);
-    void UpdataLight();
 private:
     vtkActor* m_currentActor;
     QVTKWidget* m_vtkWidget;
     vtkSmartPointer<vtkRenderer> m_vtkRenderer;
     vtkSmartPointer<vtkLight> m_light;
     QF::IQF_Main* m_pMain;
-
-    typedef  std::map<int, vtkActor*> ActorMapType;
-    ActorMapType m_actors;
 
     //ui
     QComboBox* m_typeSelector;
@@ -88,6 +89,10 @@ private:
 
     double m_bounds[6];
 
+    static const int s_DataRole;
+
 };
+
+Q_DECLARE_METATYPE(vtkActor*)
 
 #endif // VTKSceneViwer_h__

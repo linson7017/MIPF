@@ -16,9 +16,12 @@
 #include <vtkLight.h>
 #include <vtkCamera.h>
 #include <vtkLightActor.h>
+#include <vtkPointData.h>
 //qt
 #include <QColorDialog>
 #include <QImage>
+
+
 
 
 //ctk
@@ -26,6 +29,26 @@
 
 #include "iqf_main.h"
 #include "mitkMain/IQF_MitkReference.h"
+
+
+//mitk
+#include "mitkVtkInterpolationProperty.h"
+#include "mitkVtkRepresentationProperty.h"
+#include <mitkExtractSliceFilter.h>
+#include <mitkIPropertyAliases.h>
+#include <mitkIPropertyDescriptions.h>
+#include <mitkIShaderRepository.h>
+#include <mitkImageSliceSelector.h>
+#include <mitkLookupTableProperty.h>
+#include <mitkProperties.h>
+#include <mitkSmartPointerProperty.h>
+#include <mitkTransferFunctionProperty.h>
+#include <mitkVtkInterpolationProperty.h>
+#include <mitkVtkRepresentationProperty.h>
+#include <mitkVtkScalarModeProperty.h>
+
+
+const int VTKSceneViwer::s_DataRole = 10086;
 
 VTKSceneViwer::VTKSceneViwer(QF::IQF_Main* pMain, QWidget* parent) :m_pMain(pMain) , QDialog(parent), m_currentActor(nullptr)
 {
@@ -52,8 +75,17 @@ VTKSceneViwer::VTKSceneViwer(QF::IQF_Main* pMain, QWidget* parent) :m_pMain(pMai
     m_actorListWidget->setSelectionMode(QAbstractItemView::SingleSelection);
 
     controlLayout->addWidget(m_actorListWidget);
-    connect(m_actorListWidget, &QListWidget::currentRowChanged, this, &VTKSceneViwer::ActorSelectionChanged);
+    connect(m_actorListWidget, &QListWidget::currentItemChanged, this, &VTKSceneViwer::ActorSelectionChanged);
 
+
+    {
+        QPushButton* btn = new QPushButton("-");
+        connect(btn, &QPushButton::clicked, this, &VTKSceneViwer::Remove);
+
+        QHBoxLayout* layout = new QHBoxLayout;
+        layout->addWidget(btn);
+        controlLayout->addLayout(layout);
+    }
 
     {
         QPushButton* btn = new QPushButton("...");
@@ -231,6 +263,18 @@ VTKSceneViwer::~VTKSceneViwer()
 {
 }
 
+void VTKSceneViwer::Remove()
+{
+    if (m_actorListWidget->currentItem())
+    {
+        m_vtkRenderer->RemoveActor(m_actorListWidget->currentItem()->data(s_DataRole).value<vtkActor*>());
+        m_currentActor = nullptr;
+        m_actorListWidget->takeItem(m_actorListWidget->currentRow());
+        UpdateCurrentActor();
+    }
+    
+}
+
 void VTKSceneViwer::ShadingChanged(int state)
 {
     if (m_currentActor)
@@ -296,93 +340,122 @@ void VTKSceneViwer::ChangeTexture()
 }
 
 
-void VTKSceneViwer::ActorSelectionChanged(int row)
+void VTKSceneViwer::ActorSelectionChanged(QListWidgetItem *current, QListWidgetItem *previous)
 {
-    if (m_actors.count(row))
+    if (current)
     {
-        m_currentActor = m_actors[row];
-        UpdateCurrentActor();
-    }    
+        m_currentActor = current->data(s_DataRole).value<vtkActor*>();
+        if (m_currentActor)
+        {
+            UpdateCurrentActor();
+        }
+    }
 }
 
 void VTKSceneViwer::UpdateCurrentActor()
 {
     vtkActor* currentActor = CurrentActor();
-    if (!currentActor)
+    double opacity = 1.0;
+    double color[3] = { 1.0, 1.0, 1.0 };
+    double ambient[3] = { 0.5, 0.5, 0.0 };
+    double diffuse[3] = { 0.5, 0.5, 0.0 };
+    double specular[3] = { 1.0, 1.0, 1.0 };
+
+    float coeff_ambient = 0.5f;
+    float coeff_diffuse = 0.5f;
+    float coeff_specular = 0.5f;
+    float power_specular = 10.0f;
+
+    std::string representation = "surface";
+    bool shading = false;
+    bool lighting = true;
+
+
+    if (currentActor)
     {
-        return;
+        opacity = currentActor->GetProperty()->GetOpacity();
+        power_specular = currentActor->GetProperty()->GetSpecularPower();
+        currentActor->GetProperty()->GetColor(color);
+        currentActor->GetProperty()->GetAmbientColor(ambient);
+        currentActor->GetProperty()->GetDiffuseColor(diffuse);
+        currentActor->GetProperty()->GetSpecularColor(specular);
+        coeff_ambient = m_currentActor->GetProperty()->GetAmbient();
+        coeff_diffuse = m_currentActor->GetProperty()->GetDiffuse();
+        coeff_specular = m_currentActor->GetProperty()->GetSpecular();
+
+        representation = currentActor->GetProperty()->GetRepresentationAsString();
+        shading = currentActor->GetProperty()->GetShading();
+        lighting = currentActor->GetProperty()->GetLighting();
+
     }
     //opacity
-    m_actorOpacitySlider->setValue(currentActor->GetProperty()->GetOpacity());
+    m_actorOpacitySlider->setValue(opacity);
     //specular power 
-    m_actorSpecularPower->setValue(currentActor->GetProperty()->GetSpecularPower());
+    m_actorSpecularPower->setValue(power_specular);
 
     //color
-    double* color = currentActor->GetProperty()->GetColor();
     QColor wholeColor(color[0] * 255, color[1] * 255, color[2] * 255);
     QString styleSheet = QString("QPushButton {background:%1}").arg(wholeColor.name());
     m_actorColorBtn->setStyleSheet(styleSheet);
 
-    color = currentActor->GetProperty()->GetAmbientColor();
-    QColor ambientColor(color[0] * 255, color[1] * 255, color[2] * 255);
+    QColor ambientColor(ambient[0] * 255, ambient[1] * 255, ambient[2] * 255);
     styleSheet = QString("QPushButton {background:%1}").arg(ambientColor.name());
     m_actorAmbientColorBtn->setStyleSheet(styleSheet);
 
-    color = currentActor->GetProperty()->GetDiffuseColor();
-    QColor diffuseColor(color[0] * 255, color[1] * 255, color[2] * 255);
+    QColor diffuseColor(diffuse[0] * 255, diffuse[1] * 255, diffuse[2] * 255);
     styleSheet = QString("QPushButton {background:%1}").arg(diffuseColor.name());
     m_actorDiffuseColorBtn->setStyleSheet(styleSheet);
 
-    color = currentActor->GetProperty()->GetSpecularColor();
-    QColor specularColor(color[0] * 255, color[1] * 255, color[2] * 255);
+    QColor specularColor(specular[0] * 255, specular[1] * 255, specular[2] * 255);
     styleSheet = QString("QPushButton {background:%1}").arg(specularColor.name());
     m_actorSpecularColorBtn->setStyleSheet(styleSheet);
 
-    m_actorAmbientDSB->setValue(m_currentActor->GetProperty()->GetAmbient());
-    m_actorDiffuseDSB->setValue(m_currentActor->GetProperty()->GetDiffuse());
-    m_actorSpecularDSB->setValue(m_currentActor->GetProperty()->GetSpecular());
+    m_actorAmbientDSB->setValue(coeff_ambient);
+    m_actorDiffuseDSB->setValue(coeff_diffuse);
+    m_actorSpecularDSB->setValue(coeff_specular);
 
 
     //representation
-    m_actorRepresentation->setCurrentText(currentActor->GetProperty()->GetRepresentationAsString());
+    m_actorRepresentation->setCurrentText(representation.c_str());
 
     //shading and lighting
-    m_actorShadingCB->setChecked(currentActor->GetProperty()->GetShading());
-    m_actorLightingCB->setChecked(currentActor->GetProperty()->GetLighting());
+    m_actorShadingCB->setChecked(shading);
+    m_actorLightingCB->setChecked(lighting);
 
 
     m_vtkWidget->update();
 }
 
-void VTKSceneViwer::UpdataLight()
-{
-    if (!m_light)
-    {
-        //add light to scene
-        m_light = vtkSmartPointer<vtkLight>::New();
-        double focalPoint[3];
-        GetBoundsCenter(focalPoint);
-        m_light->SetFocalPoint(focalPoint);
-        m_light->SetPosition(m_vtkRenderer->GetActiveCamera()->GetPosition());
-        m_vtkRenderer->AddLight(m_light);
-    }
-    
-}
-
 void VTKSceneViwer::OpacityChanged(double value)
 {
+    if (!m_currentActor)
+    {
+        return;
+    }
     m_currentActor->GetProperty()->SetOpacity(value);
     m_vtkWidget->update();
 }
 
 void VTKSceneViwer::SpecularPowerChanged(double value)
 {
+    if (!m_currentActor)
+    {
+        return;
+    }
     m_currentActor->GetProperty()->SetSpecularPower(value);
     m_vtkWidget->update();
 }
 
 void VTKSceneViwer::ChangeColor()
 {
+    if (!m_currentActor)
+    {
+        return;
+    }
+    if (!m_currentActor)
+    {
+        return;
+    }
     QColor c = QColorDialog::getColor();
     m_currentActor->GetProperty()->SetColor(c.redF(), c.greenF(), c.blueF());
     UpdateCurrentActor();
@@ -390,18 +463,30 @@ void VTKSceneViwer::ChangeColor()
 
 void VTKSceneViwer::ChangeAmbientColor()
 {
+    if (!m_currentActor)
+    {
+        return;
+    }
     QColor c = QColorDialog::getColor();
     m_currentActor->GetProperty()->SetAmbientColor(c.redF(), c.greenF(), c.blueF());
     UpdateCurrentActor();
 }
 void VTKSceneViwer::ChangeDiffuseColor()
 {
+    if (!m_currentActor)
+    {
+        return;
+    }
     QColor c = QColorDialog::getColor();
     m_currentActor->GetProperty()->SetDiffuseColor(c.redF(), c.greenF(), c.blueF());
     UpdateCurrentActor();
 }
 void VTKSceneViwer::ChangeSpecularColor()
 {
+    if (!m_currentActor)
+    {
+        return;
+    }
     QColor c = QColorDialog::getColor();
     m_currentActor->GetProperty()->SetSpecularColor(c.redF(), c.greenF(), c.blueF());
     UpdateCurrentActor();
@@ -409,12 +494,20 @@ void VTKSceneViwer::ChangeSpecularColor()
 
 void VTKSceneViwer::ChangeAmbient(double value)
 {
+    if (!m_currentActor)
+    {
+        return;
+    }
     m_currentActor->GetProperty()->SetAmbient(value);
     m_vtkWidget->update();
 }
 
 void VTKSceneViwer::ChangeDiffuse(double value)
 {
+    if (!m_currentActor)
+    {
+        return;
+    }
     m_currentActor->GetProperty()->SetDiffuse(value);
     m_vtkWidget->update();
 
@@ -422,16 +515,298 @@ void VTKSceneViwer::ChangeDiffuse(double value)
 
 void VTKSceneViwer::ChangeSpecular(double value)
 {
+    if (!m_currentActor)
+    {
+        return;
+    }
     m_currentActor->GetProperty()->SetSpecular(value);
     m_vtkWidget->update();
 
 }
 
-void VTKSceneViwer::AddPolyData(vtkPolyData* polyData, const std::string& name)
+void VTKSceneViwer::ApplyProperties(vtkActor* actor, vtkPolyDataMapper* mapper, mitk::DataNode* node, mitk::BaseRenderer* renderer)
 {
+    double ambient[3] = { 0.5, 0.5, 0.0 };
+    double diffuse[3] = { 0.5, 0.5, 0.0 };
+    double specular[3] = { 1.0, 1.0, 1.0 };
+
+    float coeff_ambient = 0.5f;
+    float coeff_diffuse = 0.5f;
+    float coeff_specular = 0.5f;
+    float power_specular = 10.0f;
+
+    // Color
+    {
+        mitk::ColorProperty::Pointer p;
+        node->GetProperty(p, "color", renderer);
+        if (p.IsNotNull())
+        {
+            mitk::Color c = p->GetColor();
+            ambient[0] = c.GetRed();
+            ambient[1] = c.GetGreen();
+            ambient[2] = c.GetBlue();
+            diffuse[0] = c.GetRed();
+            diffuse[1] = c.GetGreen();
+            diffuse[2] = c.GetBlue();
+            // Setting specular color to the same, make physically no real sense, however vtk rendering slows down, if these
+            // colors are different.
+            specular[0] = c.GetRed();
+            specular[1] = c.GetGreen();
+            specular[2] = c.GetBlue();
+        }
+    }
+
+    // Ambient
+    {
+        mitk::ColorProperty::Pointer p;
+        node->GetProperty(p, "material.ambientColor", renderer);
+        if (p.IsNotNull())
+        {
+            mitk::Color c = p->GetColor();
+            ambient[0] = c.GetRed();
+            ambient[1] = c.GetGreen();
+            ambient[2] = c.GetBlue();
+        }
+    }
+
+    // Diffuse
+    {
+        mitk::ColorProperty::Pointer p;
+        node->GetProperty(p, "material.diffuseColor", renderer);
+        if (p.IsNotNull())
+        {
+            mitk::Color c = p->GetColor();
+            diffuse[0] = c.GetRed();
+            diffuse[1] = c.GetGreen();
+            diffuse[2] = c.GetBlue();
+        }
+    }
+
+    // Specular
+    {
+        mitk::ColorProperty::Pointer p;
+        node->GetProperty(p, "material.specularColor", renderer);
+        if (p.IsNotNull())
+        {
+            mitk::Color c = p->GetColor();
+            specular[0] = c.GetRed();
+            specular[1] = c.GetGreen();
+            specular[2] = c.GetBlue();
+        }
+    }
+
+    // Ambient coeff
+    {
+        node->GetFloatProperty("material.ambientCoefficient", coeff_ambient, renderer);
+    }
+
+    // Diffuse coeff
+    {
+        node->GetFloatProperty("material.diffuseCoefficient", coeff_diffuse, renderer);
+    }
+
+    // Specular coeff
+    {
+        node->GetFloatProperty("material.specularCoefficient", coeff_specular, renderer);
+    }
+
+    // Specular power
+    {
+        node->GetFloatProperty("material.specularPower", power_specular, renderer);
+    }
+
+    auto property = actor->GetProperty();
+    property->SetAmbient(coeff_ambient);
+    property->SetDiffuse(coeff_diffuse);
+    property->SetSpecular(coeff_specular);
+    property->SetSpecularPower(power_specular);
+    property->SetAmbientColor(ambient);
+    property->SetDiffuseColor(diffuse);
+    property->SetSpecularColor(specular);
+
+    // Opacity
+    {
+        float opacity = 1.0f;
+        if (node->GetOpacity(opacity, renderer))
+            property->SetOpacity(opacity);
+    }
+
+    // Wireframe line width
+    {
+        float lineWidth = 1;
+        node->GetFloatProperty("material.wireframeLineWidth", lineWidth, renderer);
+        property->SetLineWidth(lineWidth);
+    }
+
+    // Point size
+    {
+        float pointSize = 1.0f;
+        node->GetFloatProperty("material.pointSize", pointSize, renderer);
+        property->SetPointSize(pointSize);
+    }
+
+    // Representation
+    {
+        mitk::VtkRepresentationProperty::Pointer p;
+        node->GetProperty(p, "material.representation", renderer);
+        if (p.IsNotNull())
+            property->SetRepresentation(p->GetVtkRepresentation());
+    }
+
+    // Interpolation
+    {
+        mitk::VtkInterpolationProperty::Pointer p;
+        node->GetProperty(p, "material.interpolation", renderer);
+        if (p.IsNotNull())
+            property->SetInterpolation(p->GetVtkInterpolation());
+    }
+
+
+    //////////////////////////////////////
+    mitk::TransferFunctionProperty::Pointer transferFuncProp;
+    node->GetProperty(transferFuncProp, "Surface.TransferFunction", renderer);
+    if (transferFuncProp.IsNotNull())
+    {
+        mapper->SetLookupTable(transferFuncProp->GetValue()->GetColorTransferFunction());
+    }
+
+    mitk::LookupTableProperty::Pointer lookupTableProp;
+    node->GetProperty(lookupTableProp, "LookupTable", renderer);
+    if (lookupTableProp.IsNotNull())
+    {
+        mapper->SetLookupTable(lookupTableProp->GetLookupTable()->GetVtkLookupTable());
+    }
+
+    mitk::LevelWindow levelWindow;
+    if (node->GetLevelWindow(levelWindow, renderer, "levelWindow"))
+    {
+        mapper->SetScalarRange(levelWindow.GetLowerWindowBound(), levelWindow.GetUpperWindowBound());
+    }
+    else if (node->GetLevelWindow(levelWindow, renderer))
+    {
+        mapper->SetScalarRange(levelWindow.GetLowerWindowBound(), levelWindow.GetUpperWindowBound());
+    }
+
+    bool scalarVisibility = false;
+    node->GetBoolProperty("scalar visibility", scalarVisibility);
+    mapper->SetScalarVisibility((scalarVisibility ? 1 : 0));
+
+    if (scalarVisibility)
+    {
+        mitk::VtkScalarModeProperty *scalarMode;
+        if (node->GetProperty(scalarMode, "scalar mode", renderer))
+            mapper->SetScalarMode(scalarMode->GetVtkScalarMode());
+        else
+            mapper->SetScalarModeToDefault();
+
+        bool colorMode = false;
+        node->GetBoolProperty("color mode", colorMode);
+        mapper->SetColorMode((colorMode ? 1 : 0));
+
+        double scalarsMin = 0;
+        node->GetDoubleProperty("ScalarsRangeMinimum", scalarsMin, renderer);
+
+        double scalarsMax = 1.0;
+        node->GetDoubleProperty("ScalarsRangeMaximum", scalarsMax, renderer);
+
+        mapper->SetScalarRange(scalarsMin, scalarsMax);
+    }
+
+    mitk::SmartPointerProperty::Pointer imagetextureProp =
+        dynamic_cast<mitk::SmartPointerProperty *>(node->GetProperty("Surface.Texture", renderer));
+
+    if (imagetextureProp.IsNotNull())
+    {
+        mitk::Image *miktTexture = dynamic_cast<mitk::Image *>(imagetextureProp->GetSmartPointer().GetPointer());
+        vtkSmartPointer<vtkTexture> vtkTxture = vtkSmartPointer<vtkTexture>::New();
+        // Either select the first slice of a volume
+        if (miktTexture->GetDimension(2) > 1)
+        {
+            MITK_WARN << "3D Textures are not supported by VTK and MITK. The first slice of the volume will be used instead!";
+            mitk::ImageSliceSelector::Pointer sliceselector = mitk::ImageSliceSelector::New();
+            sliceselector->SetSliceNr(0);
+            sliceselector->SetChannelNr(0);
+            sliceselector->SetTimeNr(0);
+            sliceselector->SetInput(miktTexture);
+            sliceselector->Update();
+            vtkTxture->SetInputData(sliceselector->GetOutput()->GetVtkImageData());
+        }
+        else // or just use the 2D image
+        {
+            vtkTxture->SetInputData(miktTexture->GetVtkImageData());
+        }
+        // pass the texture to the actor
+        actor->SetTexture(vtkTxture);
+        if (mapper->GetInput()->GetPointData()->GetTCoords() == NULL)
+        {
+            MITK_ERROR << "Surface.Texture property was set, but there are no texture coordinates. Please provide texture "
+                "coordinates for the vtkPolyData via vtkPolyData->GetPointData()->SetTCoords().";
+        }
+        // if no texture is set, this will also remove a previously used texture
+        // and reset the actor to it's default behaviour
+    }
+    else
+    {
+        actor->SetTexture(0);
+    }
+
+    // deprecated settings
+    bool deprecatedUseCellData = false;
+    node->GetBoolProperty("deprecated useCellDataForColouring", deprecatedUseCellData);
+
+    bool deprecatedUsePointData = false;
+    node->GetBoolProperty("deprecated usePointDataForColouring", deprecatedUsePointData);
+
+    if (deprecatedUseCellData)
+    {
+        mapper->SetColorModeToDefault();
+        mapper->SetScalarRange(0, 255);
+        mapper->ScalarVisibilityOn();
+        mapper->SetScalarModeToUseCellData();
+        actor->GetProperty()->SetSpecular(1);
+        actor->GetProperty()->SetSpecularPower(50);
+        actor->GetProperty()->SetInterpolationToPhong();
+    }
+    else if (deprecatedUsePointData)
+    {
+        float scalarsMin = 0;
+        if (dynamic_cast<mitk::FloatProperty *>(node->GetProperty("ScalarsRangeMinimum")) != NULL)
+            scalarsMin =
+            dynamic_cast<mitk::FloatProperty *>(node->GetProperty("ScalarsRangeMinimum"))->GetValue();
+
+        float scalarsMax = 0.1;
+        if (dynamic_cast<mitk::FloatProperty *>(node->GetProperty("ScalarsRangeMaximum")) != NULL)
+            scalarsMax =
+            dynamic_cast<mitk::FloatProperty *>(node->GetProperty("ScalarsRangeMaximum"))->GetValue();
+
+        mapper->SetScalarRange(scalarsMin, scalarsMax);
+        mapper->SetColorModeToMapScalars();
+        mapper->ScalarVisibilityOn();
+        actor->GetProperty()->SetSpecular(1);
+        actor->GetProperty()->SetSpecularPower(50);
+        actor->GetProperty()->SetInterpolationToPhong();
+    }
+
+    int deprecatedScalarMode = VTK_COLOR_MODE_DEFAULT;
+    if (node->GetIntProperty("deprecated scalar mode", deprecatedScalarMode, renderer))
+    {
+        mapper->SetScalarMode(deprecatedScalarMode);
+        mapper->ScalarVisibilityOn();
+        actor->GetProperty()->SetSpecular(1);
+        actor->GetProperty()->SetSpecularPower(50);
+    }
+
+}
+
+
+void VTKSceneViwer::AddPolyData(vtkPolyData* polyData, const std::string& name, mitk::DataNode* propertyNode,mitk::BaseRenderer* renderer)
+{
+    auto copyData = vtkSmartPointer<vtkPolyData>::New();
+    copyData->DeepCopy(polyData);
+
     vtkSmartPointer<vtkPolyDataMapper> mapper =
         vtkSmartPointer<vtkPolyDataMapper>::New();
-    mapper->SetInputData(polyData);
+    mapper->SetInputData(copyData);
 
     vtkSmartPointer<vtkActor> actor =
         vtkSmartPointer<vtkActor>::New();
@@ -440,39 +815,25 @@ void VTKSceneViwer::AddPolyData(vtkPolyData* polyData, const std::string& name)
     actor->GetProperty()->SetColor(1.0, 1.0, 1.0);
     m_vtkRenderer->AddActor(actor);
 
-    m_actorListWidget->addItem(name.c_str());
-    m_actors[m_actors.size()] = actor;
+    if (propertyNode)
+    {
+        ApplyProperties(actor, mapper,propertyNode, renderer);
+    }
+    
 
-    m_actorListWidget->setCurrentRow(m_actors.size());
+    //add item add set selected
+    QListWidgetItem* item = new QListWidgetItem(name.c_str(), m_actorListWidget);
+    item->setData(s_DataRole, QVariant::fromValue(actor.Get()));
+    m_actorListWidget->addItem(item);
+    m_actorListWidget->setCurrentItem(item);
+    m_actorListWidget->setItemSelected(item,true);
 
     //UpdataLight();
     m_vtkWidget->update();
+    m_vtkRenderer->ResetCamera();
 }
 
-void VTKSceneViwer::GetLargestBounds(double* largestBounds)
-{
-    for (ActorMapType::iterator it = m_actors.begin(); it != m_actors.end(); it++)
-    {
-        vtkActor* actor = it->second;
-        double* bound = actor->GetBounds();
-        largestBounds[0] = largestBounds[0] < bound[0] ? largestBounds[0] : bound[0];
-        largestBounds[1] = largestBounds[1] > bound[1] ? largestBounds[1] : bound[1];
-        largestBounds[2] = largestBounds[2] < bound[2] ? largestBounds[2] : bound[2];
-        largestBounds[3] = largestBounds[3] > bound[3] ? largestBounds[3] : bound[3];
-        largestBounds[4] = largestBounds[4] < bound[4] ? largestBounds[4] : bound[4];
-        largestBounds[5] = largestBounds[5] > bound[5] ? largestBounds[5] : bound[5];
-    }
-}
 
-void VTKSceneViwer::GetBoundsCenter(double* center)
-{
-    double bounds[6];
-    GetLargestBounds(bounds);
-    center[0] = (bounds[0] + bounds[1]) / 2;
-    center[1] = (bounds[2] + bounds[3]) / 2;
-    center[2] = (bounds[4] + bounds[5]) / 2;
-
-}
 
 void VTKSceneViwer::Apply()
 {
