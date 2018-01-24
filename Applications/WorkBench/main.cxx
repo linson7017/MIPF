@@ -54,7 +54,7 @@ int main(int argc, char *argv[])
     std::string path = appenv.getConfigResDir();
     QSettings set(QString(static_cast<QF::IQF_Main*>(appenv.getMainPtr())->GetConfigPath()).append("/config.ini"), QSettings::IniFormat);
     set.beginGroup("config");
-    std::string value = set.value("start-xml-file", "main.xml").toString().toStdString();
+    std::string value = set.value("start-xml-file", "main_render.xml").toString().toStdString();
     set.endGroup();
 
     MainWindow mainWidget(value.c_str());

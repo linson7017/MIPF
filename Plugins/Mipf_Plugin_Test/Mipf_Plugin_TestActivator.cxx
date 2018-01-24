@@ -28,5 +28,5 @@ const char* Mipf_Plugin_Test_Activator::GetID()
 
 void Mipf_Plugin_Test_Activator::Register(R* pR)
 {
-    REGISTER_PLUGIN("TestView", TestView);
+    REGISTER_PLUGIN("TestWidget", TestView);
 }

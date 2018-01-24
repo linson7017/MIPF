@@ -23,8 +23,20 @@
 #include <vtkPolyData.h>
 #include <vtkSphereSource.h>
 
+int maxSubArray(vector<int> &nums)
+{
+    if (nums.size()==1)
+    {
+        return nums[0];
+    }
+    int cen = nums.size();
+    int left = std::accumulate(nums.begin(), nums.begin() + cen, 0);
+    int right = std::accumulate(nums.begin() + cen, nums.end() + cen, 0);
+}
+
 QMatrix4x4 CaculateMatrix(QList<QVector3D> points, QList<QVector3D> offset)
 {
+    
     QVector3D x = (points[0] - points[3]).normalized();
     QVector3D y = (points[2] - points[0]).normalized();
     QVector3D z = QVector3D::crossProduct(x, y);

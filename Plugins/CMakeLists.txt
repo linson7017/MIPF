@@ -62,3 +62,7 @@ add_subdirectory(Mipf_Plugin_DeepMedic)
 endif()
  
 add_subdirectory(Mipf_Plugin_ModelExporter)
+ 
+add_subdirectory(Mipf_Plugin_TubularTracking)
+
+add_subdirectory(Mipf_Plugin_SliceBySliceTracking)
