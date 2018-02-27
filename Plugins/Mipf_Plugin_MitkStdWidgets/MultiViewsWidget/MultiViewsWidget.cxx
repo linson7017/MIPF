@@ -95,7 +95,7 @@ void MultiViewsWidget::SetupWidgets()
     m_multiWidget->DisableDepartmentLogo();
 
     //set cross hair
-    int crosshairgapsize = m_pMitkReferences->GetInt("Crosshair-Gap-Size", 32);
+    int crosshairgapsize = m_pMitkReferences->GetInt("Crosshair-Gap-Size", 1);
     m_multiWidget->GetWidgetPlane1()->SetIntProperty("Crosshair.Gap Size", crosshairgapsize);
     m_multiWidget->GetWidgetPlane2()->SetIntProperty("Crosshair.Gap Size", crosshairgapsize);
     m_multiWidget->GetWidgetPlane3()->SetIntProperty("Crosshair.Gap Size", crosshairgapsize);

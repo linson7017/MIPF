@@ -30,7 +30,8 @@ if(VTK_QT_VERSION VERSION_GREATER "4")
   # CMAKE_AUTOMOC in ON so the MocHdrs will be automatically wrapped.
   add_executable(RobotControlApp ${DIR_SRCS} ${Headers} ${UI_Srcs} ${MOC_Hdrs})
   qt5_use_modules(RobotControlApp Core Gui Widgets)
-  target_link_libraries(RobotControlApp ${VTK_LIBRARIES} ${QTFRAMEWORK_LIBRARIES} ${QFMAIN_LIBRARIES} MitkQtWidgets)
+  target_link_libraries(RobotControlApp ${VTK_LIBRARIES} MitkQtWidgets)
+  link_framework()
 else()
   find_package(Qt4 REQUIRED)
   include(${QT_USE_FILE})
@@ -41,7 +42,8 @@ else()
   qt4_wrap_ui(UI_Srcs ${UIs})
 
   add_executable(RobotControlApp ${DIR_SRCS} ${Headers} ${UI_Srcs} ${MOC_Hdrs})
-  target_link_libraries(RobotControlApp ${QT_LIBRARIES}  ${QTFRAMEWORK_LIBRARIES} ${QFMAIN_LIBRARIES} MitkQtWidgets)
+  target_link_libraries(RobotControlApp ${QT_LIBRARIES} MitkQtWidgets)
+  link_framework()
 endif()
 
  

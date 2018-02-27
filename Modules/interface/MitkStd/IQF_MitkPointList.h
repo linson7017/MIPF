@@ -1,7 +1,7 @@
 #ifndef IQF_MitkPointList_h__
 #define IQF_MitkPointList_h__
 
-#include "iconfig.h"
+#include "IQF_Object.h"
 
 const char QF_MitkStd_PointListFactory[] = "QF_MitkStd_PointListFactory";
 
@@ -20,9 +20,8 @@ namespace mitk
 const char MITK_MESSAGE_POINTLIST_CHANGED[] = "MITK_MESSAGE_POINTLIST_CHANGED";
 const char MITK_MESSAGE_POINTLIST_REMOVED[] = "MITK_MESSAGE_POINTLIST_REMOVED";
 
-class IQF_MitkPointList 
+class IQF_MitkPointList :public IQF_Object
 {
-    BUILD_INTERFACE(IQF_MitkPointList)
 public:
     virtual void Initialize() = 0;
     virtual void CreateNewPointSetNode(mitk::DataNode * pPointSetNode, bool bDirectUse = true) = 0;

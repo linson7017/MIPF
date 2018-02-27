@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<HLayout activityRoot="true" width="800" height="500" id="setting" parent="mai" flags="FixedSize;;FixedSize">
+	<HSplitter>
+		<TreeWidget minWidth="200" headerLabels="" stretch="1" event="itemClicked">
+			<TreeWidgetItem text="General">
+				<TreeWidgetItem text="Theme" uicommand="@uicommand/switchToThemePanel"/>
+			</TreeWidgetItem>
+			<TreeWidgetItem text="Reference" uicommand="@uicommand/switchToReferencePanel"/>
+		</TreeWidget>
+		<StackedWidget id="setting.Panels" stretch="4">
+			<Widget index="0">
+				<VLayout>
+					<HLayout>
+						<Label text="Select Style" row="0" col="0"/>
+						<ComboBox  row="0" col="1">
+							<ComboBoxItem text="Fusion" uicommand="@uicommand/changeReferenceStyleToFusion"/>
+							<ComboBoxItem text="Windows" uicommand="@uicommand/changeReferenceStyleToWindows"/>
+							<ComboBoxItem text="MainStyle" uicommand="@uicommand/changeReferenceStyleToMainStyle"/>
+							<ComboBoxItem text="DarkStyle" uicommand="@uicommand/changeReferenceStyleToQssDark"/>
+							<ComboBoxItem text="BF" uicommand="@uicommand/changeReferenceStyleToQssBF"/>
+							<ComboBoxItem text="Black" uicommand="@uicommand/changeReferenceStyleToQssBlack"/>
+							<ComboBoxItem text="Blue" uicommand="@uicommand/changeReferenceStyleToQssBlue"/>
+							<ComboBoxItem text="DarkBlue" uicommand="@uicommand/changeReferenceStyleToQssDarkBlue"/>
+							<ComboBoxItem text="DarkBlack" uicommand="@uicommand/changeReferenceStyleToQssDarkBlack"/>
+							<ComboBoxItem text="DarkGray" uicommand="@uicommand/changeReferenceStyleToQssDarkGray"/>
+							<ComboBoxItem text="FlatBlac" uicommand="@uicommand/changeReferenceStyleToQssFlatBlack"/>
+							<ComboBoxItem text="FlatWhite" uicommand="@uicommand/changeReferenceStyleToQssFlatWhite"/>
+							<ComboBoxItem text="Gray" uicommand="@uicommand/changeReferenceStyleToQssGray"/>
+							<ComboBoxItem text="LightBlack" uicommand="@uicommand/changeReferenceStyleToQssLightBlack"/>
+							<ComboBoxItem text="LightBlue" uicommand="@uicommand/changeReferenceStyleToQssLightBlue"/>
+							<ComboBoxItem text="LightGray" uicommand="@uicommand/changeReferenceStyleToQssLightGray"/>
+							<ComboBoxItem text="PsBalck" uicommand="@uicommand/changeReferenceStyleToQssPsBalck"/>
+							<ComboBoxItem text="Silvery" uicommand="@uicommand/changeReferenceStyleToQssSilvery"/>
+							<ComboBoxItem text="Test" uicommand="@uicommand/changeReferenceStyleToQssTest"/>
+						</ComboBox>
+						<Button id="setting.ApplyRefeneceStyle" text="Apply" uicommand="@uicommand/applyReferenceStyle"/>
+						<Stretch size="200"/>
+					</HLayout>
+					<Holder id="@ui/theme_rep"/>
+					<Stretch size="500"/>
+				</VLayout>
+			</Widget>
+			<Widget index="1">
+				<VLayout>
+					<HLayout>
+						<CheckBox id="setting.EnableVtkWarning" text="VTK Warning" checked="false" command="@command/MITK_MAIN_COMMAND_ENABLE_VTK_WARNING"/>
+					</HLayout>
+					<Label p_styleType="seperator" width="200" height="2"/>
+					<HLayout>
+						<Label text="Crosshair Gap Size:"/>
+						<Spinner id="setting.CrosshairGapSize" range="0,100" value="1"/>
+						<Button text="Apply" command="@command/MITK_MAIN_COMMAND_CHANGE_CROSSHAIR_GAP_SIZE"/>
+						<Stretch size="100"/>
+					</HLayout>
+					<Stretch size="200" />
+				</VLayout>
+			</Widget>
+		</StackedWidget>
+	</HSplitter>
+</HLayout>

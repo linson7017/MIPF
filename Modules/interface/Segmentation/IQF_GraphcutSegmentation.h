@@ -2,7 +2,7 @@
 #define IQF_GraphcutSegmentation_h__
 
 #include "ITKImageTypeDef.h"
-#include "iconfig.h"
+#include "IQF_Object.h"
 
 /********Demo**********/
 /*
@@ -26,9 +26,8 @@
     pGraphcut->Release();
 */
 
-class IQF_GraphcutSegmentation
+class IQF_GraphcutSegmentation:public IQF_Object
 {
-    BUILD_INTERFACE(IQF_GraphcutSegmentation)
 public:
     virtual void Init()=0;
     virtual void PerformSegmentation() = 0;
@@ -42,7 +41,6 @@ public:
     virtual void SetFirstTIme(bool bFirstTime) = 0;
     virtual void SetScalarRange(double dMin, double dMax) = 0;
     virtual void SetRegion(itk::ImageRegion<3> irRegion) = 0;
-    virtual void Release() = 0;
 };
 
 #endif // IQF_GraphcutSegmentation_h__

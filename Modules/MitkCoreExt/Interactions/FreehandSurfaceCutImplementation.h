@@ -20,9 +20,7 @@ public:
     virtual ~FreehandSurfaceCutImplementation();
 protected:
     virtual vtkSmartPointer<vtkDataObject> CutImpl(vtkObject* pCutData, mitk::InteractionEvent * interactionEvent);
-    vtkDataObject* GetDataObject();
-    vtkSmartPointer<vtkDataObject> GetCopyOfDataObject();
-    void Refresh();
+    
 };
 
 #endif // FreehandSurfaceCutImplementation_h__

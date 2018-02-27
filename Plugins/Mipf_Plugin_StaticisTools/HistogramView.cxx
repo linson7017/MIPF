@@ -146,8 +146,6 @@ void HistogramView::CreateView()
     connect(m_ui.StartPointBtn, SIGNAL(clicked()), this, SLOT(OnSelectStartPoint()));
     connect(m_ui.EndPointBtn, SIGNAL(clicked()), this, SLOT(OnSelectEndPoint()));
     connect(m_ui.ProfilePlotBtn, SIGNAL(clicked()), this, SLOT(ProfilePlot()));
-
-    connect(&m_timer, SIGNAL(timeout()), this, SLOT(Refresh()));
 }
 
 void HistogramView::Plot()

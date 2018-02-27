@@ -20,7 +20,7 @@ void CQF_MitkStdCommand::Release()
    delete this;
 }
 
-bool CQF_MitkStdCommand::ExecuteCommand(const char* szCommandID, QF::IQF_PropertySet* pInParam, QF::IQF_PropertySet* pOutParam)
+bool CQF_MitkStdCommand::ExecuteCommand(const char* szCommandID, QF::IQF_Properties* pInParam, QF::IQF_Properties* pOutParam)
 {
     if (strcmp(szCommandID, "MITK_MAIN_COMMAND_STARTPICKPOINT") == 0)
     {      

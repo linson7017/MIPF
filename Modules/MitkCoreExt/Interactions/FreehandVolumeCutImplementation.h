@@ -21,9 +21,6 @@ public:
     virtual ~FreehandVolumeCutImplementation();
 protected:
     vtkSmartPointer<vtkDataObject> CutImpl(vtkObject* pCutData, mitk::InteractionEvent * interactionEvent);
-    vtkDataObject* GetDataObject();
-    vtkSmartPointer<vtkDataObject> GetCopyOfDataObject();
-    void Refresh();
 };
 
 #endif // FreehandVolumeCutImplementation_h__

@@ -6,7 +6,7 @@
 #include "iqf_main.h"
 
 
-#include "IQF_PropertySet.h"
+#include "iqf_properties.h"
 
 CQF_MainMessage::CQF_MainMessage(QF::IQF_Main* pMain):m_pMain(pMain)
 {

@@ -23,8 +23,8 @@ if(VTK_QT_VERSION VERSION_GREATER "4")
 
 add_library(Mipf_Plugin_SliceBySliceTracking SHARED ${DIR_SRCS} ${Headers} ${UI_Srcs} ${MOC_Hdrs})
 qt5_use_modules(Mipf_Plugin_SliceBySliceTracking Core Gui Widgets)
-target_link_libraries(Mipf_Plugin_SliceBySliceTracking ${VTK_LIBRARIES} ${QTFRAMEWORK_LIBRARIES} ${QFMAIN_LIBRARIES} MitkQtWidgets MitkQtWidgetsExt)
-
+target_link_libraries(Mipf_Plugin_SliceBySliceTracking ${VTK_LIBRARIES} MitkQtWidgets MitkQtWidgetsExt)
+link_framework()
 else()
 
 add_library(Mipf_Plugin_SliceBySliceTracking SHARED ${DIR_SRCS} ${Headers} ${UI_Srcs} ${MOC_Hdrs})

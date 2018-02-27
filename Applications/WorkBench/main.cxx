@@ -33,7 +33,7 @@ int main(int argc, char *argv[])
 
     app_env appenv(wk.toLocal8Bit().constData());
 
-    appenv.setMainPtr(QF::QF_CreateMainObject(wk.toLocal8Bit().constData(), qApp->applicationDirPath().toStdString().c_str()));
+    appenv.setMainPtr(QF::QF_CreateMainObject(wk.toLocal8Bit().constData(), qApp->applicationDirPath().toLocal8Bit().constData()));
     qApp->setProperty("MainPtr", QVariant::fromValue(appenv.getMainPtr()));
     //初始化qt环境
     qt_context context(&qtapplication);
@@ -50,6 +50,14 @@ int main(int argc, char *argv[])
 #else
     qt_context::addLibraryPath(wk.append("/plugins/linux").toLocal8Bit().constData());
 #endif   
+
+#ifdef QFCONFIG_DEBUG
+    //复制 qfconfig 目录
+    QString cmd = QString("xcopy %1 %2 /S /y /Q")
+        .arg("S:\\Codes\\MIPF\\bin\\qfconfig\\WorkBench")
+        .arg("S:\\Codes\\MIPF-build\\bin\\qfconfig\\WorkBench");
+    system(cmd.toLocal8Bit().constData());
+#endif
 
     std::string path = appenv.getConfigResDir();
     QSettings set(QString(static_cast<QF::IQF_Main*>(appenv.getMainPtr())->GetConfigPath()).append("/config.ini"), QSettings::IniFormat);

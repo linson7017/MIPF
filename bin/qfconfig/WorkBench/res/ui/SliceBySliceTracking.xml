@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<Widget id="SliceBySliceTracking">
+<Widget id="SliceBySliceTracking" width="400">
 	<VLayout>
 		<GridLayout colEqual="false">
 			<Label text="Maximum Searching Radius:" row="0" col="0"/>

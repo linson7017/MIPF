@@ -24,5 +24,5 @@ add_library(Mipf_Plugin_SFLSSegmentation SHARED ${DIR_SRCS} ${Headers} ${UI_Srcs
 qt5_use_modules(Mipf_Plugin_SFLSSegmentation Core Gui Widgets)
 target_link_libraries(Mipf_Plugin_SFLSSegmentation 
 ${VTK_LIBRARIES} ${ITK_LIBRARIES} 
-${QTFRAMEWORK_LIBRARIES} ${QFMAIN_LIBRARIES} 
 MitkQtWidgets MitkQtWidgetsExt MitkSegmentation MitkSegmentationUI)
+link_framework()

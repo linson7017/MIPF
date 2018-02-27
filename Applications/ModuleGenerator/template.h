@@ -149,7 +149,7 @@ const char CommandH[] = ""\
 "    @CommandName@(QF::IQF_Main* pMain);\n"\
 "    ~@CommandName@();\n"\
 "    void Release();\n"\
-"    virtual bool ExecuteCommand(const char* szCommandID, QF::IQF_PropertySet* pInParam, QF::IQF_PropertySet* pOutParam);\n"\
+"    virtual bool ExecuteCommand(const char* szCommandID, QF::IQF_Properties* pInParam, QF::IQF_Properties* pOutParam);\n"\
 "    virtual int GetCommandCount();\n"\
 "    virtual const char* GetCommandID(int iIndex);\n"\
 "private:\n"\
@@ -179,7 +179,7 @@ const char CommandC[] = ""\
 "   delete this;\n"\
 "}\n"\
 "\n"\
-"bool @CommandName@::ExecuteCommand(const char* szCommandID, QF::IQF_PropertySet* pInParam, QF::IQF_PropertySet* pOutParam)\n"\
+"bool @CommandName@::ExecuteCommand(const char* szCommandID, QF::IQF_Properties* pInParam, QF::IQF_Properties* pOutParam)\n"\
 "{\n"\
 "    if (strcmp(szCommandID, \"\") == 0)\n"\
 "    {      \n"\

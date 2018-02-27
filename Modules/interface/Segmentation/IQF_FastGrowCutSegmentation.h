@@ -2,11 +2,9 @@
 #define IQF_FastGrowCutSegmentation_h__
 
 #include "IQF_Object.h"
-#include "iconfig.h"
 
 class IQF_FastGrowCutSegmentation:public IQF_Object
 {
-    BUILD_INTERFACE(IQF_FastGrowCutSegmentation)
 public:
 	//…Ë÷√‘≠ÕºœÒ
 	virtual void SetSourceImage(vtkImageData* vtkSourceImage)=0;

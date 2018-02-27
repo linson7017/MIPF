@@ -1,8 +1,5 @@
 cmake_minimum_required(VERSION 2.8.8)
 
-FIND_PACKAGE(QTFRAMEWORK REQUIRED)
-FIND_PACKAGE(QFMAIN REQUIRED)
-
 macro(source_group_by_dir source_files)
     if(MSVC)
         set(sgbd_cur_dir ${CMAKE_CURRENT_SOURCE_DIR})
@@ -52,9 +49,13 @@ endmacro(MipfGetQfConfig)
 
 #拷贝qfconfig文件到运行目录下
 macro(InstallQfConfig projectname)
-add_custom_command(TARGET ${projectname} POST_BUILD
-                  COMMAND ${CMAKE_COMMAND} -E copy_directory
-                  ${CMAKE_SOURCE_DIR}/bin/qfconfig/${projectname} ${CMAKE_BINARY_DIR}/bin/qfconfig/${projectname})
+# add_custom_command(TARGET ${projectname} POST_BUILD
+                  # COMMAND ${CMAKE_COMMAND} -E copy_directory
+                  # ${CMAKE_SOURCE_DIR}/bin/qfconfig/${projectname} ${CMAKE_BINARY_DIR}/bin/qfconfig/${projectname})
+add_custom_target(Copy_${projectname}_Resources ALL
+				  COMMAND echo "copying ${CMAKE_SOURCE_DIR}/bin/qfconfig/${projectname} to ${CMAKE_BINARY_DIR}/bin/qfconfig/${projectname}"
+				  COMMAND ${CMAKE_COMMAND} -E copy_directory
+				  ${CMAKE_SOURCE_DIR}/bin/qfconfig/${projectname} ${CMAKE_BINARY_DIR}/bin/qfconfig/${projectname})
 endmacro(InstallQfConfig) 
 
 add_subdirectory(WorkBench)

@@ -26,6 +26,7 @@ add_library(Mipf_Plugin_ASM SHARED ${DIR_SRCS} ${Headers} ${UI_Srcs} ${MOC_Hdrs}
 qt5_use_modules(Mipf_Plugin_ASM Core Gui Widgets)
 target_link_libraries(Mipf_Plugin_ASM    
 ${VTK_LIBRARIES} ${ITK_LIBRARIES}   
-${QTFRAMEWORK_LIBRARIES} ${QFMAIN_LIBRARIES} ${ITKVTK_HELPERS_LIBRARIES}   
+${ITKVTK_HELPERS_LIBRARIES}   
 MitkQtWidgets MitkQtWidgetsExt)
+link_framework()
 

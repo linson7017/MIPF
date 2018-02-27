@@ -69,13 +69,14 @@ void FreehandCutInteractor::End()
 
 void FreehandCutInteractor::Init()
 {
-    if (1&&m_pDataStorage)
+    if (m_pDataStorage&&!m_bInitFlag)
     {
         m_bInitFlag = true;
         m_pCurveNode = mitk::DataNode::New();
         m_pCurveNode->SetColor(0.0, 1.0, 0.0);
         m_pCurveNode->SetProperty("helper object", mitk::BoolProperty::New(true));
         m_pCurveNode->SetFloatProperty("line width", 2.0);
+        m_pCurveNode->SetName("Freehand Curve");
 
 
         mitk::FreehandSurfaceCutMapper3D::Pointer mapper = mitk::FreehandSurfaceCutMapper3D::New();
@@ -90,7 +91,6 @@ void FreehandCutInteractor::Init()
 
         m_pCurvePoints = vtkSmartPointer<vtkPoints>::New();
         m_pCurvePointsBeforeModify = vtkSmartPointer<vtkPoints>::New();
-
         InitEvent.Send(GetDataNode());
     }
 }
@@ -290,9 +290,13 @@ void FreehandCutInteractor::Finished()
     FinishedEvent.Send();
     m_pCurveData->Reset();
     m_pCurvePoints->Reset();
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-    End();
 
+    if(m_pCurveNode.IsNotNull())
+    {
+        m_pCurveNode = NULL;
+        m_bInitFlag = false;
+    }
+    End();
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 

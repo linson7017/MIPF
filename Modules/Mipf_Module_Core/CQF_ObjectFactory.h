@@ -21,6 +21,8 @@ public:
     {
         return (int)m_classMap.size();
     }
+
+    virtual void Release() { delete this; }
 private:
     FunctionMapType m_classMap;
 };

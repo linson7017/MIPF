@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- styles -->
+<Commands id="changeReferenceStyleToFusion" >
+	<UICommand type="ChangeWidgetStyle" style="Fusion" widgetID="theme_rep"/>
+	<UICommand type="SetParameter" targetID="setting.ApplyRefeneceStyle" key="style" value="QString:Fusion"/> 
+</Commands>
+
+<Commands id="changeReferenceStyleToWindows" >
+	<UICommand type="ChangeWidgetStyle" style="Windows"  widgetID="theme_rep"/>
+	<UICommand type="SetParameter" targetID="setting.ApplyRefeneceStyle" key="style" value="QString:Windows"/> 
+</Commands>
+
+<Commands id="changeReferenceStyleToMainStyle" >
+	<UICommand type="ChangeWidgetStyle" style="mainstyle"  widgetID="theme_rep"/>
+	<UICommand type="SetParameter" targetID="setting.ApplyRefeneceStyle" key="style" value="QString:mainstyle"/> 
+</Commands>
+
+<Commands id="changeReferenceStyleToQssDark" >
+	<UICommand type="ChangeWidgetStyle" style="dark_style.qss"  widgetID="theme_rep"/>
+	<UICommand type="SetParameter" targetID="setting.ApplyRefeneceStyle" key="style" value="QString:dark_style.qss"/> 
+</Commands>
+
+<Commands id="changeReferenceStyleToQssBF" >
+	<UICommand type="ChangeWidgetStyle" style="bf.css"  widgetID="theme_rep"/>
+	<UICommand type="SetParameter" targetID="setting.ApplyRefeneceStyle" key="style" value="QString:bf.css"/> 
+</Commands>
+
+<Commands id="changeReferenceStyleToQssBlack" >
+	<UICommand type="ChangeWidgetStyle" style="black.css"  widgetID="theme_rep"/>
+	<UICommand type="SetParameter" targetID="setting.ApplyRefeneceStyle" key="style" value="QString:black.css"/> 
+</Commands>
+
+<Commands id="changeReferenceStyleToQssBlue" >
+	<UICommand type="ChangeWidgetStyle" style="blue.css" widgetID="theme_rep"/>
+	<UICommand type="SetParameter" targetID="setting.ApplyRefeneceStyle" key="style" value="QString:blue.css"/> 
+</Commands>
+	
+<Commands id="changeReferenceStyleToQssDarkBlue" >
+	<UICommand type="ChangeWidgetStyle" style="darkblue.css"  widgetID="theme_rep"/>
+	<UICommand type="SetParameter" targetID="setting.ApplyRefeneceStyle" key="style" value="QString:darkblue.css"/> 
+</Commands>
+
+<Commands id="changeReferenceStyleToQssDarkBlack" >
+	<UICommand type="ChangeWidgetStyle" style="darkblack.css"  widgetID="theme_rep"/>
+	<UICommand type="SetParameter" targetID="setting.ApplyRefeneceStyle" key="style" value="QString:darkblack.css"/> 
+</Commands>
+
+<Commands id="changeReferenceStyleToQssDarkGray" >
+	<UICommand type="ChangeWidgetStyle" style="darkgray.css"  widgetID="theme_rep"/>
+	<UICommand type="SetParameter" targetID="setting.ApplyRefeneceStyle" key="style" value="QString:darkgray.css"/> 
+</Commands>
+
+<Commands id="changeReferenceStyleToQssFlatBlack" >
+	<UICommand type="ChangeWidgetStyle" style="flatblack.css"  widgetID="theme_rep"/>
+	<UICommand type="SetParameter" targetID="setting.ApplyRefeneceStyle" key="style" value="QString:flatblack.css"/> 
+</Commands>
+
+<Commands id="changeReferenceStyleToQssFlatWhite" >
+	<UICommand type="ChangeWidgetStyle" style="flatwhite.css"  widgetID="theme_rep"/>
+	<UICommand type="SetParameter" targetID="setting.ApplyRefeneceStyle" key="style" value="QString:flatwhite.css"/> 
+</Commands>
+
+<Commands id="changeReferenceStyleToQssGray" >
+	<UICommand type="ChangeWidgetStyle" style="gray.css"  widgetID="theme_rep"/>
+	<UICommand type="SetParameter" targetID="setting.ApplyRefeneceStyle" key="style" value="QString:gray.css"/> 
+</Commands>
+
+<Commands id="changeReferenceStyleToQssLightBlack" >
+	<UICommand type="ChangeWidgetStyle" style="lightblack.css" widgetID="theme_rep" />
+	<UICommand type="SetParameter" targetID="setting.ApplyRefeneceStyle" key="style" value="QString:lightblack.css"/> 
+</Commands>
+
+<Commands id="changeReferenceStyleToQssLightBlue" >
+	<UICommand type="ChangeWidgetStyle" style="lightblue.css" widgetID="theme_rep" />
+	<UICommand type="SetParameter" targetID="setting.ApplyRefeneceStyle" key="style" value="QString:lightblue.css"/> 
+</Commands>
+
+<Commands id="changeReferenceStyleToQssLightGray" >
+	<UICommand type="ChangeWidgetStyle" style="lightgray.css" widgetID="theme_rep" />
+	<UICommand type="SetParameter" targetID="setting.ApplyRefeneceStyle" key="style" value="QString:lightgray.css"/> 
+</Commands>
+
+<Commands id="changeReferenceStyleToQssPsBalck" >
+	<UICommand type="ChangeWidgetStyle" style="psblack.css" widgetID="theme_rep" />
+	<UICommand type="SetParameter" targetID="setting.ApplyRefeneceStyle" key="style" value="QString:psblack.css"/> 
+</Commands>
+
+<Commands id="changeReferenceStyleToQssSilvery" >
+	<UICommand type="ChangeWidgetStyle" style="silvery.css" widgetID="theme_rep" />
+	<UICommand type="SetParameter" targetID="setting.ApplyRefeneceStyle" key="style" value="QString:silvery.css"/> 
+</Commands>
+
+<Commands id="changeReferenceStyleToQssTest" >
+	<UICommand type="ChangeWidgetStyle" style="test.css" widgetID="theme_rep" />
+	<UICommand type="SetParameter" targetID="setting.ApplyRefeneceStyle" key="style" value="QString:test.css"/> 
+</Commands>
+
+<UICommand id="applyReferenceStyle" type="ChangeApplicationStyle" />

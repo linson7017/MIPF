@@ -2,7 +2,7 @@
 
 <styles>
 
-	<style id="mainstyle11">
+	<style id="mainstyle">
 		<!-- Widget -->
 		<Widget 
 			background="#34495E"
@@ -14,10 +14,9 @@
 		/>
 		<!-- Button -->
 		<Button 
-			min-height="20px"
+			min-height="10px"
 			border-style="none"
-			padding="10px"
-			border-radius="5px"
+			border-radius="2px"
 			color="#FFFFFF"
 			background="#486178"
 		/>
@@ -38,8 +37,7 @@
 		/>
 		<!-- LineEdit -->
 		<LineEdit 
-			padding="6px"
-			border-radius="5px"
+			border-radius="2px"
 			border="2px solid #587188"
 			font-size="12px"
 			color="white"
@@ -51,13 +49,11 @@
 		/>
 		<!-- Label -->
 		<Label 
-			font-size="14px"
 			color="white"
 			font-weight="100"
 		/>
 		<!-- CheckBox -->
 		<CheckBox 
-			font-size="12px"
 			color="white"
 			font-weight="100"
 		/>
@@ -109,15 +105,14 @@
 		<!-- ProgressBar -->
 		<ProgressBar 
 			font="9pt"
-			height="8px"
 			background="#E8EDF2"
-			border-radius="5px"
+			border-radius="2px"
 			text-align="center"
 			border="1px solid #E8EDF2"
 		/>
 		<ProgressBar 
 			sub-controls="chunk"
-			border-radius="5px"
+			border-radius="2px"
 			background-color="#E74C3C"
 		/>
 		<!-- Slider -->
@@ -176,8 +171,6 @@
 		<TreeView
 			sub-controls="item"
 			states="selected"
-			font-size="12px"
-			height="100"
 		/>
 	</style>
 

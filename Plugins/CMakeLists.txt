@@ -4,9 +4,6 @@ include_directories(${PROJECT_SOURCE_DIR}/Modules/interface)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-find_package(QTFRAMEWORK REQUIRED)
-find_package(QFMAIN REQUIRED)
-
 add_definitions(-DQF_API_EXPORTS)
 
 add_subdirectory(Mipf_Plugin_MitkStdWidgets)
@@ -66,3 +63,5 @@ add_subdirectory(Mipf_Plugin_ModelExporter)
 add_subdirectory(Mipf_Plugin_TubularTracking)
 
 add_subdirectory(Mipf_Plugin_SliceBySliceTracking)
+ 
+add_subdirectory(Mipf_Plugin_SphereCropper)

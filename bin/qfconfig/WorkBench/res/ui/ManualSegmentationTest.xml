@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<Widget id="ManualSegmentationTest">
+<Widget id="ManualSegmentationTest" width="400">
 	<VLayout>
 		<HLayout>
 			<Label text="Image:"/>

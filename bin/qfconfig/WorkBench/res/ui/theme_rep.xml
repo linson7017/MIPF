@@ -1,0 +1,81 @@
+﻿<Widget id="theme_rep">
+	<VLayout>
+		<!-- 第一行 -->
+		<HLayout>
+			<Label text="Style:"/>
+			<ComboBox>
+				<ComboBoxItem text="Windows"/>
+				<ComboBoxItem text="WindowsXP"/>
+				<ComboBoxItem text="Motif"/>
+				<ComboBoxItem text="CDE"/>
+				<ComboBoxItem text="Plastique"/>
+				<ComboBoxItem text="Cleanlooks"/>
+			</ComboBox>
+			<Stretch size="10"/>
+			<CheckBox text="Disable Widgets"/>
+		</HLayout>
+		<HLayout>
+			<!-- 右上角 -->
+			<GroupBox text="Group 1">
+				<VLayout>
+					<ButtonGroup>
+						<RadioButton text="Radio button 1" checked="true"/>
+						<RadioButton text="Radio button 2"/>
+						<RadioButton text="Radio button 3"/>
+					</ButtonGroup>
+					<CheckBox text="Tri-state check box" checkState="PartiallyChecked"/>
+				</VLayout>
+			</GroupBox>
+			<!-- 左上角 -->
+			<GroupBox text="Group 2">
+				<VLayout>
+					<Button  text="Default Push Button"/>
+					<Button text="Toggle Push Button1" checkable="true"/>
+					<Button text="Toggle Push Button2" checked="true"/>
+					<Button text="Flat Push Button" flat="true"/>
+				</VLayout>
+			</GroupBox>
+		</HLayout>
+		<HLayout>
+			<!-- 左下角 -->
+			<Tabs initIndex="1" stretch="1">
+				<Tab index="0" text="Table">
+					<Table row="10" col="10"  hMinimumSectionSize="80" style="@style/TableStyle"/>
+				</Tab>
+				<Tab index="1" text="Text Edit">
+					<TextEdit index="1" text="Twinkle, twinkle, little star,How I wonder what you are.Up above the world so high,Like a diamond in the sky.Twinkletwinkle, little star,How I wonder what you are!"/>
+				</Tab>
+				<Tab index="2" text="Table">
+					<Table row="10" col="10" hHeaderLabels="labe1;;label2;;label3"/>
+				</Tab>
+				<Tab index="3" text="Table">
+					<Table row="10" col="10" hHeaderResizeMode="Stretch"/>
+				</Tab>
+			</Tabs>
+			<!-- 右下角 -->
+			<GroupBox text="Group 3" stretch="1">
+				<GridLayout>
+					<LineEdit text="123456" row="0" col="0" colSpan="2"/>  <!-- 普通文本编辑 -->
+					<LineEdit text="123456" echoMode="Password" row="1" col="0" colSpan="3"/> <!-- 特定文本编辑 -->
+					<Spinner value="50" row="2" col="0"/>      
+					<Spinner rangeMax="10" rangeMin="0" singleStep="2" value="4" row="2" col="1"/>  <!-- 设定上下限的值为int型的Spinner -->
+					<Spinner valueType="double" rangeMax="10" rangeMin="0" singleStep="2" value="4" row="2" col="2"/>  <!-- 设定上下限的值为double型的Spinner -->
+					<DateTimeEdit row="3" col="0" colSpan="3"/>    <!-- 时间编辑控件 -->
+					<HSlider value="50" row="4" col="0" colSpan="2"/>
+					<HScrollBar value="50" row="5" col="0" colSpan="2"/>
+					<Dial value="40" row="4" col="2" rowSpan="2"/>
+				</GridLayout>
+			</GroupBox>
+		</HLayout>
+		<ProgressBar range="0,1000" value="200" />
+	</VLayout>
+</Widget>
+
+
+
+
+
+
+
+
+

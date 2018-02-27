@@ -2,13 +2,11 @@
 #define IQF_AirwaySegmentation_h__
 
 #include "IQF_Object.h"
-#include "iconfig.h"
 class TInputImageType;
 class TOutputImageType;
 
 class IQF_AirwaySegmentation:public IQF_Object
 {
-    BUILD_INTERFACE(IQF_AirwaySegmentation)
 public:
 	virtual int DoSegmentation()=0;
 	virtual void SetSourceImage(TInputImageType* const sourceimage)=0;

@@ -1,6 +1,12 @@
 #include "CutImplementation.h"
 
-#include <vtkMetaImageWriter.h>
+#include "mitkImage.h"
+#include "mitkSurface.h"
+#include "mitkRenderingManager.h"
+
+
+#include "vtkPolyData.h"
+#include "vtkImageData.h"
 
 CutImplementation::CutImplementation() :m_pDataNode(nullptr), InsideOut(false) 
 {
@@ -34,6 +40,7 @@ void CutImplementation::Init(mitk::DataNode* pDataNode)
     m_pDataNode = pDataNode;
     ClearUndo();
     ClearRedo();
+    m_dataType = GetDataType(pDataNode);
     if (GetDataObject())
     {
         m_undoList.push(GetCopyOfDataObject());
@@ -167,4 +174,117 @@ void CutImplementation::Finished()
 {
     ClearRedo();
     ClearUndo();
+}
+
+
+CutImplementation::DataType CutImplementation::GetDataType(mitk::DataNode* node)
+{
+    if (dynamic_cast<mitk::Surface *>(node->GetData()) != nullptr)
+    {
+        return Surface;
+    }
+    else if (dynamic_cast<mitk::Image *>(node->GetData()) != nullptr)
+    {
+        return Image;
+    }
+    else
+    {
+        return Unknown;
+    }
+}
+
+vtkDataObject* CutImplementation::GetDataObject()
+{
+    if (m_dataType==Surface)
+    {
+        mitk::Surface* pData = dynamic_cast<mitk::Surface*>(m_pDataNode->GetData());
+        if (pData)
+        {
+            return pData->GetVtkPolyData();
+        }
+        else
+        {
+            return nullptr;
+        }
+    }
+    else if (m_dataType==Image)
+    {
+        mitk::Image* pData = dynamic_cast<mitk::Image*>(m_pDataNode->GetData());
+        if (pData)
+        {
+            return pData->GetVtkImageData();
+        }
+        else
+        {
+            return nullptr;
+        }
+    }
+    else
+    {
+        return nullptr;
+    }
+
+    
+}
+vtkSmartPointer<vtkDataObject> CutImplementation::GetCopyOfDataObject()
+{
+    if (m_dataType == Surface)
+    {
+        mitk::Surface* pData = dynamic_cast<mitk::Surface*>(m_pDataNode->GetData());
+        if (pData)
+        {
+            auto copy = vtkSmartPointer<vtkPolyData>::New();
+            copy->DeepCopy(pData->GetVtkPolyData());
+            return copy;
+        }
+        else
+        {
+            return nullptr;
+        }
+    }
+    else if (m_dataType == Image)
+    {
+        mitk::Image* pData = dynamic_cast<mitk::Image*>(m_pDataNode->GetData());
+        if (pData)
+        {
+            auto copy = vtkSmartPointer<vtkImageData>::New();
+            copy->DeepCopy(pData->GetVtkImageData());
+            return copy;
+        }
+        else
+        {
+            return nullptr;
+        }
+    }
+    else 
+    {
+        return nullptr;
+
+    }
+    
+
+}
+void CutImplementation::Refresh()
+{
+    if (m_dataType == Surface)
+    {
+        mitk::Surface* pData = dynamic_cast<mitk::Surface*>(m_pDataNode->GetData());
+        auto poly = dynamic_cast<vtkPolyData*>(TopOfUndo().Get());
+        if (pData&&poly)
+        {
+            pData->SetVtkPolyData(poly);
+            mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+        }
+    }
+    else if (m_dataType == Image)
+    {
+        mitk::Image* pData = dynamic_cast<mitk::Image*>(m_pDataNode->GetData());
+        auto img = dynamic_cast<vtkImageData*>(TopOfUndo().Get());
+        if (pData&&img)
+        {
+            pData->SetVolume(img->GetScalarPointer());
+            mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+        }
+    }
+    
 }

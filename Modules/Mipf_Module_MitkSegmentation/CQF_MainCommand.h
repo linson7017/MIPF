@@ -22,7 +22,7 @@ public:
 	CQF_MainCommand(QF::IQF_Main* pMain);
 	~CQF_MainCommand();
 	void Release();
-	virtual bool ExecuteCommand(const char* szCommandID, QF::IQF_PropertySet* pInParam, QF::IQF_PropertySet* pOutParam);
+	virtual bool ExecuteCommand(const char* szCommandID, QF::IQF_Properties* pInParam, QF::IQF_Properties* pOutParam);
 	virtual int GetCommandCount();
 	virtual const char* GetCommandID(int iIndex);
 

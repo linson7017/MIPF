@@ -66,7 +66,7 @@ const char* CQF_MainCommand::GetCommandID(int iIndex)
     }
 }
 
-bool CQF_MainCommand::ExecuteCommand(const char* szCommandID, QF::IQF_PropertySet* pInParam, QF::IQF_PropertySet* pOutParam)
+bool CQF_MainCommand::ExecuteCommand(const char* szCommandID, QF::IQF_Properties* pInParam, QF::IQF_Properties* pOutParam)
 {
     if (strcmp(szCommandID, "") == 0)
     {

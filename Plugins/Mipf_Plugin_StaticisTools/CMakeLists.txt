@@ -28,11 +28,10 @@ if (VTK_QT_VERSION VERSION_GREATER "4")
     add_library(Mipf_Plugin_StaticisTools SHARED ${DIR_SRCS} ${Headers} ${UI_Srcs} ${MOC_Hdrs})
     qt5_use_modules(Mipf_Plugin_StaticisTools Core Gui Widgets)
     target_link_libraries(Mipf_Plugin_StaticisTools    
-    ${VTK_LIBRARIES} ${ITK_LIBRARIES}    ${ITKVTK_HELPERS_LIBRARIES}
-    ${QTFRAMEWORK_LIBRARIES} ${QFMAIN_LIBRARIES}   
+    ${VTK_LIBRARIES} ${ITK_LIBRARIES}    ${ITKVTK_HELPERS_LIBRARIES} 
     ${MitkCoreExt_LIBRARIES}
     MitkQtWidgets MitkQtWidgetsExt MitkMapperExt MitkSegmentation)
-
+	link_framework()
 else()
     add_library(Mipf_Plugin_StaticisTools SHARED ${DIR_SRCS} ${Headers} ${UI_Srcs} ${MOC_Hdrs})
     target_link_libraries(Mipf_Plugin_StaticisTools ${QT_LIBRARIES@} ${VTK_LIBRARIES} ${ITK_LIBRARIES} ${QTFRAMEWORK_LIBRARIES} ${QFMAIN_LIBRARIES} MitkQtWidgets MitkQtWidgetsExt)

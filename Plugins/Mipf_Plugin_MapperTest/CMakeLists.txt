@@ -29,10 +29,9 @@ if (VTK_QT_VERSION VERSION_GREATER "4")
     qt5_use_modules(Mipf_Plugin_MapperTest Core Gui Widgets)
     target_link_libraries(Mipf_Plugin_MapperTest    
     ${VTK_LIBRARIES} ${ITK_LIBRARIES}   
-    ${QTFRAMEWORK_LIBRARIES} ${QFMAIN_LIBRARIES} 
 	${MitkCoreExt_LIBRARIES}	
     MitkQtWidgets MitkQtWidgetsExt)
-
+	link_framework()
 else()
     add_library(Mipf_Plugin_MapperTest SHARED ${DIR_SRCS} ${Headers} ${UI_Srcs} ${MOC_Hdrs})
     target_link_libraries(Mipf_Plugin_MapperTest ${QT_LIBRARIES@} ${VTK_LIBRARIES} ${ITK_LIBRARIES} ${QTFRAMEWORK_LIBRARIES} ${QFMAIN_LIBRARIES} MitkQtWidgets MitkQtWidgetsExt)

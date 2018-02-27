@@ -3,15 +3,14 @@
 
 #pragma once
 #include <functional>
-#include "iconfig.h"
+#include "IQF_Object.h"
 
 const char QF_Core_ObjectFactory[] = "QF_Core_ObjectFactory";
 
 typedef std::function<void*(void)> ContructFunctionType;
 
-class IQF_ObjectFactory
+class IQF_ObjectFactory : public IQF_Object
 {
-    BUILD_INTERFACE(IQF_ObjectFactory)
 public:
     virtual void Register(const char* szName, ContructFunctionType tFunc) = 0;
     virtual void *CreateObject(const char* szName) = 0;

@@ -14,6 +14,8 @@ endif()
 
 project(WorkBench)
 
+#add_definitions(-DQFCONFIG_DEBUG)
+
 include_directories(
   ${CMAKE_CURRENT_BINARY_DIR}
   ${CMAKE_CURRENT_SOURCE_DIR}
@@ -36,13 +38,14 @@ if(VTK_QT_VERSION VERSION_GREATER "4")
   # CMAKE_AUTOMOC in ON so the MocHdrs will be automatically wrapped.
   add_executable(WorkBench ${DIR_SRCS} ${Headers} ${UI_Srcs} ${MOC_Hdrs} ${QfConfigFiles})
   qt5_use_modules(WorkBench Core Gui Widgets)
-  target_link_libraries(WorkBench  ${QTFRAMEWORK_LIBRARIES} ${QFMAIN_LIBRARIES} )
+  link_framework()
 else()
   find_package(Qt4 REQUIRED)
   include(${QT_USE_FILE})
   qt4_wrap_ui(UI_Srcs ${UIs})
   add_executable(WorkBench ${DIR_SRCS} ${Headers} ${UI_Srcs} ${MOC_Hdrs})
-  target_link_libraries(WorkBench ${QT_LIBRARIES}  ${QTFRAMEWORK_LIBRARIES} ${QFMAIN_LIBRARIES}) 
+  target_link_libraries(WorkBench ${QT_LIBRARIES}) 
+  link_framework()
 endif()
 
 #Release去控制台窗口

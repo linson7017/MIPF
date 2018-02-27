@@ -9,11 +9,15 @@
 #include "MitkMain/IQF_MitkIO.h"
 
 #include "mitkRenderingManager.h"
+#include "QmitkStdMultiWidget.h"
+#include "mitkDataNode.h"
 
 #include "QmitkIOUtil.h"
 #include <QFileDialog>
 
 #include "iqf_main.h"
+#include "iqf_properties.h"
+#include "iqf_property.h"
 
 //qt
 #include <QMessageBox>
@@ -33,13 +37,12 @@ void CQF_MainCommand::Release()
     delete this;
 }
 
-bool CQF_MainCommand::ExecuteCommand(const char* szCommandID, QF::IQF_PropertySet* pInParam, QF::IQF_PropertySet* pOutParam)
+bool CQF_MainCommand::ExecuteCommand(const char* szCommandID, QF::IQF_Properties* pInParam, QF::IQF_Properties* pOutParam)
 {
     if (strcmp(szCommandID, MITK_MAIN_COMMAND_LOADDATA) == 0)
     {
         IQF_MitkReference* pMitkReference = (IQF_MitkReference*)m_pMain->GetInterfacePtr(QF_MitkMain_Reference);
         IQF_MitkDataManager* pMitkDataManager = (IQF_MitkDataManager*)m_pMain->GetInterfacePtr(QF_MitkMain_DataManager);
-        IQF_MitkRenderWindow* pMitkRenderWindow = (IQF_MitkRenderWindow*)m_pMain->GetInterfacePtr(QF_MitkMain_RenderWindow);
         QString defaultOpenFilePath = pMitkReference->GetString("LastOpenDirectory");
 
         QStringList fileNames = QFileDialog::getOpenFileNames(NULL, "Open",
@@ -60,6 +63,50 @@ bool CQF_MainCommand::ExecuteCommand(const char* szCommandID, QF::IQF_PropertySe
         pMitkReference->SetString("LastOpenDirectory", QFileInfo(fileNames.back()).absolutePath().toStdString().c_str());
         return true;
     }
+    else if (strcmp(szCommandID, MITK_MAIN_COMMAND_ENABLE_VTK_WARNING) == 0)
+    {
+        if (pInParam)
+        {
+            vtkObject::SetGlobalWarningDisplay(pInParam->GetProperty("EnableVtkWarning")->GetBool());
+        }
+        else
+        {
+            MITK_ERROR << "Command does not pass property EnableVtkWarning!";
+        }
+        return true;
+    }
+    else if (strcmp(szCommandID, MITK_MAIN_COMMAND_CHANGE_CROSSHAIR_GAP_SIZE)==0)
+    {
+        MITK_INFO << "MITK_MAIN_COMMAND_CHANGE_CROSSHAIR_GAP_SIZE";
+        if (pInParam)
+        {
+            IQF_MitkRenderWindow* pMitkRenderWindow = (IQF_MitkRenderWindow*)m_pMain->GetInterfacePtr(QF_MitkMain_RenderWindow);
+            if (pMitkRenderWindow)
+            {
+                QmitkStdMultiWidget* pMultiWidget = pMitkRenderWindow->GetMitkStdMultiWidget();
+                if (pMultiWidget)
+                {
+                    pMultiWidget->GetWidgetPlane1()->SetIntProperty("Crosshair.Gap Size", pInParam->GetProperty("CrosshairGapSize")->GetInt());
+                    pMultiWidget->GetWidgetPlane2()->SetIntProperty("Crosshair.Gap Size", pInParam->GetProperty("CrosshairGapSize")->GetInt());
+                    pMultiWidget->GetWidgetPlane3()->SetIntProperty("Crosshair.Gap Size", pInParam->GetProperty("CrosshairGapSize")->GetInt());
+                    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                return false;
+            }
+        }
+        else
+        {
+            MITK_ERROR << "Command does not pass property CrosshairGapSize!";
+        }
+        return true;
+    }
     else
     {
         return false;
@@ -68,7 +115,7 @@ bool CQF_MainCommand::ExecuteCommand(const char* szCommandID, QF::IQF_PropertySe
 
 int CQF_MainCommand::GetCommandCount()
 {
-    return 1;
+    return 3;
 }
 
 const char* CQF_MainCommand::GetCommandID(int iIndex)
@@ -77,6 +124,10 @@ const char* CQF_MainCommand::GetCommandID(int iIndex)
     {
     case 0:
         return MITK_MAIN_COMMAND_LOADDATA;
+    case 1:
+        return MITK_MAIN_COMMAND_ENABLE_VTK_WARNING;
+    case 2:
+        return MITK_MAIN_COMMAND_CHANGE_CROSSHAIR_GAP_SIZE;
     default:
         return "";
         break;

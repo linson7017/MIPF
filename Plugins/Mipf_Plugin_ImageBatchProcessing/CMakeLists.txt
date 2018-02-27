@@ -23,7 +23,7 @@ qt5_wrap_ui(ui_Files ${UI_Srcs})
 add_library(Mipf_Plugin_ImageBatchProcessing SHARED ${DIR_SRCS} ${Headers} ${UI_Srcs} ${MOC_Hdrs})
 qt5_use_modules(Mipf_Plugin_ImageBatchProcessing Core Gui Widgets)
 target_link_libraries(Mipf_Plugin_ImageBatchProcessing    
-${VTK_LIBRARIES} ${ITK_LIBRARIES}   
-${QTFRAMEWORK_LIBRARIES} ${QFMAIN_LIBRARIES}   
+${VTK_LIBRARIES} ${ITK_LIBRARIES}    
 MitkQtWidgets MitkQtWidgetsExt)
+link_framework()
 

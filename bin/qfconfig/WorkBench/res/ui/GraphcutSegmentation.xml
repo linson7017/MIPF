@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<Widget id="GraphcutSegmentation">
+<Widget id="GraphcutSegmentation" width="400">
 	<VLayout  stretch="1.5">
 		<HLayout>
 			<Label text="Image"/>

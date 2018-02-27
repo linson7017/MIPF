@@ -40,7 +40,6 @@ private:
     mitk::DataNode::Pointer m_pLineNode;
     mitk::PointSet::Pointer m_linePoints;
 
-    QTimer m_timer;
     mitk::DataNode::Pointer m_dataNode;
     mitk::Image::Pointer m_image;
     QImage* m_qImage;

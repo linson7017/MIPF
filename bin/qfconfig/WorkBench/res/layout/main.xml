@@ -1,4 +1,4 @@
-<MainWindow activityRoot="true" id="main.main" style="@style/mainstyle" tabPosition="Right;Right" tabShape="T">
+<MainWindow activityRoot="true" id="main" tabPosition="Right;Right" tabShape="T">
 	<TitleBar titleText="Algorithm"/>
 	<!-- 菜单栏 -->
 	<MenuBar >
@@ -7,27 +7,99 @@
 			<Action text="Save Data" />
 		</Menu>
 		<Menu p_title="QString:Views">
+			<!-- main -->
 			<Action text="Welcom" uicommand="@uicommand/toggleWelcomDockWidget" checkable="true" checked="true"/>
 			<Action text="Data Manager" uicommand="@uicommand/toggleDataManagerDockWidget" checkable="true" checked="true"/>
-			<Action text="Image Navigator" uicommand="@uicommand/toggleImageNavigatorDockWidget" checkable="true" checked="true"/>
-			<Action text="Volume Visualization" uicommand="@uicommand/toggleVolumeVisualizationDockWidget" checkable="true" checked="true"/>
-			<MenuSeparator />		
-			<Action text="TubularTracking" uicommand="@uicommand/toggleTubularTrackingDockWidget" checkable="true" />
-			<Action text="SliceBySliceTracking" uicommand="@uicommand/toggleSliceBySliceTrackingDockWidget" checkable="true" />
-			<Action text="ITKAlgorithmSet" uicommand="@uicommand/toggleITKAlgorithmSetDockWidget" checkable="true" />
-			<Action text="Measurement" uicommand="@uicommand/toggleMeasurementDockWidget" checkable="true" />
-			<Action text="Registration" uicommand="@uicommand/toggleImageRegistrationDockWidget" checkable="true" checked="true"/>
-			<Action text="Mannul Segmentation" uicommand="@uicommand/toggleSegmentationDocWidget" checkable="true" checked="true"/>
-			<Action text="Graphcut Segmentation" uicommand="@uicommand/toggleGraphcutSegmentationDocWidget" checkable="true" checked="true"/>			
-			<Action text="NDI" uicommand="@uicommand/toggleNDIDockWidget" checkable="true"/>
+			<Action text="Image Navigator" uicommand="@uicommand/toggleImageNavigatorDockWidget" checkable="true" checked="true"/>			
+		
+			<!-- BasicImageTools -->
+			<Action text="Basic Image Tools" >
+				<Menu title="Basic Image Tools">
+					<Action uicommand="@uicommand/toggleBasicImageTools" checkable="true" checked="true" />
+					<MenuSeparator />
+					<Action uicommand="@uicommand/toggleVolumeCutWidget" text="Volume Cut"  checkable="true" checked="true"/>
+					<Action uicommand="@uicommand/toggleSphereCropperView" text="Sphere Cropper"  checkable="true" checked="true"/>
+					<Action uicommand="@uicommand/toggleMapperTestWidget" text="Mapper Test" checkable="true" checked="true"/>
+					<Action uicommand="@uicommand/toggleImageRegistrationWidget" text="Image Registration" checkable="true" checked="true"/>		
+					<Action uicommand="@uicommand/toggleMaskImageWidget" text="Mask Image" checkable="true" checked="true"/>
+					<Action uicommand="@uicommand/toggleLargestConnectedComponentExtractWidget" text="Image Connected Component" checkable="true" checked="true"/>
+					<Action uicommand="@uicommand/toggleSurfaceExtractWidget" text="Surface Extract" checkable="true" checked="true"/>	
+					<Action uicommand="@uicommand/toggleItkAlgorithmSetWidget" text="Itk Algorithm Set" checkable="true" checked="true"/>
+					<Action uicommand="@uicommand/toggleTransformNodeWidget" text="Transform Node" checkable="true" checked="true"/>
+					<Action uicommand="@uicommand/toggleLandMarkExtractWidget" text="Land Mark" checkable="true" checked="true"/>	
+					<Action uicommand="@uicommand/toggleSigmoidImageWidget" text="Sigmoid" checkable="true" checked="true"/>
+					<Action uicommand="@uicommand/toggleVolumeVisualizationWidget" text="Volume Visualization" checkable="true" checked="true"/>
+				</Menu>
+			</Action>
+					
+			<!-- BasicSurfaceTools -->
+			<Action text="Basic Surface Tools" >
+				<Menu>
+					<Action uicommand="@uicommand/toggleBasicSurfaceTools" checkable="true" checked="true" />
+					<MenuSeparator />
+					<Action uicommand="@uicommand/toggleSurfaceCombineWidget" text="Surface Combine" checkable="true" checked="true"/>
+					<Action uicommand="@uicommand/toggleSurfaceConnectedWidget" text="Surface Connected" checkable="true" checked="true"/>
+					<Action uicommand="@uicommand/toggleSurfaceCutWidget" text="Surface Cut" checkable="true" checked="true"/>
+					<Action uicommand="@uicommand/toggleSurfaceToImageWidget" text="Surface To Image" checkable="true" checked="true"/>
+					<Action uicommand="@uicommand/toggleModelExporterWidget" text="Model Exporter" checkable="true" checked="true"/>
+				</Menu>
+			</Action>
+			
+			<!-- SegmentationTools -->
+			<Action text="Segmentation Tools" >
+				<Menu>
+					<Action uicommand="@uicommand/toggleSegmentationTools" checkable="true" checked="true" />
+					<MenuSeparator />
+					<Action uicommand="@uicommand/toggleGraphcutSegmentationWidget" text="Graphcut Ui" checkable="true" checked="true"/>
+					<Action uicommand="@uicommand/toggleGraphcutSegmentation" text="Graphcut Segmentation" checkable="true" checked="true"/>
+					<Action uicommand="@uicommand/toggleManualSegmentationWidget" text="Manual Segmentation" checkable="true" checked="true"/>
+					<Action uicommand="@uicommand/toggleBoneExtractWidget" text="Bone Extract"  checkable="true" checked="true"/>
+					<Action uicommand="@uicommand/toggleSkinExtractWidget" text="Skin Extract" checkable="true" checked="true"/>
+					<Action uicommand="@uicommand/toggleBasicImageProcessWidget" text="Basic Image Algorithms" checkable="true" checked="true"/>			
+					<Action uicommand="@uicommand/toggleImageCropperWidget"  text="Image Cropper" checkable="true" checked="true"/>						
+					<Action uicommand="@uicommand/toggleSFLSSegmentationWidget" text="SFLSSegmentationWidget"  checkable="true" checked="true"/>
+					<Action uicommand="@uicommand/toggleGrowcutSegmentation" text="grow cut"  checkable="true" checked="true"/>
+					<Action uicommand="@uicommand/toggleASMWidget" text="ASM"  checkable="true" checked="true"/>
+					<Action uicommand="@uicommand/toggleFastMarchingWidget" text="Fast Marching"  checkable="true" checked="true"/>
+				</Menu>
+			</Action>
+			
+			<!-- TubularTools -->
+			<Action text="Tubular Tools" >
+				<Menu>
+					<Action uicommand="@uicommand/toggleTubularTools" checkable="true" checked="true" />
+					<MenuSeparator />
+					<Action uicommand="@uicommand/toggleVesselSegmentationWidget" text="Vessel Segmentation" checkable="true" checked="true"/>
+					<Action uicommand="@uicommand/toggleCenterLineExtractWidget" text="Center Line Extract" checkable="true" checked="true"/>
+					<Action uicommand="@uicommand/toggleVesselnessFilteringWidget" text="Vesselness Filtering"  checkable="true" checked="true"/>
+					<Action uicommand="@uicommand/toggleAirwaySegmentationWidget" text="Airway Segmentation"  checkable="true" checked="true"/>
+					<Action uicommand="@uicommand/toggleTubularTrackingWidget" text="Leksell Correct"  checkable="true" checked="true"/>
+					<Action uicommand="@uicommand/toggleSliceBySliceTrackingWidget" text="CRW Correct"  checkable="true" checked="true"/>
+				</Menu>
+			</Action>
+			
+			<!-- StaticisTools -->
+			<Action text="Staticis Tools" >
+				<Menu>
+					<Action uicommand="@uicommand/toggleStaticisTools" checkable="true" checked="true" />
+					<MenuSeparator />
+					<Action uicommand="@uicommand/togglePropertiesWidget" text="Properties" checkable="true" checked="true"/>
+					<Action uicommand="@uicommand/toggleHistogramWidget" text="Histogram" checkable="true" checked="true"/>
+					<Action uicommand="@uicommand/toggleProfileGrayScaleDistributionWidget" text="Profile Gray Scale Distribution" checkable="true" checked="true"/>
+					<Action uicommand="@uicommand/toggleMeasurementWidget" text="Measure" checkable="true" checked="true"/>
+					<Action uicommand="@uicommand/toggleGeometryInformationWidget" text="Geometry Information" checkable="true" checked="true"/>
+				</Menu>
+			</Action>
+			
 		</Menu>
 	</MenuBar>
+	
 	<!-- 工具栏 -->
 	<ToolBar p_movable="Bool:true" p_iconSize="QSize:40,40" toolButtonStyle="ToolButtonTextBesideIcon" p_windowTitle="QString:File">
-		<Action text="Open" icon="@icon/open.png"  command="MITK_MAIN_COMMAND_LOADDATA"/>
+		<Action text="Open" icon="@icon/open.png"  command="@command/MITK_MAIN_COMMAND_LOADDATA"/>
 		<Action text="Save Project" icon="@icon/SaveAs.png" msgcommand="main.SaveProject"/>
 	</ToolBar>
-	<ToolBar p_movable="Bool:false" p_iconSize="QSize:40,40" p_windowTitle="QString:Views">
+	<ToolBar p_movable="Bool:false" p_iconSize="QSize:40,40" p_windowTitle="QString:Tools">
 		<ActionGroup>
 			<Action text="view all" parameterIndex="int:0" msgcommand="MITK_COMMAND_MULTIVIEWS_CHANGELAYOUT" icon="@icon/widget0.png" />
 			<Action text="view1" parameterIndex="int:1" msgcommand="MITK_COMMAND_MULTIVIEWS_CHANGELAYOUT" icon="@icon/widget1.png" />
@@ -37,73 +109,85 @@
 			<Action text="Reset" msgcommand="MITK_COMMAND_MULTIVIEWS_RESET" icon="@icon/btn_reset.png" />
 		</ActionGroup>
 	</ToolBar>
+	<ToolBar p_movable="Bool:false" p_iconSize="QSize:40,40" p_windowTitle="QString:Views">
+		<ActionGroup>
+			<Action text="Refresh Framework" uicommand="@uicommand/goToSetting" icon="@icon/main_config.png" />
+			<Action text="Exist" uicommand="@uicommand/existApplication" icon="@icon/main_exit.png" />
+		</ActionGroup>
+	</ToolBar>
+	
 	<!-- 显示窗口 -->
-	<!-- <Widget centerWidget="true" style="@style/CenterWidgetStyle" contents_margin="0">
-		<HLayout contents_margin="0"> -->
-	<MultiViewsWidget id="main_vtkMulitView" centerWidget="true"  contents_margin="0"/>
-	<!-- 	</HLayout>
-	</Widget> -->
+	<MultiViewsWidget id="main.vtkMulitView" centerWidget="true"  contents_margin="0"/>
 	
 	<!-- 停靠窗口 -->
-	<DockWidget id="main.DataManagerDocWidget" windowTitle="Data Manager">
+	<DockWidget id="main.DataManagerDocWidget" windowTitle="Data Manager" minWidth="400">
 		<DataManagerWidget id="main.DataManager" />
 	</DockWidget>
 	<DockWidget id="main.ImageNavigatorDockWidget" height="300" windowTitle="Image Navigator">
 		<ImageNavigatorWidget id="main.ImageNavigator" />
 	</DockWidget>
-	<DockWidget id="main.Segmentation" windowTitle="Segmentation" dockWidgetArea="RightDockWidgetArea"   visible="true">
+	<DockWidget id="main.BasicImageTools" windowTitle="Image Tools" dockWidgetArea="RightDockWidgetArea"  visible="true" minWidth="400">
+		<ToolBox >
+			<VolumeCutWidget text="Volume Cut" id="main.VolumeCutWidget"/>
+			<SphereCropperView text="Sphere Cropper"  id="main.SphereCropperView"/>
+			<MapperTestWidget text="Mapper Test" id="main.MapperTestWidget"/>
+			<ImageRegistrationWidget text="Image Registration" id="main.ImageRegistrationWidget"/>		
+			<MaskImageWidget text="Mask Image" id="main.MaskImageWidget"/>
+			<LargestConnectedComponentExtractWidget text="Image Connected Component" id="main.LargestConnectedComponentExtractWidget"/>
+			<SurfaceExtractWidget text="Surface Extract"  id="main.SurfaceExtractWidget"/>	
+			<ItkAlgorithmSetWidget text="Itk Algorithm Set" id="main.ItkAlgorithmSetWidget"/>
+			<TransformNodeWidget text="Transform Node" id="main.TransformNodeWidget"/>
+			<LandMarkExtractWidget text="Land Mark" id="main.LandMarkExtractWidget"/>	
+			<SigmoidImageWidget text="Sigmoid"  id="main.SigmoidImageWidget"/>
+			<VolumeVisualizationWidget text="Volume Visualization" id="main.VolumeVisualizationWidget"/>
+		</ToolBox>
+	</DockWidget>
+	<DockWidget id="main.BasicSurfaceTools" windowTitle="Surface Tools" tabfiedDocWidgetID="main.BasicImageTools" dockWidgetArea="RightDockWidgetArea"  visible="true">
+		<ToolBox >
+			<SurfaceCombineWidget text="Surface Combine" id="main.SurfaceCombineWidget"/>
+			<SurfaceConnectedWidget text="Surface Connected" id="main.SurfaceConnectedWidget"/>
+			<SurfaceCutWidget text="Surface Cut" id="main.SurfaceCutWidget"/>
+			<SurfaceToImageWidget text="Surface To Image" id="main.SurfaceToImageWidget"/>
+			<ModelExporterWidget text="Model Exporter" id="main.ModelExporterWidget"/>
+		</ToolBox>
+	</DockWidget>
+	<DockWidget id="main.SegmentationTools" windowTitle="Segmentation Tools" tabfiedDocWidgetID="main.BasicSurfaceTools" dockWidgetArea="RightDockWidgetArea"   visible="true">
 		<ToolBox >	
-			<GraphcutSegmentationWidget text="Graphcut Ui" />
-			<Holder id="@ui/GraphcutSegmentation" text="Graphcut Segmentation"/>
-			<ManualSegmentationWidget text="Manual Segmentation"/>
-			<BoneExtractWidget text="Bone Extract"/>
-			<SkinExtractWidget text="Skin Extract"/>
-			<CenterLineExtractWidget text="Center Line Extract"/>
-			<VesselSegmentationWidget text="Vessel Segmentation"/>
-			<BasicImageProcessWidget text="Basic Image Algorithms"/>			
-			<ImageCropperWidget  text="Image Cropper"/>				
-			<Holder id="@ui/SurfaceExtract" text="Surface Extract"/>
-			<AirwaySegmentationWidget text="Airway Segmentation" />	
-			<SFLSSegmentationWidget text="SFLSSegmentationWidget" />
-			<Holder id="@ui/GrowcutSegmentation" text="grow cut" />
+			<GraphcutSegmentationWidget text="Graphcut Ui"  id="main.GraphcutSegmentationWidget"/>
+			<Holder id="@ui/GraphcutSegmentation" text="Graphcut Segmentation" />
+			<ManualSegmentationWidget text="Manual Segmentation" id="main.ManualSegmentationWidget"/>
+			<BoneExtractWidget text="Bone Extract" id="main.BoneExtractWidget"/>
+			<SkinExtractWidget text="Skin Extract" id="main.SkinExtractWidget"/>
+			<BasicImageProcessWidget text="Basic Image Algorithms" id="main.BasicImageProcessWidget"/>			
+			<ImageCropperWidget  text="Image Cropper" id="main.ImageCropperWidget"/>						
+			<SFLSSegmentationWidget text="SFLSSegmentationWidget"  id="main.SFLSSegmentationWidget"/>
+			<Holder id="@ui/GrowcutSegmentation" text="grow cut"/>
+			<ASMWidget text="ASM"  id="main.ASMWidget"/>
+			<FastMarchingWidget text="Fast Marching"  id="main.FastMarchingWidget"/>
 		</ToolBox>
 	</DockWidget>
-	<DockWidget id="main.Plugins" windowTitle="Plugins" tabfiedDocWidgetID="main.Segmentation" dockWidgetArea="RightDockWidgetArea"   visible="true">
-		<ToolBox >
-			<VolumeCutWidget text="Volume Cut" />
-			<SurfaceCombineWidget text="Surface Combine" />
-			<SurfaceConnectedWidget text="Surface Connected" />
-			<SurfaceCutWidget text="Surface Cut"/>
-			<MapperTestWidget text="Mapper Test"/>
-			<ImageRegistrationWidget text="Image Registration"/>		
-			<MaskImageWidget text="Mask Image"/>
-			<LargestConnectedComponentExtractWidget text="Image Connected Component"/>
-			<SurfaceExtractWidget text="Surface Extract" />
-			<SurfaceToImageWidget text="Surface To Image" />
-			<ItkAlgorithmSetWidget text="Itk Algorithm Set"/>
-			<TransformNodeWidget text="Transform Node"/>
-			<LandMarkExtractWidget text="Land Mark"/>	
-			<VesselnessFilteringWidget text="Vesselness Filtering" />
-			<VolumeVisualizationWidget text="Volume Visualization"/>
-		</ToolBox>
-	</DockWidget>
-	<DockWidget id="main.Staticis" windowTitle="Staticis" tabfiedDocWidgetID="main.Plugins" dockWidgetArea="RightDockWidgetArea"  visible="true">
-		<ToolBox >
-			<PropertiesWidget text="Properties" />
-			<HistogramWidget text="Histogram"/>
-			<ProfileGrayScaleDistributionWidget text="Profile Gray Scale Distribution"/>
-			<MeasurementWidget text="Measure"/>
-		</ToolBox>
-	</DockWidget>
-	<DockWidget id="main.Test" windowTitle="Test" tabfiedDocWidgetID="main.Staticis" dockWidgetArea="RightDockWidgetArea"   visible="true">
+	<DockWidget id="main.TubularTools" windowTitle="Tubular Tools" tabfiedDocWidgetID="main.SegmentationTools" dockWidgetArea="RightDockWidgetArea"   visible="true">
 		<ToolBox>
-			<ModelExporterWidget text="Model Exporter"/>
-			<ASMWidget text="ASM" />
-			<FastMarchingWidget text="Fast Marching" />
-			<SigmoidImageWidget text="Sigmoid" />
+			<VesselSegmentationWidget text="Vessel Segmentation" id="main.VesselSegmentationWidget"/>
+			<CenterLineExtractWidget text="Center Line Extract" id="main.CenterLineExtractWidget"/>
+			<VesselnessFilteringWidget text="Vesselness Filtering" id="main.VesselnessFilteringWidget"/>
+			<AirwaySegmentationWidget text="Airway Segmentation" id="main.AirwaySegmentationWidget"/>
+			<TubularTrackingWidget text="Leksell Correct" id="main.TubularTrackingWidget"/>
+			<SliceBySliceTrackingWidget text="CRW Correct" id="main.SliceBySliceTrackingWidget"/>
+		</ToolBox>			
+	</DockWidget>
+	<DockWidget id="main.StaticisTools" windowTitle="Staticis Tools" tabfiedDocWidgetID="main.TubularTools" dockWidgetArea="RightDockWidgetArea"  visible="true">
+		<ToolBox >
+			<PropertiesWidget text="Properties"  id="main.PropertiesWidget"/>
+			<HistogramWidget text="Histogram" id="main.HistogramWidget"/>
+			<ProfileGrayScaleDistributionWidget text="Profile Gray Scale Distribution" id="main.ProfileGrayScaleDistributionWidget"/>
+			<MeasurementWidget text="Measure" id="main.MeasurementWidget"/>
+			<GeometryInformationWidget text="Geometry Information"  id="main.GeometryInformationWidget"/>
+		</ToolBox>
+	</DockWidget>
+	<DockWidget id="main.Test" windowTitle="Test" tabfiedDocWidgetID="main.StaticisTools" dockWidgetArea="RightDockWidgetArea" visible="true">
+		<ToolBox>			
 			<ImageInteractionWidget text="Image Interaction"/>
-			<ProgressBarWidget text="Progress" />
-			<GeometryInformationWidget text="Geometry Information" />
 			<Holder id="@ui/ManualSegmentationTest" text="Manual Segmentation" />
 			<RenderWindowWidget	text="Render Window 3D" size="300,300"
 				mapperID="Standard3D" 
@@ -118,6 +202,7 @@
 			/>
 		</ToolBox>
 	</DockWidget>
+	
 	<!-- 状态条 -->
 	<StatusBarWidget statusBar="true"/>
 	<ProgressBarWidget geometry="0" size="200,25"/>

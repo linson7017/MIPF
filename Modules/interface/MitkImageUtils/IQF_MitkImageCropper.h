@@ -1,7 +1,7 @@
 #ifndef IQF_MitkImageCropper_h__
 #define IQF_MitkImageCropper_h__
 
-#include "iconfig.h"
+#include "IQF_Object.h"
 
 const char QF_MitkImageUtils_ImageCropper[] = "QF_MitkImageUtils_ImageCropper";
 
@@ -11,9 +11,8 @@ namespace mitk
     class  GeometryData;
 }
 
-class IQF_MitkImageCropper
+class IQF_MitkImageCropper 
 {
-    BUILD_INTERFACE(IQF_MitkImageCropper)
 public:
     virtual void CreateBoundingBoxNode(mitk::DataNode* pInNode, mitk::DataNode*pOutNode, const char* szName = "", bool bAutoUse = true)=0;
     virtual void EnableInteraction(bool bEnable = true)=0;

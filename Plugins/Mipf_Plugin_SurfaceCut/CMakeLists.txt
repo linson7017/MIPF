@@ -38,10 +38,9 @@ if (VTK_QT_VERSION VERSION_GREATER "4")
     qt5_use_modules(Mipf_Plugin_SurfaceCut Core Gui Widgets)
     target_link_libraries(Mipf_Plugin_SurfaceCut    
     ${VTK_LIBRARIES} ${ITK_LIBRARIES}   
-    ${QTFRAMEWORK_LIBRARIES} ${QFMAIN_LIBRARIES} 
     ${MitkCoreExt_LIBRARIES}  
     MitkQtWidgets MitkQtWidgetsExt MitkBoundingShape)
-
+	link_framework()
 else()
     add_library(Mipf_Plugin_SurfaceCut SHARED ${DIR_SRCS} ${Headers} ${UI_Srcs} ${MOC_Hdrs})
     target_link_libraries(Mipf_Plugin_SurfaceCut ${QT_LIBRARIES@} ${VTK_LIBRARIES} ${ITK_LIBRARIES} ${QTFRAMEWORK_LIBRARIES} ${QFMAIN_LIBRARIES} MitkQtWidgets MitkQtWidgetsExt)

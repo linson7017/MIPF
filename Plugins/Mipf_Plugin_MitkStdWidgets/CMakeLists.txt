@@ -78,5 +78,5 @@ add_library(Mipf_Plugin_MitkStdWidgets SHARED
 	${UI_Srcs} 
 	${MOC_Hdrs})
 qt5_use_modules(Mipf_Plugin_MitkStdWidgets Core Gui Widgets)
-target_link_libraries(Mipf_Plugin_MitkStdWidgets ${VTK_LIBRARIES} ${QTFRAMEWORK_LIBRARIES} ${QFMAIN_LIBRARIES} MitkQtWidgets MitkQtWidgetsExt )
-
+target_link_libraries(Mipf_Plugin_MitkStdWidgets ${VTK_LIBRARIES} MitkQtWidgets MitkQtWidgetsExt )
+link_framework()

@@ -269,7 +269,6 @@ void SurfaceCutView::BoxCut()
 
         auto clipFunction = vtkSmartPointer<vtkBox>::New();
         clipFunction->SetBounds(bound.GetDataPointer());
-        
 
         vtkSmartPointer<vtkClipPolyData> clipper =
             vtkSmartPointer<vtkClipPolyData>::New();

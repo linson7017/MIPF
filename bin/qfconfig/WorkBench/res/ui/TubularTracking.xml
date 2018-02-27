@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<Widget id="TubularTracking">
+<Widget id="TubularTracking" width="400">
 	<VLayout>
 		<GridLayout colEqual="false">
 			<Label text="Min Radius:" row="0" col="0"/>

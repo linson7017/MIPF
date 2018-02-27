@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<Widget id="ImageRegistration">
+<Widget id="ImageRegistration" width="400">
 	<VLayout>
 		<GridLayout>
 			<Label text="Fixed Image:" row="0" col="0"/>

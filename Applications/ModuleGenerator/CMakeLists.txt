@@ -34,14 +34,15 @@ if(VTK_QT_VERSION VERSION_GREATER "4")
   # CMAKE_AUTOMOC in ON so the MocHdrs will be automatically wrapped.
   add_executable(ModuleGenerator ${DIR_SRCS} ${Headers} ${UI_Srcs} ${MOC_Hdrs})
   qt5_use_modules(ModuleGenerator Core Gui Widgets)
-  target_link_libraries(ModuleGenerator ${QTFRAMEWORK_LIBRARIES} ${QFMAIN_LIBRARIES})
+  link_framework()
 else()
   find_package(Qt4 REQUIRED)
   include(${QT_USE_FILE})
   qt4_wrap_ui(UI_Srcs ${UIs})
 
   add_executable(ModuleGenerator ${DIR_SRCS} ${Headers} ${UI_Srcs} ${MOC_Hdrs})
-  target_link_libraries(ModuleGenerator ${QT_LIBRARIES}  ${QTFRAMEWORK_LIBRARIES} ${QFMAIN_LIBRARIES}  )
+  target_link_libraries(ModuleGenerator ${QT_LIBRARIES} )
+  link_framework()
 endif()
 
 InstallQfConfig(${PROJECT_NAME})

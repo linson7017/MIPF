@@ -24,6 +24,6 @@ add_library(Mipf_Plugin_Test SHARED ${DIR_SRCS} ${Headers} ${UI_Srcs} ${MOC_Hdrs
 qt5_use_modules(Mipf_Plugin_Test Core Gui Widgets)
 target_link_libraries(Mipf_Plugin_Test    
 ${VTK_LIBRARIES} ${ITK_LIBRARIES}   
-${QTFRAMEWORK_LIBRARIES} ${QFMAIN_LIBRARIES}   
 MitkQtWidgets MitkQtWidgetsExt)
+link_framework()
 

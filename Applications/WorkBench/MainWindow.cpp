@@ -6,7 +6,9 @@
 
 #include "Res/R.h"
 #include "Common/app_env.h"
+#include "Common/qt_context.h"
 #include "Utils/variant.h"
+
 
 #include "MitkMain/IQF_MitkIO.h"
 #include "MitkMain/IQF_MitkReference.h"
@@ -50,6 +52,10 @@ void MainWindow::Update(const char* szMessage, int iValue, void* pValue)
     {
         IQF_MitkIO* pMitkIO = (IQF_MitkIO*)m_pMain->GetInterfacePtr(QF_MitkMain_IO);
         pMitkIO->SaveProject();
+    }
+    else if (strcmp(szMessage, "main.RefreshFramework") == 0)
+    {
+        qt_context::setApplicationStyle("mainstyle11");
     }
 }
 

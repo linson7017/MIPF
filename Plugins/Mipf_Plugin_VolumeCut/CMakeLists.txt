@@ -28,8 +28,8 @@ add_library(Mipf_Plugin_VolumeCut SHARED ${DIR_SRCS} ${Headers} ${UI_Srcs} ${MOC
 qt5_use_modules(Mipf_Plugin_VolumeCut Core Gui Widgets)
 
 target_link_libraries(Mipf_Plugin_VolumeCut    
-${VTK_LIBRARIES} ${ITK_LIBRARIES}   
-${QTFRAMEWORK_LIBRARIES} ${QFMAIN_LIBRARIES}   
+${VTK_LIBRARIES} ${ITK_LIBRARIES}     
 ${MitkCoreExt_LIBRARIES}  
 MitkQtWidgets MitkQtWidgetsExt MitkBoundingShape)
+link_framework()
 

@@ -16,7 +16,7 @@ void CQF_TestCommand::Release()
    delete this;
 }
 
-bool CQF_TestCommand::ExecuteCommand(const char* szCommandID, QF::IQF_PropertySet* pInParam, QF::IQF_PropertySet* pOutParam)
+bool CQF_TestCommand::ExecuteCommand(const char* szCommandID, QF::IQF_Properties* pInParam, QF::IQF_Properties* pOutParam)
 {
     if (strcmp(szCommandID, "") == 0)
     {      

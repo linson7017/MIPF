@@ -895,7 +895,7 @@ void GraphcutSegmentationViewUi::CreateView()
     m_ui.ImageSelector->SetPredicate(mitk::TNodePredicateDataType<mitk::Image>::New());
     connect(m_ui.ImageSelector, SIGNAL(OnSelectionChanged(const mitk::DataNode *)), this, SLOT(OnImageSelectionChanged(const mitk::DataNode *)));
 
-    connect(m_ui.ResampleBtn, SIGNAL(clicked()), this, SLOT(Resample()));
+    connect(m_ui.ResampleBtn, SIGNAL(clicked()), this, SLOT(Resmaple()));
 
     connect(m_ui.InitBtn, SIGNAL(clicked()), this, SLOT(Init()));
     connect(m_ui.RemoveAllBtn, SIGNAL(clicked()), this, SLOT(Reset()));
@@ -912,8 +912,8 @@ void GraphcutSegmentationViewUi::CreateView()
 
     connect(m_ui.PenSizeSlider, SIGNAL(valueChanged(int)), this, SLOT(PenSizeChanged(int)));
 
-    connect(m_ui.LambdaLE, SIGNAL(valueChanged(int)), this, SLOT(LambdaChanged(const QString)));
-    connect(m_ui.HistogramBinsLE, SIGNAL(valueChanged(int)), this, SLOT(HistogramBinsChanged(const QString)));
+    connect(m_ui.LambdaLE, SIGNAL(textChanged(const QString &)), this, SLOT(LambdaChanged(const QString &)));
+    connect(m_ui.HistogramBinsLE, SIGNAL(textChanged(const QString &)), this, SLOT(HistogramBinsChanged(const QString &)));
 
 
     m_pSegTool = (IQF_MitkSegmentationTool*)m_pMain->GetInterfacePtr(QF_MitkSegmentation_Tool);

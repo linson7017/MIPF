@@ -23,8 +23,8 @@ qt5_wrap_ui(ui_Files ${UI_Srcs})
 add_library(Mipf_Plugin_ManualSegmentationTest SHARED ${DIR_SRCS} ${Headers} ${UI_Srcs} ${MOC_Hdrs})
 qt5_use_modules(Mipf_Plugin_ManualSegmentationTest Core Gui Widgets)
 target_link_libraries(Mipf_Plugin_ManualSegmentationTest 
-${VTK_LIBRARIES} ${ITK_LIBRARIES} 
-${QTFRAMEWORK_LIBRARIES} ${QFMAIN_LIBRARIES} 
+${VTK_LIBRARIES} ${ITK_LIBRARIES}  
 MitkQtWidgets MitkQtWidgetsExt MitkSegmentation MitkSegmentationUI  MitkMultilabel)
+link_framework()
 
 

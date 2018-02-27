@@ -19,48 +19,6 @@ FreehandVolumeCutImplementation::~FreehandVolumeCutImplementation()
 {
 }
 
-
-vtkDataObject* FreehandVolumeCutImplementation::GetDataObject()
-{
-    mitk::Image* pData = dynamic_cast<mitk::Image*>(m_pDataNode->GetData());
-    if (pData)
-    {
-        return pData->GetVtkImageData();
-    }
-    else 
-    {
-        return nullptr;
-    }
-}
-
-vtkSmartPointer<vtkDataObject> FreehandVolumeCutImplementation::GetCopyOfDataObject()
-{
-    mitk::Image* pData = dynamic_cast<mitk::Image*>(m_pDataNode->GetData());
-    if (pData)
-    {
-        auto copy = vtkSmartPointer<vtkImageData>::New();
-        copy->DeepCopy(pData->GetVtkImageData());
-        return copy;
-    }
-    else
-    {
-        return nullptr;
-    }
-}
-
-
-void FreehandVolumeCutImplementation::Refresh()
-{
-    mitk::Image* pData = dynamic_cast<mitk::Image*>(m_pDataNode->GetData());
-    auto img = dynamic_cast<vtkImageData*>(TopOfUndo().Get());
-    if (pData&&img)
-    {
-        pData->SetVolume(img->GetScalarPointer());
-        mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-    }
-}
-
-
 vtkSmartPointer<vtkDataObject> FreehandVolumeCutImplementation::CutImpl(vtkObject* pCutData, mitk::InteractionEvent * interactionEvent)
 {
     vtkPoints* curvePoints = dynamic_cast<vtkPoints*>(pCutData);

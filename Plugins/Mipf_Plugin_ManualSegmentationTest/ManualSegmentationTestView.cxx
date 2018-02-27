@@ -141,17 +141,20 @@ void ManualSegmentationTestView::Update(const char* szMessage, int iValue, void*
     else if (strcmp(szMessage, "MITK_MESSAGE_MST_PENSIZE_CHANGED") == 0)
     { 
         QObject* obj = (QObject*)pValue;
-        if (obj&&obj->property("value").isValid())
+        if (obj)
         {
-            if (m_currentToolName == "Paint" || m_currentToolName == "Wipe")
+            if (obj->property("value").isValid())
             {
-                mitk::DrawPaintbrushTool* paintTool = dynamic_cast<mitk::DrawPaintbrushTool*>(m_pMitkSegmentationTool->GetActivedTool());
-                if (paintTool)
+                if (m_currentToolName == "Paint" || m_currentToolName == "Wipe")
                 {
-                    paintTool->SetSize(obj->property("value").toInt());
-                }       
-            }
-            SetGuiProperty("ManualSegmentationTest.PenSizeValue", "text", QString("%1").arg(obj->property("value").toInt()));
+                    mitk::DrawPaintbrushTool* paintTool = dynamic_cast<mitk::DrawPaintbrushTool*>(m_pMitkSegmentationTool->GetActivedTool());
+                    if (paintTool)
+                    {
+                        paintTool->SetSize(obj->property("value").toInt());
+                    }
+                }
+                SetGuiProperty("ManualSegmentationTest.PenSizeValue", "text", QString("%1").arg(obj->property("value").toInt()));
+            }     
         }   
     }
     else if(strcmp(szMessage, "MITK_MESSAGE_MST_INTERPOLATE3D") == 0)

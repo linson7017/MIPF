@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<UICommand id="existApplication" type="ExistApplication"/>
+<!-- main -->
+<UICommand id="toggleWelcomDockWidget" type="ToggleWidget" widgetID="main.WelcomDocWidget"/>
+<UICommand id="toggleDataManagerDockWidget" type="ToggleWidget" widgetID="main.DataManagerDocWidget"/>
+<UICommand id="toggleImageNavigatorDockWidget" type="ToggleWidget" widgetID="main.ImageNavigatorDockWidget"/>
+<!-- BasicImageTools -->
+<UICommand id="toggleBasicImageTools" type="ToggleWidget"  widgetID="main.BasicImageTools"/>
+<UICommand id="toggleVolumeCutWidget" type="ToggleWidget"  widgetID="main.VolumeCutWidget"/>
+<UICommand id="toggleSphereCropperView" type="ToggleWidget"   widgetID="main.SphereCropperView"/>
+<UICommand id="toggleMapperTestWidget" type="ToggleWidget"  widgetID="main.MapperTestWidget"/>
+<UICommand id="toggleImageRegistrationWidget" type="ToggleWidget"  widgetID="main.ImageRegistrationWidget"/>		
+<UICommand id="toggleMaskImageWidget" type="ToggleWidget"  widgetID="main.MaskImageWidget"/>
+<UICommand id="toggleLargestConnectedComponentExtractWidget" type="ToggleWidget"  widgetID="main.LargestConnectedComponentExtractWidget"/>
+<UICommand id="toggleSurfaceExtractWidget" type="ToggleWidget"  widgetID="main.SurfaceExtractWidget"/>	
+<UICommand id="toggleItkAlgorithmSetWidget" type="ToggleWidget"  widgetID="main.ItkAlgorithmSetWidget"/>
+<UICommand id="toggleTransformNodeWidget" type="ToggleWidget"  widgetID="main.TransformNodeWidget"/>
+<UICommand id="toggleLandMarkExtractWidget" type="ToggleWidget"  widgetID="main.LandMarkExtractWidget"/>	
+<UICommand id="toggleSigmoidImageWidget" type="ToggleWidget"  widgetID="main.SigmoidImageWidget"/>
+<UICommand id="toggleVolumeVisualizationWidget" type="ToggleWidget"  widgetID="main.VolumeVisualizationWidget"/>
+<!-- BasicSurfaceTools -->
+<UICommand id="toggleBasicSurfaceTools" type="ToggleWidget"  widgetID="main.BasicSurfaceTools"/>
+<UICommand id="toggleSurfaceCombineWidget" type="ToggleWidget" widgetID="main.SurfaceCombineWidget"/>
+<UICommand id="toggleSurfaceConnectedWidget" type="ToggleWidget" widgetID="main.SurfaceConnectedWidget"/>
+<UICommand id="toggleSurfaceCutWidget" type="ToggleWidget" widgetID="main.SurfaceCutWidget"/>
+<UICommand id="toggleSurfaceToImageWidget" type="ToggleWidget" widgetID="main.SurfaceToImageWidget"/>
+<UICommand id="toggleModelExporterWidget" type="ToggleWidget" widgetID="main.ModelExporterWidget"/>
+<!-- SegmentationTools -->
+<UICommand id="toggleSegmentationTools" type="ToggleWidget"  widgetID="main.SegmentationTools"/>
+<UICommand id="toggleGraphcutSegmentationWidget"  type="ToggleWidget" widgetID="main.GraphcutSegmentationWidget"/>
+<UICommand id="toggleGraphcutSegmentation"  type="ToggleWidget" widgetID="main.GraphcutSegmentation"/>
+<UICommand id="toggleManualSegmentationWidget"  type="ToggleWidget" widgetID="main.ManualSegmentationWidget"/>
+<UICommand id="toggleBoneExtractWidget"  type="ToggleWidget" widgetID="main.BoneExtractWidget"/>
+<UICommand id="toggleSkinExtractWidget"  type="ToggleWidget" widgetID="main.SkinExtractWidget"/>
+<UICommand id="toggleBasicImageProcessWidget"  type="ToggleWidget" widgetID="main.BasicImageProcessWidget"/>			
+<UICommand id="toggleImageCropperWidget"   type="ToggleWidget" widgetID="main.ImageCropperWidget"/>						
+<UICommand id="toggleSFLSSegmentationWidget"  type="ToggleWidget" widgetID="main.SFLSSegmentationWidget"/>
+<UICommand id="toggleGrowcutSegmentation"  type="ToggleWidget" widgetID="GrowcutSegmentation"/>
+<UICommand id="toggleSMWidget"  type="ToggleWidget" widgetID="main.ASMWidget"/>
+<UICommand id="toggleFastMarchingWidget"  type="ToggleWidget" widgetID="main.FastMarchingWidget"/>
+<!-- TubularTools -->
+<UICommand id="toggleTubularTools" type="ToggleWidget"  widgetID="main.TubularTools"/>
+<UICommand id="toggleVesselSegmentationWidget" type="ToggleWidget" widgetID="main.VesselSegmentationWidget"/>
+<UICommand id="toggleCenterLineExtractWidget" type="ToggleWidget" widgetID="main.CenterLineExtractWidget"/>
+<UICommand id="toggleVesselnessFilteringWidget" type="ToggleWidget" widgetID="main.VesselnessFilteringWidget"/>
+<UICommand id="toggleAirwaySegmentationWidget" type="ToggleWidget" widgetID="main.AirwaySegmentationWidget"/>
+<UICommand id="toggleTubularTrackingWidget" type="ToggleWidget" widgetID="main.TubularTrackingWidget"/>
+<UICommand id="toggleSliceBySliceTrackingWidget" type="ToggleWidget" widgetID="main.SliceBySliceTrackingWidget"/>	
+<!-- StaticisTools -->
+<UICommand id="toggleStaticisTools" type="ToggleWidget"  widgetID="main.StaticisTools"/>
+<UICommand id="togglePropertiesWidget" type="ToggleWidget" widgetID="main.PropertiesWidget"/>
+<UICommand id="toggleHistogramWidget" type="ToggleWidget" widgetID="main.HistogramWidget"/>
+<UICommand id="toggleProfileGrayScaleDistributionWidget" type="ToggleWidget" widgetID="main.ProfileGrayScaleDistributionWidget"/>
+<UICommand id="toggleMeasurementWidget" type="ToggleWidget" widgetID="main.MeasurementWidget"/>
+<UICommand id="toggleGeometryInformationWidget" type="ToggleWidget" widgetID="main.GeometryInformationWidget"/>
+	
+<!-- setting -->
+<UICommand id="goToSetting" type="PopDialog" layout="setting.xml" />
+<UICommand id="switchToThemePanel" type="SwitchWidget" widgetID="setting.Panels" index="0"/>
+<UICommand id="switchToReferencePanel" type="SwitchWidget" widgetID="setting.Panels" index="1"/>
+
+

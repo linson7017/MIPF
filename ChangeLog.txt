@@ -1,3 +1,11 @@
+20180227
+添加styles资源
+修改Workbench布局
+增加一些Mitk常用命令
+将CMake中对qtframework的链接通过link_framework()替换，Modules中依然显示链接QFMAIN_LIBRARY
+修改Application中的InstallQfConfig()函数为add_custom_target功能，即为每个可执行工程绑定一个资源拷贝工程，工程永远都会重新生成
+
+
 20180119 
 完善ModelExporter
 
