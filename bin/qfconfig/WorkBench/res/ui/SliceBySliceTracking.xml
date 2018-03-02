@@ -2,6 +2,10 @@
 
 <Widget id="SliceBySliceTracking" width="400">
 	<VLayout>
+		<HLayout>
+			<Label text="Input Image:"/>
+			<QmitkDataStorageComboBox id="SliceBySliceTracking.DataSelector"/>
+		</HLayout>
 		<GridLayout colEqual="false">
 			<Label text="Maximum Searching Radius:" row="0" col="0"/>
 			<LineEdit id="SliceBySliceTracking.SearchingRadius" text="0.5" row="0" col="1"/>
@@ -28,11 +32,13 @@
 		</GridLayout>
 		<HLayout>
 			<Button text="Track" msgcommand="SliceBySliceTracking.Track"/>
-			<CheckBox id="SliceBySliceTracking.NeedInvert" text="Need Invert" checked="false"/>
+			<ComboBox id="SliceBySliceTracking.TrackMode">
+				<ComboBoxItem text="Blob"/>
+				<ComboBoxItem text="Brightest Point"/>
+			</ComboBox>
 		</HLayout>
-		<ProgressBar value="50" />
-		<HSlider msgcommand="SliceBySliceTracking.ChangeThresold" property="value"/>
-		<SliceBySliceTrackingSeedWidget />
+		<SliceBySliceTrackingSeedWidget height="300"/>
+		<Stretch size="200"/>
 	</VLayout>
 </Widget>
 

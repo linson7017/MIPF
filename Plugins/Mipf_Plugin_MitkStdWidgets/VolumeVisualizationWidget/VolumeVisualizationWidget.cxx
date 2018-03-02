@@ -51,7 +51,7 @@ void VolumeVisualizationWidget::CreateView()
 
 void VolumeVisualizationWidget::Update(const char* szMessage, int iValue, void* pValue)
 {
-    if (strcmp(szMessage, "MITK_MESSAGE_SELECTION_CHANGED") == 0)
+    if (strcmp(szMessage, MITK_MESSAGE_SELECTION_CHANGED) == 0)
     {
         IQF_MitkDataManager* pMitkDataManager = (IQF_MitkDataManager*)m_pMain->GetInterfacePtr(QF_MitkMain_DataManager);
         if(!pMitkDataManager)
@@ -119,7 +119,7 @@ void VolumeVisualizationWidget::Update(const char* szMessage, int iValue, void* 
 
         UpdateInterface();
     }
-    else if (strcmp(szMessage, "MITK_MESSAGE_REMOVE_NODE") == 0)
+    else if (strcmp(szMessage, MITK_MESSAGE_NODE_REMOVED) == 0)
     {
         mitk::DataNode* node = (mitk::DataNode*)pValue;
         if (m_SelectedNode.GetPointer() == node)
@@ -128,6 +128,14 @@ void VolumeVisualizationWidget::Update(const char* szMessage, int iValue, void* 
             m_SelectedImageLabel->hide();
             m_ErrorImageLabel->hide();
             m_NoSelectedImageLabel->show();
+            UpdateInterface();
+        }
+    }
+    else if (strcmp(szMessage, MITK_MESSAGE_NODE_CHANGED) == 0)
+    {
+        mitk::DataNode* node = (mitk::DataNode*)pValue;
+        if (m_SelectedNode.GetPointer() == node)
+        {
             UpdateInterface();
         }
     }

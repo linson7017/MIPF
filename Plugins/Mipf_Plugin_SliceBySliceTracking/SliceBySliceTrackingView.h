@@ -12,6 +12,7 @@ class SliceBySliceTrackingView : public PluginView
 public:
     SliceBySliceTrackingView(QF::IQF_Main* pMain);
     void InitResource(R* pR);
+    void Constructed(R* pR);
 protected:
     virtual void Update(const char* szMessage, int iValue = 0, void* pValue = 0);
 private:

@@ -41,7 +41,8 @@
 			<Button text="Track" msgcommand="TubularTracking.Track"/>
 			<CheckBox id="TubularTracking.NeedInvert" text="Need Invert" checked="false"/>
 		</HLayout>
-		<TubularTrackingSeedWidget />	
+		<TubularTrackingSeedWidget height="300"/>
+		<Stretch size="200"/>		
 	</VLayout>
 </Widget>
 

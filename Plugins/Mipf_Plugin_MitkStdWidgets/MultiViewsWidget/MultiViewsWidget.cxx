@@ -112,7 +112,7 @@ void MultiViewsWidget::Init(QWidget* parent)
     if (pRenderWindow)
     {
         pRenderWindow->SetMitkStdMultiWidget(m_multiWidget);
-        m_pMain->SendMessageQf(MITK_MESSAGE_MULTIWIDGET_INIT, 0, pRenderWindow);
+        m_pMain->SendMessageQf(MITK_MESSAGE_MULTIWIDGET_INITIALIZED, 0, pRenderWindow);
     }
 }
 

@@ -96,10 +96,10 @@
 	
 	<!-- 工具栏 -->
 	<ToolBar p_movable="Bool:true" p_iconSize="QSize:40,40" toolButtonStyle="ToolButtonTextBesideIcon" p_windowTitle="QString:File">
-		<Action text="Open" icon="@icon/open.png"  command="@command/MITK_MAIN_COMMAND_LOADDATA"/>
+		<Action text="Open" icon="@icon/open.png"  command="MITK_MAIN_COMMAND_LOADDATA"/>
 		<Action text="Save Project" icon="@icon/SaveAs.png" msgcommand="main.SaveProject"/>
 	</ToolBar>
-	<ToolBar p_movable="Bool:false" p_iconSize="QSize:40,40" p_windowTitle="QString:Tools">
+	<ToolBar p_movable="Bool:false" p_iconSize="QSize:40,40" p_windowTitle="QString:Views">
 		<ActionGroup>
 			<Action text="view all" parameterIndex="int:0" msgcommand="MITK_COMMAND_MULTIVIEWS_CHANGELAYOUT" icon="@icon/widget0.png" />
 			<Action text="view1" parameterIndex="int:1" msgcommand="MITK_COMMAND_MULTIVIEWS_CHANGELAYOUT" icon="@icon/widget1.png" />
@@ -109,9 +109,14 @@
 			<Action text="Reset" msgcommand="MITK_COMMAND_MULTIVIEWS_RESET" icon="@icon/btn_reset.png" />
 		</ActionGroup>
 	</ToolBar>
-	<ToolBar p_movable="Bool:false" p_iconSize="QSize:40,40" p_windowTitle="QString:Views">
+	<ToolBar p_movable="Bool:false" p_iconSize="QSize:40,40" p_windowTitle="QString:Tools">
 		<ActionGroup>
-			<Action text="Refresh Framework" uicommand="@uicommand/goToSetting" icon="@icon/main_config.png" />
+			<Action text="Volume Visualization" command="MITK_MAIN_COMMAND_VOLUME_VISUALIZATION" icon="@icon/volume_visualization.png" />
+		</ActionGroup>
+	</ToolBar>
+	<ToolBar p_movable="Bool:false" p_iconSize="QSize:40,40" p_windowTitle="QString:Options">
+		<ActionGroup>
+			<Action text="Setting" uicommand="@uicommand/goToSetting" icon="@icon/main_config.png" />
 			<Action text="Exist" uicommand="@uicommand/existApplication" icon="@icon/main_exit.png" />
 		</ActionGroup>
 	</ToolBar>
@@ -172,8 +177,8 @@
 			<CenterLineExtractWidget text="Center Line Extract" id="main.CenterLineExtractWidget"/>
 			<VesselnessFilteringWidget text="Vesselness Filtering" id="main.VesselnessFilteringWidget"/>
 			<AirwaySegmentationWidget text="Airway Segmentation" id="main.AirwaySegmentationWidget"/>
-			<TubularTrackingWidget text="Leksell Correct" id="main.TubularTrackingWidget"/>
-			<SliceBySliceTrackingWidget text="CRW Correct" id="main.SliceBySliceTrackingWidget"/>
+			<Holder id="@ui/TubularTracking" text="Tubular Tracking"/>
+			<Holder id="@ui/SliceBySliceTracking" text="Slice By Slice Tracking"/>
 		</ToolBox>			
 	</DockWidget>
 	<DockWidget id="main.StaticisTools" windowTitle="Staticis Tools" tabfiedDocWidgetID="main.TubularTools" dockWidgetArea="RightDockWidgetArea"  visible="true">
@@ -200,6 +205,7 @@
 				rectangleColor="0.0,1.0,1.0"
 				stdPlaneWidgetsOn="false"
 			/>
+			<ThresholdImageWidget text="Threshold Image"/>
 		</ToolBox>
 	</DockWidget>
 	

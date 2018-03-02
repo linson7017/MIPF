@@ -27,14 +27,14 @@ void* 增加的节点指针 mitk::DataNode*
 /**
 节点被更改
 int 0
-void* 增加的节点指针 mitk::DataNode*
+void* 更改的节点指针 mitk::DataNode*
 */
 #define MITK_MESSAGE_NODE_CHANGED "MITK_MESSAGE_NODE_CHANGED"
 
 /**
 节点被删除
 int 0
-void* 增加的节点指针 mitk::DataNode*
+void* 删除的节点指针 mitk::DataNode*
 */
 #define MITK_MESSAGE_NODE_DELETED "MITK_MESSAGE_NODE_DELETED"
 
@@ -51,7 +51,7 @@ MitkMultiWidgets 初始化完成
 int 0
 void* IQF_MitkRenderWindow*指针
 */
-#define MITK_MESSAGE_MULTIWIDGET_INIT "MITK_MESSAGE_MULTIWIDGET_INIT"
+#define MITK_MESSAGE_MULTIWIDGET_INITIALIZED "MITK_MESSAGE_MULTIWIDGET_INITIALIZED"
 
 /**
 MitkMultiWidgets 隐藏

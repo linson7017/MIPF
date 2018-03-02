@@ -6,6 +6,7 @@
 #include "mitkImage.h"
 #include "mitkImageCast.h"
 #include "mitkSurface.h"
+#include "mitkNodePredicateDataType.h"
 
 #include "MitkMain/IQF_MitkDataManager.h"
 #include "MitkMain/IQF_MitkRenderWindow.h"
@@ -15,10 +16,15 @@
 
 #include "QmitkPointListViewWidget.h"
 #include "QmitkPointListWidget.h"
+#include "QmitkDataStorageComboBox.h"
+
+#include <QComboBox>
 
 #include "vtkPolyData.h"
 #include "vtkPolyVertex.h"
 #include "vtkUnstructuredGrid.h"
+#include "vtkAppendPolyData.h"
+#include "vtkSphereSource.h"
 
 SliceBySliceTrackingView::SliceBySliceTrackingView(QF::IQF_Main* pMain):PluginView(pMain)
 {
@@ -72,14 +78,27 @@ void SliceBySliceTrackingView::Update(const char* szMessage, int iValue, void* p
             }
             pTrakcer->SetSeedPoints(seedList);
 
+            int trackMode = BLOB_TRACK;
+            QComboBox* modeSelector = (QComboBox*)R::Instance()->getObjectFromGlobalMap("SliceBySliceTracking.TrackMode");
+            if (modeSelector)
+            {
+                if (modeSelector->currentText().compare("Blob",Qt::CaseInsensitive)==0)
+                {
+                    trackMode = BLOB_TRACK;
+                }
+                else if (modeSelector->currentText().compare("Brightest Point", Qt::CaseInsensitive) == 0)
+                {
+                    trackMode = BRIGHT_POINT_TRACK;
+                }    
+            }
 
-            pTrakcer->Track();
+            pTrakcer->Track(trackMode);
             std::vector< std::vector<Vector3> > result;
             pTrakcer->GetOutput(result);
             ShowResults(result);
         }
     }
-    else if (strcmp(szMessage, "MITK_MESSAGE_MULTIWIDGET_INIT") == 0)
+    else if (strcmp(szMessage, MITK_MESSAGE_MULTIWIDGET_INITIALIZED) == 0)
     {
         IQF_MitkRenderWindow* pRenderWindow = (IQF_MitkRenderWindow*)m_pMain->GetInterfacePtr(QF_MitkMain_RenderWindow);
         if (pRenderWindow)
@@ -123,26 +142,23 @@ void SliceBySliceTrackingView::ShowResults(std::vector< std::vector<Vector3> > g
     for (int i = 0; i < graph.size(); i++)
     {
         std::vector<Vector3> points = graph.at(i);
-        //points
-        vtkSmartPointer<vtkPoints> pointSet = vtkSmartPointer<vtkPoints>::New();
-        vtkSmartPointer<vtkCellArray> vertices = vtkSmartPointer<vtkCellArray>::New();
-        for (int i=0;i<points.size();i++)
-        {
-            vtkIdType pid[1];
-            pid[0] = pointSet->InsertNextPoint(points.at(i).x(), points.at(i).y(), points.at(i).z());
-            vertices->InsertNextCell(1, pid);
-        }
-
         // Create a polydata object
-        vtkSmartPointer<vtkPolyData> pointsPolyData =
-            vtkSmartPointer<vtkPolyData>::New();
-        pointsPolyData->Allocate();
+        vtkSmartPointer<vtkAppendPolyData> appendFilter =
+            vtkSmartPointer<vtkAppendPolyData>::New();
+        for (auto data : points)
+        {
+            auto sphere = vtkSmartPointer<vtkSphereSource>::New();
+            sphere->SetCenter(data.x(), data.y(), data.z());
+            sphere->SetRadius(0.5);
+            sphere->Update();
+            appendFilter->AddInputData(sphere->GetOutput());
+        }
+        appendFilter->Update();
+
 
         // Set the points and vertices we created as the geometry and topology of the polydata
-        pointsPolyData->SetPoints(pointSet);
-        pointsPolyData->SetVerts(vertices);
         mitk::Surface::Pointer pointsSurface = mitk::Surface::New();
-        pointsSurface->SetVtkPolyData(pointsPolyData);
+        pointsSurface->SetVtkPolyData(appendFilter->GetOutput());
         pointsSurface->Update();
         mitk::DataNode::Pointer pointsNode = mitk::DataNode::New();
         pointsNode->SetData(pointsSurface);
@@ -196,5 +212,17 @@ void SliceBySliceTrackingView::ShowResults(std::vector< std::vector<Vector3> > g
 void SliceBySliceTrackingView::InitResource(R* pR)
 {
     m_pR = pR;
+    
 }
 
+
+void SliceBySliceTrackingView::Constructed(R* pR)
+{
+    QmitkDataStorageComboBox* selector = (QmitkDataStorageComboBox*)m_pR->getObjectFromGlobalMap("SliceBySliceTracking.DataSelector");
+    if (selector)
+    {
+        IQF_MitkDataManager* pMitkDataStorage = (IQF_MitkDataManager*)m_pMain->GetInterfacePtr("QF_MitkMain_DataManager");
+        selector->SetDataStorage(pMitkDataStorage->GetDataStorage());
+        selector->SetPredicate(mitk::TNodePredicateDataType<mitk::Image>::New());
+    }
+}

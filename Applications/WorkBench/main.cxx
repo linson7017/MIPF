@@ -39,10 +39,7 @@ int main(int argc, char *argv[])
     qt_context context(&qtapplication);
     //设置qt程序编码
     qt_context::setApplicationCoding("UTF-8");
-    //设置qt程序默认语言
-   // qt_context::setDefaultLanguage("Chinese");
-    //设置qt程序风格
-    qt_context::setApplicationStyle("fusion");
+
 
     //添加qt插件库的搜索路径
 #if defined _WIN32 || defined WIN32 || defined __NT__ || defined __WIN32__
@@ -62,10 +59,15 @@ int main(int argc, char *argv[])
     std::string path = appenv.getConfigResDir();
     QSettings set(QString(static_cast<QF::IQF_Main*>(appenv.getMainPtr())->GetConfigPath()).append("/config.ini"), QSettings::IniFormat);
     set.beginGroup("config");
-    std::string value = set.value("start-xml-file", "main_render.xml").toString().toStdString();
+    std::string startXML = set.value("Start-XML-File", "main.xml").toString().toStdString();
+    std::string style = set.value("Default-Application-Style", "fusion").toString().toStdString();
     set.endGroup();
+    //设置qt程序默认语言
+    // qt_context::setDefaultLanguage("Chinese");
+    //设置qt程序风格
+    qt_context::setApplicationStyle(style.c_str());
 
-    MainWindow mainWidget(value.c_str());
+    MainWindow mainWidget(startXML.c_str());
     mainWidget.setShowMode(Activity::MAXIMIZED);
     mainWidget.active();
 

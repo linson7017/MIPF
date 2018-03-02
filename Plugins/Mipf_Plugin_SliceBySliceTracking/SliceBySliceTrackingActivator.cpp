@@ -31,3 +31,9 @@ void SliceBySliceTrackingView_Activator::Register(R* pR)
 {
     m_pView->InitResource(pR);
 }
+
+void SliceBySliceTrackingView_Activator::Constructed(R* pR)
+{
+    m_pView->Constructed(pR);
+
+}

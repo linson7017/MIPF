@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<Command id="MITK_MAIN_COMMAND_LOADDATA" />
 <Command id="MITK_MAIN_COMMAND_ENABLE_VTK_WARNING">
 	<Property type="Object" name="EnableVtkWarning">setting.EnableVtkWarning:checked</Property>
 </Command>

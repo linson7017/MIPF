@@ -30,8 +30,8 @@ const char CMakeListTemplate[] = ""\
 "qt5_use_modules(@PluginName@ Core Gui Widgets)\n"\
 "target_link_libraries(@PluginName@    \n"\
 "@VTK_LIBRARIES@ @ITK_LIBRARIES@  @VMTK_LIBRARIES@ \n"\
-"@QTFRAMEWORK_LIBRARIES@ @QFMAIN_LIBRARIES@   \n"\
 "@MitkQtWidgets@ @MitkQtWidgetsExt@)\n"\
+"link_framework()\n"\
 "\n";
 
 const char ViewH[] = ""\

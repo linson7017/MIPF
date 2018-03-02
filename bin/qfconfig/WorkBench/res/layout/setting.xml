@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<HLayout activityRoot="true" width="800" height="500" id="setting" parent="mai" flags="FixedSize;;FixedSize">
+<HLayout activityRoot="true" title="Setting" width="800" height="500" id="setting" parent="main" flags="FixedSize;;FixedSize">
 	<HSplitter>
 		<TreeWidget minWidth="200" headerLabels="" stretch="1" event="itemClicked">
 			<TreeWidgetItem text="General">

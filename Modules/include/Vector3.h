@@ -42,6 +42,17 @@ public:
     void setX(double x) { mv[0] = x; }
     void setY(double y) { mv[1] = y; }
     void setZ(double z) { mv[2] = z; }
+    bool isNull()
+    {
+        return (abs(mv[0] - 0.0) < 1e-15) && (abs(mv[1] - 0.0) < 1e-15) && (abs(mv[2] - 0.0) < 1e-15);
+    }
+    void initialize()
+    {
+        mv[0] = 0.0;
+        mv[1] = 0.0;
+        mv[2] = 0.0;
+        mv[3] = 1.0;
+    }
 
 
     double lengthSquared() const { return mv[0]*mv[0] + mv[1]*mv[1] + mv[2]*mv[2]; }

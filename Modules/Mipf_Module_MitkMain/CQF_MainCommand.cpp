@@ -63,6 +63,20 @@ bool CQF_MainCommand::ExecuteCommand(const char* szCommandID, QF::IQF_Properties
         pMitkReference->SetString("LastOpenDirectory", QFileInfo(fileNames.back()).absolutePath().toStdString().c_str());
         return true;
     }
+    else if (strcmp(szCommandID, MITK_MAIN_COMMAND_VOLUME_VISUALIZATION) == 0)
+    {
+        IQF_MitkDataManager* pMitkDataManager = (IQF_MitkDataManager*)m_pMain->GetInterfacePtr(QF_MitkMain_DataManager);
+        if (pMitkDataManager)
+        {
+            if (pMitkDataManager->GetCurrentNode())
+            {
+                bool volumeRenderingEnabled = true;
+                pMitkDataManager->GetCurrentNode()->GetBoolProperty("volumerendering", volumeRenderingEnabled);
+                pMitkDataManager->GetCurrentNode()->SetBoolProperty("volumerendering", !volumeRenderingEnabled);
+                mitk::RenderingManager::GetInstance()->RequestUpdateAll(mitk::RenderingManager::REQUEST_UPDATE_3DWINDOWS);
+            }
+        }
+    }
     else if (strcmp(szCommandID, MITK_MAIN_COMMAND_ENABLE_VTK_WARNING) == 0)
     {
         if (pInParam)
@@ -115,7 +129,7 @@ bool CQF_MainCommand::ExecuteCommand(const char* szCommandID, QF::IQF_Properties
 
 int CQF_MainCommand::GetCommandCount()
 {
-    return 3;
+    return 4;
 }
 
 const char* CQF_MainCommand::GetCommandID(int iIndex)
@@ -128,6 +142,8 @@ const char* CQF_MainCommand::GetCommandID(int iIndex)
         return MITK_MAIN_COMMAND_ENABLE_VTK_WARNING;
     case 2:
         return MITK_MAIN_COMMAND_CHANGE_CROSSHAIR_GAP_SIZE;
+    case 3:
+        return MITK_MAIN_COMMAND_VOLUME_VISUALIZATION;
     default:
         return "";
         break;

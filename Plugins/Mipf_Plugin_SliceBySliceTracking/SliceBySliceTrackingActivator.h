@@ -11,6 +11,7 @@ public:
     bool Init();
     const char* GetID();
     void Register(R* pR);
+    void Constructed(R* pR);
 private:
     SliceBySliceTrackingView* m_pView;
 };

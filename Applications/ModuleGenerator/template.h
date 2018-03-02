@@ -25,7 +25,9 @@ const char CMakeListTemplate[] = ""\
 "FIND_PACKAGE(PocoFoundation REQUIRED)\n"\
 "\n"\
 "add_library(@ProjectName@ SHARED ${DIR_SRCS} ${Headers})\n"\
-"target_link_libraries(@ProjectName@ @VTK_LIBRARIES@ @ITK_LIBRARIES@ @QTFRAMEWORK_LIBRARIES@ @QFMAIN_LIBRARIES@ @MitkQtWidgets@ @MitkQtWidgetsExt@)\n"\
+"target_link_libraries(@ProjectName@ @VTK_LIBRARIES@ @ITK_LIBRARIES@ \n"\
+"@QFMAIN_LIBRARIES@\n"\
+"@MitkQtWidgets@ @MitkQtWidgetsExt@)\n"\
 "\n";
 
 const char ComH[] = ""\

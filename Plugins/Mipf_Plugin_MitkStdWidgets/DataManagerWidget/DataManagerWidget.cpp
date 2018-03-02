@@ -71,6 +71,7 @@
 #include "DataManagerItemDelegate.h"
 #include "iqf_main.h"
 #include <Res/R.h>
+#include <Common/qt_context.h>
 
 
 DataManagerWidget::DataManagerWidget() :MitkPluginView(),
@@ -200,7 +201,7 @@ void DataManagerWidget::CreateView()
     _OpacityWidgetLayout->addWidget(m_OpacitySlider);
     QWidget* _OpacityWidget = new QWidget;
     _OpacityWidget->setLayout(_OpacityWidgetLayout);
-    _OpacityWidget->setStyleSheet(m_pR->getStyleResource("mainstyle")+QString("QLabel {font-size:12px;font-weight:100}" ) );
+    _OpacityWidget->setStyleSheet(m_pR->getStyleResource(qt_context::getApplicationStyle())+QString("QLabel {font-size:12px;font-weight:100}" ) );
 
     QWidgetAction* opacityAction = new QWidgetAction(this);
     opacityAction->setDefaultWidget(_OpacityWidget);
@@ -224,7 +225,7 @@ void DataManagerWidget::CreateView()
     _ColorWidgetLayout->addWidget(m_ColorButton);
     QWidget* _ColorWidget = new QWidget;
     _ColorWidget->setLayout(_ColorWidgetLayout);
-    _ColorWidget->setStyleSheet(m_pR->getStyleResource("mainstyle")+ QString("QLabel {font-size:12px;font-weight:100}"));
+    _ColorWidget->setStyleSheet(m_pR->getStyleResource(qt_context::getApplicationStyle())+ QString("QLabel {font-size:12px;font-weight:100}"));
 
     QWidgetAction* colorAction = new QWidgetAction(this);
     colorAction->setDefaultWidget(_ColorWidget);
@@ -622,7 +623,7 @@ void DataManagerWidget::ColormapMenuAboutToShow()
 
     while (lutType != "END_OF_ARRAY")
     {
-        m_ColormapAction->menu()->setStyleSheet(m_pR->getStyleResource("mainstyle"));
+        m_ColormapAction->menu()->setStyleSheet(m_pR->getStyleResource(qt_context::getApplicationStyle()));
         tmp = m_ColormapAction->menu()->addAction(QString::fromStdString(lutType));
         tmp->setCheckable(true);
 
