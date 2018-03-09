@@ -14,7 +14,7 @@ public:
 
     bool Init();
     const char* GetID();
-    void Register(R* pR);
+    void Register();
 private:
     ImageCropperView* m_pImageCropperView;
 };

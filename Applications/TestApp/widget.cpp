@@ -21,15 +21,15 @@ widget::widget(QF::IQF_Main* pMain)
 
     
     multiViewPlugin->SetMainPtr(pMain);
-    multiViewPlugin->InitResource(NULL);
+    multiViewPlugin->InitResource();
     dataManagerPlugin->SetMainPtr(pMain);
-    dataManagerPlugin->InitResource(NULL);
+    dataManagerPlugin->InitResource();
     navigatePlugin->SetMainPtr(pMain);
-    navigatePlugin->InitResource(NULL);
+    navigatePlugin->InitResource();
     volumeVisualizationPlugin->SetMainPtr(pMain);
-    volumeVisualizationPlugin->InitResource(NULL);
+    volumeVisualizationPlugin->InitResource();
     measurementPlugin->SetMainPtr(pMain);
-    measurementPlugin->InitResource(NULL);
+    measurementPlugin->InitResource();
 
     vlayout->addWidget(dynamic_cast<QWidget*>(dataManagerPlugin));
     vlayout->addWidget(dynamic_cast<QWidget*>(navigatePlugin));

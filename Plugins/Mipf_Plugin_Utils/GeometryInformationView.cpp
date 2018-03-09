@@ -24,7 +24,7 @@ WndHandle GeometryInformationView::GetPluginHandle()
 
 void GeometryInformationView::Update(const char* szMessage, int iValue /* = 0 */, void* pValue /* = 0 */)
 {
-      if (strcmp(szMessage,MITK_MESSAGE_SELECTION_CHANGED)==0)
+      if (strcmp(szMessage,MITK_MESSAGE_NODE_SELECTION_CHANGED)==0)
       {
           std::vector<mitk::DataNode::Pointer> nodes = m_pMitkDataManager->GetSelectedNodes();
           if (nodes.size()==0)

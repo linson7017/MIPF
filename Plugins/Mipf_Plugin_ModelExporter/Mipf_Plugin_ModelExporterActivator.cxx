@@ -26,7 +26,7 @@ const char* Mipf_Plugin_ModelExporter_Activator::GetID()
     return Mipf_Plugin_ModelExporter_Activator_ID; 
 }
 
-void Mipf_Plugin_ModelExporter_Activator::Register(R* pR)
+void Mipf_Plugin_ModelExporter_Activator::Register()
 {
     REGISTER_PLUGIN("ModelExporterWidget", ModelExporterView);
 }

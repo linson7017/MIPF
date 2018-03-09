@@ -28,7 +28,7 @@ protected slots:
     void Start(bool start);
     void Reset();
 private:
-    void ImageMatrixChanged();
+    void ImageMatrixChanged(vtkMatrix4x4* matrix);
 
     mitk::DataInteractor::Pointer m_Interactor;
     Ui::ImageNavigationView m_ui;

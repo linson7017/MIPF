@@ -1,7 +1,6 @@
 #ifndef PluginView_h__
 #define PluginView_h__
 #include "iqf_observer.h"
-#include "MitkMain/mitk_main_msg.h"
 #include "UIs/QF_Plugin.h"
 
 #include "iqf_main.h"
@@ -15,10 +14,10 @@ class R;
 class PluginView :public QF::QF_Plugin,  public QF::IQF_Observer
 {
 public:
-    PluginView() :m_pMain(0), m_pR(0), m_bActivated(false)
+    PluginView() :m_pMain(0), m_bActivated(false)
     {
     }
-    PluginView(QF::IQF_Main* pMain) :m_pMain(pMain),m_pR(0), m_bActivated(false) 
+    PluginView(QF::IQF_Main* pMain) :m_pMain(pMain), m_bActivated(false) 
     {
     }
     //override
@@ -26,12 +25,12 @@ public:
     {
         m_pMain = pMain;
     }
-	virtual void InitResource(R* pR)
+	virtual void InitResource()
 	{
-		m_pR = pR; 
 		CreateView(); 
 		m_bActivated = true;
 	}
+    virtual void SetupResource() {}
 	virtual void Activate() { m_bActivated = true; }
 	virtual void Disactivate() { m_bActivated = false; }
     virtual WndHandle GetPluginHandle() { return nullptr; }
@@ -77,7 +76,6 @@ protected:
     virtual void CreateView() {};
 protected:
     QF::IQF_Main* m_pMain;
-    R* m_pR;
 	bool m_bActivated;
 };
 

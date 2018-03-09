@@ -23,6 +23,8 @@ file (GLOB Headers "./" "*.h" "*.hxx" "*.hpp")
 file(GLOB UI_Srcs "./*.ui")
 AUX_SOURCE_DIRECTORY(. DIR_SRCS)
 
+include_directories(${MitkCoreExt_INCLUDE_DIR})
+
 set(CMAKE_AUTOMOC ON)
 
 
@@ -30,7 +32,9 @@ if(VTK_QT_VERSION VERSION_GREATER "4")
     qt5_wrap_ui(ui_Files ${UI_Srcs})
 	add_library(Mipf_Plugin_ImageRegistration SHARED ${DIR_SRCS} ${Headers} ${UI_Srcs} ${MOC_Hdrs})
 	qt5_use_modules(Mipf_Plugin_ImageRegistration Core Gui Widgets)
-	target_link_libraries(Mipf_Plugin_ImageRegistration ${ITK_LIBRARIES} ${ITK_LIBRARIES} MitkQtWidgets MitkQtWidgetsExt MitkMultilabel MitkContourModel)
+	target_link_libraries(Mipf_Plugin_ImageRegistration ${ITK_LIBRARIES} ${ITK_LIBRARIES} 
+    ${MitkCoreExt_LIBRARIES}
+    MitkQtWidgets MitkQtWidgetsExt MitkMultilabel MitkContourModel)
 	link_framework()
 else()
 

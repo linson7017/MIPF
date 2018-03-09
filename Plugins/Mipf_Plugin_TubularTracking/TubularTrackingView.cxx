@@ -22,9 +22,9 @@
 
 
 
-TubularTrackingView::TubularTrackingView(QF::IQF_Main* pMain):PluginView(pMain)
+TubularTrackingView::TubularTrackingView():MitkPluginView()
 {
-    m_pMain->Attach(this);
+    
 }
 
 
@@ -101,11 +101,11 @@ void TubularTrackingView::Update(const char* szMessage, int iValue, void* pValue
 
             // add the pointset to the data storage (for rendering and access by other modules)
             IQF_MitkDataManager* pMitkDataStorage = (IQF_MitkDataManager*)m_pMain->GetInterfacePtr("QF_MitkMain_DataManager");
-            pMitkDataStorage->GetDataStorage()->Add(pointSetNode);
+            GetDataStorage()->Add(pointSetNode);
             // tell the GUI widget about the point set
             m_PointListWidget->SetPointSetNode(pointSetNode);  
             m_PointListWidget->SetMultiWidget(pRenderWindow->GetMitkStdMultiWidget());
-            m_pR->registerCustomWidget("TubularTrackingSeedWidget", m_PointListWidget);
+            R::Instance()->registerCustomWidget("TubularTrackingSeedWidget", m_PointListWidget);
         }     
     }
 }
@@ -193,15 +193,15 @@ void TubularTrackingView::ShowResults(std::vector< std::vector<Vector3> > graph)
         IQF_MitkDataManager* pMitkDataStorage = (IQF_MitkDataManager*)m_pMain->GetInterfacePtr("QF_MitkMain_DataManager");
         if (pMitkDataStorage)
         {
-            pMitkDataStorage->GetDataStorage()->Add(pointsNode, pMitkDataStorage->GetCurrentNode());
-            pMitkDataStorage->GetDataStorage()->Add(lineNode, pMitkDataStorage->GetCurrentNode());
+            GetDataStorage()->Add(pointsNode, pMitkDataStorage->GetCurrentNode());
+            GetDataStorage()->Add(lineNode, pMitkDataStorage->GetCurrentNode());
             mitk::RenderingManager::GetInstance()->RequestUpdateAll();
         }
     }
 }
 
-void TubularTrackingView::InitResource(R* pR)
+void TubularTrackingView::InitResource()
 {
-    m_pR = pR;
+    m_pMain->Attach(this);
 }
 

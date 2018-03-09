@@ -94,7 +94,7 @@ void MaskImageView::Mask()
     maskedImageNode->SetColor(1, 1, 1);
     maskedImageNode->SetName(imageName.toStdString());
 
-    m_pMitkDataManager->GetDataStorage()->Add(maskedImageNode);
+    GetDataStorage()->Add(maskedImageNode);
 }
 
 

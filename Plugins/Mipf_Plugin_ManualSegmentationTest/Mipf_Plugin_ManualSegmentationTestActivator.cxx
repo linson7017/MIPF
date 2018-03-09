@@ -27,13 +27,13 @@ const char* Mipf_Plugin_ManualSegmentationTest_Activator::GetID()
     return Mipf_Plugin_ManualSegmentationTest_Activator_ID; 
 }
 
-void Mipf_Plugin_ManualSegmentationTest_Activator::Register(R* pR)
+void Mipf_Plugin_ManualSegmentationTest_Activator::Register()
 {
-    m_pManualSegmentationTestView->InitResource(pR); 
+    m_pManualSegmentationTestView->InitResource(); 
    // pR->registerCustomWidget("ManualSegmentationTestView", m_pManualSegmentationTestView); 
 }
 
-void Mipf_Plugin_ManualSegmentationTest_Activator::Constructed(R* pR)
+void Mipf_Plugin_ManualSegmentationTest_Activator::Constructed()
 {
-    m_pManualSegmentationTestView->Constructed(pR);
+    m_pManualSegmentationTestView->Constructed();
 }

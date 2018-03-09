@@ -29,7 +29,7 @@ const char* Mipf_Plugin_StaticisTools_Activator::GetID()
     return Mipf_Plugin_StaticisTools_Activator_ID; 
 }
 
-void Mipf_Plugin_StaticisTools_Activator::Register(R* pR)
+void Mipf_Plugin_StaticisTools_Activator::Register()
 {
     REGISTER_QOBJECT("HistogramWidget", HistogramView);
     REGISTER_QOBJECT("ProfileGrayScaleDistributionWidget", ProfileGrayScaleDistributionView);

@@ -23,6 +23,7 @@ public:
     void ChangeLayout(int index);
     void ResetView();
     virtual void Update(const char* szMessage, int iValue = 0, void* pValue = 0);
+    WndHandle GetPluginHandle() { return this; }
 protected:
     virtual void SetupWidgets();
 	//event

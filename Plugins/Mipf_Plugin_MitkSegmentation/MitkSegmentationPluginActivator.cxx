@@ -26,9 +26,9 @@ const char* MitkSegmentationPlugin_Activator::GetID()
     return MitkSegmentationPlugin_Activator_Activator_ID; 
 }
 
-void MitkSegmentationPlugin_Activator::Register(R* pR)
+void MitkSegmentationPlugin_Activator::Register()
 {
-    /*m_pMitkSegmentation->InitResource(pR); 
+    /*m_pMitkSegmentation->InitResource(); 
 	pR->registerCustomWidget("ManualSegmentationWidget", m_pMitkSegmentation);*/
     REGISTER_QOBJECT("ManualSegmentationWidget", MitkSegmentation);
 }

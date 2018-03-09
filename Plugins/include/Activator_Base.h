@@ -9,8 +9,8 @@ public:
     ActivatorBase(QF::IQF_Main* pMain) :m_pMain(pMain){}
     virtual bool Init() { return true; }
     virtual const char* GetID() { return ""; }
-    virtual void Register(R* pR) {}
-    virtual void Constructed(R* pR) {}
+    virtual void Register() {}
+    virtual void Constructed() {}
 protected:
     QF::IQF_Main* m_pMain;
 };

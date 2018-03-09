@@ -123,7 +123,7 @@ const char ViewActivatorH[] = ""\
 "\n"\
 "    bool Init();\n"\
 "    const char* GetID();\n"\
-"    void Register(R* pR);\n"\
+"    void Register();\n"\
 "private:\n"\
 "    @ViewName@* m_p@ViewName@;\n"\
 "};\n"\
@@ -144,7 +144,7 @@ const char  MitkViewActivatorH[] = ""\
 "\n"\
 "    bool Init();\n"\
 "    const char* GetID();\n"\
-"    void Register(R* pR);\n"\
+"    void Register();\n"\
 "};\n"\
 "\n"\
 "#endif // @PluginName@Activator_h__";
@@ -180,9 +180,9 @@ const char ViewActivatorC[] = ""\
 "    return @PluginName@_Activator_ID; \n"\
 "}\n"\
 "\n"\
-"void @PluginName@_Activator::Register(R* pR)\n"\
+"void @PluginName@_Activator::Register()\n"\
 "{\n"\
-"    m_p@ViewName@->InitResource(pR); \n"\
+"    m_p@ViewName@->InitResource(); \n"\
 "   // pR->registerCustomWidget(\"@ViewName@\", m_p@ViewName@); \n"\
 "}";
 
@@ -215,7 +215,7 @@ const char MitkViewActivatorC[] = ""\
 "    return @PluginName@_Activator_ID; \n"\
 "}\n"\
 "\n"\
-"void @PluginName@_Activator::Register(R* pR)\n"\
+"void @PluginName@_Activator::Register()\n"\
 "{\n"\
 "    REGISTER_PLUGIN(\"@ViewName@\", @ViewName@);\n"\
 "}";

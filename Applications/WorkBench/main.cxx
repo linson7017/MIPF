@@ -1,4 +1,5 @@
 #include "MainWindow.h"
+#include "SplashWindow.h"
 #include <QApplication>
 #include <QStyleFactory>
 
@@ -33,7 +34,8 @@ int main(int argc, char *argv[])
 
     app_env appenv(wk.toLocal8Bit().constData());
 
-    appenv.setMainPtr(QF::QF_CreateMainObject(wk.toLocal8Bit().constData(), qApp->applicationDirPath().toLocal8Bit().constData()));
+    QF::IQF_Main* pMain = QF::QF_CreateMainObject(wk.toLocal8Bit().constData(), qApp->applicationDirPath().toLocal8Bit().constData(), false);
+    appenv.setMainPtr(pMain);
     qApp->setProperty("MainPtr", QVariant::fromValue(appenv.getMainPtr()));
     //初始化qt环境
     qt_context context(&qtapplication);
@@ -48,6 +50,7 @@ int main(int argc, char *argv[])
     qt_context::addLibraryPath(wk.append("/plugins/linux").toLocal8Bit().constData());
 #endif   
 
+#define QFCONFIG_DEBUG  
 #ifdef QFCONFIG_DEBUG
     //复制 qfconfig 目录
     QString cmd = QString("xcopy %1 %2 /S /y /Q")
@@ -56,20 +59,24 @@ int main(int argc, char *argv[])
     system(cmd.toLocal8Bit().constData());
 #endif
 
-    std::string path = appenv.getConfigResDir();
-    QSettings set(QString(static_cast<QF::IQF_Main*>(appenv.getMainPtr())->GetConfigPath()).append("/config.ini"), QSettings::IniFormat);
+    QSettings set(QString(pMain->GetConfigPath()).append("/config.ini"), QSettings::IniFormat);
     set.beginGroup("config");
     std::string startXML = set.value("Start-XML-File", "main.xml").toString().toStdString();
     std::string style = set.value("Default-Application-Style", "fusion").toString().toStdString();
+    std::string splashImage = set.value("Splash-Image", "@image/splash.png").toString().toStdString();
     set.endGroup();
     //设置qt程序默认语言
     // qt_context::setDefaultLanguage("Chinese");
     //设置qt程序风格
     qt_context::setApplicationStyle(style.c_str());
 
-    MainWindow mainWidget(startXML.c_str());
+    SplashWindow splashWindow(pMain, R::Instance()->getImageResourceUrl(splashImage.c_str()).c_str());
+    splashWindow.show();
+    pMain->Init();
+    MainWindow mainWidget(startXML.c_str(), &splashWindow);
     mainWidget.setShowMode(Activity::MAXIMIZED);
     mainWidget.active();
+    splashWindow.close();
 
     return qtapplication.exec();
 }

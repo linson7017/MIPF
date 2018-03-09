@@ -2,6 +2,7 @@
 优化SliceBySliceTracking，增加最亮点的提取功能，增加逐层patch截取功能
 增加实时阈值分割插件ThresholdImageWidget
 增加体绘制命令，关联体绘制插件对体绘制状态的监听
+将ImageInteractor与Qt剥离，使用vtkTransfrom来完成变换过程
 
 20180227
 添加styles资源

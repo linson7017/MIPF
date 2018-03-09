@@ -25,7 +25,7 @@ class GrowcutView : public QObject, public MitkPluginView
 public:
     GrowcutView(QF::IQF_Main* pMain);
     ~GrowcutView();
-	void Contructed(R* pR);
+	void Constructed();
 	
 protected:
     virtual void Update(const char* szMessage, int iValue = 0, void* pValue = 0);

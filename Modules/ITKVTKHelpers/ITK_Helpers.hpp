@@ -30,6 +30,8 @@
 
 #include "itkTranslationTransform.h"
 
+#include "itkConnectedThresholdImageFilter.h"
+
 
 #include "itkImageFileWriter.h"
 
@@ -538,5 +540,38 @@ namespace ITKHelpers
         output->Graft(resampleFilter->GetOutput());
 
     }
+
+    template <class TImageType>
+    void BinaryFillLargeHolesByRegionGrowing(TImageType* input, TImageType* output, itk::Index<TImageType::ImageDimension> seed)
+    {
+        typedef itk::ConnectedThresholdImageFilter<TImageType, TImageType> RegionGrowingFilterType;
+        typename RegionGrowingFilterType::Pointer regionGrower = RegionGrowingFilterType::New();
+        // perform region growing in desired segmented region
+        regionGrower->SetInput(input);
+        regionGrower->AddSeed(seed);
+        regionGrower->SetLower(-0.5);
+        regionGrower->SetUpper(0.5);
+        regionGrower->SetReplaceValue(255);
+        try
+        {
+            regionGrower->Update();
+        }
+        catch (itk::ExceptionObject& ex)
+        {
+            std::cout << "Region Growing Failed! Exception code: " << std::endl;
+            std::cout << ex.what() << std::endl;
+            return;
+        }
+        typedef itk::InvertIntensityImageFilter <TImageType>
+            InvertIntensityImageFilterType;
+        InvertIntensityImageFilterType::Pointer invertIntensityFilter
+            = InvertIntensityImageFilterType::New();
+        invertIntensityFilter->SetInput(regionGrower->GetOutput());
+        invertIntensityFilter->SetMaximum(255);
+        invertIntensityFilter->Update();
+
+        output->Graft(invertIntensityFilter->GetOutput());
+    }
+
 }
 #endif // ITK_Helpers_h__

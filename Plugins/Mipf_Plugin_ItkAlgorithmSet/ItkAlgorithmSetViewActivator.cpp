@@ -31,7 +31,7 @@ const char* ItkAlgorithmSetView_Activator::GetID()
     return ItkAlgorithmSetView_Activator_ID;
 }
 
-void ItkAlgorithmSetView_Activator::Register(R* pR)
+void ItkAlgorithmSetView_Activator::Register()
 {
     REGISTER_QOBJECT("ItkAlgorithmSetWidget", ItkAlgorithmSetView);
 

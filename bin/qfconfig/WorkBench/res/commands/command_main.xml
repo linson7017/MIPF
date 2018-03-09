@@ -1,8 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<Command id="MITK_MAIN_COMMAND_ENABLE_VTK_WARNING">
+<Command id="enableVtkWarning" name="MITK_MAIN_COMMAND_ENABLE_VTK_WARNING">
 	<Property type="Object" name="EnableVtkWarning">setting.EnableVtkWarning:checked</Property>
 </Command>
-<Command id="MITK_MAIN_COMMAND_CHANGE_CROSSHAIR_GAP_SIZE">
+<Command id="loadData" name="MITK_MAIN_COMMAND_LOADDATA">
+	<Property type="Value" name="DataStorage">QString:test</Property>
+</Command>
+<Command id="changeCrosshairSize" name="MITK_MAIN_COMMAND_CHANGE_CROSSHAIR_GAP_SIZE">
 	<Property type="Object" name="CrosshairGapSize">setting.CrosshairGapSize:value</Property>
+</Command>
+<Command id="changeMultiViewLayout" name="MITK_MAIN_COMMAND_CHANGE_MULTIVIEW_LAYOUT">
+	<Property type="Object" name="LayoutMode">sender:layoutMode</Property>
+    <Property type="Value" name="MultiViewID">QString:main.mitkMulitView</Property>
+</Command>
+<Command id="resetMultiView" name="MITK_MAIN_COMMAND_RESET_MULTIVIEW">
+    <Property type="Value" name="MultiViewID">QString:main.mitkMulitView</Property>
+</Command>
+
+<Command id="loadData1" name="MITK_MAIN_COMMAND_LOADDATA">
+	<Property type="Value" name="DataStorage">QString:storage1</Property>
+</Command>
+
+<Command id="loadData2" name="MITK_MAIN_COMMAND_LOADDATA">
+	<Property type="Value" name="DataStorage">QString:storage2</Property>
 </Command>

@@ -28,9 +28,9 @@ const char* Mipf_Plugin_BasicImageProcess_Activator::GetID()
     return Mipf_Plugin_BasicImageProcess_Activator_ID; 
 }
 
-void Mipf_Plugin_BasicImageProcess_Activator::Register(R* pR)
+void Mipf_Plugin_BasicImageProcess_Activator::Register()
 {
-    //m_pBasicImageProcessView->InitResource(pR); 
+    //m_pBasicImageProcessView->InitResource(); 
    // pR->registerCustomWidget("BasicImageProcessWidget", m_pBasicImageProcessView);
     REGISTER_QOBJECT("BasicImageProcessWidget", BasicImageProcessView);
 }

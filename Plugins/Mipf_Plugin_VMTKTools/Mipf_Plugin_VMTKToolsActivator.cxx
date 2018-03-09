@@ -31,13 +31,13 @@ const char* Mipf_Plugin_VMTKTools_Activator::GetID()
     return Mipf_Plugin_VMTKTools_Activator_ID; 
 }
 
-void Mipf_Plugin_VMTKTools_Activator::Register(R* pR)
+void Mipf_Plugin_VMTKTools_Activator::Register()
 {
 
     REGISTER_QOBJECT("CenterLineExtractWidget", CenterLineExtractView);
     REGISTER_QOBJECT("VesselnessFilteringWidget", VesselnessFilteringView);
 
     
-    //m_pCenterLineExtractView->InitResource(pR); 
+    //m_pCenterLineExtractView->InitResource(); 
    // pR->registerCustomWidget("CenterLineExtractView", m_pCenterLineExtractView); 
 }

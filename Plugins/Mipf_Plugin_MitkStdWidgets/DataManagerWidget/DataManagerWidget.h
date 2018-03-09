@@ -35,6 +35,8 @@ class QmitkDataStorageFilterProxyModel;
 class QWidget;
 class IQF_MitkDataManager;
 class DataManagerItemDelegate;
+class NodeDescriptorManager;
+
 
 class DataManagerWidget : public QWidget, public MitkPluginView
 {
@@ -43,7 +45,6 @@ public:
     DataManagerWidget();
     ~DataManagerWidget();
     void Init(QWidget* parent);
-    void SetDataStorage(IQF_MitkDataManager* dataStorage);
     virtual void CreateView();
 public slots:
     void NodeSelectionChanged(const QItemSelection & selected, const QItemSelection & deselected);
@@ -54,7 +55,7 @@ public slots:
 
     void OpacityChanged(int value);
     void OpacityActionChanged();
-    void ComponentActionChanged() {}
+    void ComponentActionChanged();
     void ColorChanged();
     void ColorActionChanged();
     void TextureInterpolationChanged();
@@ -66,10 +67,10 @@ public slots:
     void RemoveSelectedNodes(bool checked = false);
     void SaveSelectedNodes(bool checked = false);
     void ReinitSelectedNodes(bool checked = false);
-    void MakeAllNodesInvisible(bool checked = false) {}
-    void ShowOnlySelectedNodes(bool checked = false) {}
-    void ToggleVisibilityOfSelectedNodes(bool checked = false) {}
-    void ShowInfoDialogForSelectedNodes(bool checked = false) {}
+    void MakeAllNodesInvisible(bool checked = false);
+    void ShowOnlySelectedNodes(bool checked = false);
+    void ToggleVisibilityOfSelectedNodes(bool checked = false);
+    void ShowInfoDialogForSelectedNodes(bool checked = false);
     void GlobalReinit(bool checked = false);
     void ContextMenuActionTriggered(bool) {}
     void ShowIn(const QString& editorId) {}
@@ -136,6 +137,8 @@ protected:
 
     //
     IQF_MitkDataManager* m_DataManager;
+
+    NodeDescriptorManager* m_DescriptorManager;
 
 private:
 

@@ -307,7 +307,7 @@ void GraphcutSegmentationViewUi::Resmaple()
     resampleNode->SetData(mitkImage);
     resampleNode->SetName(name);
     resampleNode->Update();
-    m_pMitkDataManager->GetDataStorage()->Add(resampleNode);
+    GetDataStorage()->Add(resampleNode);
 }
 
 
@@ -392,9 +392,9 @@ void GraphcutSegmentationViewUi::Reset()
     m_sources.clear();
     m_sinks.clear();
 
-    m_pMitkDataManager->GetDataStorage()->Remove(m_pMitkDataManager->GetDataStorage()->GetNamedNode("source"));
-    m_pMitkDataManager->GetDataStorage()->Remove(m_pMitkDataManager->GetDataStorage()->GetNamedNode("sink"));
-    m_pMitkDataManager->GetDataStorage()->Remove(m_pMitkDataManager->GetDataStorage()->GetNamedNode("Result"));
+    GetDataStorage()->Remove(GetDataStorage()->GetNamedNode("source"));
+    GetDataStorage()->Remove(GetDataStorage()->GetNamedNode("sink"));
+    GetDataStorage()->Remove(GetDataStorage()->GetNamedNode("Result"));
     m_sourceSinkNode = NULL;
     InitSourceAndSinkNodes();
 
@@ -846,7 +846,7 @@ void GraphcutSegmentationViewUi::Segment()
     mitk::Image::Pointer mitkImage = mitk::Image::New();
     mitk::CastToMitkImage<UChar3DImageType>(maskImage, mitkImage);
 
-    m_pMitkDataManager->GetDataStorage()->Remove(
+    GetDataStorage()->Remove(
         GetDataStorage()->GetNamedNode(m_currentResultName.toStdString()));
     mitk::DataNode::Pointer resultNode = mitk::DataNode::New();
     resultNode->SetName(m_currentResultName.toStdString());
@@ -854,7 +854,7 @@ void GraphcutSegmentationViewUi::Segment()
     resultNode->SetData(mitkImage);
     resultNode->SetBoolProperty("volumerendering", true);
     resultNode->Update();
-    m_pMitkDataManager->GetDataStorage()->Add(resultNode);
+    GetDataStorage()->Add(resultNode);
     resultNode->SetOpacity(0.8);
     m_currentResultNode = resultNode.GetPointer();
 
@@ -1001,7 +1001,7 @@ void GraphcutSegmentationViewUi::OnContourValueChanged(int value)
     {
         return;
     }
-    mitk::DataNode::Pointer surfaceNode = m_pMitkDataManager->GetDataStorage()->GetNamedNode("Surface");
+    mitk::DataNode::Pointer surfaceNode = GetDataStorage()->GetNamedNode("Surface");
     if (!surfaceNode)
     {
         return;

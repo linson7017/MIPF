@@ -18,6 +18,7 @@
 <UICommand id="toggleTransformNodeWidget" type="ToggleWidget"  widgetID="main.TransformNodeWidget"/>
 <UICommand id="toggleLandMarkExtractWidget" type="ToggleWidget"  widgetID="main.LandMarkExtractWidget"/>	
 <UICommand id="toggleSigmoidImageWidget" type="ToggleWidget"  widgetID="main.SigmoidImageWidget"/>
+<UICommand id="toggleThresholdImageWidget" type="ToggleWidget"  widgetID="main.ThresholdImageWidget"/>
 <UICommand id="toggleVolumeVisualizationWidget" type="ToggleWidget"  widgetID="main.VolumeVisualizationWidget"/>
 <!-- BasicSurfaceTools -->
 <UICommand id="toggleBasicSurfaceTools" type="ToggleWidget"  widgetID="main.BasicSurfaceTools"/>

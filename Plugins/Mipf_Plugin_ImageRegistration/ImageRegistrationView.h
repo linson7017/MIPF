@@ -49,7 +49,7 @@ protected slots:
     void UpdataRegistrationText(const vtkMatrix4x4& matrix);
 
 signals:
-    void SignalDoRegistration(const Float3DImagePointerType fixedImage, const Float3DImagePointerType movingImage, QMatrix4x4 initTransformMatrix);
+    void SignalDoRegistration(const Float3DImagePointerType fixedImage, const Float3DImagePointerType movingImage, vtkMatrix4x4* initTransformMatrix);
     void SignalStopRegistration();
 private:
     
@@ -68,7 +68,7 @@ private:
 
     vtkMatrix4x4* m_originMatrix;
 
-    QMatrix4x4 m_registrationMatrix;
+    vtkMatrix4x4* m_registrationMatrix;
 
     bool m_bInited;
 

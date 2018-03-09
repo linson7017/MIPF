@@ -210,7 +210,7 @@ m_bSampleRate(-1)
     command2->SetCallbackFunction(this, &GraphcutSegmentationView::OnSurfaceInterpolationInfoChanged);
 
     /*SurfaceInterpolationInfoChangedObserverTag = m_SurfaceInterpolator->AddObserver(itk::ModifiedEvent(), command2);
-    m_SurfaceInterpolator->SetDataStorage(m_pMitkDataManager->GetDataStorage());
+    m_SurfaceInterpolator->SetDataStorage(GetDataStorage());
     connect(&m_Watcher, SIGNAL(finished()), this, SLOT(OnSurfaceInterpolationFinished()));*/
 
     m_pSegTool = (IQF_MitkSegmentationTool*)m_pMain->GetInterfacePtr(QF_MitkSegmentation_Tool);
@@ -384,7 +384,7 @@ void GraphcutSegmentationView::Update(const char* szMessage, int iValue, void* p
     }
     else if (strcmp(szMessage, "MITK_MESSAGE_GRAPHCUT_RESAMPLE") == 0)
     {
-        QLineEdit* lineEdit = (QLineEdit*)m_pR->getObjectFromGlobalMap("GraphcutSegmentation.Resample");
+        QLineEdit* lineEdit = (QLineEdit*)R::Instance()->getObjectFromGlobalMap("GraphcutSegmentation.Resample");
         Float3DImageType::Pointer itkImage = Float3DImageType::New();
         mitk::CastToItkImage<Float3DImageType>(dynamic_cast<mitk::Image *>(m_refImageNode->GetData()), itkImage);
         Float3DImageType::Pointer resampleImage = Float3DImageType::New();
@@ -399,7 +399,7 @@ void GraphcutSegmentationView::Update(const char* szMessage, int iValue, void* p
         resampleNode->SetData(mitkImage);
         resampleNode->SetName(name);
         resampleNode->Update();
-        m_pMitkDataManager->GetDataStorage()->Add(resampleNode);
+        GetDataStorage()->Add(resampleNode);
 
     }
     else if (strcmp(szMessage, "MITK_MESSAGE_GRAPHCUT_LAMBDA_CHANGED") == 0)
@@ -600,9 +600,9 @@ void GraphcutSegmentationView::Reset()
     m_sources.clear();
     m_sinks.clear();
 
-    m_pMitkDataManager->GetDataStorage()->Remove(m_pMitkDataManager->GetDataStorage()->GetNamedNode("source"));
-    m_pMitkDataManager->GetDataStorage()->Remove(m_pMitkDataManager->GetDataStorage()->GetNamedNode("sink"));
-    m_pMitkDataManager->GetDataStorage()->Remove(m_pMitkDataManager->GetDataStorage()->GetNamedNode("Result"));
+    GetDataStorage()->Remove(GetDataStorage()->GetNamedNode("source"));
+    GetDataStorage()->Remove(GetDataStorage()->GetNamedNode("sink"));
+    GetDataStorage()->Remove(GetDataStorage()->GetNamedNode("Result"));
     m_sourceSinkNode = NULL;
     InitSourceAndSinkNodes();
     
@@ -701,7 +701,7 @@ void GraphcutSegmentationView::InitTool()
         return;
     }
     mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
-    toolManager->SetDataStorage(*(m_pMitkDataManager->GetDataStorage()));
+    toolManager->SetDataStorage(*(GetDataStorage()));
     toolManager->InitializeTools();
     toolManager->RegisterClient();
 
@@ -722,7 +722,7 @@ void GraphcutSegmentationView::ChangeTool(const QString& toolName)
     {
         return;
     }
-    QSlider* le = (QSlider*)m_pR->getObjectFromGlobalMap("GraphcutSegmentation.PenSize");
+    QSlider* le = (QSlider*)R::Instance()->getObjectFromGlobalMap("GraphcutSegmentation.PenSize");
     int size = 1.0;
     if (le)
     {
@@ -1091,7 +1091,7 @@ void GraphcutSegmentationView::Segment()
     mitk::Image::Pointer mitkImage = mitk::Image::New();
     mitk::CastToMitkImage<UChar3DImageType>(maskImage,mitkImage);
 
-    m_pMitkDataManager->GetDataStorage()->Remove(
+    GetDataStorage()->Remove(
         GetDataStorage()->GetNamedNode(m_currentResultName.toStdString()));
     mitk::DataNode::Pointer resultNode = mitk::DataNode::New();
     resultNode->SetName(m_currentResultName.toStdString());
@@ -1099,7 +1099,7 @@ void GraphcutSegmentationView::Segment()
     resultNode->SetData(mitkImage);
     resultNode->SetBoolProperty("volumerendering", true);
     resultNode->Update();
-    m_pMitkDataManager->GetDataStorage()->Add(resultNode);
+    GetDataStorage()->Add(resultNode);
     resultNode->SetOpacity(0.8);
     m_currentResultNode = resultNode.GetPointer();
 
@@ -1130,9 +1130,8 @@ void GraphcutSegmentationView::GenerateSurface()
        }
 }
 
-void GraphcutSegmentationView::Constructed(R* pR)
+void GraphcutSegmentationView::Constructed()
 {
-    m_pR = pR;
     m_imageComboBox = (QmitkDataStorageComboBox*)R::Instance()->getObjectFromGlobalMap("GraphcutSegmentation.ImageSelector");
     if (m_imageComboBox)
     {
@@ -1160,7 +1159,7 @@ void GraphcutSegmentationView::OnContourValueChanged(int value)
     {
         return;
     }
-    mitk::DataNode::Pointer surfaceNode = m_pMitkDataManager->GetDataStorage()->GetNamedNode("Surface");
+    mitk::DataNode::Pointer surfaceNode = GetDataStorage()->GetNamedNode("Surface");
     if (!surfaceNode)
     {
         return;

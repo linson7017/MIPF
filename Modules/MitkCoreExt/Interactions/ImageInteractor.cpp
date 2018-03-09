@@ -9,16 +9,31 @@
 #include <mitkPropertyList.h>
 #include <mitkCameraController.h>
 
+#include <vtkMath.h>
+
 
 ImageInteractor::ImageInteractor() :m_bDragging(false), m_originMatrix(NULL), m_bInitFlag(false)
 {
-    m_transformMatrix.setToIdentity();
+    m_transform = vtkSmartPointer<vtkTransform>::New();
+    m_transform->Identity();
 }
 
 
 ImageInteractor::~ImageInteractor()
 {
 }
+
+vtkMatrix4x4* ImageInteractor::GetTransform()
+{
+    return m_transform->GetMatrix();
+}
+
+void ImageInteractor::SetTransform(vtkMatrix4x4* data)
+{
+    m_transform->GetMatrix()->DeepCopy(data);
+    TransformChangedEvent.Send(m_transform->GetMatrix());
+}
+
 
 void ImageInteractor::SetDataNode(mitk::DataNode *dataNode)
 {
@@ -30,40 +45,21 @@ void ImageInteractor::Init()
 {
     if (!m_originMatrix)
     {
-        m_originMatrix = vtkMatrix4x4::New();
+        m_originMatrix = vtkSmartPointer<vtkMatrix4x4>::New();
     }
     m_originMatrix->DeepCopy(GetDataNode()->GetData()->GetGeometry()->GetVtkMatrix());
     m_originCenter = GetDataNode()->GetData()->GetGeometry()->GetCenter();
     m_bInitFlag = true;
 }
 
-void ImageInteractor::SetTransformMatrix(const QMatrix4x4& matrix)
-{
-    m_transformMatrix = matrix;
-}
-
-QMatrix4x4 ImageInteractor::GetTransformMatrix()
-{
-    return m_transformMatrix;
-}
-
 void ImageInteractor::RefreshDataGeometry()
 {
-    vtkMatrix4x4* transform = vtkMatrix4x4::New();
-    vtkMatrix4x4* rm = vtkMatrix4x4::New();
-    for (int i = 0; i < 4; i++)
-    {
-        for (int j = 0; j < 4; j++)
-        {
-            transform->SetElement(i, j, m_transformMatrix(i, j));
-        }
-    }
-    vtkMatrix4x4::Multiply4x4(transform, m_originMatrix, rm);
+    auto rm = vtkSmartPointer<vtkMatrix4x4>::New();
+    vtkMatrix4x4::Multiply4x4(m_transform->GetMatrix(), m_originMatrix, rm);
     if (GetDataNode() != NULL)
     {
         GetDataNode()->GetData()->GetGeometry()->SetIndexToWorldTransformByVtkMatrix(rm);
         GetDataNode()->Modified();
-        //RequestRenderWindowUpdate();
         mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     }
 
@@ -72,31 +68,37 @@ void ImageInteractor::RefreshDataGeometry()
 
 void ImageInteractor::Reset()
 {
-    m_transformMatrix.setToIdentity();
+    m_transform->Identity();
+    TransformChangedEvent.Send(m_transform->GetMatrix());
     RefreshDataGeometry();
 }
 
-void ImageInteractor::Translate(const QVector3D& translate)
+void ImageInteractor::Translate(const vtkVector3d& translate)
 {
-    QMatrix4x4 invertMatrix = m_transformMatrix;
-    invertMatrix = invertMatrix.inverted();
-    invertMatrix(0, 3) = 0.0;
-    invertMatrix(1, 3) = 0.0;
-    invertMatrix(2, 3) = 0.0;
-    invertMatrix(3, 3) = 1.0;
-    invertMatrix(3, 0) = 0.0;
-    invertMatrix(3, 1) = 0.0;
-    invertMatrix(3, 2) = 0.0;
-    QVector3D delta = invertMatrix*translate;
-    m_transformMatrix.translate(delta);
+    auto  invertMatrix = vtkSmartPointer<vtkMatrix4x4>::New();
+    vtkMatrix4x4::Invert(m_transform->GetMatrix(), invertMatrix);
+    invertMatrix->SetElement(0, 3, 0.0);
+    invertMatrix->SetElement(1, 3, 0.0);
+    invertMatrix->SetElement(2, 3, 0.0);
+    invertMatrix->SetElement(3, 3, 1.0);
+    invertMatrix->SetElement(3, 0, 0.0);
+    invertMatrix->SetElement(3, 1, 0.0);
+    invertMatrix->SetElement(3, 2, 0.0);
+
+    double ft[4] = { translate[0], translate[1] ,translate[2] ,1.0 };
+    double* delta = invertMatrix->MultiplyDoublePoint(ft);
+
+    m_transform->Translate(delta[0], delta[1], delta[2]);
+    TransformChangedEvent.Send(m_transform->GetMatrix());
     RefreshDataGeometry();
 }
 
-void ImageInteractor::Rotate(double angle, const QVector3D& normal)
+void ImageInteractor::Rotate(double angle, const vtkVector3d& normal)
 {
-    m_transformMatrix.translate(m_originCenter[0], m_originCenter[1], m_originCenter[2]);
-    m_transformMatrix.rotate(angle, normal);
-    m_transformMatrix.translate(-m_originCenter[0], -m_originCenter[1], -m_originCenter[2]);
+    m_transform->Translate(m_originCenter[0], m_originCenter[1], m_originCenter[2]);
+    m_transform->RotateWXYZ(angle, normal.GetData());
+    m_transform->Translate(-m_originCenter[0], -m_originCenter[1], -m_originCenter[2]);
+    TransformChangedEvent.Send(m_transform->GetMatrix());
     RefreshDataGeometry();
 }
 
@@ -135,7 +137,7 @@ void ImageInteractor::MoveImage(mitk::StateMachineAction *, mitk::InteractionEve
             mitk::Point3D newPoint, resultPoint;
             newPoint = positionEvent->GetPositionInWorld();
             mitk::Vector3D dirVector = newPoint - m_LastPoint;
-            Translate(QVector3D(dirVector.GetElement(0), dirVector.GetElement(1), dirVector.GetElement(2)));
+            Translate(vtkVector3d(dirVector.GetElement(0), dirVector.GetElement(1), dirVector.GetElement(2)));
 
             m_LastPoint = newPoint;
         }
@@ -153,22 +155,12 @@ void ImageInteractor::RotateImage(mitk::StateMachineAction *, mitk::InteractionE
             newPoint = positionEvent->GetPositionInWorld();
             mitk::Vector3D dirVector = newPoint - m_LastPoint;
 
-            // m_SumVec = m_SumVec + dirVector;
-            double angle = dirVector.Length;
-
-
             mitk::Vector3D normal = positionEvent->GetSender()->GetCurrentWorldGeometry2D()->GetNormal();
-            QVector3D qStart(m_LastPoint.GetElement(0), m_LastPoint.GetElement(1), m_LastPoint.GetElement(2));
-            QVector3D qEnd(newPoint.GetElement(0), newPoint.GetElement(1), newPoint.GetElement(2));
-            QVector3D qNormal(normal.GetElement(0), normal.GetElement(1), normal.GetElement(2));
-            qNormal.normalize();
-
-            QVector3D qDirection = QVector3D::crossProduct(qStart, qEnd);
-            float direction = QVector3D::dotProduct(qDirection.normalized(), qNormal.normalized());
-            direction /= fabs(direction);
-            Rotate(direction*angle, qNormal);
-
-
+            mitk::Point3D imageCenter = GetDataNode()->GetData()->GetGeometry()->GetCenter();
+            vtkVector3d start((m_LastPoint - imageCenter).GetDataPointer());
+            vtkVector3d end((newPoint - imageCenter).GetDataPointer());
+            float angle = vtkMath::DegreesFromRadians(acos(start.Normalized().Dot(end.Normalized())));
+            Rotate(angle,vtkVector3d(start.Cross(end)));
             m_LastPoint = newPoint;
 
         }

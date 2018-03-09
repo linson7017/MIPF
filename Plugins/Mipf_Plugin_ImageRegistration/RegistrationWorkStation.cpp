@@ -5,7 +5,7 @@
 #include "Registration_SFD.h"
 
 #include "ItkNotifier.h"
-#include <QMatrix4x4>
+#include <vtkMatrix4x4.h>
 #include <itkImageRegistrationMethod.h>
 #include <itkMultiResolutionImageRegistrationMethod.h>
 
@@ -22,14 +22,14 @@ RegistrationWorkStation::~RegistrationWorkStation()
 {
 }
 
-void RegistrationWorkStation::SlotDoRegistration(const Float3DImagePointerType fixedImage, const Float3DImagePointerType movingImage, QMatrix4x4 initTransformMatrix)
+void RegistrationWorkStation::SlotDoRegistration(const Float3DImagePointerType fixedImage, const Float3DImagePointerType movingImage, vtkMatrix4x4* initTransformMatrix)
 {
     itk::Matrix<double, 4, 4> itkMatirx;
     for (int i = 0; i < 4; i++)
     {
         for (int j = 0;j < 4;j++)
         {
-            itkMatirx[i][j] = initTransformMatrix(i,j);
+            itkMatirx[i][j] = initTransformMatrix->GetElement(i,j);
         }
     }
     switch (m_registrationType)
@@ -64,10 +64,10 @@ void RegistrationWorkStation::SlotDoRegistration(const Float3DImagePointerType f
         {
             m_pCurrentRegistration = new RegistrationMI<Float3DImageType, Float3DImageType>();
         }
-        if (!initTransformMatrix.isIdentity())
+        /*if (!initTransformMatrix.isIdentity())
         {
             m_pCurrentRegistration->SetBeginStepLength(0.2);
-        }
+        }*/
         m_pCurrentRegistration->SetNotifier(m_pItkNotifier);
         m_pCurrentRegistration->SetUseMultiResolution(m_useMultiResolution);
         m_pCurrentRegistration->Start(fixedImage.GetPointer(), movingImage.GetPointer(), NULL, 
@@ -83,7 +83,7 @@ void RegistrationWorkStation::SlotDoRegistration(const Float3DImagePointerType f
         {
             for (int j = 0;j < 4;j++)
             {
-                itkMatirx[i][j] = initTransformMatrix(i, j);
+                itkMatirx[i][j] = initTransformMatrix->GetElement(i, j);
             }
         }
         m_pItkNotifier->RESULT.Init();

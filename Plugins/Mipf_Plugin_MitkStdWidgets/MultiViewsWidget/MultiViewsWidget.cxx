@@ -37,16 +37,16 @@ MultiViewsWidget::MultiViewsWidget():MitkPluginView(),m_bInited(false), m_multiW
 
 void MultiViewsWidget::CreateView()
 {
-    Init(NULL);
+    Init(this);
 }
 
 void MultiViewsWidget::Update(const char* szMessage, int iValue, void* pValue)
 {
-    if (strcmp(szMessage, "MITK_COMMAND_MULTIVIEWS_CHANGELAYOUT") == 0)
+    if (strcmp(szMessage, "MITK_MESSAGE_MULTIVIEWS_CHANGELAYOUT") == 0)
     {
         ChangeLayout(variant::GetVariant(*(VarientMap*)pValue, "parameterIndex").getInt());
     }
-    else if (strcmp(szMessage, "MITK_COMMAND_MULTIVIEWS_RESET") == 0)
+    else if (strcmp(szMessage, "MITK_MESSAGE_MULTIVIEWS_RESET") == 0)
     {
         ResetView();
     }
@@ -72,13 +72,13 @@ void MultiViewsWidget::SetupWidgets()
     m_multiWidget = new QmitkStdMultiWidget(viewParent);
     hlayout->addWidget(m_multiWidget);
 
-    if (m_pMitkDataManager->GetDataStorage())
+    if (GetDataStorage())
     {
         // Tell the multiWidget which DataStorage to render
-        m_multiWidget->SetDataStorage(m_pMitkDataManager->GetDataStorage());
+        m_multiWidget->SetDataStorage(GetDataStorage());
         // Initialize views as axial, sagittal, coronar (from
         // top-left to bottom)
-        mitk::TimeGeometry::Pointer geo = m_pMitkDataManager->GetDataStorage()->ComputeBoundingGeometry3D(m_pMitkDataManager->GetDataStorage()->GetAll());
+        mitk::TimeGeometry::Pointer geo = GetDataStorage()->ComputeBoundingGeometry3D(GetDataStorage()->GetAll());
         mitk::RenderingManager::GetInstance()->InitializeViews(geo);
     }
 
@@ -91,11 +91,28 @@ void MultiViewsWidget::SetupWidgets()
     // Add the displayed views to the DataStorage to see their positions in 2D and 3D
     m_multiWidget->AddDisplayPlaneSubTree();
     m_multiWidget->AddPlanesToDataStorage();
-    m_multiWidget->SetWidgetPlanesVisibility(true);
+    bool widgetPlanesVisible = true;
+    if (HasAttribute("widgetsVisible"))
+    {
+        widgetPlanesVisible = QString(GetAttribute("widgetsVisible")).compare("true", Qt::CaseInsensitive) == 0;
+    }
+    m_multiWidget->SetWidgetPlanesVisibility(widgetPlanesVisible);
+
     m_multiWidget->DisableDepartmentLogo();
+    if (HasAttribute("logo"))
+    {
+        MITK_INFO << R::Instance()->getImageResourceUrl(GetAttribute("logo"));
+        m_multiWidget->SetDepartmentLogoPath(R::Instance()->getImageResourceUrl(GetAttribute("logo")).c_str());
+        m_multiWidget->EnableDepartmentLogo();
+    }
+    
 
     //set cross hair
     int crosshairgapsize = m_pMitkReferences->GetInt("Crosshair-Gap-Size", 1);
+    if (HasAttribute("Crosshair-Gap-Size"))
+    {
+        crosshairgapsize = QString(GetAttribute("Crosshair-Gap-Size")).toInt();
+    }
     m_multiWidget->GetWidgetPlane1()->SetIntProperty("Crosshair.Gap Size", crosshairgapsize);
     m_multiWidget->GetWidgetPlane2()->SetIntProperty("Crosshair.Gap Size", crosshairgapsize);
     m_multiWidget->GetWidgetPlane3()->SetIntProperty("Crosshair.Gap Size", crosshairgapsize);
@@ -111,7 +128,7 @@ void MultiViewsWidget::Init(QWidget* parent)
     IQF_MitkRenderWindow* pRenderWindow = (IQF_MitkRenderWindow*)m_pMain->GetInterfacePtr(QF_MitkMain_RenderWindow);
     if (pRenderWindow)
     {
-        pRenderWindow->SetMitkStdMultiWidget(m_multiWidget);
+        pRenderWindow->SetMitkStdMultiWidget(m_multiWidget,GetAttribute("id"));
         m_pMain->SendMessageQf(MITK_MESSAGE_MULTIWIDGET_INITIALIZED, 0, pRenderWindow);
     }
 }

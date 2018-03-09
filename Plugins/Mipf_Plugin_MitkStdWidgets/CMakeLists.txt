@@ -15,7 +15,7 @@ endif()
 project(Mipf_Plugin_MitkStdWidgets)
 
 
-include_directories(".")
+include_directories(".")  
 
 
 file(GLOB DIR_SRCS ${CMAKE_CURRENT_SOURCE_DIR}  *.h* *.c*)

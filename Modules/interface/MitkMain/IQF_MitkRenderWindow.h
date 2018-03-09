@@ -24,15 +24,15 @@ public:
     //handle windows
     virtual void AddMitkRenderWindow(QmitkRenderWindow* renderWindow, const QString& id) = 0;
     virtual void RemoveMitkRenderWindow(const QString& id) = 0;
-    virtual void SetMitkStdMultiWidget(QmitkStdMultiWidget* stdMultiWidget) = 0;
+    virtual void SetMitkStdMultiWidget(QmitkStdMultiWidget* stdMultiWidget,const QString& id="") = 0;
    
     //functions
-    virtual QmitkStdMultiWidget* GetMitkStdMultiWidget() = 0; 
+    virtual QmitkStdMultiWidget* GetMitkStdMultiWidget(const QString& id = "") = 0;
     virtual QmitkRenderWindow* GetActiveMitkRenderWindow() = 0;
     virtual mitk::RenderingManager* GetRenderingManager(QString name = "") = 0;
 
-    virtual void SetCrossHairVisibility(bool state) = 0;
-    virtual void ResetCrossHair() = 0;
+    virtual void SetCrossHairVisibility(bool state,const QString& id="") = 0;
+    virtual void ResetCrossHair(const QString& id = "") = 0;
 
     virtual void Reinit(mitk::DataNode* node) = 0;
 };

@@ -2,12 +2,19 @@
 #define mitk_main_msg_h__
 
 
+#define MAX_ID_SIZE (100)
+
+typedef struct _data_with_id
+{
+    char* id;
+    void* data;
+}IdentifiableMessage;
 /**
 选中节点变化
 int 选中节点数量
-void* IQF_MitkDataManager*指针
+void* IdentifiableMessage*指针
 */
-#define MITK_MESSAGE_SELECTION_CHANGED "MITK_MESSAGE_SELECTION_CHANGED"
+#define MITK_MESSAGE_NODE_SELECTION_CHANGED "MITK_MESSAGE_NODE_SELECTION_CHANGED"
 
 
 /**

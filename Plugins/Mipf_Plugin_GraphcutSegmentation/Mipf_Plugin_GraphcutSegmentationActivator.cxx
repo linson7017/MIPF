@@ -28,13 +28,13 @@ const char* Mipf_Plugin_GraphcutSegmentation_Activator::GetID()
     return Mipf_Plugin_GraphcutSegmentation_Activator_Activator_ID; 
 }
 
-void Mipf_Plugin_GraphcutSegmentation_Activator::Register(R* pR)
+void Mipf_Plugin_GraphcutSegmentation_Activator::Register()
 {
-    //m_pGraphcutSegmentationView->InitResource(pR); 
+    //m_pGraphcutSegmentationView->InitResource(); 
     REGISTER_PLUGIN("GraphcutSegmentationWidget", GraphcutSegmentationViewUi);
 }
 
-void Mipf_Plugin_GraphcutSegmentation_Activator::Constructed(R* pR)
+void Mipf_Plugin_GraphcutSegmentation_Activator::Constructed()
 {
-    m_pGraphcutSegmentationView->Constructed(pR);
+    m_pGraphcutSegmentationView->Constructed();
 }

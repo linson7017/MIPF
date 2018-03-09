@@ -1,6 +1,7 @@
 #include "SliceBySliceTrackingActivator.h"
 #include "SliceBySliceTrackingView.h"
 
+#include "Utils/PluginFactory.h"
 
 QF_API QF::IQF_Activator* QF::QF_CreatePluginActivator(QF::IQF_Main* pMain)
 {
@@ -18,7 +19,6 @@ SliceBySliceTrackingView_Activator::SliceBySliceTrackingView_Activator(QF::IQF_M
 
 bool SliceBySliceTrackingView_Activator::Init()
 {
-    m_pView = new SliceBySliceTrackingView(m_pMain);
     return true;
 }
 
@@ -27,13 +27,12 @@ const char* SliceBySliceTrackingView_Activator::GetID()
     return SliceBySliceTrackingView_Activator_ID;
 }
 
-void SliceBySliceTrackingView_Activator::Register(R* pR)
+void SliceBySliceTrackingView_Activator::Register()
 {
-    m_pView->InitResource(pR);
+    REGISTER_PLUGIN("SliceBySliceTracking", SliceBySliceTrackingView);
 }
 
-void SliceBySliceTrackingView_Activator::Constructed(R* pR)
+void SliceBySliceTrackingView_Activator::Constructed()
 {
-    m_pView->Constructed(pR);
-
+    //m_pView->Constructed();
 }

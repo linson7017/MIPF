@@ -4,6 +4,8 @@
 #include "PluginView.h"
 #include "Res/R.h"
 
+#include "MitkMain/mitk_main_msg.h"
+
 #include "mitkRenderingManager.h"
 #include <QList>
 #include <mitkDataNode.h>
@@ -38,10 +40,10 @@ public:
          Segmentation,
          BinaryOrSegmentation
     };
-    MitkPluginView() :PluginView()
+    MitkPluginView() :PluginView(), m_dataStorageID("")
     {
     }
-    MitkPluginView(QF::IQF_Main* pMain):PluginView(pMain)
+    MitkPluginView(QF::IQF_Main* pMain):PluginView(pMain), m_dataStorageID("")
 	{
         SetMainPtr(pMain);
 	}
@@ -52,6 +54,14 @@ public:
         m_pMitkDataManager = (IQF_MitkDataManager*)m_pMain->GetInterfacePtr(QF_MitkMain_DataManager);
         m_pMitkRenderWindow = (IQF_MitkRenderWindow*)m_pMain->GetInterfacePtr(QF_MitkMain_RenderWindow);
         m_pMitkReferences = (IQF_MitkReference*)m_pMain->GetInterfacePtr(QF_MitkMain_Reference);
+    }
+    virtual void InitResource()
+    {
+        if (HasAttribute("datastorage"))
+        {
+            m_dataStorageID = GetAttribute("datastorage");
+        }
+        PluginView::InitResource();
     }
 protected:
     void RequestRenderWindowUpdate(mitk::RenderingManager::RequestType requestType = mitk::RenderingManager::REQUEST_UPDATE_ALL)
@@ -66,7 +76,19 @@ protected:
     }
     mitk::DataStorage::Pointer GetDataStorage()
     {
-        return m_pMitkDataManager->GetDataStorage();
+        return m_pMitkDataManager->GetDataStorage(m_dataStorageID);
+    }
+    mitk::DataStorage::Pointer GetDataStorage() const 
+    {
+        return m_pMitkDataManager->GetDataStorage(m_dataStorageID);
+    }
+    void SetDataStorageID(const char* dataStorageID)
+    {
+        m_dataStorageID = dataStorageID;
+    }
+    const char* GetDataStorageID()
+    {
+        return m_dataStorageID.c_str();
     }
     QList<mitk::DataNode::Pointer> GetCurrentSelection()
 	{
@@ -84,17 +106,10 @@ protected:
     }
     QVariant GetGuiProperty(const char* guiId,const char* propertyID)
     {
-        if (m_pR)
+        QObject* obj = (QObject*)R::Instance()->getObjectFromGlobalMap(guiId);
+        if (obj)
         {
-            QObject* obj = (QObject*)m_pR->getObjectFromGlobalMap(guiId);
-            if (obj)
-            {
-                return obj->property(propertyID);
-            }
-            else
-            {
-                return QVariant(NULL);
-            }
+            return obj->property(propertyID);
         }
         else
         {
@@ -103,18 +118,17 @@ protected:
     }
     bool SetGuiProperty(const char* guiId, const char* propertyID, const QVariant& value)
     {
-        if (m_pR)
+        QObject* obj = (QObject*)R::Instance()->getObjectFromGlobalMap(guiId);
+        if (obj)
         {
-            QObject* obj = (QObject*)m_pR->getObjectFromGlobalMap(guiId);
-            if (obj)
-            {
-                obj->setProperty(propertyID, value);
-            }
+            obj->setProperty(propertyID, value);
+            return true;
         }
         else
         {
             return false;
         }
+
     }
     static void CastFromStdNodesToQListNodes(std::vector<mitk::DataNode::Pointer>& stdNodes, QList<mitk::DataNode::Pointer>& qlistNodes)
 	{
@@ -202,6 +216,7 @@ protected:
     IQF_MitkDataManager* m_pMitkDataManager;
     IQF_MitkRenderWindow* m_pMitkRenderWindow;
 	IQF_MitkReference* m_pMitkReferences;
+    std::string m_dataStorageID;
 };
 
 

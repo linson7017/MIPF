@@ -44,13 +44,13 @@
 			<Widget index="1">
 				<VLayout>
 					<HLayout>
-						<CheckBox id="setting.EnableVtkWarning" text="VTK Warning" checked="false" command="@command/MITK_MAIN_COMMAND_ENABLE_VTK_WARNING"/>
+						<CheckBox id="setting.EnableVtkWarning" text="VTK Warning" checked="false" command="@command/enableVtkWarning"/>
 					</HLayout>
 					<Label p_styleType="seperator" width="200" height="2"/>
 					<HLayout>
 						<Label text="Crosshair Gap Size:"/>
 						<Spinner id="setting.CrosshairGapSize" range="0,100" value="1"/>
-						<Button text="Apply" command="@command/MITK_MAIN_COMMAND_CHANGE_CROSSHAIR_GAP_SIZE"/>
+						<Button text="Apply" command="@command/changeCrosshairSize"/>
 						<Stretch size="100"/>
 					</HLayout>
 					<Stretch size="200" />

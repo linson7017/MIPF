@@ -135,7 +135,7 @@ void ManualSegmentationTestView::Update(const char* szMessage, int iValue, void*
             {
                 std::cout << "Change To Tool " << m_currentToolName.toStdString() << std::endl;
             }
-            m_pMain->SendMessageQf("MITK_MESSAGE_MST_PENSIZE_CHANGED", 0,m_pR->getObjectFromGlobalMap("ManualSegmentationTest.PenSize"));
+            m_pMain->SendMessageQf("MITK_MESSAGE_MST_PENSIZE_CHANGED", 0, R::Instance()->getObjectFromGlobalMap("ManualSegmentationTest.PenSize"));
         }
     }
     else if (strcmp(szMessage, "MITK_MESSAGE_MST_PENSIZE_CHANGED") == 0)
@@ -229,7 +229,7 @@ void ManualSegmentationTestView::Update(const char* szMessage, int iValue, void*
     }
 }
 
-void ManualSegmentationTestView::Constructed(R* pR)
+void ManualSegmentationTestView::Constructed()
 {
     m_pImageSelector = (QmitkDataStorageComboBox*)R::Instance()->getObjectFromGlobalMap("ManualSegmentationTest.ImageSelector");
     if (m_pImageSelector)

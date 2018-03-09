@@ -158,7 +158,7 @@ void MeasurementWidget::CreateView()
 
 void MeasurementWidget::Update(const char* szMessage, int iValue , void* pValue )
 {
-    if (strcmp(szMessage, MITK_MESSAGE_SELECTION_CHANGED) == 0)
+    if (strcmp(szMessage, MITK_MESSAGE_NODE_SELECTION_CHANGED) == 0)
     {
         SelectionChanged(GetCurrentSelection());
     }
@@ -291,11 +291,11 @@ mitk::DataNode::Pointer MeasurementWidget::AddFigureToDataStorage(mitk::PlanarFi
 
     if (d->m_SelectedImageNode.IsNotNull())
     {
-        pMitkDataManager->GetDataStorage()->Add(newNode, d->m_SelectedImageNode);
+        GetDataStorage()->Add(newNode, d->m_SelectedImageNode);
     }
     else
     {
-        pMitkDataManager->GetDataStorage()->Add(newNode);
+        GetDataStorage()->Add(newNode);
     }
 
     for (auto &node : d->m_CurrentSelection)
@@ -462,7 +462,7 @@ mitk::DataNode::Pointer MeasurementWidget::DetectTopMostVisibleImage()
     auto isNotBinary = mitk::NodePredicateNot::New(isBinary);
     auto isNormalImage = mitk::NodePredicateAnd::New(isImage, isNotBinary);
 
-    auto images = pMitkDataManager->GetDataStorage()->GetSubset(isNormalImage);
+    auto images = GetDataStorage()->GetSubset(isNormalImage);
 
     mitk::DataNode::Pointer currentNode;
 
@@ -516,7 +516,7 @@ void MeasurementWidget::CheckForTopMostVisibleImage(mitk::DataNode* nodeToNeglec
     auto isHelpherObject = mitk::NodePredicateProperty::New("helper object", mitk::BoolProperty::New(true));
     auto isNotHelpherObject = mitk::NodePredicateNot::New(isHelpherObject);
 
-    auto nodeElements = pMitkDataManager->GetDataStorage()->GetSubset(isNotHelpherObject);
+    auto nodeElements = GetDataStorage()->GetSubset(isNotHelpherObject);
 
     if (d->m_SelectedImageNode.IsNotNull() && d->m_UnintializedPlanarFigure == false)
     {
@@ -745,7 +745,7 @@ void MeasurementWidget::NodeRemoved(const mitk::DataNode* node)
         nonConstNode->SetDataInteractor(nullptr);
 
     auto isPlanarFigure = mitk::TNodePredicateDataType<mitk::PlanarFigure>::New();
-    auto nodes = m_pMitkDataManager->GetDataStorage()->GetDerivations(node, isPlanarFigure);
+    auto nodes = GetDataStorage()->GetDerivations(node, isPlanarFigure);
 
     for (unsigned int x = 0; x < nodes->size(); ++x)
     {
@@ -757,7 +757,7 @@ void MeasurementWidget::NodeRemoved(const mitk::DataNode* node)
 
             if (!isFigureFinished) // if the property does not yet exist or is false, drop the datanode
             {
-                m_pMitkDataManager->GetDataStorage()->Remove(nodes->at(x));
+                GetDataStorage()->Remove(nodes->at(x));
 
                 if (!d->m_DataNodeToPlanarFigureData.empty())
                 {
@@ -792,7 +792,7 @@ void MeasurementWidget::SelectionChanged(const QList<mitk::DataNode::Pointer>& n
         d->m_SelectedImageLabel->setText("No visible image available.");
 
         auto isPlanarFigure = mitk::TNodePredicateDataType<mitk::PlanarFigure>::New();
-        auto planarFigures = m_pMitkDataManager->GetDataStorage()->GetSubset(isPlanarFigure);
+        auto planarFigures = GetDataStorage()->GetSubset(isPlanarFigure);
 
         // setting all planar figures which are not helper objects not selected
         for (mitk::DataStorage::SetOfObjects::ConstIterator it = planarFigures->Begin(); it != planarFigures->End(); ++it)
@@ -949,7 +949,7 @@ mitk::DataStorage::SetOfObjects::ConstPointer MeasurementWidget::GetAllPlanarFig
         auto isPlanarFigure = mitk::TNodePredicateDataType<mitk::PlanarFigure>::New();
         auto isNotHelperObject = mitk::NodePredicateProperty::New("helper object", mitk::BoolProperty::New(false));
         auto isNotHelperButPlanarFigure = mitk::NodePredicateAnd::New(isPlanarFigure, isNotHelperObject);
-        return pMitkDataManager->GetDataStorage()->GetSubset(isPlanarFigure);
+        return GetDataStorage()->GetSubset(isPlanarFigure);
     }    
 }
 

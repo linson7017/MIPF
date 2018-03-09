@@ -55,7 +55,7 @@ GrowcutView::~GrowcutView()
      }
 }
 
-void GrowcutView::Contructed(R* pR)
+void GrowcutView::Constructed()
 {
 	m_pSourceImageSelector = (QmitkDataStorageComboBox*)R::Instance()->getObjectFromGlobalMap("GrowcutSegmentation.ImageSelector");
 	if (m_pSourceImageSelector)
@@ -172,7 +172,7 @@ void GrowcutView::Init()
         //init seed image
         if (1)
         {
-            m_pMitkDataManager->GetDataStorage()->Remove(m_seedImageNode);
+            GetDataStorage()->Remove(m_seedImageNode);
             m_seedImageNode = mitk::DataNode::New();
             m_pMitkSegTool->CreateLabelSetImageNode(m_pSourceImageSelector->GetSelectedNode(), m_seedImageNode, "seed");
             mitk::LabelSetImage* labelImage = dynamic_cast<mitk::LabelSetImage*>(m_seedImageNode->GetData());

@@ -51,7 +51,7 @@ void VolumeVisualizationWidget::CreateView()
 
 void VolumeVisualizationWidget::Update(const char* szMessage, int iValue, void* pValue)
 {
-    if (strcmp(szMessage, MITK_MESSAGE_SELECTION_CHANGED) == 0)
+    if (strcmp(szMessage, MITK_MESSAGE_NODE_SELECTION_CHANGED) == 0)
     {
         IQF_MitkDataManager* pMitkDataManager = (IQF_MitkDataManager*)m_pMain->GetInterfacePtr(QF_MitkMain_DataManager);
         if(!pMitkDataManager)

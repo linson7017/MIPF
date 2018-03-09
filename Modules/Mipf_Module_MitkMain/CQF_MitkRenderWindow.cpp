@@ -4,7 +4,7 @@
 #include <mitkRenderingManager.h>
 #include <QmitkRenderWindow.h>
 
-CQF_MitkRenderWindow::CQF_MitkRenderWindow()
+CQF_MitkRenderWindow::CQF_MitkRenderWindow():m_DefaultMultiWidgetID("multi-widget-default")
 {
 
 }
@@ -24,38 +24,44 @@ void CQF_MitkRenderWindow::SetMitkRenderWindowSet(QSet<QmitkRenderWindow*> rende
     m_RenderWindows = renderWindows;
 }
 
-QmitkStdMultiWidget* CQF_MitkRenderWindow::GetMitkStdMultiWidget()
+QmitkStdMultiWidget* CQF_MitkRenderWindow::GetMitkStdMultiWidget(const QString& id)
 {
-    return m_StdMultiWidget;
+    QString tempID = id;
+    if (tempID.isEmpty())
+    {
+        tempID = m_DefaultMultiWidgetID;
+    }
+    return m_StdMultiWidgetMap.value(tempID, NULL);
 }
 
-void CQF_MitkRenderWindow::SetMitkStdMultiWidget(QmitkStdMultiWidget* stdMultiWidget)
-{
-    m_StdMultiWidget = stdMultiWidget;
+void CQF_MitkRenderWindow::SetMitkStdMultiWidget(QmitkStdMultiWidget* stdMultiWidget, const QString& id)
+{  
+    if (!stdMultiWidget)
+    {
+        return;
+    }
+    if (id.isEmpty())
+    {
+        m_StdMultiWidgetMap.insert(m_DefaultMultiWidgetID,stdMultiWidget);
+    }
+    else
+    {
+        m_StdMultiWidgetMap.insert(id, stdMultiWidget);
+    }
+    
     for (int i=0;i<4;i++)
     {
-        m_RenderWindows.insert(m_StdMultiWidget->GetRenderWindow(i));
+        m_RenderWindows.insert(stdMultiWidget->GetRenderWindow(i));
     }
-
-    m_RenderWindowMap.insert("axial", m_StdMultiWidget->GetRenderWindow1());
-    m_RenderWindowMap.insert("sagittal", m_StdMultiWidget->GetRenderWindow2());
-    m_RenderWindowMap.insert("coronal", m_StdMultiWidget->GetRenderWindow3());
-    m_RenderWindowMap.insert("3d", m_StdMultiWidget->GetRenderWindow4());
+    m_RenderWindowMap.insert(id+"-axial", stdMultiWidget->GetRenderWindow1());
+    m_RenderWindowMap.insert(id + "-sagittal", stdMultiWidget->GetRenderWindow2());
+    m_RenderWindowMap.insert(id + "-coronal", stdMultiWidget->GetRenderWindow3());
+    m_RenderWindowMap.insert(id + "-3d", stdMultiWidget->GetRenderWindow4());
 }
 
 mitk::RenderingManager* CQF_MitkRenderWindow::GetRenderingManager(QString name)
 {
     return mitk::RenderingManager::GetInstance();
-    /*QmitkRenderWindow* renderWindow = GetActiveMitkRenderWindow();
-
-    if (renderWindow)
-    {
-        return renderWindow->GetRenderer()->GetRenderingManager();
-    }
-    else
-    {
-        return NULL;
-    }*/
 }
 
 QmitkRenderWindow* CQF_MitkRenderWindow::GetActiveMitkRenderWindow()
@@ -96,32 +102,46 @@ void CQF_MitkRenderWindow::RemoveMitkRenderWindow(const QString& id)
     m_RenderWindowMap.remove(id);
 }
 
-void CQF_MitkRenderWindow::SetCrossHairVisibility(bool state)
+void CQF_MitkRenderWindow::SetCrossHairVisibility(bool state, const QString& id)
 {
-    if (m_StdMultiWidget)
+    if (id.isEmpty())
     {
-        mitk::DataNode *n;
-        if (this->m_StdMultiWidget)
+        foreach(QmitkStdMultiWidget* widget,m_StdMultiWidgetMap.values())
         {
-            n = this->m_StdMultiWidget->GetWidgetPlane1();
-            if (n)
-                n->SetVisibility(state);
-            n = this->m_StdMultiWidget->GetWidgetPlane2();
-            if (n)
-                n->SetVisibility(state);
-            n = this->m_StdMultiWidget->GetWidgetPlane3();
-            if (n)
-                n->SetVisibility(state);
-            GetRenderingManager()->RequestUpdateAll();
+            widget->GetWidgetPlane1()->SetVisibility(state);
+            widget->GetWidgetPlane2()->SetVisibility(state);
+            widget->GetWidgetPlane3()->SetVisibility(state);
         }
     }
+    else
+    {
+        QmitkStdMultiWidget* widget = m_StdMultiWidgetMap.value(id, NULL);
+        if (widget)
+        {
+            widget->GetWidgetPlane1()->SetVisibility(state);
+            widget->GetWidgetPlane2()->SetVisibility(state);
+            widget->GetWidgetPlane3()->SetVisibility(state);
+        }
+    }
+    GetRenderingManager()->RequestUpdateAll();
 }
 
-void CQF_MitkRenderWindow::ResetCrossHair()
+void CQF_MitkRenderWindow::ResetCrossHair(const QString& id)
 {
-    if (m_StdMultiWidget)
+    if (id.isEmpty())
     {
-        m_StdMultiWidget->ResetCrosshair();
+        foreach(QmitkStdMultiWidget* widget, m_StdMultiWidgetMap.values())
+        {
+            widget->ResetCrosshair();
+        }
+    }
+    else
+    {
+        QmitkStdMultiWidget* widget = m_StdMultiWidgetMap.value(id, NULL);
+        if (widget)
+        {
+            widget->ResetCrosshair();
+        }
     }
 }
 

@@ -75,7 +75,7 @@ void MitkSegmentation::Update(const char* szMessage, int iValue, void* pValue)
 		mitk::DataNode* node = (mitk::DataNode*)pValue;
 		NodeRemoved(node);
 	}
-	else  if (strcmp(szMessage, MITK_MESSAGE_SELECTION_CHANGED) == 0)
+	else  if (strcmp(szMessage, MITK_MESSAGE_NODE_SELECTION_CHANGED) == 0)
 	{
 		IQF_MitkDataManager* pDataManager = (IQF_MitkDataManager*)pValue;
 		if (pDataManager)
@@ -257,7 +257,7 @@ void MitkSegmentation::CreateNewSegmentation()
 							mitk::ToolManagerProvider::GetInstance()->GetToolManager()->GetWorkingData(0)->SetSelected(false);
 						}
 						emptySegmentation->SetSelected(true);
-						m_pMitkDataManager->GetDataStorage()->Add(emptySegmentation, node); // add as a child, because the segmentation "derives" from the original
+						GetDataStorage()->Add(emptySegmentation, node); // add as a child, because the segmentation "derives" from the original
 
 						this->ApplyDisplayOptions(emptySegmentation);
 						//this->FireNodeSelected(emptySegmentation);
@@ -342,7 +342,7 @@ void MitkSegmentation::OnSelectionChanged(std::vector<mitk::DataNode::Pointer> n
 				if (isASegmentation)
 				{
 					//If a segmentation is selected find a possible reference image:
-					mitk::DataStorage::SetOfObjects::ConstPointer sources = m_pMitkDataManager->GetDataStorage()->GetSources(selectedNode, m_IsAPatientImagePredicate);
+					mitk::DataStorage::SetOfObjects::ConstPointer sources = GetDataStorage()->GetSources(selectedNode, m_IsAPatientImagePredicate);
 					mitk::DataNode::Pointer refNode;
 					if (sources->Size() != 0)
 					{
@@ -352,7 +352,7 @@ void MitkSegmentation::OnSelectionChanged(std::vector<mitk::DataNode::Pointer> n
 						selectedNode->SetVisibility(true);
 						SetToolManagerSelection(refNode, selectedNode);
 
-						mitk::DataStorage::SetOfObjects::ConstPointer otherSegmentations = m_pMitkDataManager->GetDataStorage()->GetSubset(m_IsASegmentationImagePredicate);
+						mitk::DataStorage::SetOfObjects::ConstPointer otherSegmentations = GetDataStorage()->GetSubset(m_IsASegmentationImagePredicate);
 						for (mitk::DataStorage::SetOfObjects::const_iterator iter = otherSegmentations->begin(); iter != otherSegmentations->end(); ++iter)
 						{
 							mitk::DataNode* node = *iter;
@@ -360,7 +360,7 @@ void MitkSegmentation::OnSelectionChanged(std::vector<mitk::DataNode::Pointer> n
 								node->SetVisibility(false);
 						}
 
-						mitk::DataStorage::SetOfObjects::ConstPointer otherPatientImages = m_pMitkDataManager->GetDataStorage()->GetSubset(m_IsAPatientImagePredicate);
+						mitk::DataStorage::SetOfObjects::ConstPointer otherPatientImages = GetDataStorage()->GetSubset(m_IsAPatientImagePredicate);
 						for (mitk::DataStorage::SetOfObjects::const_iterator iter = otherPatientImages->begin(); iter != otherPatientImages->end(); ++iter)
 						{
 							mitk::DataNode* node = *iter;
@@ -370,7 +370,7 @@ void MitkSegmentation::OnSelectionChanged(std::vector<mitk::DataNode::Pointer> n
 					}
 					else
 					{
-						mitk::DataStorage::SetOfObjects::ConstPointer possiblePatientImages = m_pMitkDataManager->GetDataStorage()->GetSubset(m_IsAPatientImagePredicate);
+						mitk::DataStorage::SetOfObjects::ConstPointer possiblePatientImages = GetDataStorage()->GetSubset(m_IsAPatientImagePredicate);
 
 						for (mitk::DataStorage::SetOfObjects::ConstIterator it = possiblePatientImages->Begin(); it != possiblePatientImages->End(); it++)
 						{
@@ -381,7 +381,7 @@ void MitkSegmentation::OnSelectionChanged(std::vector<mitk::DataNode::Pointer> n
 								refNode->SetVisibility(true);
 								selectedNode->SetVisibility(true);
 
-								mitk::DataStorage::SetOfObjects::ConstPointer otherSegmentations = m_pMitkDataManager->GetDataStorage()->GetSubset(m_IsASegmentationImagePredicate);
+								mitk::DataStorage::SetOfObjects::ConstPointer otherSegmentations = GetDataStorage()->GetSubset(m_IsASegmentationImagePredicate);
 								for (mitk::DataStorage::SetOfObjects::const_iterator iter = otherSegmentations->begin(); iter != otherSegmentations->end(); ++iter)
 								{
 									mitk::DataNode* node = *iter;
@@ -389,7 +389,7 @@ void MitkSegmentation::OnSelectionChanged(std::vector<mitk::DataNode::Pointer> n
 										node->SetVisibility(false);
 								}
 
-								mitk::DataStorage::SetOfObjects::ConstPointer otherPatientImages = m_pMitkDataManager->GetDataStorage()->GetSubset(m_IsAPatientImagePredicate);
+								mitk::DataStorage::SetOfObjects::ConstPointer otherPatientImages = GetDataStorage()->GetSubset(m_IsAPatientImagePredicate);
 								for (mitk::DataStorage::SetOfObjects::const_iterator iter = otherPatientImages->begin(); iter != otherPatientImages->end(); ++iter)
 								{
 									mitk::DataNode* node = *iter;
@@ -441,7 +441,7 @@ void MitkSegmentation::OnPatientComboBoxSelectionChanged(const mitk::DataNode* n
 		mitk::DataNode* segNode = m_Controls->segImageSelector->GetSelectedNode();
 		if (segNode)
 		{
-			mitk::DataStorage::SetOfObjects::ConstPointer possibleParents = m_pMitkDataManager->GetDataStorage()->GetSources(segNode, m_IsAPatientImagePredicate);
+			mitk::DataStorage::SetOfObjects::ConstPointer possibleParents = GetDataStorage()->GetSources(segNode, m_IsAPatientImagePredicate);
 			bool isSourceNode(false);
 
 			for (mitk::DataStorage::SetOfObjects::ConstIterator it = possibleParents->Begin(); it != possibleParents->End(); it++)
@@ -504,7 +504,7 @@ void MitkSegmentation::OnSegmentationComboBoxSelectionChanged(const mitk::DataNo
 	}
 	else
 	{
-		mitk::DataStorage::SetOfObjects::ConstPointer possibleParents = m_pMitkDataManager->GetDataStorage()->GetSources(node, m_IsAPatientImagePredicate);
+		mitk::DataStorage::SetOfObjects::ConstPointer possibleParents = GetDataStorage()->GetSources(node, m_IsAPatientImagePredicate);
 
 		if (possibleParents->Size() == 1)
 		{
@@ -665,7 +665,7 @@ void MitkSegmentation::SetMultiWidget(QmitkStdMultiWidget* multiWidget)
 	if (m_Controls && m_MultiWidget)
 	{
 		mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
-		m_Controls->m_SlicesInterpolator->SetDataStorage(m_pMitkDataManager->GetDataStorage());
+		m_Controls->m_SlicesInterpolator->SetDataStorage(GetDataStorage());
 		QList<mitk::SliceNavigationController*> controllers;
 		controllers.push_back(m_MultiWidget->GetRenderWindow1()->GetSliceNavigationController());
 		controllers.push_back(m_MultiWidget->GetRenderWindow2()->GetSliceNavigationController());
@@ -749,7 +749,7 @@ void MitkSegmentation::ForceDisplayPreferencesUponAllImages()
 	if (referenceData.IsNotNull())
 	{
 		// iterate all images
-		mitk::DataStorage::SetOfObjects::ConstPointer allImages = m_pMitkDataManager->GetDataStorage()->GetSubset(m_IsASegmentationImagePredicate);
+		mitk::DataStorage::SetOfObjects::ConstPointer allImages = GetDataStorage()->GetSubset(m_IsASegmentationImagePredicate);
 
 		for (mitk::DataStorage::SetOfObjects::const_iterator iter = allImages->begin(); iter != allImages->end(); ++iter)
 
@@ -868,9 +868,9 @@ void MitkSegmentation::Activated()
 
 		//    m_Controls->m_SlicesInterpolator->Enable3DInterpolation( m_Controls->widgetStack->currentWidget() == m_Controls->pageManual );
 
-		mitk::DataStorage::SetOfObjects::ConstPointer segmentations = m_pMitkDataManager->GetDataStorage()->GetSubset(m_IsABinaryImagePredicate);
+		mitk::DataStorage::SetOfObjects::ConstPointer segmentations = GetDataStorage()->GetSubset(m_IsABinaryImagePredicate);
 
-		mitk::DataStorage::SetOfObjects::ConstPointer image = m_pMitkDataManager->GetDataStorage()->GetSubset(m_IsAPatientImagePredicate);
+		mitk::DataStorage::SetOfObjects::ConstPointer image = GetDataStorage()->GetSubset(m_IsAPatientImagePredicate);
 		if (!image->empty()) {
 			OnSelectionChanged(*image->begin());
 		}
@@ -1038,7 +1038,7 @@ void MitkSegmentation::NodeRemoved(const mitk::DataNode* node)
 	if (isSeg && !isHelperObject && image)
 	{
 		//First of all remove all possible contour markers of the segmentation
-		mitk::DataStorage::SetOfObjects::ConstPointer allContourMarkers = m_pMitkDataManager->GetDataStorage()->GetDerivations(node, mitk::NodePredicateProperty::New("isContourMarker"
+		mitk::DataStorage::SetOfObjects::ConstPointer allContourMarkers = GetDataStorage()->GetDerivations(node, mitk::NodePredicateProperty::New("isContourMarker"
 			, mitk::BoolProperty::New(true)));
 
 		/*ctkPluginContext* context = mitk::PluginActivator::getContext();
@@ -1053,7 +1053,7 @@ void MitkSegmentation::NodeRemoved(const mitk::DataNode* node)
 
 			//service->RemovePlanePosition(id);
 
-			m_pMitkDataManager->GetDataStorage()->Remove(it->Value());
+			GetDataStorage()->Remove(it->Value());
 		}
 
 		//context->ungetService(ppmRef);
@@ -1131,7 +1131,7 @@ void MitkSegmentation::CreateView()
 	m_Controls = new Ui::QmitkSegmentationControls;
 	m_Controls->setupUi(this);
 
-	m_Controls->patImageSelector->SetDataStorage(m_pMitkDataManager->GetDataStorage());
+	m_Controls->patImageSelector->SetDataStorage(GetDataStorage());
 	m_Controls->patImageSelector->SetPredicate(mitk::NodePredicateAnd::New(m_IsAPatientImagePredicate, mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object"))).GetPointer());
 
 	this->UpdateWarningLabel(tr("Please load an image"));
@@ -1139,7 +1139,7 @@ void MitkSegmentation::CreateView()
 	if (m_Controls->patImageSelector->GetSelectedNode().IsNotNull())
 		this->UpdateWarningLabel(tr("Select or create a new segmentation"));
 
-	m_Controls->segImageSelector->SetDataStorage(m_pMitkDataManager->GetDataStorage());
+	m_Controls->segImageSelector->SetDataStorage(GetDataStorage());
 	m_Controls->segImageSelector->SetPredicate(mitk::NodePredicateAnd::New(m_IsASegmentationImagePredicate, mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object"))).GetPointer());
 	if (m_Controls->segImageSelector->GetSelectedNode().IsNotNull())
 		this->UpdateWarningLabel("");
@@ -1147,7 +1147,7 @@ void MitkSegmentation::CreateView()
 	mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
 	assert(toolManager);
 
-	toolManager->SetDataStorage(*(m_pMitkDataManager->GetDataStorage()));
+	toolManager->SetDataStorage(*(GetDataStorage()));
 	toolManager->InitializeTools();
 
 	// all part of open source MITK

@@ -54,6 +54,14 @@ QMatrix4x4 CaculateMatrix(QList<QVector3D> points, QList<QVector3D> offset)
     return m;
 }
 
+double Distance(double* p1,double* p2)
+{
+    return sqrt((p1[0]-p2[0])*(p1[0] - p2[0])+
+        (p1[1] - p2[1])*(p1[1] - p2[1])+
+        (p1[2] - p2[2])*(p1[2] - p2[2]));
+
+}
+
 
 LankMarkExtractView::LankMarkExtractView()
 {
@@ -69,6 +77,8 @@ void LankMarkExtractView::CreateView()
     m_ui.setupUi(this);
 
     connect(m_ui.ExtractBtn, SIGNAL(clicked()), this, SLOT(Extract()));
+    connect(m_ui.AddModelBtn, SIGNAL(clicked()), this, SLOT(AddModel()));
+    connect(m_ui.RemoveModelBtn, SIGNAL(clicked()), this, SLOT(RemoveModel()));
 
     m_ui.ImageSelector->SetDataStorage(GetDataStorage());
     m_ui.ImageSelector->SetPredicate(mitk::NodePredicateDataType::New("Image"));
@@ -102,8 +112,15 @@ void LankMarkExtractView::CreateView()
     m_ui.ThresholdSlider->setMaximum(200000000);
     m_ui.ThresholdSlider->setMinimum(500);
     m_ui.ThresholdSlider->setMaximumValue(5000);
-    m_ui.ThresholdSlider->setMinimumValue(1800);
+    m_ui.ThresholdSlider->setMinimumValue(1800);       
 
+
+    m_ui.ModelList->setEditTriggers(QAbstractItemView::DoubleClicked);
+    m_ui.ModelList->setSelectionMode(QAbstractItemView::ExtendedSelection);
+    m_ui.ModelList->setSelectionBehavior(QAbstractItemView::SelectItems);
+    QStringList defaultModels;
+    defaultModels << "10.0,12.0,14.0"<<"7.0,9.0,11.0";
+    m_ui.ModelList->addItems(defaultModels);
 }
 
 void LankMarkExtractView::OnImageSelectionChanged(const mitk::DataNode *node)
@@ -118,101 +135,36 @@ void LankMarkExtractView::OnImageSelectionChanged(const mitk::DataNode *node)
 }
 
 
-double Distance(double* p1,double* p2)
-{
-    return sqrt((p1[0]-p2[0])*(p1[0] - p2[0])+
-        (p1[1] - p2[1])*(p1[1] - p2[1])+
-        (p1[2] - p2[2])*(p1[2] - p2[2]));
 
-}
 
 void LankMarkExtractView::Extract()
 {
     std::vector<std::vector<double>>  vecModelDistance;
-
-    double p0[] = { -19.0,-9.7,0 };
-    double p1[] = { 16.5,-3.7,0 };
-    double p2[] = { 0,-12.7,21.5 };
-    double p3[] = { 0,-6.7,-18 };
-
-
-    std::vector<double> vecModelOne;
-    vecModelOne.push_back(Distance(p0,p1));
-    vecModelOne.push_back(Distance(p0, p2));
-    vecModelOne.push_back(Distance(p0, p3));
-    vecModelDistance.push_back(vecModelOne);
-    std::vector<double> vecModelTwo;
-    vecModelTwo.push_back(10);
-    vecModelTwo.push_back(12);
-    vecModelTwo.push_back(14);
-    vecModelDistance.push_back(vecModelTwo);
-    std::vector<double> vecModelThree;
-    vecModelThree.push_back(7);
-    vecModelThree.push_back(9);
-    vecModelThree.push_back(11);
-    vecModelDistance.push_back(vecModelThree);
+    for (int i=0;i<m_ui.ModelList->count();i++)
+    {
+        QString str = m_ui.ModelList->item(i)->text();
+        if (str.isEmpty())
+        {
+            continue;
+        }
+        QStringList distanceList = str.split(QRegExp("[^\\d\.]"));
+        qDebug() << distanceList;
+        if (distanceList.size()>2)
+        {
+            std::vector<double> vecModel;
+            foreach(QString distance, distanceList)
+            {
+                vecModel.push_back(distance.toDouble());
+            }
+            vecModelDistance.push_back(vecModel);
+        }
+    }
 
     mitk::Image* mitkImage = dynamic_cast<mitk::Image*>(m_ui.ImageSelector->GetSelectedNode()->GetData());
     LandMarkExtractor extractor;
     std::vector<LandMarkPoint> results = LandMarkExtractor::ExtractLandMarks(mitkImage, vecModelDistance, 3.0, 
         m_ui.ThresholdSlider->minimumValue(),m_ui.ThresholdSlider->maximumValue(),
         m_ui.XCutRate->value(), m_ui.YCutRate->value(), m_ui.ZCutRate->value());
-
-    QList<QVector3D> block;
-    QList<QVector3D> offset;
-    block.append(QVector3D(results[0].Coord.GetElement(0), results[0].Coord.GetElement(1), results[0].Coord.GetElement(2)));
-    block.append(QVector3D(results[1].Coord.GetElement(0), results[1].Coord.GetElement(1), results[1].Coord.GetElement(2)));
-    block.append(QVector3D(results[2].Coord.GetElement(0), results[2].Coord.GetElement(1), results[2].Coord.GetElement(2)));
-    block.append(QVector3D(results[3].Coord.GetElement(0), results[3].Coord.GetElement(1), results[3].Coord.GetElement(2)));
-    offset.append(QVector3D(-4.5, -7, -2));
-    offset.append(QVector3D(-4.5, -14, -2));
-    offset.append(QVector3D(-4.5, 5, -2));
-    offset.append(QVector3D(-15.5, -7, -2));
-
-    QMatrix4x4 m = CaculateMatrix(block, offset);
-
-    //////////////////////////////
-    vtkSmartPointer<vtkPolyData> linesPolyData =
-        vtkSmartPointer<vtkPolyData>::New();
-
-    QVector3D origin = m.column(3).toVector3D();
-    QVector3D px = origin + m.column(0).toVector3D() * 10;
-    QVector3D py = origin + m.column(1).toVector3D() * 10;
-    QVector3D pz = origin + m.column(2).toVector3D() * 10;
-
-
-    for (int i=0;i<4;i++)
-    {
-        /* vtkSmartPointer<vtkPoints> pts =
-             vtkSmartPointer<vtkPoints>::New();
-         vtkSmartPointer<vtkCellArray> vertices =
-             vtkSmartPointer<vtkCellArray>::New();
-         vtkIdType pid[1];
-         pid[0] = pts->InsertNextPoint(results[i].Coord.GetElement(0), results[i].Coord.GetElement(1), results[i].Coord.GetElement(2));
-         vertices->InsertNextCell(1, pid);
- */
- // Add the points to the polydata container
-      /*  auto pointPolyData = vtkSmartPointer<vtkPolyData>::New();
-        pointPolyData->SetPoints(pts);
-        pointPolyData->SetVerts(vertices);*/
-
-        vtkSmartPointer<vtkSphereSource> sphereSource =
-            vtkSmartPointer<vtkSphereSource>::New();
-        sphereSource->SetCenter(results[i].Coord.GetElement(0), results[i].Coord.GetElement(1), results[i].Coord.GetElement(2));
-        sphereSource->SetRadius(1.0);
-        sphereSource->Update();
-
-        
-
-        QString pointName = QString("Point%1").arg(i);
-        mitk::DataNode::Pointer node = ImportVtkPolyData(sphereSource->GetOutput(), pointName.toStdString().c_str());
-    }
-    // Create a vtkPoints container and store the points in it
-    
-
-    ////////////////////////////
-
-
 
     for (int i=0;i<results.size();i++)
     {
@@ -221,4 +173,18 @@ void LankMarkExtractView::Extract()
     }
     return;
 
+}
+
+
+void LankMarkExtractView::AddModel()
+{
+    QListWidgetItem* item = new QListWidgetItem("Please input model");
+    item->setFlags(item->flags()|Qt::ItemIsEditable);
+    item->setSelected(true);
+    m_ui.ModelList->addItem(item);
+}
+
+void LankMarkExtractView::RemoveModel()
+{
+    m_ui.ModelList->takeItem(m_ui.ModelList->currentRow());
 }

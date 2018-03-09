@@ -31,7 +31,7 @@ void ImageHoleFillingView::CreateView()
 {
     m_ui.setupUi(this);
     m_ui.ImageSelector->SetPredicate(CreatePredicate(Image));
-    m_ui.ImageSelector->SetDataStorage(m_pMitkDataManager->GetDataStorage());
+    m_ui.ImageSelector->SetDataStorage(GetDataStorage());
     connect(m_ui.FillHoles, SIGNAL(clicked()), this, SLOT(FillHoles()));
 }
 
@@ -83,7 +83,7 @@ void ImageHoleFillingView::FillHoles()
     filledHoleImageNode->SetProperty("binary", mitk::BoolProperty::New(true));
     filledHoleImageNode->SetName(imageName.toStdString());
 
-    m_pMitkDataManager->GetDataStorage()->Add(filledHoleImageNode);
+    GetDataStorage()->Add(filledHoleImageNode);
 
 }
 

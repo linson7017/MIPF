@@ -19,10 +19,14 @@ public:
     ~ThresholdImageView();
     void CreateView();
     WndHandle GetPluginHandle();
-    protected slots:
+protected:
+    void showEvent(QShowEvent *event);
+    void hideEvent(QHideEvent *event);
+protected slots:
     void ThresholdChanged(double minValue, double maxValue);
     void Export();
     void SelectionChanged(const mitk::DataNode* node);
+    void VisibleChanged(bool visible);
 
 private:
     Ui::ThresholdImageView m_ui;

@@ -13,8 +13,8 @@ public:
 
     bool Init();
     const char* GetID();
-    void Register(R* pR);
-	void Constructed(R* pR);
+    void Register();
+	void Constructed();
 private:
     GrowcutView* m_pGrowcutView;
 };

@@ -169,9 +169,9 @@ void SFLSSegmentationView::CreateView()
     mitk::NodePredicateAnd::Pointer isImageNotBinary = mitk::NodePredicateAnd::New(isImage, isNotBinary);
     mitk::NodePredicateAnd::Pointer isImageAndBinary = mitk::NodePredicateAnd::New(isImage, isBinary);
 
-    m_Controls->cmbbxOriginalImageSelector->SetDataStorage(m_pMitkDataManager->GetDataStorage());
+    m_Controls->cmbbxOriginalImageSelector->SetDataStorage(GetDataStorage());
     m_Controls->cmbbxOriginalImageSelector->SetPredicate(isImageNotBinary);
-    m_Controls->cmbbxLabelImageSelector->SetDataStorage(m_pMitkDataManager->GetDataStorage());
+    m_Controls->cmbbxLabelImageSelector->SetDataStorage(GetDataStorage());
     m_Controls->cmbbxLabelImageSelector->SetPredicate(isImageAndBinary);
 
 

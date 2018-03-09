@@ -13,7 +13,9 @@
 #include "mitkCommon.h"
 #include "mitkDataInteractor.h"
 #include <mitkImage.h>
-#include <QMatrix4x4>
+
+#include <vtkSmartPointer.h>
+#include <vtkVector.h>
 
 #include "qf_config.h"
 
@@ -23,11 +25,14 @@ class QF_API ImageInteractor : public mitk::DataInteractor
 public:
     mitkClassMacro(ImageInteractor, mitk::DataInteractor);
     itkFactorylessNewMacro(Self) itkCloneMacro(Self)
-        void SetDataNode(mitk::DataNode *dataNode);
-
-    void SetTransformMatrix(const QMatrix4x4& matrix);
-    QMatrix4x4 GetTransformMatrix();
+    void SetDataNode(mitk::DataNode *dataNode);
     void Reset();
+    vtkMatrix4x4* GetTransform();
+    void SetTransform(vtkMatrix4x4* data);
+
+    //event
+    typedef mitk::Message1<vtkMatrix4x4*> MatrixChangeEventType;
+    MatrixChangeEventType TransformChangedEvent;
 protected:
     ImageInteractor();
     ~ImageInteractor();
@@ -42,8 +47,8 @@ private:
 
     void Init();
     void RefreshDataGeometry();
-    void Translate(const QVector3D& translate);
-    void Rotate(double angle, const QVector3D& normal);
+    void Translate(const vtkVector3d& translate);
+    void Rotate(double angle, const vtkVector3d& normal);
 
 
     mitk::Image::Pointer m_imageData;
@@ -52,9 +57,9 @@ private:
     mitk::Point3D m_LastPoint;
     mitk::Vector3D m_SumVec;
 
-    vtkMatrix4x4* m_originMatrix;
+    vtkSmartPointer<vtkMatrix4x4> m_originMatrix;
     mitk::Point3D m_originCenter;
-    QMatrix4x4 m_transformMatrix;
+    vtkSmartPointer<vtkTransform> m_transform;
     bool m_bInitFlag;
 };
 

@@ -27,13 +27,13 @@ const char* Mipf_Plugin_Growcut_Activator::GetID()
     return Mipf_Plugin_Growcut_Activator_ID; 
 }
 
-void Mipf_Plugin_Growcut_Activator::Register(R* pR)
+void Mipf_Plugin_Growcut_Activator::Register()
 {
-    m_pGrowcutView->InitResource(pR); 
+    m_pGrowcutView->InitResource(); 
    // pR->registerCustomWidget("GrowcutView", m_pGrowcutView); 
 }
 
-void Mipf_Plugin_Growcut_Activator::Constructed(R* pR)
+void Mipf_Plugin_Growcut_Activator::Constructed()
 {
-	m_pGrowcutView->Contructed(pR);
+	m_pGrowcutView->Constructed();
 }

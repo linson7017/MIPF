@@ -40,7 +40,7 @@ const char* MitkStdWidgets_Activator::GetID()
     return MitkStdWidgets_Activator_ID;
 }
 
-void MitkStdWidgets_Activator::Register(R* pR)
+void MitkStdWidgets_Activator::Register()
 {
     //数据管理插件
     REGISTER_QOBJECT("DataManagerWidget", DataManagerWidget);
@@ -70,6 +70,6 @@ void MitkStdWidgets_Activator::Register(R* pR)
 
 
 
-  //  m_pImageStatisticsWidget->InitResource(pR);
+  //  m_pImageStatisticsWidget->InitResource();
   //  pR->registerCustomWidget("ImageStatisticsWidget", m_pImageStatisticsWidget);
 }

@@ -1,5 +1,6 @@
 #include "TubularTrackingViewActivator.h"
 #include "TubularTrackingView.h"
+#include "Utils/PluginFactory.h"
 
 
 QF_API QF::IQF_Activator* QF::QF_CreatePluginActivator(QF::IQF_Main* pMain)
@@ -18,7 +19,6 @@ TubularTrackingView_Activator::TubularTrackingView_Activator(QF::IQF_Main* pMain
 
 bool TubularTrackingView_Activator::Init()
 {
-    m_pView = new TubularTrackingView(m_pMain);
     return true;
 }
 
@@ -27,7 +27,7 @@ const char* TubularTrackingView_Activator::GetID()
     return SliceBySliceTrackingView_Activator_ID;
 }
 
-void TubularTrackingView_Activator::Register(R* pR)
+void TubularTrackingView_Activator::Register()
 {
-    m_pView->InitResource(pR);
+    REGISTER_PLUGIN("TubularTracking", TubularTrackingView);
 }

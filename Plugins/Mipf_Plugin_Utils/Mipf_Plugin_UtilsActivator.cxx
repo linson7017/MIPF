@@ -43,7 +43,7 @@ const char* Mipf_Plugin_Utils_Activator::GetID()
     return Mipf_Plugin_Utils_Activator_ID;
 }
 
-void Mipf_Plugin_Utils_Activator::Register(R* pR)
+void Mipf_Plugin_Utils_Activator::Register()
 {
     REGISTER_QOBJECT("LargestConnectedComponentExtractWidget", LargestConnectedComponentView);
     REGISTER_QOBJECT("SurfaceExtractWidget", SurfaceExtractView);

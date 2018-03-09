@@ -85,7 +85,7 @@ void LargestConnectedComponentView::Extract()
     resultImageNode->SetProperty("volumerendering", mitk::BoolProperty::New(true));
     resultImageNode->SetName(imageName.toStdString());
 
-    m_pMitkDataManager->GetDataStorage()->Add(resultImageNode);
+    GetDataStorage()->Add(resultImageNode);
 
     RequestRenderWindowUpdate();
 }

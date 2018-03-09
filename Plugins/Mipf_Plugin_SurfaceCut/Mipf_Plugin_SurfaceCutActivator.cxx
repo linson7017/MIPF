@@ -38,7 +38,7 @@ const char* Mipf_Plugin_SurfaceCut_Activator::GetID()
     return Mipf_Plugin_SurfaceCut_Activator_ID; 
 }
 
-void Mipf_Plugin_SurfaceCut_Activator::Register(R* pR)
+void Mipf_Plugin_SurfaceCut_Activator::Register()
 {
     REGISTER_QOBJECT("SurfaceCutWidget", SurfaceCutView);
     REGISTER_QOBJECT("SurfaceConnectedWidget", SurfaceConnectedView);

@@ -133,7 +133,7 @@ m_TimeStepperAdapter(NULL)
 
 void BasicImageProcessView::Update(const char* szMessage, int iValue, void* pValue)
 {
-    if (strcmp(szMessage, MITK_MESSAGE_SELECTION_CHANGED) == 0)
+    if (strcmp(szMessage, MITK_MESSAGE_NODE_SELECTION_CHANGED) == 0)
     {
         //do what you want for the message
         OnSelectionChanged(GetCurrentSelection());

@@ -42,14 +42,15 @@
 #include "usGetModuleContext.h"
 #include "usModuleContext.h"
 #include <usModuleInitialization.h>
-#include "ImageNavigationInteractor.h"
+#include "Interactions/ImageInteractor.h"
 
 
 ImageRegistrationView::ImageRegistrationView():MitkPluginView(), m_FixedImageNode(NULL),m_MovingImageNode(NULL), m_bInited(false),
 m_EventConfig("DisplayConfigMITK.xml"), m_ScrollEnabled(true)
 {
 
-    m_registrationMatrix.setToIdentity();
+    m_registrationMatrix = vtkMatrix4x4::New();
+    m_registrationMatrix->Identity();
 
     qRegisterMetaType<QfResult>("QfResult");
 }
@@ -119,7 +120,7 @@ void ImageRegistrationView::DoRegistration()
     Float3DImagePointerType itkMovingImage = Float3DImageType::New();
     mitk::CastToItkImage<Float3DImageType>(dynamic_cast<mitk::Image *>(m_MovingImageNode->GetData()), itkMovingImage);
 
-    if (!m_bInited || !m_pMitkDataManager->GetDataStorage()->GetNamedNode("DisplayMoving") || !m_pMitkDataManager->GetDataStorage()->GetNamedNode("DisplayFixed"))
+    if (!m_bInited || !GetDataStorage()->GetNamedNode("DisplayMoving") || !GetDataStorage()->GetNamedNode("DisplayFixed"))
     {
         InitRegistration();
     }
@@ -129,15 +130,18 @@ void ImageRegistrationView::DoRegistration()
     QMatrix4x4 qm;
     qm.setToIdentity();
     //QMatrix4x4 initMatrix = m_registrationMatrix;
-    QMatrix4x4 initMatrix = static_cast<ImageNavigationInteractor*>(m_movingImageInteractor.GetPointer())->GetTransformMatrix();
+    auto initMatrix = vtkSmartPointer<vtkMatrix4x4>::New();
+    initMatrix->DeepCopy(static_cast<ImageInteractor*>(m_movingImageInteractor.GetPointer())->GetTransform());
     if (m_ui.AlignCenterCB->isChecked())
     {
-        initMatrix.setToIdentity();
+        initMatrix->Identity();
         mitk::Point3D movingImageCenter = m_MovingImageNode->GetData()->GetGeometry()->GetCenter();
         mitk::Point3D fixedImageCenter = m_FixedImageNode->GetData()->GetGeometry()->GetCenter();
-        initMatrix.translate(fixedImageCenter[0] - movingImageCenter[0],
+        auto translate = vtkSmartPointer<vtkTransform>::New();
+        translate->Translate(fixedImageCenter[0] - movingImageCenter[0],
             fixedImageCenter[1] - movingImageCenter[1],
             fixedImageCenter[2] - movingImageCenter[2]);
+        vtkMatrix4x4::Multiply4x4(translate->GetMatrix(), initMatrix, initMatrix);
     }
 
     ///////////////Normal Version///////////////////////////
@@ -186,7 +190,10 @@ void ImageRegistrationView::DoRegistration()
 
     //start registration
     m_RegistrationThread->start();
-    emit SignalDoRegistration(itkFixedImage, itkMovingImage, initMatrix.inverted());
+    auto tempMatrix = vtkSmartPointer<vtkMatrix4x4>::New();
+
+    initMatrix->Invert();
+    emit SignalDoRegistration(itkFixedImage, itkMovingImage, initMatrix.Get());
 }
 
 void ImageRegistrationView::OnFixedImageSelectionChanged(const mitk::DataNode* node)
@@ -204,7 +211,7 @@ void ImageRegistrationView::OnMovingImageSelectionChanged(const mitk::DataNode* 
 void ImageRegistrationView::SlotRegistrationIterationEnd(const itk::Matrix<double, 4, 4>& result)
 {
     
-    mitk::DataNode* displayNode = m_pMitkDataManager->GetDataStorage()->GetNamedNode("DisplayMoving");
+    mitk::DataNode* displayNode = GetDataStorage()->GetNamedNode("DisplayMoving");
     if (!displayNode || !displayNode->GetData())
     {
         return;
@@ -214,12 +221,11 @@ void ImageRegistrationView::SlotRegistrationIterationEnd(const itk::Matrix<doubl
     vtkMatrix4x4* transform = vtkMatrix4x4::New();
     vtkMatrix4x4* rm = vtkMatrix4x4::New();
 
-    MatrixUtil::VnlMatrixToVtkMatrix(matrix, transform);
-    MatrixUtil::VtkMatrixToQMatrix(transform, m_registrationMatrix);
-    static_cast<ImageNavigationInteractor*>(m_movingImageInteractor.GetPointer())->SetTransformMatrix(m_registrationMatrix);
+    MatrixUtil::VnlMatrixToVtkMatrix(matrix, m_registrationMatrix);
+    static_cast<ImageInteractor*>(m_movingImageInteractor.GetPointer())->SetTransform(m_registrationMatrix);
 
-    vtkMatrix4x4::Multiply4x4(transform, m_originMatrix, rm);      
-    UpdataRegistrationText(*transform);
+    vtkMatrix4x4::Multiply4x4(m_registrationMatrix, m_originMatrix, rm);
+    UpdataRegistrationText(*m_registrationMatrix);
     if (displayNode != NULL)
     {
         displayNode->GetData()->GetGeometry()->SetIndexToWorldTransformByVtkMatrix(rm);
@@ -265,8 +271,8 @@ void ImageRegistrationView::InitRegistration()
     m_FixedImageNode->SetVisibility(false);
     m_MovingImageNode->SetVisibility(false);
 
-    m_pMitkDataManager->GetDataStorage()->Remove(m_pMitkDataManager->GetDataStorage()->GetNamedNode("DisplayMoving"));
-    m_pMitkDataManager->GetDataStorage()->Remove(m_pMitkDataManager->GetDataStorage()->GetNamedNode("DisplayFixed"));
+    GetDataStorage()->Remove(GetDataStorage()->GetNamedNode("DisplayMoving"));
+    GetDataStorage()->Remove(GetDataStorage()->GetNamedNode("DisplayFixed"));
     //display  moving image
     mitk::DataNode::Pointer displayMovingNode = mitk::DataNode::New();
     mitk::Image::Pointer mitkDisplayMovingImage = mitk::Image::New();
@@ -284,7 +290,7 @@ void ImageRegistrationView::InitRegistration()
     {
         std::string configpath = m_pMain->GetConfigPath();
         configpath.append("/mitk/Interactions/");
-        m_movingImageInteractor = ImageNavigationInteractor::New();
+        m_movingImageInteractor = ImageInteractor::New();
         m_movingImageInteractor->LoadStateMachine(configpath + "ImageNavigation.xml");
         m_movingImageInteractor->SetEventConfig(configpath + "ImageNavigationConfig.xml");
         m_movingImageInteractor->SetDataNode(displayMovingNode);
@@ -307,8 +313,8 @@ void ImageRegistrationView::InitRegistration()
     m_originMatrix = vtkMatrix4x4::New();
     m_originMatrix->DeepCopy(mitkDisplayMovingImage->GetGeometry()->GetVtkMatrix());
 
-    m_pMitkDataManager->GetDataStorage()->Add(displayFixedNode);
-    m_pMitkDataManager->GetDataStorage()->Add(displayMovingNode);
+    GetDataStorage()->Add(displayFixedNode);
+    GetDataStorage()->Add(displayMovingNode);
     
 
     //init to fixed and moving image
@@ -321,8 +327,8 @@ void ImageRegistrationView::EndRegistration()
 {
     m_FixedImageNode->SetVisibility(true);
     m_MovingImageNode->SetVisibility(true);
-    m_pMitkDataManager->GetDataStorage()->Remove(m_pMitkDataManager->GetDataStorage()->GetNamedNode("DisplayMoving"));
-    m_pMitkDataManager->GetDataStorage()->Remove(m_pMitkDataManager->GetDataStorage()->GetNamedNode("DisplayFixed"));
+    GetDataStorage()->Remove(GetDataStorage()->GetNamedNode("DisplayMoving"));
+    GetDataStorage()->Remove(GetDataStorage()->GetNamedNode("DisplayFixed"));
 
     m_movingImageInteractor = NULL;
 
@@ -383,7 +389,7 @@ void ImageRegistrationView::Reset()
     //{
     //    return;
     //}
-    mitk::DataNode* displayNode = m_pMitkDataManager->GetDataStorage()->GetNamedNode("DisplayMoving");
+    mitk::DataNode* displayNode = GetDataStorage()->GetNamedNode("DisplayMoving");
     if (displayNode)
     {
         displayNode->GetData()->GetGeometry()->SetIndexToWorldTransformByVtkMatrix(m_originMatrix);
@@ -391,8 +397,8 @@ void ImageRegistrationView::Reset()
         mitk::RenderingManager::GetInstance()->InitializeViews(m_FixedImageNode->GetData()->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true);
         RequestRenderWindowUpdate();
     }
-    m_registrationMatrix.setToIdentity();
-    static_cast<ImageNavigationInteractor*>(m_movingImageInteractor.GetPointer())->SetTransformMatrix(m_registrationMatrix);
+    m_registrationMatrix->Identity();
+    static_cast<ImageInteractor*>(m_movingImageInteractor.GetPointer())->SetTransform(m_registrationMatrix);
 }
 
 void ImageRegistrationView::Stop()
@@ -435,7 +441,7 @@ void ImageRegistrationView::SlotReslutImageGenerated(const Float3DImagePointerTy
     resultImageNode->SetVisibility(true);
     resultImageNode->Update();
 
-    m_pMitkDataManager->GetDataStorage()->Add(resultImageNode);
+    GetDataStorage()->Add(resultImageNode);
     RequestRenderWindowUpdate();
 }
 

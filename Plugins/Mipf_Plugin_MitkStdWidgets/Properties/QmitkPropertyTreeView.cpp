@@ -62,7 +62,7 @@ QmitkPropertyTreeView::~QmitkPropertyTreeView()
 
 void QmitkPropertyTreeView::Update(const char* szMessage, int iValue /* = 0 */, void* pValue /* = 0 */)
 {
-        if (strcmp(szMessage,MITK_MESSAGE_SELECTION_CHANGED)==0)
+        if (strcmp(szMessage,MITK_MESSAGE_NODE_SELECTION_CHANGED)==0)
         {
             std::vector<mitk::DataNode::Pointer> select = m_pMitkDataManager->GetSelectedNodes();
             QList< mitk::DataNode::Pointer> qSelect;

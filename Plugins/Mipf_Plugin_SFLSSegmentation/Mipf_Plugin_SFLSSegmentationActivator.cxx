@@ -26,7 +26,7 @@ const char* Mipf_Plugin_SFLSSegmentation_Activator::GetID()
     return Mipf_Plugin_SFLSSegmentation_Activator_Activator_ID; 
 }
 
-void Mipf_Plugin_SFLSSegmentation_Activator::Register(R* pR)
+void Mipf_Plugin_SFLSSegmentation_Activator::Register()
 {
     REGISTER_PLUGIN("SFLSSegmentationWidget", SFLSSegmentationView);
 }

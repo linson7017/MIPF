@@ -28,9 +28,9 @@ const char* Mipf_Plugin_VesselSegmentation_Activator::GetID()
     return Mipf_Plugin_VesselSegmentation_Activator_ID; 
 }
 
-void Mipf_Plugin_VesselSegmentation_Activator::Register(R* pR)
+void Mipf_Plugin_VesselSegmentation_Activator::Register()
 {
-   // m_pVesselSegmentationView->InitResource(pR); 
+   // m_pVesselSegmentationView->InitResource(); 
    // pR->registerCustomWidget("VesselSegmentationView", m_pVesselSegmentationView); 
     REGISTER_QOBJECT("VesselSegmentationWidget", VesselSegmentationView);
 }

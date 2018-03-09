@@ -26,9 +26,9 @@
 #include "vtkAppendPolyData.h"
 #include "vtkSphereSource.h"
 
-SliceBySliceTrackingView::SliceBySliceTrackingView(QF::IQF_Main* pMain):PluginView(pMain)
+SliceBySliceTrackingView::SliceBySliceTrackingView():MitkPluginView()
 {
-    m_pMain->Attach(this);
+
 }
 
 
@@ -100,26 +100,7 @@ void SliceBySliceTrackingView::Update(const char* szMessage, int iValue, void* p
     }
     else if (strcmp(szMessage, MITK_MESSAGE_MULTIWIDGET_INITIALIZED) == 0)
     {
-        IQF_MitkRenderWindow* pRenderWindow = (IQF_MitkRenderWindow*)m_pMain->GetInterfacePtr(QF_MitkMain_RenderWindow);
-        if (pRenderWindow)
-        {
-            m_PointListWidget = new QmitkPointListWidget();
-
-            m_PointSet = mitk::PointSet::New();
-            mitk::DataNode::Pointer pointSetNode = mitk::DataNode::New();
-            pointSetNode->SetData(m_PointSet);
-            pointSetNode->SetName("seed points for tracking");
-            pointSetNode->SetProperty("helper object", mitk::BoolProperty::New(true));
-            pointSetNode->SetProperty("layer", mitk::IntProperty::New(1024));
-
-            // add the pointset to the data storage (for rendering and access by other modules)
-            IQF_MitkDataManager* pMitkDataStorage = (IQF_MitkDataManager*)m_pMain->GetInterfacePtr("QF_MitkMain_DataManager");
-            pMitkDataStorage->GetDataStorage()->Add(pointSetNode);
-            // tell the GUI widget about the point set
-            m_PointListWidget->SetPointSetNode(pointSetNode);  
-            m_PointListWidget->SetMultiWidget(pRenderWindow->GetMitkStdMultiWidget());
-            m_pR->registerCustomWidget("SliceBySliceTrackingSeedWidget", m_PointListWidget);
-        }     
+          
     }
 }
 
@@ -202,27 +183,42 @@ void SliceBySliceTrackingView::ShowResults(std::vector< std::vector<Vector3> > g
         IQF_MitkDataManager* pMitkDataStorage = (IQF_MitkDataManager*)m_pMain->GetInterfacePtr("QF_MitkMain_DataManager");
         if (pMitkDataStorage)
         {
-            pMitkDataStorage->GetDataStorage()->Add(lineNode, pMitkDataStorage->GetCurrentNode());
-            pMitkDataStorage->GetDataStorage()->Add(pointsNode, pMitkDataStorage->GetCurrentNode());
+            GetDataStorage()->Add(lineNode, pMitkDataStorage->GetCurrentNode());
+            GetDataStorage()->Add(pointsNode, pMitkDataStorage->GetCurrentNode());
             mitk::RenderingManager::GetInstance()->RequestUpdateAll();
         }
     }
 }
 
-void SliceBySliceTrackingView::InitResource(R* pR)
+void SliceBySliceTrackingView::SetupResource()
 {
-    m_pR = pR;
-    
-}
-
-
-void SliceBySliceTrackingView::Constructed(R* pR)
-{
-    QmitkDataStorageComboBox* selector = (QmitkDataStorageComboBox*)m_pR->getObjectFromGlobalMap("SliceBySliceTracking.DataSelector");
+    m_pMain->Attach(this);
+    QmitkDataStorageComboBox* selector = (QmitkDataStorageComboBox*)R::Instance()->getObjectFromGlobalMap("SliceBySliceTracking.DataSelector");
     if (selector)
     {
         IQF_MitkDataManager* pMitkDataStorage = (IQF_MitkDataManager*)m_pMain->GetInterfacePtr("QF_MitkMain_DataManager");
-        selector->SetDataStorage(pMitkDataStorage->GetDataStorage());
+        selector->SetDataStorage(GetDataStorage());
         selector->SetPredicate(mitk::TNodePredicateDataType<mitk::Image>::New());
     }
+    IQF_MitkRenderWindow* pRenderWindow = (IQF_MitkRenderWindow*)m_pMain->GetInterfacePtr(QF_MitkMain_RenderWindow);
+    if (pRenderWindow)
+    {
+        m_PointListWidget = (QmitkPointListWidget*)R::Instance()->getObjectFromGlobalMap("SliceBySliceTracking.PointListWidget");
+        m_PointListWidget = new QmitkPointListWidget();
+
+        m_PointSet = mitk::PointSet::New();
+        mitk::DataNode::Pointer pointSetNode = mitk::DataNode::New();
+        pointSetNode->SetData(m_PointSet);
+        pointSetNode->SetName("seed points for tracking");
+        pointSetNode->SetProperty("helper object", mitk::BoolProperty::New(true));
+        pointSetNode->SetProperty("layer", mitk::IntProperty::New(1024));
+
+        // add the pointset to the data storage (for rendering and access by other modules)
+        IQF_MitkDataManager* pMitkDataStorage = (IQF_MitkDataManager*)m_pMain->GetInterfacePtr("QF_MitkMain_DataManager");
+        GetDataStorage()->Add(pointSetNode);
+        // tell the GUI widget about the point set
+        m_PointListWidget->SetPointSetNode(pointSetNode);
+        m_PointListWidget->SetMultiWidget(pRenderWindow->GetMitkStdMultiWidget());
+    }
 }
+

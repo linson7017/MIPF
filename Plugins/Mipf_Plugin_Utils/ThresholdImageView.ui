@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>87</height>
+    <height>150</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,13 +16,16 @@
   <widget class="QWidget" name="verticalLayoutWidget">
    <property name="geometry">
     <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>401</width>
-     <height>81</height>
+     <x>10</x>
+     <y>10</y>
+     <width>381</width>
+     <height>121</height>
     </rect>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout">
+    <property name="sizeConstraint">
+     <enum>QLayout::SetDefaultConstraint</enum>
+    </property>
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
@@ -38,13 +41,49 @@
      </layout>
     </item>
     <item>
-     <widget class="ctkRangeWidget" name="ThresholdSlider" native="true"/>
-    </item>
-    <item>
-     <widget class="QPushButton" name="ExportBtn">
-      <property name="text">
-       <string>Export</string>
+     <widget class="QWidget" name="WorkWidget" native="true">
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>150</height>
+       </size>
       </property>
+      <widget class="QWidget" name="verticalLayoutWidget_2">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>-1</y>
+         <width>401</width>
+         <height>91</height>
+        </rect>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_2">
+        <item>
+         <widget class="ctkRangeWidget" name="ThresholdSlider" native="true"/>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="VisibleCB">
+          <property name="text">
+           <string>visible</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="ExportBtn">
+          <property name="text">
+           <string>Export</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <zorder>ExportBtn</zorder>
+      <zorder>ThresholdSlider</zorder>
+      <zorder>VisibleCB</zorder>
+      <zorder>ExportBtn</zorder>
+      <zorder>ThresholdSlider</zorder>
+      <zorder>VisibleCB</zorder>
+      <zorder>verticalLayoutWidget_2</zorder>
      </widget>
     </item>
    </layout>

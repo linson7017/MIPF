@@ -4,7 +4,8 @@
 
 #include "iqf_main.h"
 
-CQF_MitkDataManager::CQF_MitkDataManager(QF::IQF_Main* pMain):m_pMain(pMain), m_DataStorage(nullptr)
+CQF_MitkDataManager::CQF_MitkDataManager(QF::IQF_Main* pMain):m_pMain(pMain),
+m_DefaultDataStorageID("datastorage-default")
 {
     //Init();
 }
@@ -16,66 +17,98 @@ CQF_MitkDataManager::~CQF_MitkDataManager()
 
 void CQF_MitkDataManager::Init()
 {
-    if (!m_DataStorage)
+    if (m_DataStorageMap.empty())
     {
-        m_DataStorage = mitk::StandaloneDataStorage::New();
+        mitk::DataStorage::Pointer defaultDataStorage = mitk::StandaloneDataStorage::New();
+        m_DataStorageMap[m_DefaultDataStorageID] = defaultDataStorage;
+        RelateDataStorage(defaultDataStorage);
+    }   
+}
+
+void CQF_MitkDataManager::SetDataStorage(mitk::DataStorage::Pointer dataStorage, const std::string& id)
+{
+    if (dataStorage.IsNull())
+    {
+        return;
     }
-    RelateDataStorage();
+     if (id.empty())
+     {
+         //remove defalut datastorage
+         /*DataStorageMapType::iterator it = m_DataStorageMap.find(m_DefaultDataStorageID);
+         if (it!=m_DataStorageMap.end())
+         {
+             it->second->Delete();
+             m_DataStorageMap.erase(it);
+         }*/
+         m_DataStorageMap[m_DefaultDataStorageID] = dataStorage;
+     }
+     else
+     {
+         m_DataStorageMap[id] = dataStorage;
+     }
+     RelateDataStorage(dataStorage);
 }
 
-void CQF_MitkDataManager::SetDataStorage(mitk::DataStorage::Pointer dataStorage)
+void CQF_MitkDataManager::RelateDataStorage(mitk::DataStorage::Pointer pDataStorage)
 {
-    m_DataStorage = dataStorage;
-}
-
-void CQF_MitkDataManager::RelateDataStorage()
-{
-
-    m_DataStorage->ChangedNodeEvent.AddListener(
+    pDataStorage->ChangedNodeEvent.AddListener(
         mitk::MessageDelegate1<CQF_MitkDataManager, const mitk::DataNode *>(this, &CQF_MitkDataManager::OnNodeChanged));
-    m_DataStorage->RemoveNodeEvent.AddListener(
+    pDataStorage->RemoveNodeEvent.AddListener(
         mitk::MessageDelegate1<CQF_MitkDataManager, const mitk::DataNode *>(this, &CQF_MitkDataManager::OnNodeRemoved));
-    m_DataStorage->AddNodeEvent.AddListener(
+    pDataStorage->AddNodeEvent.AddListener(
         mitk::MessageDelegate1<CQF_MitkDataManager, const mitk::DataNode *>(this, &CQF_MitkDataManager::OnNodeAdded));
-    m_DataStorage->DeleteNodeEvent.AddListener(
+    pDataStorage->DeleteNodeEvent.AddListener(
         mitk::MessageDelegate1<CQF_MitkDataManager, const mitk::DataNode *>(this, &CQF_MitkDataManager::OnNodeDeleted));
-    m_DataStorage->InteractorChangedNodeEvent.AddListener(
+    pDataStorage->InteractorChangedNodeEvent.AddListener(
         mitk::MessageDelegate1<CQF_MitkDataManager, const mitk::DataNode *>(this, &CQF_MitkDataManager::OnNodeInteractorChanged));
 }
 
 
-mitk::DataStorage::Pointer CQF_MitkDataManager::GetDataStorage()
+mitk::DataStorage::Pointer CQF_MitkDataManager::GetDataStorage(const std::string& id)
 {
-    return m_DataStorage;
+    std::string temp=id;
+    if (temp.empty())
+    {
+        temp = m_DefaultDataStorageID;
+    }
+    DataStorageMapType::iterator it = m_DataStorageMap.find(temp);
+    if (it != m_DataStorageMap.end())
+    {
+        return it->second;
+    }
+    else
+    {
+        return NULL;
+    }
 }
 
-void CQF_MitkDataManager::SetSelectedNode(std::vector<mitk::DataNode::Pointer> selectNodes)
+void CQF_MitkDataManager::SetSelectedNode(std::vector<mitk::DataNode::Pointer> selectNodes, const std::string& id)
 {
     m_SelectedNodes = selectNodes;
 }
 
-std::vector<mitk::DataNode::Pointer> CQF_MitkDataManager::GetSelectedNodes()
+std::vector<mitk::DataNode::Pointer> CQF_MitkDataManager::GetSelectedNodes(const std::string& id)
 {
     return m_SelectedNodes;
 }
 
 
-void CQF_MitkDataManager::SetNodeSet(std::list<mitk::DataNode::Pointer> nodeSet)
+void CQF_MitkDataManager::SetNodeSet(std::list<mitk::DataNode::Pointer> nodeSet, const std::string& id)
 {
     m_NodeSet = nodeSet;
 }
 
-std::list<mitk::DataNode::Pointer> CQF_MitkDataManager::GetNodeSet()
+std::list<mitk::DataNode::Pointer> CQF_MitkDataManager::GetNodeSet(const std::string& id)
 {
     return m_NodeSet;
 }
 
-void CQF_MitkDataManager::ClearNodeSet()
+void CQF_MitkDataManager::ClearNodeSet(const std::string& id)
 {
     m_NodeSet.clear();
 }
 
-mitk::DataNode::Pointer CQF_MitkDataManager::GetCurrentNode()
+mitk::DataNode::Pointer CQF_MitkDataManager::GetCurrentNode(const std::string& id)
 {
     if (m_SelectedNodes.size() > 0)
     {

@@ -26,7 +26,7 @@ const char* Mipf_Plugin_ASM_Activator::GetID()
     return Mipf_Plugin_ASM_Activator_ID; 
 }
 
-void Mipf_Plugin_ASM_Activator::Register(R* pR)
+void Mipf_Plugin_ASM_Activator::Register()
 {
     REGISTER_PLUGIN("ASMWidget", ASMView);
 }

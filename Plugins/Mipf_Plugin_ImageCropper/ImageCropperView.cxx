@@ -71,7 +71,7 @@ ImageCropperView::~ImageCropperView()
 
 void ImageCropperView::Update(const char* szMessage, int iValue, void* pValue)
 {
-    if (strcmp(szMessage, MITK_MESSAGE_SELECTION_CHANGED) == 0)
+    if (strcmp(szMessage, MITK_MESSAGE_NODE_SELECTION_CHANGED) == 0)
     {
         //do what you want for the message
         OnSelectionChanged(GetCurrentSelection());
@@ -82,7 +82,7 @@ void ImageCropperView::CreateView()
 {
     m_Controls.setupUi(this);
 
-    m_Controls.boundingShapeSelector->SetDataStorage(m_pMitkDataManager->GetDataStorage());
+    m_Controls.boundingShapeSelector->SetDataStorage(GetDataStorage());
     m_Controls.boundingShapeSelector->SetPredicate(mitk::NodePredicateAnd::New(
         mitk::TNodePredicateDataType<mitk::GeometryData>::New(),
         mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object"))));
@@ -203,9 +203,9 @@ void ImageCropperView::DoCreateNewBoundingObject()
         m_CroppingObjectNode->AddProperty("handle size factor", mitk::DoubleProperty::New(1.0 / 40.0));
         m_CroppingObjectNode->SetBoolProperty("pickable", true);
 
-        if (!m_pMitkDataManager->GetDataStorage()->Exists(m_CroppingObjectNode))
+        if (!GetDataStorage()->Exists(m_CroppingObjectNode))
         {
-            m_pMitkDataManager->GetDataStorage()->Add(m_CroppingObjectNode, m_ImageNode);
+            GetDataStorage()->Add(m_CroppingObjectNode, m_ImageNode);
             m_Controls.boundingShapeSelector->SetSelectedNode(m_CroppingObjectNode);
             m_CroppingObjectNode->SetVisibility(true);
             m_BoundingShapeInteractor->EnableInteraction(true);
@@ -218,7 +218,7 @@ void ImageCropperView::DoCreateNewBoundingObject()
     tempDataStorage->InsertElement(0, m_CroppingObjectNode);
 
     // initialize the views to the bounding geometry
-    /*mitk::TimeGeometry::Pointer bounds = m_pMitkDataManager->GetDataStorage()->ComputeBoundingGeometry3D(tempDataStorage);
+    /*mitk::TimeGeometry::Pointer bounds = GetDataStorage()->ComputeBoundingGeometry3D(tempDataStorage);
     mitk::RenderingManager::GetInstance()->InitializeViews(bounds);
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();*/
 }
@@ -328,9 +328,9 @@ void ImageCropperView::ProcessImage(bool mask)
             //add cropping result to the current data storage as child node to the image node
             if (!m_Controls.checkOverwriteImage->isChecked())
             {
-                if (!m_pMitkDataManager->GetDataStorage()->Exists(croppedImageNode))
+                if (!GetDataStorage()->Exists(croppedImageNode))
                 {
-                    m_pMitkDataManager->GetDataStorage()->Add(croppedImageNode, m_ImageNode);
+                    GetDataStorage()->Add(croppedImageNode, m_ImageNode);
                 }
             }
             else // original image will be overwritten by the result image and the bounding box of the result is adjusted
@@ -342,7 +342,7 @@ void ImageCropperView::ProcessImage(bool mask)
                 tempDataStorage->InsertElement(0, node);
 
                 // initialize the views to the bounding geometry
-                mitk::TimeGeometry::Pointer bounds = m_pMitkDataManager->GetDataStorage()->ComputeBoundingGeometry3D(tempDataStorage);
+                mitk::TimeGeometry::Pointer bounds = GetDataStorage()->ComputeBoundingGeometry3D(tempDataStorage);
                 mitk::RenderingManager::GetInstance()->InitializeViews(bounds);
                 mitk::RenderingManager::GetInstance()->RequestUpdateAll();
             }
@@ -377,9 +377,9 @@ void ImageCropperView::ProcessImage(bool mask)
                     croppedImageNode->SetProperty("color", mitk::ColorProperty::New(1.0, 0.0, 0.0));
                     croppedImageNode->SetProperty("opacity", mitk::FloatProperty::New(0.4));
                     croppedImageNode->SetProperty("layer", mitk::IntProperty::New(99)); // arbitrary, copied from segmentation functionality
-                    if (!m_pMitkDataManager->GetDataStorage()->Exists(croppedImageNode))
+                    if (!GetDataStorage()->Exists(croppedImageNode))
                     {
-                        m_pMitkDataManager->GetDataStorage()->Add(croppedImageNode, m_ImageNode);
+                        GetDataStorage()->Add(croppedImageNode, m_ImageNode);
                     }
                 }
                 else // original image will be overwritten by the result image and the bounding box of the result is adjusted
@@ -391,7 +391,7 @@ void ImageCropperView::ProcessImage(bool mask)
                     tempDataStorage->InsertElement(0, node);
 
                     // initialize the views to the bounding geometry
-                    mitk::TimeGeometry::Pointer bounds = m_pMitkDataManager->GetDataStorage()->ComputeBoundingGeometry3D(tempDataStorage);
+                    mitk::TimeGeometry::Pointer bounds = GetDataStorage()->ComputeBoundingGeometry3D(tempDataStorage);
                     mitk::RenderingManager::GetInstance()->InitializeViews(bounds);
                     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
                 }

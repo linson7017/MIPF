@@ -22,19 +22,20 @@ public:
     virtual void AddMitkRenderWindow(QmitkRenderWindow* renderWindow, const QString& id);
     virtual void RemoveMitkRenderWindow(const QString& id);
 
-    virtual QmitkStdMultiWidget* GetMitkStdMultiWidget();
-    virtual void SetMitkStdMultiWidget(QmitkStdMultiWidget* stdMultiWidget);
+    virtual QmitkStdMultiWidget* GetMitkStdMultiWidget(const QString& id = "");
+    virtual void SetMitkStdMultiWidget(QmitkStdMultiWidget* stdMultiWidget, const QString& id = "");
     virtual mitk::RenderingManager* GetRenderingManager(QString name="");
     virtual QmitkRenderWindow* GetActiveMitkRenderWindow();
 
-    virtual void SetCrossHairVisibility(bool state);
+    virtual void SetCrossHairVisibility(bool state, const QString& id = "");
 
-    virtual void ResetCrossHair();
+    virtual void ResetCrossHair(const QString& id = "");
 
     virtual void Reinit(mitk::DataNode* node);
 private:
     QSet<QmitkRenderWindow*> m_RenderWindows;
     QHash<QString, QmitkRenderWindow*> m_RenderWindowMap;
-    QmitkStdMultiWidget* m_StdMultiWidget;
+    QHash<QString, QmitkStdMultiWidget*> m_StdMultiWidgetMap;
+    QString m_DefaultMultiWidgetID;
 };
 #endif // CQF_MitkRenderWindow_h__

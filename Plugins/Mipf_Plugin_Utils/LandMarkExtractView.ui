@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>399</width>
+    <width>400</width>
     <height>524</height>
    </rect>
   </property>
@@ -19,7 +19,7 @@
      <x>10</x>
      <y>10</y>
      <width>381</width>
-     <height>391</height>
+     <height>501</height>
     </rect>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout">
@@ -158,6 +158,27 @@
        </layout>
       </widget>
      </widget>
+    </item>
+    <item>
+     <widget class="QListWidget" name="ModelList"/>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_4">
+      <item>
+       <widget class="QPushButton" name="AddModelBtn">
+        <property name="text">
+         <string>+</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="RemoveModelBtn">
+        <property name="text">
+         <string>-</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </item>
     <item>
      <widget class="QPushButton" name="ExtractBtn">

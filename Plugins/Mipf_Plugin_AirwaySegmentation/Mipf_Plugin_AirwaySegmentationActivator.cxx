@@ -28,7 +28,7 @@ const char* Mipf_Plugin_AirwaySegmentation_Activator::GetID()
     return Mipf_Plugin_AirwaySegmentation_Activator_Activator_ID; 
 }
 
-void Mipf_Plugin_AirwaySegmentation_Activator::Register(R* pR)
+void Mipf_Plugin_AirwaySegmentation_Activator::Register()
 {
     REGISTER_QOBJECT("AirwaySegmentationWidget", AirwaySegmentationView);
 }

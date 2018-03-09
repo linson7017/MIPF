@@ -15,10 +15,10 @@
 #include "MitkMain/IQF_MitkInit.h"
 
 
-
+#include "SplashWindow.h"
 #include "iqf_main.h"
 
-MainWindow::MainWindow(const char* xmlfile)
+MainWindow::MainWindow(const char* xmlfile, SplashWindow* pSplashWindow) :m_pSplashWindow(pSplashWindow)
 {
     m_pMain = (QF::IQF_Main*)app_env::getMainPtr();
     m_pMain->Attach(this);
@@ -86,6 +86,11 @@ void MainWindow::SetupWidgets(const char* xmlfile)
     IQF_MitkInit* pMitkInit = (IQF_MitkInit*)m_pMain->GetInterfacePtr(QF_MitkMain_Init);
     pMitkInit->Init(nullptr);
 
+    if (m_pSplashWindow)
+    {
+        m_pSplashWindow->showMessage("Startup window ...");
+    }
     setContentView(xmlfile);
+    
     R::Instance()->Constructed();
 }

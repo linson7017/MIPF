@@ -41,8 +41,15 @@ bool CQF_MainCommand::ExecuteCommand(const char* szCommandID, QF::IQF_Properties
 {
     if (strcmp(szCommandID, MITK_MAIN_COMMAND_LOADDATA) == 0)
     {
-        IQF_MitkReference* pMitkReference = (IQF_MitkReference*)m_pMain->GetInterfacePtr(QF_MitkMain_Reference);
+        std::string datastorageID = pInParam->GetStringProperty("DataStorage","");
         IQF_MitkDataManager* pMitkDataManager = (IQF_MitkDataManager*)m_pMain->GetInterfacePtr(QF_MitkMain_DataManager);
+        mitk::DataStorage::Pointer pDataStorage = pMitkDataManager->GetDataStorage(datastorageID);
+        if (pDataStorage.IsNull())
+        {
+            MITK_INFO << "Data storage with id \""<<datastorageID<<"\" does not exist!";
+            return false;
+        }
+        IQF_MitkReference* pMitkReference = (IQF_MitkReference*)m_pMain->GetInterfacePtr(QF_MitkMain_Reference);
         QString defaultOpenFilePath = pMitkReference->GetString("LastOpenDirectory");
 
         QStringList fileNames = QFileDialog::getOpenFileNames(NULL, "Open",
@@ -52,14 +59,14 @@ bool CQF_MainCommand::ExecuteCommand(const char* szCommandID, QF::IQF_Properties
             return false;
         try
         {
-            QmitkIOUtil::Load(fileNames, *pMitkDataManager->GetDataStorage());           
+            QmitkIOUtil::Load(fileNames, *pDataStorage);
         }
         catch (const mitk::Exception& e)
         {
             MITK_INFO << e;
             return false;
         }
-        mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(pMitkDataManager->GetDataStorage());
+        mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(pDataStorage);
         pMitkReference->SetString("LastOpenDirectory", QFileInfo(fileNames.back()).absolutePath().toStdString().c_str());
         return true;
     }
@@ -79,36 +86,29 @@ bool CQF_MainCommand::ExecuteCommand(const char* szCommandID, QF::IQF_Properties
     }
     else if (strcmp(szCommandID, MITK_MAIN_COMMAND_ENABLE_VTK_WARNING) == 0)
     {
-        if (pInParam)
+        if (pInParam->HasProperty("EnableVtkWarning"))
         {
-            vtkObject::SetGlobalWarningDisplay(pInParam->GetProperty("EnableVtkWarning")->GetBool());
+            vtkObject::SetGlobalWarningDisplay(pInParam->GetProperty("EnableVtkWarning")->GetBool());  
         }
         else
         {
-            MITK_ERROR << "Command does not pass property EnableVtkWarning!";
-        }
+            vtkObject::SetGlobalWarningDisplay(vtkObject::GetGlobalWarningDisplay());
+        }   
         return true;
     }
     else if (strcmp(szCommandID, MITK_MAIN_COMMAND_CHANGE_CROSSHAIR_GAP_SIZE)==0)
     {
         MITK_INFO << "MITK_MAIN_COMMAND_CHANGE_CROSSHAIR_GAP_SIZE";
-        if (pInParam)
+        IQF_MitkRenderWindow* pMitkRenderWindow = (IQF_MitkRenderWindow*)m_pMain->GetInterfacePtr(QF_MitkMain_RenderWindow);
+        if (pMitkRenderWindow)
         {
-            IQF_MitkRenderWindow* pMitkRenderWindow = (IQF_MitkRenderWindow*)m_pMain->GetInterfacePtr(QF_MitkMain_RenderWindow);
-            if (pMitkRenderWindow)
+            QmitkStdMultiWidget* pMultiWidget = pMitkRenderWindow->GetMitkStdMultiWidget(pInParam->GetStringProperty("MultiViewID",""));
+            if (pMultiWidget)
             {
-                QmitkStdMultiWidget* pMultiWidget = pMitkRenderWindow->GetMitkStdMultiWidget();
-                if (pMultiWidget)
-                {
-                    pMultiWidget->GetWidgetPlane1()->SetIntProperty("Crosshair.Gap Size", pInParam->GetProperty("CrosshairGapSize")->GetInt());
-                    pMultiWidget->GetWidgetPlane2()->SetIntProperty("Crosshair.Gap Size", pInParam->GetProperty("CrosshairGapSize")->GetInt());
-                    pMultiWidget->GetWidgetPlane3()->SetIntProperty("Crosshair.Gap Size", pInParam->GetProperty("CrosshairGapSize")->GetInt());
-                    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-                }
-                else
-                {
-                    return false;
-                }
+                pMultiWidget->GetWidgetPlane1()->SetIntProperty("Crosshair.Gap Size", pInParam->GetProperty("CrosshairGapSize")->GetInt());
+                pMultiWidget->GetWidgetPlane2()->SetIntProperty("Crosshair.Gap Size", pInParam->GetProperty("CrosshairGapSize")->GetInt());
+                pMultiWidget->GetWidgetPlane3()->SetIntProperty("Crosshair.Gap Size", pInParam->GetProperty("CrosshairGapSize")->GetInt());
+                mitk::RenderingManager::GetInstance()->RequestUpdateAll();
             }
             else
             {
@@ -117,9 +117,68 @@ bool CQF_MainCommand::ExecuteCommand(const char* szCommandID, QF::IQF_Properties
         }
         else
         {
-            MITK_ERROR << "Command does not pass property CrosshairGapSize!";
+            return false;
         }
         return true;
+    }
+    else if (strcmp(szCommandID, MITK_MAIN_COMMAND_CHANGE_MULTIVIEW_LAYOUT) == 0)
+    {
+        IQF_MitkRenderWindow* pRenderWindow = (IQF_MitkRenderWindow*)m_pMain->GetInterfacePtr(QF_MitkMain_RenderWindow);
+        if (pRenderWindow)
+        {
+            QmitkStdMultiWidget* pMultiWidget = pRenderWindow->GetMitkStdMultiWidget(pInParam->GetStringProperty("MultiViewID",""));
+            if (pMultiWidget)
+            {
+                switch (pInParam->GetProperty("LayoutMode")->GetInt())
+                {
+                case 0:
+                    pMultiWidget->changeLayoutToDefault();
+                    return true;
+                case 1:
+                    pMultiWidget->changeLayoutToWidget1();
+                    return true;
+                case 2:
+                    pMultiWidget->changeLayoutToWidget2();
+                    return true;
+                case 3:
+                    pMultiWidget->changeLayoutToWidget3();
+                    return true;
+                case 4:
+                    pMultiWidget->changeLayoutToBig3D();
+                    return true;
+                default:
+                    return false;
+                }    
+            }
+            else
+            {
+                return false;
+            }
+        }
+        else 
+        {
+            return false;
+        }
+    }
+    else if (strcmp(szCommandID, MITK_MAIN_COMMAND_RESET_MULTIVIEW) == 0)
+    {
+        IQF_MitkRenderWindow* pRenderWindow = (IQF_MitkRenderWindow*)m_pMain->GetInterfacePtr(QF_MitkMain_RenderWindow);
+        if (pRenderWindow)
+        {
+            if (pRenderWindow->GetMitkStdMultiWidget())
+            {
+                QmitkStdMultiWidget* pMultiWidget = pRenderWindow->GetMitkStdMultiWidget(pInParam->GetStringProperty("MultiViewID", ""));
+                pMultiWidget->ResetCrosshair();
+            }
+            else
+            {
+                return false;
+            }
+        }
+        else
+        {
+            return false;
+        }
     }
     else
     {
@@ -129,7 +188,7 @@ bool CQF_MainCommand::ExecuteCommand(const char* szCommandID, QF::IQF_Properties
 
 int CQF_MainCommand::GetCommandCount()
 {
-    return 4;
+    return 6;
 }
 
 const char* CQF_MainCommand::GetCommandID(int iIndex)
@@ -144,6 +203,10 @@ const char* CQF_MainCommand::GetCommandID(int iIndex)
         return MITK_MAIN_COMMAND_CHANGE_CROSSHAIR_GAP_SIZE;
     case 3:
         return MITK_MAIN_COMMAND_VOLUME_VISUALIZATION;
+    case 4:
+        return MITK_MAIN_COMMAND_CHANGE_MULTIVIEW_LAYOUT;
+    case 5:
+        return MITK_MAIN_COMMAND_RESET_MULTIVIEW;
     default:
         return "";
         break;

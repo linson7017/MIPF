@@ -1,5 +1,6 @@
 #include "LandMarkExtractor.h"
 #include <algorithm>
+#include <numeric>
 
 
 #include "mitkImage.h"
@@ -234,20 +235,26 @@ std::vector<LandMarkPoint> LandMarkExtractor::ExtractLandMarks(const mitk::Image
     double error = 0.4;
     for (int i = 0; i < landMarkPoints.size(); i++)
     {
-        //landMarkPoints[i].SortDistanceMap();
-        // landMarkPoints[i].PrintSelf();
         for (int j = 0; j < vModelDistance.size(); j++)
         {
-            std::pair<int, double> map1, map2, map3;
-            double v1, v2, v3;
-            if (landMarkPoints[i].ContainDistance(vModelDistance[j][0], map1, v1, error) &&
-                landMarkPoints[i].ContainDistance(vModelDistance[j][1], map2, v2, error) &&
-                landMarkPoints[i].ContainDistance(vModelDistance[j][2], map3, v3, error))
+            bool fitted = true;
+            std::vector< std::pair<int, double> >  maps;
+            std::vector<double> vs;
+            for (int k=0;k<vModelDistance[j].size();k++)
             {
-                landMarkPoints[i].GroupMember.push_back(map1.first);
-                landMarkPoints[i].GroupMember.push_back(map2.first);
-                landMarkPoints[i].GroupMember.push_back(map3.first);
-                landMarkPoints[i].CentricGrade = 1.0 / (v1 + v2 + v3);
+                std::pair<int, double> map;
+                double v;
+                fitted &= landMarkPoints[i].ContainDistance(vModelDistance[j][k], map, v, error);
+                maps.push_back(map);
+                vs.push_back(v);
+            }
+            if (fitted)
+            {
+                for (std::vector< std::pair<int, double> >::iterator it=maps.begin();it!=maps.end();it++)
+                {
+                    landMarkPoints[i].GroupMember.push_back(it->first);
+                }
+                landMarkPoints[i].CentricGrade = 1.0 / (std::accumulate(vs.begin(),vs.end(),0.0));
                 landMarkPoints[i].Centric = true;
                 landMarkPoints[i].GroupID = j;
             }

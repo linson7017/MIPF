@@ -37,7 +37,7 @@
 				<ComboBoxItem text="Brightest Point"/>
 			</ComboBox>
 		</HLayout>
-		<SliceBySliceTrackingSeedWidget height="300"/>
+		<QmitkPointListWidget id="SliceBySliceTracking.PointListWidget" height="300"/>
 		<Stretch size="200"/>
 	</VLayout>
 </Widget>

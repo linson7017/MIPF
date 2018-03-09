@@ -28,8 +28,8 @@ const char* Mipf_Plugin_ImageCropper_Activator::GetID()
     return Mipf_Plugin_ImageCropper_Activator_Activator_ID; 
 }
 
-void Mipf_Plugin_ImageCropper_Activator::Register(R* pR)
+void Mipf_Plugin_ImageCropper_Activator::Register()
 {
-    m_pImageCropperView->InitResource(pR); 
-    pR->registerCustomWidget("ImageCropperWidget", m_pImageCropperView);
+    m_pImageCropperView->InitResource(); 
+    R::Instance()->registerCustomWidget("ImageCropperWidget", m_pImageCropperView);
 }

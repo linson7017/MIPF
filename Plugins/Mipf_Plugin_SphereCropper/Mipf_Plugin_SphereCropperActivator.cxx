@@ -26,7 +26,7 @@ const char* Mipf_Plugin_SphereCropper_Activator::GetID()
     return Mipf_Plugin_SphereCropper_Activator_ID; 
 }
 
-void Mipf_Plugin_SphereCropper_Activator::Register(R* pR)
+void Mipf_Plugin_SphereCropper_Activator::Register()
 {
-    REGISTER_PLUGIN("SphereCropperView", SphereCropperView);
+    REGISTER_PLUGIN("SphereCropperWidget", SphereCropperView);
 }

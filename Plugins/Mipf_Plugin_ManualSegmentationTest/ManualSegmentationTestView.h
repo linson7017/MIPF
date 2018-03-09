@@ -14,7 +14,7 @@ class ManualSegmentationTestView :public QObject, public MitkPluginView
 public:
     ManualSegmentationTestView(QF::IQF_Main* pMain);
 
-    void Constructed(R* pR);
+    void Constructed();
 protected:
     virtual void Update(const char* szMessage, int iValue = 0, void* pValue = 0);
 

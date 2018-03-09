@@ -29,14 +29,14 @@ const char* ImageRegistrationView_Activator::GetID()
     return ImageRegistrationView_Activator_ID;
 }
 
-void ImageRegistrationView_Activator::Register(R* pR)
+void ImageRegistrationView_Activator::Register()
 {
-    //m_pView->InitResource(pR);
+    //m_pView->InitResource();
     REGISTER_QOBJECT("ImageRegistrationWidget", ImageRegistrationView);
 
 }
 
-void ImageRegistrationView_Activator::Constructed(R* pR)
+void ImageRegistrationView_Activator::Constructed()
 {
    // m_pView->ResourceConstructed(pR);
 }

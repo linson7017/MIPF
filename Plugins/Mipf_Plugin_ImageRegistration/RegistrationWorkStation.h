@@ -3,10 +3,11 @@
 
 #include <QObject>
 #include "ITKImageTypeDef.h"
-#include <QMatrix4x4>
+#include "vtkMatrix4x4.h"
 #include "Registration_Base.h"
 #include "QfResult.h"
 #include "ItkNotifier.h"
+
 
 #pragma once
 class RegistrationWorkStation:public QObject
@@ -33,7 +34,7 @@ public:
     void SetOnlyTranslation(bool onlyTranslation) { m_onlyTranslation = onlyTranslation; }
     bool GetOnlyTranslation() { return m_onlyTranslation; }
 public slots:
-    void SlotDoRegistration(const Float3DImagePointerType fixedImage, const Float3DImagePointerType movingImage, QMatrix4x4 initTransformMatrix);
+    void SlotDoRegistration(const Float3DImagePointerType fixedImage, const Float3DImagePointerType movingImage, vtkMatrix4x4* initTransformMatrix);
     void SlotRegistrationIterationEnd(const itk::Matrix<double, 4, 4>& result);
     void SlotRegistrationFinished(const QfResult& result);
     void SlotStopRegistration();

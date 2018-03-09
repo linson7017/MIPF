@@ -73,6 +73,9 @@ namespace ITKHelpers
     template <class TInput, class TOutput>
     void ExtractCentroidImageWithGivenSize(TInput* input, TOutput* output, int* outputSize);
 
+    template <class TImageType>
+    void BinaryFillLargeHolesByRegionGrowing(TImageType* input, TImageType* output,itk::Index<TImageType::ImageDimension> seed);
+
     QF_API std::vector<itk::Index<3> > DilatePixelList(const std::vector<itk::Index<3> >& pixelList,
         const itk::ImageRegion<3>& region, const unsigned int radius);
 

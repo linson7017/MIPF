@@ -152,8 +152,11 @@ void RenderWindow::wheelEvent(QWheelEvent *e)
             currentSlice >= GetSliceNavigationController()->GetSlice()->GetRangeMin())
         {
             GetSliceNavigationController()->GetSlice()->SetPos(currentSlice);
-            QString info = QString("Slice: %1").arg(currentSlice);
-            m_annotation->SetText(0, info.toStdString().c_str());
+            if (m_annotation)
+            {
+                QString info = QString("Slice: %1").arg(currentSlice);
+                m_annotation->SetText(0, info.toStdString().c_str());
+            } 
         }     
     }
     QmitkRenderWindow::wheelEvent(e);

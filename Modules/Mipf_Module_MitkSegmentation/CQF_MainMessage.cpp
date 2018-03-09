@@ -33,7 +33,7 @@ const char* CQF_MainMessage::GetMessageID(int iIndex)
     switch (iIndex)
     {
     case 0:
-        return MITK_MESSAGE_SELECTION_CHANGED;
+        return MITK_MESSAGE_NODE_SELECTION_CHANGED;
     case 1:
         return MITK_MESSAGE_NODE_ADDED;
     case 2:
@@ -45,7 +45,7 @@ const char* CQF_MainMessage::GetMessageID(int iIndex)
 
 void CQF_MainMessage::OnMessage(const char* szMessage, int iValue, void *pValue)
 {
-    if (strcmp(szMessage, MITK_MESSAGE_SELECTION_CHANGED)==0)
+    if (strcmp(szMessage, MITK_MESSAGE_NODE_SELECTION_CHANGED)==0)
     {
         IQF_MitkDataManager* pDataManager = (IQF_MitkDataManager*)pValue;
     }

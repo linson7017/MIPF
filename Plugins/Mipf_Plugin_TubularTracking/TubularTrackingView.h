@@ -1,17 +1,17 @@
 #ifndef SliceBySliceTrackingView_h__
 #define SliceBySliceTrackingView_h__
 
-#include "PluginView.h"
+#include "MitkPluginView.h"
 #include "mitkPointSet.h"
 #include "mitkDataNode.h"
 #include "Vector3.h"
 
 class QmitkPointListWidget;
-class TubularTrackingView : public PluginView
+class TubularTrackingView : public MitkPluginView
 {
 public:
-    TubularTrackingView(QF::IQF_Main* pMain);
-    void InitResource(R* pR);
+    TubularTrackingView();
+    void InitResource();
 protected:
     virtual void Update(const char* szMessage, int iValue = 0, void* pValue = 0);
 private:

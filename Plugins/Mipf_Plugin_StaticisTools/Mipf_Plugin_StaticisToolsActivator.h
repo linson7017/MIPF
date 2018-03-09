@@ -11,7 +11,7 @@ public:
 
     bool Init();
     const char* GetID();
-    void Register(R* pR);
+    void Register();
 private:
 
 };

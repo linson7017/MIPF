@@ -24,6 +24,8 @@ public:
 protected slots:
     void Extract();
     void OnImageSelectionChanged(const mitk::DataNode *node);
+    void AddModel();
+    void RemoveModel();
 private:
     Ui::LandMarkExtractView m_ui;
 
