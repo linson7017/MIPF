@@ -151,8 +151,8 @@ void RegistrationMI<FixedImageType, MovingImageType>::Start(const FixedImageType
     const unsigned int numberOfPixels = fixedImageRegion.GetNumberOfPixels();
     unsigned long numberOfSpatialSamples = static_cast<unsigned long>(numberOfPixels * RegistrationParameters.GetRateOfSpatialSamples());
     metric->SetNumberOfHistogramBins(RegistrationParameters.GetNumberOfHistogramBins());
-    //metric->SetNumberOfSpatialSamples(numberOfSpatialSamples);
-    //metric->SetUseAllPixels(true);
+    metric->SetNumberOfSpatialSamples(numberOfSpatialSamples);
+    metric->SetUseAllPixels(true);
 
 
     //**************Interpolator****************//

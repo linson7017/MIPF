@@ -197,7 +197,7 @@ void ProfileGrayScaleDistributionView::Clear()
 
 void ProfileGrayScaleDistributionView::OnSelectStartPoint()
 {
-    m_startPoint = m_pMitkRenderWindow->GetMitkStdMultiWidget()->GetCrossPosition();
+    m_startPoint = GetMitkRenderWindowInterface()->GetMitkStdMultiWidget()->GetCrossPosition();
     QString pointStr = QString("%1,%2,%3").arg(m_startPoint.GetElement(0)).arg(m_startPoint.GetElement(1)).arg(m_startPoint.GetElement(2));
     m_ui.StartPointLE->setText(pointStr);
     DrawLine();
@@ -205,7 +205,7 @@ void ProfileGrayScaleDistributionView::OnSelectStartPoint()
 
 void ProfileGrayScaleDistributionView::OnSelectEndPoint()
 {
-    m_endPoint = m_pMitkRenderWindow->GetMitkStdMultiWidget()->GetCrossPosition();
+    m_endPoint = GetMitkRenderWindowInterface()->GetMitkStdMultiWidget()->GetCrossPosition();
     QString pointStr = QString("%1,%2,%3").arg(m_endPoint.GetElement(0)).arg(m_endPoint.GetElement(1)).arg(m_endPoint.GetElement(2));
     m_ui.EndPointLE->setText(pointStr);
     DrawLine();

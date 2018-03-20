@@ -318,7 +318,7 @@ void ImageRegistrationView::InitRegistration()
     
 
     //init to fixed and moving image
-    m_pMitkRenderWindow->ResetCrossHair();
+    GetMitkRenderWindowInterface()->ResetCrossHair();
 
     m_bInited = true;
 }

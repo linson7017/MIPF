@@ -46,7 +46,7 @@ void VesselnessFilteringView::CreateView()
     GetDataStorage()->Add(seedNode);
     m_ui.SeedPointList->SetPointSetNode(seedNode);
     m_ui.SeedPointList->SetPointSet(m_seeds);
-    m_ui.SeedPointList->SetMultiWidget(m_pMitkRenderWindow->GetMitkStdMultiWidget());
+    m_ui.SeedPointList->SetMultiWidget(GetMitkRenderWindowInterface()->GetMitkStdMultiWidget());
 
     connect(m_ui.ApplyBtn, SIGNAL(clicked()), this, SLOT(Start()));
 }
@@ -59,7 +59,7 @@ void VesselnessFilteringView::Start()
 
     double spacing[3];
     mitkImage->GetVtkImageData()->GetSpacing(spacing);
-    double minSpacing = min(spacing[0], min(spacing[1], spacing[2]));
+    double minSpacing = vtkMath::Min(spacing[0], vtkMath::Min(spacing[1], spacing[2]));
 
     double alpha = alphaFromSuppressPlatesPercentage(0.1);
     double beta = betaFromSuppressBlobsPercentage(0.1);
@@ -97,7 +97,7 @@ void VesselnessFilteringView::Start()
     resultNode->SetName("Reslut");
     resultNode->SetColor(1.0, 0.0, 0.0);
     GetDataStorage()->Add(resultNode);
-    //m_pMitkRenderWindow->Reinit(resultNode);
+    //GetMitkRenderWindowInterface()->Reinit(resultNode);
 
 }
 

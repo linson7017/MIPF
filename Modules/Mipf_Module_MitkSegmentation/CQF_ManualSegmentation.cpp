@@ -240,6 +240,11 @@ bool CQF_ManualSegmentation::CreateSegmentationNode(const mitk::Image* pOriginIm
     // visualization properties
     pSegmentationNode->SetProperty("binary", mitk::BoolProperty::New(true));
     pSegmentationNode->SetProperty("color", mitk::ColorProperty::New(color));
+
+
+
+    
+
     mitk::LookupTable::Pointer lut = mitk::LookupTable::New();
     lut->SetType(mitk::LookupTable::MULTILABEL);
     mitk::LookupTableProperty::Pointer lutProp = mitk::LookupTableProperty::New();

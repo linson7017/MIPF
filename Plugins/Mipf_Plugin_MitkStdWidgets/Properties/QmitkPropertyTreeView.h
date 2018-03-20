@@ -51,6 +51,7 @@ public:
   //void RenderWindowPartDeactivated(mitk::IRenderWindowPart*) override;
 
   void CreateView() override;
+  WndHandle GetPluginHandle() { return this; }
 protected:
     void Update(const char* szMessage, int iValue /* = 0 */, void* pValue /* = 0 */);
 

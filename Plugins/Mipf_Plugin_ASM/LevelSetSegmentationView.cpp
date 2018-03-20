@@ -25,7 +25,7 @@ LevelSetSegmentationView::LevelSetSegmentationView(QF::IQF_Main* pMain, QWidget*
     connect(m_ui.StopBtn, &QPushButton::clicked, this, &LevelSetSegmentationView::Stop);
 
     //seed widget
-    m_ui.SeedWidget->SetMultiWidget(m_pMitkRenderWindow->GetMitkStdMultiWidget());
+    m_ui.SeedWidget->SetMultiWidget(GetMitkRenderWindowInterface()->GetMitkStdMultiWidget());
 
     if (m_PointSet.IsNull())
         m_PointSet = mitk::PointSet::New();

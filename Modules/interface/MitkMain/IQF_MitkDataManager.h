@@ -5,6 +5,11 @@
 
 const char QF_MitkMain_DataManager[] = "QF_MitkMain_DataManager";
 
+namespace QF
+{
+    class IQF_Subject;
+}
+
 class IQF_MitkDataManager
 {
 public:
@@ -18,6 +23,9 @@ public:
     virtual std::list<mitk::DataNode::Pointer> GetNodeSet(const std::string& id = "") = 0;
     virtual mitk::DataNode::Pointer GetCurrentNode(const std::string& id = "") = 0;
     virtual void ClearNodeSet(const std::string& id = "") = 0;
+
+    virtual void SetDataManagerSubject(QF::IQF_Subject* pSubject, const std::string& id = "") = 0;
+    virtual QF::IQF_Subject* GetDataManagerSubject(const std::string& id = "") = 0;
 };
 
 

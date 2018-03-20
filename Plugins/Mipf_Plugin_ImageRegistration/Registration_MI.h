@@ -26,7 +26,7 @@ public:
     MIRegistrationParameters() :
         m_numberOfIterations(200),
         m_numberOfHistogramBins(128),
-        m_rateOfSpatialSamples(0.01),
+        m_rateOfSpatialSamples(0.10),
         m_minimumStepLength(0.001),
         m_maximumStepLength(0.5)
     {}

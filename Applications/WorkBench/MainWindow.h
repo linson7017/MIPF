@@ -37,7 +37,7 @@ private:
     void SetupWidgets(const char* xmlfile);
 
     QF::IQF_Main* m_pMain;
-    IQF_MitkDataManager* m_pMitkDataManager;
+    IQF_MitkDataManager* GetMitkDataManagerInterface();
     SplashWindow* m_pSplashWindow;
 };
 

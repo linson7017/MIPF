@@ -5,9 +5,7 @@
 #include "ImageHoleFillingView.h"
 #include "SurfaceExtractView.h"
 #include "PointListView.h"
-#include "BoneExtract.h"
 #include "LankMarkExtractView.h"
-#include "SkinExtractView.h"
 #include "TransformNodeView.h"
 #include "GeometryInformationView.h"
 #include "SurfaceToImageView.h"
@@ -50,9 +48,7 @@ void Mipf_Plugin_Utils_Activator::Register()
     REGISTER_QOBJECT("MaskImageWidget", MaskImageView);
     REGISTER_QOBJECT("ImageHoleFillingWidget", ImageHoleFillingView);
     REGISTER_QOBJECT("PointListWidget", PointListView);
-    REGISTER_QOBJECT("BoneExtractWidget", BoneExtract);
     REGISTER_QOBJECT("LandMarkExtractWidget", LankMarkExtractView);
-    REGISTER_QOBJECT("SkinExtractWidget", SkinExtractView);
     REGISTER_QOBJECT("TransformNodeWidget", TransformNodeView);
 
     REGISTER_PLUGIN("GeometryInformationWidget", GeometryInformationView);

@@ -14,6 +14,7 @@ public:
     virtual IQF_FastGrowCutSegmentation* CreateFastGrowCutSegmentationMethod();
     virtual IQF_AirwaySegmentation* CreateAirwaySegmentationMethod();
     virtual IQF_GraphcutSegmentation* CreateGraphcutSegmentationMethod();
+    virtual IQF_RSSSegmentation* CreateRSSSegmentationMethod();
 
 };
 #endif // CQF_SegmentationFactory_h__

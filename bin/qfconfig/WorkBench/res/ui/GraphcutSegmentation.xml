@@ -12,7 +12,7 @@
 			<Button text=".." msgcommand="MITK_MESSAGE_GRAPHCUT_CREATE_NEW_SEGMENTATION"/>
 		</HLayout> -->
 		<HLayout>
-			<Button text="Resample" msgcommand="MITK_MESSAGE_GRAPHCUT_RESAMPLE"/>
+			<Button text="Resample" msgcommand="@msgcommand/graphcutResample"/>
 			<LineEdit id="GraphcutSegmentation.Resample" text="2"/>
 		</HLayout>
 		<HLayout>
@@ -53,18 +53,17 @@
 		<VLayout>
 			<HLayout>
 				<Label text="Pen Size"/>
-				<HSlider id="GraphcutSegmentation.PenSize" value="5" minimum="1" maximum="40" msgcommand="MITK_MESSAGE_GRAPHCUT_PENSIZE_CHANGED" property="object"/>
+				<HSlider id="GraphcutSegmentation.PenSize" value="5" minimum="1" maximum="40" msgcommand="@msgcommand/graphcutPensizeChanged" property="object"/>
 			</HLayout>
 			<HLayout>
-				<Button text="Paint" msgcommand="MITK_MESSAGE_GRAPHCUT_BEGIN_PAINT"/>
-				<Button text="Erase" msgcommand="MITK_MESSAGE_GRAPHCUT_BEGIN_WIPE"/>
-				<Button text="End" msgcommand="MITK_MESSAGE_GRAPHCUT_END_PAINT"/>
+				<Button text="Paint" id="GraphcutSegmentation.Paint" checkable="true" commands="@commands/graphcutPaint"/>
+				<Button text="Erase" id="GraphcutSegmentation.Wipe" checkable="true" commands="@commands/graphcutWipe"/>
 			</HLayout>
 		</VLayout>
 		<HLayout>
 			<ButtonGroup>	
-				<CheckBox text="Foreground" id="GraphcutSegmentation.Foreground" checked="true" msgcommand="MITK_MESSAGE_GRAPHCUT_FOREGROUND" property="checked"/>
-				<CheckBox text="Background" id="GraphcutSegmentation.Background" msgcommand="MITK_MESSAGE_GRAPHCUT_BACKGROUND" property="checked"/>
+				<CheckBox text="Foreground" id="GraphcutSegmentation.Foreground" checked="true" msgcommand="@msgcommand/graphcutForegroundOrBackground"/>
+				<CheckBox text="Background" id="GraphcutSegmentation.Background" msgcommand="@msgcommand/graphcutForegroundOrBackground"/>
 			</ButtonGroup>
 			<!-- <Button text="Interpolate" msgcommand="GraphcutSegmentation.Interpolate"/> -->
 		</HLayout>

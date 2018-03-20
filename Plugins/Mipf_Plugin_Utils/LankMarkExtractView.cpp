@@ -23,7 +23,7 @@
 #include <vtkPolyData.h>
 #include <vtkSphereSource.h>
 
-int maxSubArray(vector<int> &nums)
+int maxSubArray(std::vector<int> &nums)
 {
     if (nums.size()==1)
     {
@@ -74,6 +74,19 @@ LankMarkExtractView::~LankMarkExtractView()
 
 void LankMarkExtractView::CreateView()
 {
+
+    QVector3D p0(-19,-9.7,0);
+    QVector3D p1(16.5, -3.7, 0);
+    QVector3D p2(0,-12.7,21.5);
+    QVector3D p3(0,-6.7,-18);
+
+    double dis1 = (p1 - p0).length();
+    double dis2 = (p2 - p0).length();
+    double dis3 = (p3 - p0).length();
+    MITK_INFO << dis1;
+    MITK_INFO << dis2;
+    MITK_INFO << dis3;
+
     m_ui.setupUi(this);
 
     connect(m_ui.ExtractBtn, SIGNAL(clicked()), this, SLOT(Extract()));
@@ -84,7 +97,7 @@ void LankMarkExtractView::CreateView()
     m_ui.ImageSelector->SetPredicate(mitk::NodePredicateDataType::New("Image"));
     connect(m_ui.ImageSelector, SIGNAL(OnSelectionChanged(const mitk::DataNode *)),this,SLOT(OnImageSelectionChanged(const mitk::DataNode *)));
 
-    m_ui.PointListWidget->SetMultiWidget(m_pMitkRenderWindow->GetMitkStdMultiWidget());
+    m_ui.PointListWidget->SetMultiWidget(GetMitkRenderWindowInterface()->GetMitkStdMultiWidget());
 
     mitk::DataNode* tempNode;
     if (m_pPointSet.IsNull())  
@@ -119,7 +132,7 @@ void LankMarkExtractView::CreateView()
     m_ui.ModelList->setSelectionMode(QAbstractItemView::ExtendedSelection);
     m_ui.ModelList->setSelectionBehavior(QAbstractItemView::SelectItems);
     QStringList defaultModels;
-    defaultModels << "10.0,12.0,14.0"<<"7.0,9.0,11.0";
+    defaultModels << QString("%1,%2,%3").arg(dis1).arg(dis2).arg(dis3);
     m_ui.ModelList->addItems(defaultModels);
 }
 

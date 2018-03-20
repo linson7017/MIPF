@@ -428,7 +428,7 @@ void GraphcutSegmentationViewUi::Init()
     double range[2];
     originImage->GetScalarRange(range);
 
-    m_pMitkRenderWindow->Reinit(m_refImageNode);
+    GetMitkRenderWindowInterface()->Reinit(m_refImageNode);
     m_graphcut->Init();
     InitSourceAndSinkNodes();
     //InitInterpolator(m_sourceImageNode.GetPointer());

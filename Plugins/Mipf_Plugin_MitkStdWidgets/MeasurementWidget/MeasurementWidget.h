@@ -23,6 +23,7 @@ public:
     void CreateView() override;
     void Init(QWidget* parent);
     void SetupWidget(R* pR);
+    WndHandle GetPluginHandle() { return this; }
 public:
     void NodeAdded(const mitk::DataNode* node);
     void NodeChanged(const mitk::DataNode* node);

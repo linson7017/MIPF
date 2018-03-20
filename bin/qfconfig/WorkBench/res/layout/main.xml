@@ -123,14 +123,14 @@
 	</ToolBar>
 	
 	<!-- 显示窗口 -->
-	<MultiViewsWidget id="main.mitkMulitView" centerWidget="true"  contents_margin="0"/>
+	<MultiViewsWidget id="multi-widget-default" centerWidget="true"  contents_margin="0"/>
 	
 	<!-- 停靠窗口 -->
 	<DockWidget id="main.DataManagerDocWidget" windowTitle="Data Manager" minWidth="400">
 		<DataManagerWidget id="main.DataManager" />
 	</DockWidget>
-	<DockWidget id="main.TestWidget" windowTitle="Data Manager" minWidth="400">
-		<DataManagerWidget id="main.DataManager2" datastorage="test"/>
+	<DockWidget id="main.DataManagerDocWidget2" windowTitle="Data Manager2" minWidth="400">
+		<DataManagerWidget id="main.DataManager2" />
 	</DockWidget>
 	<DockWidget id="main.ImageNavigatorDockWidget" height="300" windowTitle="Image Navigator">
 		<ImageNavigatorWidget id="main.ImageNavigator" />
@@ -164,9 +164,10 @@
 	<DockWidget id="main.SegmentationTools" windowTitle="Segmentation Tools" tabfiedDocWidgetID="main.BasicSurfaceTools" dockWidgetArea="RightDockWidgetArea"   visible="true">
 		<ToolBox >	
 			<GraphcutSegmentationWidget text="Graphcut Ui"  id="main.GraphcutSegmentationWidget" icon="@icon/plugin/graphcut.png"/>
-			<Holder id="@ui/GraphcutSegmentation" text="Graphcut Segmentation"  icon="@icon/plugin/graphcut.png"/>
-			<ManualSegmentationWidget text="Manual Segmentation" id="main.ManualSegmentationWidget"  icon="@icon/plugin/segmentation.png"/>
-			<BoneExtractWidget text="Bone Extract" id="main.BoneExtractWidget"/>
+			<Holder id="@ui/GraphcutSegmentation" text="Graphcut Segmentation"  
+				icon="@icon/plugin/graphcut.png" pluginModel="GraphcutSegmentation"/>
+			<ManualSegmentationWidget text="Manual Segmentation" id="main.ManualSegmentationWidget"  icon="@icon/plugin/segmentation.png" />
+			<BoneExtractWidget text="Bone Extract" id="main.BoneExtractWidget" icon="@icon/plugin/bone_extraction.png"/>
 			<SkinExtractWidget text="Skin Extract" id="main.SkinExtractWidget" icon="@icon/plugin/abd_skin_extraction.png"/>
 			<BasicImageProcessWidget text="Basic Image Algorithms" id="main.BasicImageProcessWidget"/>			
 			<ImageCropperWidget  text="Image Cropper" id="main.ImageCropperWidget"/>						
@@ -191,13 +192,15 @@
 			<PropertiesWidget text="Properties"  id="main.PropertiesWidget"  icon="@icon/plugin/properties.png"/>
 			<HistogramWidget text="Histogram" id="main.HistogramWidget"  icon="@icon/plugin/histogram.png"/>
 			<ProfileGrayScaleDistributionWidget text="Profile Gray Scale Distribution" id="main.ProfileGrayScaleDistributionWidget"  icon="@icon/plugin/scalar_distribution.png"/>
-			<MeasurementWidget text="Measure" id="main.MeasurementWidget"  icon="@icon/plugin/SimpleMeasurement.png"/>
+			<MeasurementWidget text="Measure" id="main.MeasurementWidget"  icon="@icon/plugin/SimpleMeasurement.png" datamanager="main.DataManager2"/>
 			<GeometryInformationWidget text="Geometry Information"  id="main.GeometryInformationWidget" icon="@icon/plugin/geometry.png"/>
 		</ToolBox>
 	</DockWidget>
 	<DockWidget id="main.Test" windowTitle="Test" tabfiedDocWidgetID="main.StaticisTools" dockWidgetArea="RightDockWidgetArea" visible="true">
-		<ToolBox>			
-			<ImageInteractionWidget text="Image Interaction"/>
+		<ToolBox>
+			<RSSegmentationWidget text="Robust Statistics Segmentation" />
+			<LungSegmentationWidget text="Lung Segmentation" />
+			<ImageInteractionWidget text="Image Interaction" />
 			<Holder id="@ui/ManualSegmentationTest" text="Manual Segmentation" />
 			<RenderWindowWidget	text="Render Window 3D" size="300,300"
 				mapperID="Standard3D" 
@@ -209,7 +212,6 @@
 				colorRectangleOn="true"
 				rectangleColor="0.0,1.0,1.0"
 				stdPlaneWidgetsOn="false"
-				datastorage="test"
 			/>
 		</ToolBox>
 	</DockWidget>

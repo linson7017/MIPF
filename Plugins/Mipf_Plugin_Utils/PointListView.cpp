@@ -33,7 +33,7 @@ void PointListView::CreateView()
     m_pPointList->CreateNewPointSetNode(m_pPointSetNode);
     m_ui.AddPointBtn->setCheckable(true);
 
-    m_ui.PointsTable->SetMultiWidget(m_pMitkRenderWindow->GetMitkStdMultiWidget());
+    m_ui.PointsTable->SetMultiWidget(GetMitkRenderWindowInterface()->GetMitkStdMultiWidget());
     dynamic_cast<QmitkPointListModel *>(m_ui.PointsTable->model())->SetPointSetNode(m_pPointSetNode);
     connect(m_ui.AddPointBtn, SIGNAL(clicked(bool)),this,SLOT(OnAddPoint(bool)));
     connect(m_ui.RemovePointBtn, SIGNAL(clicked()), this, SLOT(OnRemoveSelectedPoint()));

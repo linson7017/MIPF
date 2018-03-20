@@ -77,9 +77,9 @@ void VesselSegmentationView::CreateView()
     ui.cmbbxSurfaceSelector->SetPredicate(mitk::NodePredicateDataType::New("Surface"));
 
 
-    ui.lstPoints->SetMultiWidget(m_pMitkRenderWindow->GetMitkStdMultiWidget());
-    ui.lstPoints_3->SetMultiWidget(m_pMitkRenderWindow->GetMitkStdMultiWidget());
-    ui.lstPoints_4->SetMultiWidget(m_pMitkRenderWindow->GetMitkStdMultiWidget());
+    ui.lstPoints->SetMultiWidget(GetMitkRenderWindowInterface()->GetMitkStdMultiWidget());
+    ui.lstPoints_3->SetMultiWidget(GetMitkRenderWindowInterface()->GetMitkStdMultiWidget());
+    ui.lstPoints_4->SetMultiWidget(GetMitkRenderWindowInterface()->GetMitkStdMultiWidget());
     InitializePointListWidget();
 }
 

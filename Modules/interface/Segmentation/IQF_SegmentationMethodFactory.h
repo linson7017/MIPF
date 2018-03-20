@@ -4,6 +4,7 @@
 class IQF_FastGrowCutSegmentation;
 class IQF_AirwaySegmentation;
 class IQF_GraphcutSegmentation;
+class IQF_RSSSegmentation;
 
 const char QF_Segmentation_Factory[] = "QF_Segmentation_Factory";
 
@@ -13,6 +14,7 @@ public:
     virtual IQF_FastGrowCutSegmentation* CreateFastGrowCutSegmentationMethod()=0;
     virtual IQF_AirwaySegmentation* CreateAirwaySegmentationMethod()=0;
     virtual IQF_GraphcutSegmentation* CreateGraphcutSegmentationMethod()=0;
+    virtual IQF_RSSSegmentation* CreateRSSSegmentationMethod() = 0;
 };
 
 

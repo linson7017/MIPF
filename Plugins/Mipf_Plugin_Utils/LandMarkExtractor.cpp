@@ -229,10 +229,14 @@ std::vector<LandMarkPoint> LandMarkExtractor::ExtractLandMarks(const mitk::Image
             landMarkPoints[j].InsertDistanceMap(i, distance);
         }
     }
-   //return  landMarkPoints;
+  /*  for (int  i=0; i < landMarkPoints.size(); i++)
+    {
+        landMarkPoints[i].PrintSelf();
+    }*/
+  // return  landMarkPoints;
 
     //**********Fit Point***********////
-    double error = 0.4;
+    double error = 0.5;
     for (int i = 0; i < landMarkPoints.size(); i++)
     {
         for (int j = 0; j < vModelDistance.size(); j++)

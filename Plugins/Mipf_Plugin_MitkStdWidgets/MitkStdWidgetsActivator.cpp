@@ -43,22 +43,29 @@ const char* MitkStdWidgets_Activator::GetID()
 void MitkStdWidgets_Activator::Register()
 {
     //数据管理插件
-    REGISTER_QOBJECT("DataManagerWidget", DataManagerWidget);
+
+    REGISTER_PLUGIN("DataManagerWidget", DataManagerWidget);
 
     //多视图显示插件
-    REGISTER_QOBJECT("MultiViewsWidget", MultiViewsWidget);
+
+    REGISTER_PLUGIN("MultiViewsWidget", MultiViewsWidget);
 
     //体绘制插件
-    REGISTER_QOBJECT("VolumeVisualizationWidget", VolumeVisualizationWidget);
+
+    REGISTER_PLUGIN("VolumeVisualizationWidget", VolumeVisualizationWidget);
 
     //图像浏览插件
-    REGISTER_QOBJECT("ImageNavigatorWidget", ImageNavigatorWidget);
+
+    REGISTER_PLUGIN("ImageNavigatorWidget", ImageNavigatorWidget);
 
     //测量插件
-    REGISTER_QOBJECT("MeasurementWidget", MeasurementWidget);
+
+    REGISTER_PLUGIN("MeasurementWidget", MeasurementWidget);
 
     //状态条
+
     REGISTER_QOBJECT("StatusBarWidget", StatusBarWidget);
+
 
     REGISTER_QOBJECT("ProgressBarWidget", ProgressBarWidget);
 
@@ -66,7 +73,8 @@ void MitkStdWidgets_Activator::Register()
 
     REGISTER_PLUGIN("RenderWindowWidget", RenderWindow);
 
-    REGISTER_QOBJECT("PropertiesWidget", QmitkPropertyTreeView);
+    
+    REGISTER_PLUGIN("PropertiesWidget", QmitkPropertyTreeView);
 
 
 

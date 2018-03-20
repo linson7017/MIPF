@@ -38,7 +38,7 @@
 			<LineEdit id="TubularTracking.ExtentMaxZ" row="2" col="3"/>	
 		</GridLayout>
 		<HLayout>
-			<Button text="Track" msgcommand="TubularTracking.Track"/>
+			<Button text="Track"/>
 			<CheckBox id="TubularTracking.NeedInvert" text="Need Invert" checked="false"/>
 		</HLayout>
 		<TubularTrackingSeedWidget height="300"/>

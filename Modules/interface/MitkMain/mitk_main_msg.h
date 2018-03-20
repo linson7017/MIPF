@@ -16,6 +16,12 @@ void* IdentifiableMessage*指针
 */
 #define MITK_MESSAGE_NODE_SELECTION_CHANGED "MITK_MESSAGE_NODE_SELECTION_CHANGED"
 
+/**
+DataManager选中节点变化，与上述消息不同的是此消息与DataManager窗口绑定，
+int 选中节点数量
+void* IdentifiableMessage*指针
+*/
+#define MITK_MESSAGE_DATA_MANAGER_SELECTION_CHANGED   "MITK_MESSAGE_DATA_MANAGER_SELECTION_CHANGED"
 
 /**
 节点被移除

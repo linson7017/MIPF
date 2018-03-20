@@ -27,6 +27,9 @@ public:
     virtual std::list<mitk::DataNode::Pointer> GetNodeSet(const std::string& id = "");
     virtual mitk::DataNode::Pointer GetCurrentNode(const std::string& id = "");
     virtual void ClearNodeSet(const std::string& id = "");
+
+    virtual void SetDataManagerSubject(QF::IQF_Subject* pSubject, const std::string& id = "");
+    virtual QF::IQF_Subject* GetDataManagerSubject(const std::string& id = "");
 private:
     void RelateDataStorage(mitk::DataStorage::Pointer pDataStorage);
     void OnNodeRemoved(const mitk::DataNode *node);
@@ -42,6 +45,9 @@ private:
     std::vector<mitk::DataNode::Pointer> m_SelectedNodes;
     std::list<mitk::DataNode::Pointer> m_NodeSet;
     QF::IQF_Main* m_pMain;
+
+    typedef std::map<std::string, QF::IQF_Subject*> SubjectMapType;
+    SubjectMapType m_DataManagerSubjects;
 };
 
 #endif // CQF_MitkDataStorage_h__

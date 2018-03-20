@@ -77,6 +77,8 @@
 
 #include "ITK_Helpers.h"
 
+#include "iqf_properties.h"
+
 void SegmentationOption::SetOrgan(const QString& szOrganType)
 {
     Organ = szOrganType;
@@ -188,7 +190,7 @@ mitk::NodePredicateBase::Pointer CreateUserPredicate(int type)
     return mitk::NodePredicateAnd::New(returnValue, nonHelperObject).GetPointer();
 }
 
-GraphcutSegmentationView::GraphcutSegmentationView(QF::IQF_Main* pMain) :MitkPluginView(pMain), 
+GraphcutSegmentationView::GraphcutSegmentationView() :MitkPluginView(), 
 m_bInited(false), 
 m_tool(NULL), 
 m_bPaintForeground(true),
@@ -198,25 +200,19 @@ m_bSampleRate(-1)
 {
     m_segOption.SetOrgan("Liver");
     m_currentResultName = "";
-    m_pMain->Attach(this);
-    m_roi[0] = 0;
+   /* m_roi[0] = 0;
     m_roi[1] = 0;
     m_roi[2] = 0;
     m_roi[3] = 0;
     m_roi[4] = 0;
-    m_roi[5] = 0;
+    m_roi[5] = 0;*/
 
-    itk::ReceptorMemberCommand<GraphcutSegmentationView>::Pointer command2 = itk::ReceptorMemberCommand<GraphcutSegmentationView>::New();
-    command2->SetCallbackFunction(this, &GraphcutSegmentationView::OnSurfaceInterpolationInfoChanged);
+   // itk::ReceptorMemberCommand<GraphcutSegmentationView>::Pointer command2 = itk::ReceptorMemberCommand<GraphcutSegmentationView>::New();
+    //command2->SetCallbackFunction(this, &GraphcutSegmentationView::OnSurfaceInterpolationInfoChanged);
 
     /*SurfaceInterpolationInfoChangedObserverTag = m_SurfaceInterpolator->AddObserver(itk::ModifiedEvent(), command2);
     m_SurfaceInterpolator->SetDataStorage(GetDataStorage());
     connect(&m_Watcher, SIGNAL(finished()), this, SLOT(OnSurfaceInterpolationFinished()));*/
-
-    m_pSegTool = (IQF_MitkSegmentationTool*)m_pMain->GetInterfacePtr(QF_MitkSegmentation_Tool);
-
-    IQF_SegmentationMethodFactory* pFactory = (IQF_SegmentationMethodFactory*)m_pMain->GetInterfacePtr(QF_Segmentation_Factory);
-    m_graphcut = pFactory->CreateGraphcutSegmentationMethod();
 }
 
 
@@ -384,73 +380,67 @@ void GraphcutSegmentationView::Update(const char* szMessage, int iValue, void* p
     }
     else if (strcmp(szMessage, "MITK_MESSAGE_GRAPHCUT_RESAMPLE") == 0)
     {
-        QLineEdit* lineEdit = (QLineEdit*)R::Instance()->getObjectFromGlobalMap("GraphcutSegmentation.Resample");
+        QF::IQF_Properties* ps = (QF::IQF_Properties*)pValue;
+
         Float3DImageType::Pointer itkImage = Float3DImageType::New();
         mitk::CastToItkImage<Float3DImageType>(dynamic_cast<mitk::Image *>(m_refImageNode->GetData()), itkImage);
         Float3DImageType::Pointer resampleImage = Float3DImageType::New();
-        ITKHelpers::Resample(itkImage.GetPointer(), resampleImage.GetPointer(), lineEdit->text().toInt());
+        double sampleRate = ps->GetDoubleProperty("sampleRate", 2.0);
+        ITKHelpers::Resample(itkImage.GetPointer(), resampleImage.GetPointer(), sampleRate);
 
       //  ITKHelpers::SaveImage(resampleImage.GetPointer(), "D:/temp/resample.mhd");
         mitk::Image::Pointer mitkImage = mitk::Image::New();
         mitk::CastToMitkImage<Float3DImageType>(resampleImage, mitkImage);
         mitk::DataNode::Pointer resampleNode = mitk::DataNode::New();
-        std::string name = "Resample-";
-        name.append(lineEdit->text().toStdString());
+        QString name = QString("Resample-%1").arg(sampleRate);
         resampleNode->SetData(mitkImage);
-        resampleNode->SetName(name);
+        resampleNode->SetName(name.toLocal8Bit().constData());
         resampleNode->Update();
         GetDataStorage()->Add(resampleNode);
 
-    }
-    else if (strcmp(szMessage, "MITK_MESSAGE_GRAPHCUT_LAMBDA_CHANGED") == 0)
-    {
-        VarientMap* vm= (VarientMap*)pValue;
-        variant v = variant::GetVariant(*vm, "text");
-        QString vs = v.getString();
-        m_graphcut->SetLambda(vs.toDouble());
-        m_graphcut->Init();
-    }
-    else if (strcmp(szMessage, "MITK_MESSAGE_GRAPHCUT_HISTOGRAMBINS_CHANGED") == 0)
-    {
-        VarientMap* vm = (VarientMap*)pValue;
-        variant v = variant::GetVariant(*vm, "text");
-        QString vs = v.getString();
-        m_graphcut->SetNumberOfHistogramBins(vs.toInt());
-        m_graphcut->Init();
     }
     else if (strcmp(szMessage, "MITK_MESSAGE_GRAPHCUT_PENSIZE_CHANGED") == 0)
     {
         if (m_tool)
         {
-            VarientMap* vm = (VarientMap*)pValue;
-            variant v = variant::GetVariant(*vm, "object");
-            QObject* obj = (QObject*)v.getPtr();
-            QVariant qv = obj->property("value");
-            m_tool->SetSize(qv.toInt());
+            QF::IQF_Properties* ps = (QF::IQF_Properties*)pValue;
+            if (ps->HasProperty("pensize"))
+            {
+                m_tool->SetSize(ps->GetIntProperty("pensize", 10));
+            }      
         }
-        
     }
-    else if (strcmp(szMessage, "MITK_MESSAGE_GRAPHCUT_FOREGROUND") == 0)
+    else if (strcmp(szMessage, "MITK_MESSAGE_GRAPHCUT_FOREGROUND_OR_BACKGROUND") == 0)
     {
-        VarientMap* vm = (VarientMap*)pValue;
-        variant v = variant::GetVariant(*vm, "checked");
-        if (v.getBool())
+        QF::IQF_Properties* ps = (QF::IQF_Properties * )pValue;
+        if (ps->HasProperty("foreground"))
         {
-            SwitchToForeground();
+            if (ps->GetBoolProperty("foreground",false))
+            {
+                SwitchToForeground();
+            }
+            else
+            {
+                SwitchToBackground();
+            }
         }
     }
-    else if (strcmp(szMessage, "MITK_MESSAGE_GRAPHCUT_BACKGROUND") == 0)
+    else if (strcmp(szMessage, "MITK_MESSAGE_GRAPHCUT_BEGIN_WIPE") == 0)
     {
-        VarientMap* vm = (VarientMap*)pValue;
-        variant v = variant::GetVariant(*vm, "checked");
-        if (v.getBool())
+        ChangeTool("Wipe");
+    }
+    else if (strcmp(szMessage, "MITK_MESSAGE_GRAPHCUT_PAINT") == 0)
+    {
+        QF::IQF_Properties* ps = (QF::IQF_Properties *)pValue;
+
+        if (ps->GetBoolProperty("paint",false))
         {
-            SwitchToBackground();
+            ChangeTool("Paint");
         }
-    }
-    else if (strcmp(szMessage, "MITK_MESSAGE_GRAPHCUT_BEGIN_PAINT") == 0)
-    {
-        ChangeTool("Paint");
+        else
+        {
+            ChangeTool("");
+        }
         if (m_bPaintForeground)
         {
             SwitchToForeground();
@@ -460,9 +450,17 @@ void GraphcutSegmentationView::Update(const char* szMessage, int iValue, void* p
             SwitchToBackground();
         }
     }
-    else if (strcmp(szMessage, "MITK_MESSAGE_GRAPHCUT_BEGIN_WIPE") == 0)
+    else if (strcmp(szMessage, "MITK_MESSAGE_GRAPHCUT_WIPE") == 0)
     {
-        ChangeTool("Wipe");
+        QF::IQF_Properties* ps = (QF::IQF_Properties *)pValue;
+        if (ps->GetBoolProperty("wipe", false))
+        {
+            ChangeTool("Wipe");
+        }
+        else
+        {
+            ChangeTool("");
+        }
         if (m_bPaintForeground)
         {
             SwitchToForeground();
@@ -636,7 +634,7 @@ void GraphcutSegmentationView::Init()
     double range[2];
     originImage->GetScalarRange(range);
    
-    m_pMitkRenderWindow->Reinit(m_refImageNode);
+    GetMitkRenderWindowInterface()->Reinit(m_refImageNode);
     m_graphcut->Init();
     InitSourceAndSinkNodes(); 
     //InitInterpolator(m_sourceImageNode.GetPointer());
@@ -1130,8 +1128,9 @@ void GraphcutSegmentationView::GenerateSurface()
        }
 }
 
-void GraphcutSegmentationView::Constructed()
+void GraphcutSegmentationView::SetupResource()
 {
+    m_pMain->Attach(this);
     m_imageComboBox = (QmitkDataStorageComboBox*)R::Instance()->getObjectFromGlobalMap("GraphcutSegmentation.ImageSelector");
     if (m_imageComboBox)
     {
@@ -1146,6 +1145,10 @@ void GraphcutSegmentationView::Constructed()
         coarseImageComboBox->SetDataStorage(GetDataStorage());
         coarseImageComboBox->SetPredicate(CreateUserPredicate(4));
     }
+
+    m_pSegTool = (IQF_MitkSegmentationTool*)m_pMain->GetInterfacePtr(QF_MitkSegmentation_Tool);
+    IQF_SegmentationMethodFactory* pFactory = (IQF_SegmentationMethodFactory*)m_pMain->GetInterfacePtr(QF_Segmentation_Factory);
+    m_graphcut = pFactory->CreateGraphcutSegmentationMethod();
 }
 
 void GraphcutSegmentationView::OnContourValueChanged(int value)

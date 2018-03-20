@@ -39,7 +39,7 @@ void CQF_MainCommand::Release()
 
 bool CQF_MainCommand::ExecuteCommand(const char* szCommandID, QF::IQF_Properties* pInParam, QF::IQF_Properties* pOutParam)
 {
-    if (strcmp(szCommandID, MITK_MAIN_COMMAND_LOADDATA) == 0)
+    if (strcmp(szCommandID, MITK_MAIN_COMMAND_LOAD_DATA) == 0)
     {
         std::string datastorageID = pInParam->GetStringProperty("DataStorage","");
         IQF_MitkDataManager* pMitkDataManager = (IQF_MitkDataManager*)m_pMain->GetInterfacePtr(QF_MitkMain_DataManager);
@@ -70,6 +70,18 @@ bool CQF_MainCommand::ExecuteCommand(const char* szCommandID, QF::IQF_Properties
         pMitkReference->SetString("LastOpenDirectory", QFileInfo(fileNames.back()).absolutePath().toStdString().c_str());
         return true;
     }
+    else if (strcmp(szCommandID, MITK_MAIN_COMMAND_OPEN_PROJECT) == 0)
+    {
+        IQF_MitkIO* pMitkIO = (IQF_MitkIO*)m_pMain->GetInterfacePtr(QF_MitkMain_IO);
+        pMitkIO->OpenProject();
+        return true;
+    }
+    else if (strcmp(szCommandID, MITK_MAIN_COMMAND_SAVE_PROJECT)==0)
+    {
+        IQF_MitkIO* pMitkIO = (IQF_MitkIO*)m_pMain->GetInterfacePtr(QF_MitkMain_IO);
+        pMitkIO->SaveProject();
+        return true;
+    }
     else if (strcmp(szCommandID, MITK_MAIN_COMMAND_VOLUME_VISUALIZATION) == 0)
     {
         IQF_MitkDataManager* pMitkDataManager = (IQF_MitkDataManager*)m_pMain->GetInterfacePtr(QF_MitkMain_DataManager);
@@ -98,7 +110,6 @@ bool CQF_MainCommand::ExecuteCommand(const char* szCommandID, QF::IQF_Properties
     }
     else if (strcmp(szCommandID, MITK_MAIN_COMMAND_CHANGE_CROSSHAIR_GAP_SIZE)==0)
     {
-        MITK_INFO << "MITK_MAIN_COMMAND_CHANGE_CROSSHAIR_GAP_SIZE";
         IQF_MitkRenderWindow* pMitkRenderWindow = (IQF_MitkRenderWindow*)m_pMain->GetInterfacePtr(QF_MitkMain_RenderWindow);
         if (pMitkRenderWindow)
         {
@@ -188,7 +199,7 @@ bool CQF_MainCommand::ExecuteCommand(const char* szCommandID, QF::IQF_Properties
 
 int CQF_MainCommand::GetCommandCount()
 {
-    return 6;
+    return 8;
 }
 
 const char* CQF_MainCommand::GetCommandID(int iIndex)
@@ -196,7 +207,7 @@ const char* CQF_MainCommand::GetCommandID(int iIndex)
     switch (iIndex)
     {
     case 0:
-        return MITK_MAIN_COMMAND_LOADDATA;
+        return MITK_MAIN_COMMAND_LOAD_DATA;
     case 1:
         return MITK_MAIN_COMMAND_ENABLE_VTK_WARNING;
     case 2:
@@ -207,6 +218,10 @@ const char* CQF_MainCommand::GetCommandID(int iIndex)
         return MITK_MAIN_COMMAND_CHANGE_MULTIVIEW_LAYOUT;
     case 5:
         return MITK_MAIN_COMMAND_RESET_MULTIVIEW;
+    case 6:
+        return MITK_MAIN_COMMAND_SAVE_PROJECT;
+    case 7:
+        return MITK_MAIN_COMMAND_OPEN_PROJECT;
     default:
         return "";
         break;

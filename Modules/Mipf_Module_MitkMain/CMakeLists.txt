@@ -15,7 +15,8 @@ endif()
 project(Mipf_Module_MitkMain)
 
 file (GLOB Headers "./*.h")
-AUX_SOURCE_DIRECTORY(. DIR_SRCS)
+AUX_SOURCE_DIRECTORY(. DIR_SRCS) 
+ADD_DEFINITIONS(-D_WIN32_WINNT=0x0A00)
 
 
 add_library(Mipf_Module_MitkMain SHARED ${DIR_SRCS} ${Headers} )

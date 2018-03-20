@@ -29,7 +29,7 @@ public:
     void CreateView() override;
     virtual void Init(QWidget* parent);
     virtual void Update(const char* szMessage, int iValue = 0, void* pValue = 0);
-
+    WndHandle GetPluginHandle() { return this; }
 protected slots:
     void OnMillimetreCoordinateValueChanged();
     void OnRefetch();

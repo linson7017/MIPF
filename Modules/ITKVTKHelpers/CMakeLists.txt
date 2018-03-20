@@ -19,6 +19,11 @@ set(ITKVTK_HELPERS_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/"  CACHE INTERNAL "I
 set(ITKVTK_HELPERS_LIBRARIES 
 	optimized ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/Release/ITKVTKHelpers.lib debug ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/Debug/ITKVTKHelpers.lib  
 	CACHE INTERNAL "ITKVTKHelpers library" )
+	
+macro(link_ITKVTKHelpers)
+	include_directories(${ITKVTK_HELPERS_INCLUDE_DIR})
+	target_link_libraries(${PROJECT_NAME} ${ITKVTK_HELPERS_LIBRARIES})
+endmacro(link_ITKVTKHelpers)
 
 file(GLOB SRCS "./*.h" "*.hpp" "*.cpp")
 

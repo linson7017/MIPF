@@ -64,7 +64,7 @@ void QmitkPropertyTreeView::Update(const char* szMessage, int iValue /* = 0 */, 
 {
         if (strcmp(szMessage,MITK_MESSAGE_NODE_SELECTION_CHANGED)==0)
         {
-            std::vector<mitk::DataNode::Pointer> select = m_pMitkDataManager->GetSelectedNodes();
+            std::vector<mitk::DataNode::Pointer> select = GetMitkDataManagerInterface()->GetSelectedNodes();
             QList< mitk::DataNode::Pointer> qSelect;
             CastFromStdNodesToQListNodes(select, qSelect);
             OnSelectionChanged(qSelect);
@@ -84,9 +84,9 @@ void QmitkPropertyTreeView::CreateView()
 
   m_Controls.propertyListComboBox->addItem("Data node: common");
 
-  if (m_pMitkRenderWindow != NULL)
+  if (GetMitkRenderWindowInterface() != NULL)
   {
-    QHash<QString, QmitkRenderWindow*> renderWindows = m_pMitkRenderWindow->GetQmitkRenderWindows();
+    QHash<QString, QmitkRenderWindow*> renderWindows = GetMitkRenderWindowInterface()->GetQmitkRenderWindows();
 
     Q_FOREACH(QString renderWindow, renderWindows.keys())
     {
@@ -281,12 +281,12 @@ void QmitkPropertyTreeView::OnModelReset()
 
 void QmitkPropertyTreeView::OnPreferencesChanged()
 {
-  bool showAliases = m_pMitkReferences->GetBool(SHOW_ALIASES, true);
-  bool showDescriptions = m_pMitkReferences->GetBool(SHOW_DESCRIPTIONS, true);
-  bool showAliasesInDescription = m_pMitkReferences->GetBool(SHOW_ALIASES_IN_DESCRIPTION, true);
-  bool showPersistenceInDescription = m_pMitkReferences->GetBool(SHOW_PERSISTENCE_IN_DESCRIPTION, true);
-  bool developerMode = m_pMitkReferences->GetBool(DEVELOPER_MODE, true);
-  bool filterProperties = m_pMitkReferences->GetBool(FILTER_PROPERTIES, true);
+  bool showAliases = GetMitkReferenceInterface()->GetBool(SHOW_ALIASES, true);
+  bool showDescriptions = GetMitkReferenceInterface()->GetBool(SHOW_DESCRIPTIONS, true);
+  bool showAliasesInDescription = GetMitkReferenceInterface()->GetBool(SHOW_ALIASES_IN_DESCRIPTION, true);
+  bool showPersistenceInDescription = GetMitkReferenceInterface()->GetBool(SHOW_PERSISTENCE_IN_DESCRIPTION, true);
+  bool developerMode = GetMitkReferenceInterface()->GetBool(DEVELOPER_MODE, true);
+  bool filterProperties = GetMitkReferenceInterface()->GetBool(FILTER_PROPERTIES, true);
   m_Model->SetFilterProperties(filterProperties);
   m_Model->SetShowAliases(showAliases);
 
@@ -436,7 +436,7 @@ void QmitkPropertyTreeView::OnPropertyListChanged(int index)
     renderer = QString::fromStdString(renderer.toStdString().substr(11));
 
   m_Renderer = renderer != "common" && renderer != "Base data"
-    ? m_pMitkRenderWindow->GetQmitkRenderWindow(renderer)->GetRenderer()
+    ? GetMitkRenderWindowInterface()->GetQmitkRenderWindow(renderer)->GetRenderer()
     : NULL;
 
   QList<mitk::DataNode::Pointer> nodes;

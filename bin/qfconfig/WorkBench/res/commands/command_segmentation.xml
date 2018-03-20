@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- ***************************Graphcut********************************** -->
+<MsgCommand id="graphcutPensizeChanged" name="MITK_MESSAGE_GRAPHCUT_PENSIZE_CHANGED">
+	<Property type="Object" name="pensize">{"name":"value"}</Property>
+</MsgCommand>
+
+<MsgCommand id="graphcutForegroundOrBackground" name="MITK_MESSAGE_GRAPHCUT_FOREGROUND_OR_BACKGROUND">
+	<Property type="Object" name="foreground">{"id":"GraphcutSegmentation.Foreground","name":"checked"}</Property>
+</MsgCommand>
+
+<MsgCommand id="graphcutResample" name="MITK_MESSAGE_GRAPHCUT_RESAMPLE">
+	<Property type="Object" name="sampleRate">
+	{	
+		"id":"GraphcutSegmentation.Resample",
+		"name":"text",
+		"type":"double"
+	}
+	</Property>
+</MsgCommand>
+
+<Commands id="graphcutPaint" >
+	<Command name="y">
+		<Property name="x"></Property>
+	</Command>
+	<MsgCommand name="MITK_MESSAGE_GRAPHCUT_PAINT">
+		<Property type="Object" name="paint">{"name":"checked"}</Property>
+	</MsgCommand>
+	<UICommand type="SetProperty" targetID="GraphcutSegmentation.Wipe" name="checked" value="bool:false"/>
+</Commands>
+
+
+<Commands id="graphcutWipe" >
+	<MsgCommand name="MITK_MESSAGE_GRAPHCUT_WIPE">
+		<Property type="Object" name="wipe">{"name":"checked"}</Property>
+	</MsgCommand>
+	<UICommand type="SetProperty" targetID="GraphcutSegmentation.Paint" name="checked" value="bool:false"/>
+</Commands>
+
+<!-- ***************************Growcut********************************** -->
+<MsgCommand id="growcutPensizeChanged" name="MITK_MESSAGE_GROWCUT_PENSIZE_CHANGED">
+	<Property type="Object" name="pensize">{"name":"value"}</Property>
+</MsgCommand>
+
+
+
+
+

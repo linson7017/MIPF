@@ -48,12 +48,12 @@ void CQF_MitkMain::Release()
 
 bool CQF_MitkMain::Init()
 {
-    m_pMitkDataManager = new CQF_MitkDataManager(m_pMain);
+   m_pMitkDataManager = new CQF_MitkDataManager(m_pMain);
     m_pMitkRenderWindow = new CQF_MitkRenderWindow;
     m_pMitkReference = new CQF_MitkReference(m_pMain);
-    m_pMitkIO = new CQF_MitkIO(m_pMain);
     m_pDisplayOption = new CQF_MitkDisplayOption(m_pMain);
     m_pMitkInit = new CQF_MitkInit(m_pMain);
+    m_pMitkIO = new CQF_MitkIO(m_pMain);
 
 	m_pMainCommand = new CQF_MainCommand(m_pMain);
     return true;

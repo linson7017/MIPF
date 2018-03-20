@@ -52,7 +52,7 @@ void ModelExporterView::Import()
 void ModelExporterView ::Apply()
 {
     //所有注册的窗口中render的actors数目都为零，奇怪！！
-  /*  mitk::RenderingManager::RenderWindowVector renderwindows = m_pMitkRenderWindow->GetRenderingManager()->GetAllRegisteredRenderWindows();
+  /*  mitk::RenderingManager::RenderWindowVector renderwindows = GetMitkRenderWindowInterface()->GetRenderingManager()->GetAllRegisteredRenderWindows();
     for (int j = 0; j < renderwindows.size(); j++)
     {
         vtkRenderWindow* renwin = renderwindows.at(j);
@@ -83,7 +83,7 @@ void ModelExporterView ::Apply()
     }
     m_sceneViewer->AddPolyData(surface->GetVtkPolyData(), m_ui.DataSelector->GetSelectedNode()->GetName(),
         m_ui.DataSelector->GetSelectedNode(),
-        m_pMitkRenderWindow->GetMitkStdMultiWidget()->GetRenderWindow4()->GetRenderer());
+        GetMitkRenderWindowInterface()->GetMitkStdMultiWidget()->GetRenderWindow4()->GetRenderer());
     m_sceneViewer->show();
 
     return;

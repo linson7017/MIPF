@@ -80,7 +80,7 @@ void MitkSegmentation::Update(const char* szMessage, int iValue, void* pValue)
 		IQF_MitkDataManager* pDataManager = (IQF_MitkDataManager*)pValue;
 		if (pDataManager)
 		{
-			OnSelectionChanged(m_pMitkDataManager->GetSelectedNodes());
+			OnSelectionChanged(GetMitkDataManagerInterface()->GetSelectedNodes());
 		}
 	}
 	else  if (strcmp(szMessage, MITK_MESSAGE_MULTIWIDGET_HIDE) == 0)
@@ -164,7 +164,7 @@ void MitkSegmentation::CreateNewSegmentation()
 				// ask about the name and organ type of the new segmentation
 				QmitkNewSegmentationDialog* dialog = new QmitkNewSegmentationDialog(m_Parent); // needs a QWidget as parent, "this" is not QWidget
 
-				QString storedList = m_pMitkReferences->GetString("Organ-Color-List");
+				QString storedList = GetMitkReferenceInterface()->GetString("Organ-Color-List");
 				//QString storedList = "";
 				QStringList organColors;
 				if (storedList.isEmpty())
@@ -250,7 +250,7 @@ void MitkSegmentation::CreateNewSegmentation()
 						MITK_DEBUG << "Will store: " << stringForStorage;
 						//this->GetPreferences()->Put("Organ-Color-List", stringForStorage);
 						//this->GetPreferences()->Flush();
-						m_pMitkReferences->SetString("Organ-Color-List", stringForStorage.toStdString().c_str());
+						GetMitkReferenceInterface()->SetString("Organ-Color-List", stringForStorage.toStdString().c_str());
 
 						if (mitk::ToolManagerProvider::GetInstance()->GetToolManager()->GetWorkingData(0))
 						{
@@ -288,7 +288,7 @@ void MitkSegmentation::Visible()
 {
 	if (m_DataSelectionChanged)
 	{
-		this->OnSelectionChanged(m_pMitkDataManager->GetSelectedNodes());
+		this->OnSelectionChanged(GetMitkDataManagerInterface()->GetSelectedNodes());
 	}
 }
 
@@ -779,10 +779,10 @@ void MitkSegmentation::ApplyDisplayOptions(mitk::DataNode* node)
 
 	if (isBinary)
 	{
-		node->SetProperty("outline binary", mitk::BoolProperty::New(m_pMitkReferences->GetBool("draw outline")));
+		node->SetProperty("outline binary", mitk::BoolProperty::New(GetMitkReferenceInterface()->GetBool("draw outline")));
 		node->SetProperty("outline width", mitk::FloatProperty::New(2.0));
-		node->SetProperty("opacity", mitk::FloatProperty::New(m_pMitkReferences->GetBool("draw outline", true) ? 1.0 : 0.3));
-		node->SetProperty("volumerendering", mitk::BoolProperty::New(m_pMitkReferences->GetBool("volume rendering", false)));
+		node->SetProperty("opacity", mitk::FloatProperty::New(GetMitkReferenceInterface()->GetBool("draw outline", true) ? 1.0 : 0.3));
+		node->SetProperty("volumerendering", mitk::BoolProperty::New(GetMitkReferenceInterface()->GetBool("volume rendering", false)));
 	}
 }
 

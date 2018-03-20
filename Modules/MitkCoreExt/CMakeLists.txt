@@ -36,6 +36,10 @@ set(MitkCoreExt_LIBRARIES
 	optimized ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/Release/MitkCoreExt.lib debug ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/Debug/MitkCoreExt.lib  
 	CACHE INTERNAL "MitkCoreExt library" )
 
+macro(link_MitkCoreExt)
+	include_directories(${MitkCoreExt_INCLUDE_DIR})
+	target_link_libraries(${PROJECT_NAME} ${MitkCoreExt_LIBRARIES})
+endmacro(link_MitkCoreExt)
 
 add_definitions(-DUS_MODULE_NAME)
 

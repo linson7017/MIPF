@@ -8,7 +8,7 @@
 
 #include "mitkBaseDataSerializer.h"
 #include "mitkPropertyListSerializer.h"
-#include "mitkSceneReader.h"
+
 
 #include "mitkBaseRenderer.h"
 #include "mitkProgressBar.h"
@@ -16,6 +16,8 @@
 #include "mitkStandaloneDataStorage.h"
 #include <mitkLocaleSwitch.h>
 #include <mitkStandardFileLocations.h>
+#include <mitkSceneReader.h>
+
 
 #include <itkObjectFactoryBase.h>
 

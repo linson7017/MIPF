@@ -37,6 +37,7 @@ void SliceBySliceTrackingView::Update(const char* szMessage, int iValue, void* p
     if (strcmp(szMessage, "SliceBySliceTracking.Track") == 0)
     {
         std::cout << "Resceive command " << szMessage << std::endl;
+        return;
         IQF_MitkDataManager* pMitkDataStorage = (IQF_MitkDataManager*)m_pMain->GetInterfacePtr("QF_MitkMain_DataManager");
         if (pMitkDataStorage)
         {

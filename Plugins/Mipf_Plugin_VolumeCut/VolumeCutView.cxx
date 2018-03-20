@@ -103,7 +103,7 @@ void VolumeCutView::ModelCut(bool b)
 
             static_cast<FreehandCutInteractor*>(m_freehandCutInteractor.GetPointer())->SetDataStorage(GetDataStorage());
             static_cast<FreehandCutInteractor*>(m_freehandCutInteractor.GetPointer())->SetRenderer(
-                m_pMitkRenderWindow->GetMitkStdMultiWidget()->GetRenderWindow4()->GetRenderer()->GetVtkRenderer());
+                GetMitkRenderWindowInterface()->GetMitkStdMultiWidget()->GetRenderWindow4()->GetRenderer()->GetVtkRenderer());
 
             
             std::string configPath = m_pMain->GetConfigPath();

@@ -19,7 +19,6 @@ Mipf_Plugin_GraphcutSegmentation_Activator::Mipf_Plugin_GraphcutSegmentation_Act
 
 bool Mipf_Plugin_GraphcutSegmentation_Activator::Init()
 {
-    m_pGraphcutSegmentationView = new GraphcutSegmentationView(m_pMain); 
     return true; 
 }
 
@@ -32,9 +31,9 @@ void Mipf_Plugin_GraphcutSegmentation_Activator::Register()
 {
     //m_pGraphcutSegmentationView->InitResource(); 
     REGISTER_PLUGIN("GraphcutSegmentationWidget", GraphcutSegmentationViewUi);
+    REGISTER_PLUGIN("GraphcutSegmentation", GraphcutSegmentationView);
 }
 
 void Mipf_Plugin_GraphcutSegmentation_Activator::Constructed()
 {
-    m_pGraphcutSegmentationView->Constructed();
 }

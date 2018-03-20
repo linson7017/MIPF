@@ -115,7 +115,7 @@ void SurfaceCutView::FreehandCut(bool enableCut)
             //
             static_cast<FreehandCutInteractor*>(m_freehandCutInteractor.GetPointer())->SetDataStorage(GetDataStorage());
             static_cast<FreehandCutInteractor*>(m_freehandCutInteractor.GetPointer())->SetRenderer(
-                m_pMitkRenderWindow->GetMitkStdMultiWidget()->GetRenderWindow4()->GetRenderer()->GetVtkRenderer());
+                GetMitkRenderWindowInterface()->GetMitkStdMultiWidget()->GetRenderWindow4()->GetRenderer()->GetVtkRenderer());
 
             std::string configpath = m_pMain->GetConfigPath();
             configpath.append("/mitk/Interactions/");

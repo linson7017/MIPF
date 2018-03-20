@@ -219,9 +219,9 @@ add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 FIND_PACKAGE(QTXML REQUIRED)
 FIND_PACKAGE(QFMAIN REQUIRED)
 FIND_PACKAGE(QFCOMMON REQUIRED)
-macro(link_framework)
+macro(link_qf)
 	target_link_libraries(${PROJECT_NAME} ${QTXML_LIBRARIES} ${QFMAIN_LIBRARIES})
-endmacro(link_framework)
+endmacro(link_qf)
 
 set(QF_CONFIG_DIR ${CMAKE_CURRENT_SOURCE_DIR}/bin/qfconfig)
 

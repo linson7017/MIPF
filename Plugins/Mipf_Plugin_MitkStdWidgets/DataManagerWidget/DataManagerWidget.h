@@ -14,6 +14,11 @@ namespace mitk
     class DataStorage;
 }
 
+namespace QF
+{
+    class IQF_Subject;
+}
+
 // Forward declarations
 class QMenu;
 class QAction;
@@ -46,6 +51,7 @@ public:
     ~DataManagerWidget();
     void Init(QWidget* parent);
     virtual void CreateView();
+    WndHandle GetPluginHandle() { return this; }
 public slots:
     void NodeSelectionChanged(const QItemSelection & selected, const QItemSelection & deselected);
     void NodeTreeViewRowsInserted(const QModelIndex & parent, int start, int end);
@@ -141,6 +147,8 @@ protected:
     NodeDescriptorManager* m_DescriptorManager;
 
 private:
+
+    QF::IQF_Subject* m_pDataManagerSubject;
 
    // QItemSelectionModel* GetDataNodeSelectionModel() const override;
 };

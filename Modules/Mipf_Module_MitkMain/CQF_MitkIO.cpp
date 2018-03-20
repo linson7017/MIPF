@@ -1,5 +1,7 @@
 #include "CQF_MitkIO.h"
 
+#include "MitkProjectIO.h"
+
 #include <mitkIOUtil.h>
 #include "QmitkIOUtil.h"
 #include "mitkStandaloneDataStorage.h"
@@ -10,7 +12,6 @@
 #include <mitkNodePredicateProperty.h>
 #include <mitkProperties.h>
 
-#include "MitkProjectIO.h"
 
 
 #include <QFileDialog>
@@ -99,7 +100,7 @@ void CQF_MitkIO::OpenProject()
 
         QString fileName = QFileDialog::getOpenFileName(NULL, "Open",
             defaultOpenFilePath,
-            QmitkIOUtil::GetFileOpenFilterString());
+            "project (*.mitk)");
         if (fileName.isEmpty())
             return;
 
@@ -147,6 +148,7 @@ void CQF_MitkIO::SaveProject()
         }
         static QString m_LastPath;
         {
+            mitk::DataStorage::Pointer ds = pMitkDataManager->GetDataStorage();
             if (pMitkDataManager->GetDataStorage().IsNull())
             {
                 QString msg = "IDataStorageService service not available. Unable to open files.";

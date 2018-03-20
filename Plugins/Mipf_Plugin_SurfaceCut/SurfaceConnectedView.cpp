@@ -130,11 +130,11 @@ void SurfaceConnectedView::Import()
 {
 
     QString name = QFileDialog::getOpenFileName(this, "Select one polydata with color to open",
-        m_pMitkReferences->GetString("LastOpenFilePath"),
+        GetMitkReferenceInterface()->GetString("LastOpenFilePath"),
         "polydata (*.vtp *.vtk)");
     if (name.isEmpty())
         return ;
-    m_pMitkReferences->SetString("LastOpenFilePath", QFileInfo(name).absolutePath().toStdString().c_str());
+    GetMitkReferenceInterface()->SetString("LastOpenFilePath", QFileInfo(name).absolutePath().toStdString().c_str());
 
     IQF_MitkIO* pIO = (IQF_MitkIO*)GetInterfacePtr(QF_MitkMain_IO);
     mitk::DataNode* loadedNode = pIO->Load(name.toStdString().c_str());
@@ -170,10 +170,10 @@ void SurfaceConnectedView::Import()
 void SurfaceConnectedView::Save()
 {
     QString name = QFileDialog::getSaveFileName(
-        NULL, "Save surface", m_pMitkReferences->GetString("LastFileSavePath"), "vtp (*.vtp)");
+        NULL, "Save surface", GetMitkReferenceInterface()->GetString("LastFileSavePath"), "vtp (*.vtp)");
     if (name.isEmpty())
         return;
-    m_pMitkReferences->SetString("LastFileSavePath", QFileInfo(name).absolutePath().toStdString().c_str());
+    GetMitkReferenceInterface()->SetString("LastFileSavePath", QFileInfo(name).absolutePath().toStdString().c_str());
 
 
     mitk::Surface* surface = dynamic_cast<mitk::Surface*>(m_ui.SurfaceSelector->GetSelectedNode()->GetData());

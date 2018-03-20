@@ -1,26 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <Command id="enableVtkWarning" name="MITK_MAIN_COMMAND_ENABLE_VTK_WARNING">
-	<Property type="Object" name="EnableVtkWarning">setting.EnableVtkWarning:checked</Property>
+	<Property type="Object" name="EnableVtkWarning">
+	{
+		"id":"setting.EnableVtkWarning"
+		"name":"checked"
+	}
+	</Property>
 </Command>
-<Command id="loadData" name="MITK_MAIN_COMMAND_LOADDATA">
-	<Property type="Value" name="DataStorage">QString:test</Property>
+<Command id="loadData" name="MITK_MAIN_COMMAND_LOAD_DATA">
+	<!-- <Property type="Value" name="DataStorage">QString:test</Property> -->
 </Command>
 <Command id="changeCrosshairSize" name="MITK_MAIN_COMMAND_CHANGE_CROSSHAIR_GAP_SIZE">
-	<Property type="Object" name="CrosshairGapSize">setting.CrosshairGapSize:value</Property>
+	<Property type="Object" name="CrosshairGapSize">
+	{
+		"id":"setting.CrosshairGapSize",
+		"name":"value",
+		"type":"int"
+	}
+	</Property>
+	<Property type="Value" name="MultiViewID">{"value":"main.mitkMulitView"}</Property>
 </Command>
 <Command id="changeMultiViewLayout" name="MITK_MAIN_COMMAND_CHANGE_MULTIVIEW_LAYOUT">
-	<Property type="Object" name="LayoutMode">sender:layoutMode</Property>
-    <Property type="Value" name="MultiViewID">QString:main.mitkMulitView</Property>
+	<Property type="Object" name="LayoutMode">{"name":"layoutMode"}</Property>
+    <Property type="Value" name="MultiViewID">{"value":"main.mitkMulitView"}</Property>
 </Command>
 <Command id="resetMultiView" name="MITK_MAIN_COMMAND_RESET_MULTIVIEW">
-    <Property type="Value" name="MultiViewID">QString:main.mitkMulitView</Property>
+    <Property type="Value" name="MultiViewID">{"value":"main.mitkMulitView"}</Property>
+</Command>
+<Command id="loadData1" name="MITK_MAIN_COMMAND_LOAD_DATA">
+	<Property type="Value" name="DataStorage">{"value":"storage1"}</Property>
 </Command>
 
-<Command id="loadData1" name="MITK_MAIN_COMMAND_LOADDATA">
-	<Property type="Value" name="DataStorage">QString:storage1</Property>
-</Command>
-
-<Command id="loadData2" name="MITK_MAIN_COMMAND_LOADDATA">
-	<Property type="Value" name="DataStorage">QString:storage2</Property>
+<Command id="loadData2" name="MITK_MAIN_COMMAND_LOAD_DATA">
+	<Property type="Value" name="DataStorage">{"value":"storage2"}</Property>
 </Command>

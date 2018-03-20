@@ -64,7 +64,7 @@ void CenterLineExtractView::CreateView()
     GetDataStorage()->Add(m_pPointSetNode);
   
     m_ui.SeedWidget->SetPointSetNode(m_pPointSetNode);
-    m_ui.SeedWidget->SetMultiWidget(m_pMitkRenderWindow->GetMitkStdMultiWidget());
+    m_ui.SeedWidget->SetMultiWidget(GetMitkRenderWindowInterface()->GetMitkStdMultiWidget());
 
     //end point
     IQF_PointListFactory* pFactory = (IQF_PointListFactory*)m_pMain->GetInterfacePtr(QF_MitkStd_PointListFactory);
@@ -74,7 +74,7 @@ void CenterLineExtractView::CreateView()
     m_pEndPointSetNode = mitk::DataNode::New();
     m_pEndPointList->CreateNewPointSetNode(m_pEndPointSetNode);
 
-    m_ui.EndPointList->SetMultiWidget(m_pMitkRenderWindow->GetMitkStdMultiWidget());
+    m_ui.EndPointList->SetMultiWidget(GetMitkRenderWindowInterface()->GetMitkStdMultiWidget());
     dynamic_cast<QmitkPointListModel *>(m_ui.EndPointList->model())->SetPointSetNode(m_pEndPointSetNode);
 
     connect(m_ui.ApplyBtn, SIGNAL(clicked()), this, SLOT(Extract()));

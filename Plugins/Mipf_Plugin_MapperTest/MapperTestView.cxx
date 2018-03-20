@@ -152,7 +152,7 @@ void MapperTestView::Cut(bool enableCut)
             static_cast<FreehandSurfaceCutInteractor*>(m_curveDrawInteractor.GetPointer())->SetDataStorage(GetDataStorage());
             static_cast<FreehandSurfaceCutInteractor*>(m_curveDrawInteractor.GetPointer())->SetInsideOut(m_ui.InsideOutCheckBox->isChecked());
             static_cast<FreehandSurfaceCutInteractor*>(m_curveDrawInteractor.GetPointer())->SetRenderer(
-                m_pMitkRenderWindow->GetMitkStdMultiWidget()->GetRenderWindow4()->GetRenderer()->GetVtkRenderer());
+                GetMitkRenderWindowInterface()->GetMitkStdMultiWidget()->GetRenderWindow4()->GetRenderer()->GetVtkRenderer());
 
             std::string configpath = m_pMain->GetConfigPath();
             configpath.append("/mitk/Interactions/");
@@ -187,20 +187,20 @@ void MapperTestView::Apply()
 {
     mitk::DataNode* node = m_ui.DataSelector->GetSelectedNode();
     mitk::VtkMapper* mapper = dynamic_cast<mitk::VtkMapper*>(node->GetMapper(mitk::BaseRenderer::Standard3D));
-    vtkProp* prop = mapper->GetVtkProp(m_pMitkRenderWindow->GetMitkStdMultiWidget()->GetRenderWindow4()->GetRenderer());
+    vtkProp* prop = mapper->GetVtkProp(GetMitkRenderWindowInterface()->GetMitkStdMultiWidget()->GetRenderWindow4()->GetRenderer());
     vtkVolume* volume = dynamic_cast<vtkVolume*>(prop);
     if (volume)
     {
         vtkSmartPointer<vtkBoxWidget> boxWidget =
             vtkSmartPointer<vtkBoxWidget>::New();
-        boxWidget->SetInteractor(m_pMitkRenderWindow->GetMitkStdMultiWidget()->GetRenderWindow4()->GetVtkRenderWindowInteractor());
+        boxWidget->SetInteractor(GetMitkRenderWindowInterface()->GetMitkStdMultiWidget()->GetRenderWindow4()->GetVtkRenderWindowInteractor());
 
         boxWidget->SetProp3D(volume);
         boxWidget->SetPlaceFactor(0.8); // Make the box 1.25x larger than the actor
         boxWidget->PlaceWidget();
         boxWidget->On();
 
-        const mitk::PlaneGeometry* mitkPlane = m_pMitkRenderWindow->GetMitkStdMultiWidget()->GetRenderWindow3()->GetRenderer()->GetCurrentWorldPlaneGeometry();
+        const mitk::PlaneGeometry* mitkPlane = GetMitkRenderWindowInterface()->GetMitkStdMultiWidget()->GetRenderWindow3()->GetRenderer()->GetCurrentWorldPlaneGeometry();
         vtkPlanes* planes = vtkPlanes::New();
         vtkPlane* plane = vtkPlane::New();
         const double* normal = mitkPlane->GetNormal().GetDataPointer();
@@ -214,7 +214,7 @@ void MapperTestView::Apply()
 
 
 
-    /*   vtkPropCollection *props = m_pMitkRenderWindow->GetMitkStdMultiWidget()->GetRenderWindow4()->GetRenderer()->GetVtkRenderer()->GetViewProps();
+    /*   vtkPropCollection *props = GetMitkRenderWindowInterface()->GetMitkStdMultiWidget()->GetRenderWindow4()->GetRenderer()->GetVtkRenderer()->GetViewProps();
        int numberOfProps = props->GetNumberOfItems();
        auto propVisibilities = new bool[numberOfProps];
        props->InitTraversal();
@@ -226,7 +226,7 @@ void MapperTestView::Apply()
            vtkVolume* volume = dynamic_cast<vtkVolume*>(p);
            if (volume)
            {
-               const mitk::PlaneGeometry* mitkPlane = m_pMitkRenderWindow->GetMitkStdMultiWidget()->GetRenderWindow3()->GetRenderer()->GetCurrentWorldPlaneGeometry();
+               const mitk::PlaneGeometry* mitkPlane = GetMitkRenderWindowInterface()->GetMitkStdMultiWidget()->GetRenderWindow3()->GetRenderer()->GetCurrentWorldPlaneGeometry();
                vtkPlanes* planes = vtkPlanes::New();
                vtkPlane* plane = vtkPlane::New();
                plane->SetNormal(mitkPlane->GetNormal().GetDataPointer());

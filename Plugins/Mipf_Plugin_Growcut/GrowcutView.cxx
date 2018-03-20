@@ -24,6 +24,8 @@
 
 #include "MitkSegmentation/IQF_MitkSegmentationTool.h"
 
+#include "iqf_properties.h"
+
 GrowcutView::GrowcutView(QF::IQF_Main* pMain) :MitkPluginView(pMain), 
 m_pSourceImageSelector(NULL), 
 m_bPaintForeground(true) , 
@@ -153,15 +155,11 @@ void GrowcutView::Update(const char* szMessage, int iValue, void* pValue)
     }
     else if (strcmp(szMessage, "MITK_MESSAGE_GROWCUT_PENSIZE_CHANGED") == 0)
     {
+        QF::IQF_Properties* ps = (QF::IQF_Properties*)pValue;
         if (m_tool)
         {
-            VarientMap* vm = (VarientMap*)pValue;
-            variant v = variant::GetVariant(*vm, "object");
-            QObject* obj = (QObject*)v.getPtr();
-            QVariant qv = obj->property("value");
-            m_tool->SetSize(qv.toInt());
+            m_tool->SetSize(ps->GetIntProperty("pensize", 10));
         }
-
     }
 }
 

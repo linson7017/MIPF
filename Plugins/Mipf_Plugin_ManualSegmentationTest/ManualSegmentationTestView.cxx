@@ -102,7 +102,7 @@ void ManualSegmentationTestView::Update(const char* szMessage, int iValue, void*
          m_pMitkSegmentationTool->CreateSegmentationNode(m_pImageSelector->GetSelectedNode(), newNode,
              dialog->GetSegmentationName().toStdString().c_str(), SegRGBColor(color.GetRed(), color.GetGreen(), color.GetBlue()));
          GetDataStorage()->Add(newNode, m_pImageSelector->GetSelectedNode());
-         m_pMitkRenderWindow->Reinit(newNode);
+         GetMitkRenderWindowInterface()->Reinit(newNode);
          m_pSegmentSelector->SetSelectedNode(newNode);
 
          if (!m_bToolInited)

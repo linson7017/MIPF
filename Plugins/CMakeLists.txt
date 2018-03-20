@@ -6,6 +6,13 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 add_definitions(-DQF_API_EXPORTS)
 
+add_subdirectory(MipfPluginBase)
+
+macro(link_framework)
+	link_qf()
+	link_MipfPluginBase()
+endmacro(link_framework)
+
 add_subdirectory(Mipf_Plugin_MitkStdWidgets)
 
 add_subdirectory(Mipf_Plugin_ImageRegistration)
@@ -65,3 +72,7 @@ add_subdirectory(Mipf_Plugin_TubularTracking)
 add_subdirectory(Mipf_Plugin_SliceBySliceTracking)
  
 add_subdirectory(Mipf_Plugin_SphereCropper)
+ 
+add_subdirectory(Mipf_Plugin_TruncusSegmentation)
+ 
+add_subdirectory(Mipf_Plugin_RSSSegmentation)

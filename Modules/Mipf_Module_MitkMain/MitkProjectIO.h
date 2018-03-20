@@ -11,8 +11,6 @@
 #include "mitkDataStorage.h"
 #include "mitkNodePredicateBase.h"
 
-#define WINVER 0x0A00  
-#define _WIN32_WINNT 0x0A00  
 
 #include <Poco/Zip/ZipLocalFileHeader.h>
 class TiXmlElement;

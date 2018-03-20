@@ -14,25 +14,25 @@
 					<HLayout>
 						<Label text="Select Style" row="0" col="0"/>
 						<ComboBox  row="0" col="1">
-							<ComboBoxItem text="Fusion" uicommand="@uicommand/changeReferenceStyleToFusion"/>
-							<ComboBoxItem text="Windows" uicommand="@uicommand/changeReferenceStyleToWindows"/>
-							<ComboBoxItem text="MainStyle" uicommand="@uicommand/changeReferenceStyleToMainStyle"/>
-							<ComboBoxItem text="DarkStyle" uicommand="@uicommand/changeReferenceStyleToQssDark"/>
-							<ComboBoxItem text="BF" uicommand="@uicommand/changeReferenceStyleToQssBF"/>
-							<ComboBoxItem text="Black" uicommand="@uicommand/changeReferenceStyleToQssBlack"/>
-							<ComboBoxItem text="Blue" uicommand="@uicommand/changeReferenceStyleToQssBlue"/>
-							<ComboBoxItem text="DarkBlue" uicommand="@uicommand/changeReferenceStyleToQssDarkBlue"/>
-							<ComboBoxItem text="DarkBlack" uicommand="@uicommand/changeReferenceStyleToQssDarkBlack"/>
-							<ComboBoxItem text="DarkGray" uicommand="@uicommand/changeReferenceStyleToQssDarkGray"/>
-							<ComboBoxItem text="FlatBlac" uicommand="@uicommand/changeReferenceStyleToQssFlatBlack"/>
-							<ComboBoxItem text="FlatWhite" uicommand="@uicommand/changeReferenceStyleToQssFlatWhite"/>
-							<ComboBoxItem text="Gray" uicommand="@uicommand/changeReferenceStyleToQssGray"/>
-							<ComboBoxItem text="LightBlack" uicommand="@uicommand/changeReferenceStyleToQssLightBlack"/>
-							<ComboBoxItem text="LightBlue" uicommand="@uicommand/changeReferenceStyleToQssLightBlue"/>
-							<ComboBoxItem text="LightGray" uicommand="@uicommand/changeReferenceStyleToQssLightGray"/>
-							<ComboBoxItem text="PsBalck" uicommand="@uicommand/changeReferenceStyleToQssPsBalck"/>
-							<ComboBoxItem text="Silvery" uicommand="@uicommand/changeReferenceStyleToQssSilvery"/>
-							<ComboBoxItem text="Test" uicommand="@uicommand/changeReferenceStyleToQssTest"/>
+							<ComboBoxItem text="Fusion" commands="@commands/changeReferenceStyleToFusion"/>
+							<ComboBoxItem text="Windows" commands="@commands/changeReferenceStyleToWindows"/>
+							<ComboBoxItem text="MainStyle" commands="@commands/changeReferenceStyleToMainStyle"/>
+							<ComboBoxItem text="DarkStyle" commands="@commands/changeReferenceStyleToQssDark"/>
+							<ComboBoxItem text="BF" commands="@commands/changeReferenceStyleToQssBF"/>
+							<ComboBoxItem text="Black" commands="@commands/changeReferenceStyleToQssBlack"/>
+							<ComboBoxItem text="Blue" commands="@commands/changeReferenceStyleToQssBlue"/>
+							<ComboBoxItem text="DarkBlue" commands="@commands/changeReferenceStyleToQssDarkBlue"/>
+							<ComboBoxItem text="DarkBlack" commands="@commands/changeReferenceStyleToQssDarkBlack"/>
+							<ComboBoxItem text="DarkGray" commands="@commands/changeReferenceStyleToQssDarkGray"/>
+							<ComboBoxItem text="FlatBlac" commands="@commands/changeReferenceStyleToQssFlatBlack"/>
+							<ComboBoxItem text="FlatWhite" commands="@commands/changeReferenceStyleToQssFlatWhite"/>
+							<ComboBoxItem text="Gray" commands="@commands/changeReferenceStyleToQssGray"/>
+							<ComboBoxItem text="LightBlack" commands="@commands/changeReferenceStyleToQssLightBlack"/>
+							<ComboBoxItem text="LightBlue" commands="@commands/changeReferenceStyleToQssLightBlue"/>
+							<ComboBoxItem text="LightGray" commands="@commands/changeReferenceStyleToQssLightGray"/>
+							<ComboBoxItem text="PsBalck" commands="@commands/changeReferenceStyleToQssPsBalck"/>
+							<ComboBoxItem text="Silvery" commands="@commands/changeReferenceStyleToQssSilvery"/>
+							<ComboBoxItem text="Test" commands="@commands/changeReferenceStyleToQssTest"/>
 						</ComboBox>
 						<Button id="setting.ApplyRefeneceStyle" text="Apply" uicommand="@uicommand/applyReferenceStyle"/>
 						<Stretch size="200"/>

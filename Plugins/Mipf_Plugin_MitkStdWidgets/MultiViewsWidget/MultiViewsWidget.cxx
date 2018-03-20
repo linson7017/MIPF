@@ -27,6 +27,7 @@
 
 #include "iqf_main.h"
 #include "Utils/variant.h"
+#include "Res/R.h"
 
 //##Documentation
 //## @brief As MultiViews, but with QmitkStdMultiWidget as widget
@@ -108,7 +109,7 @@ void MultiViewsWidget::SetupWidgets()
     
 
     //set cross hair
-    int crosshairgapsize = m_pMitkReferences->GetInt("Crosshair-Gap-Size", 1);
+    int crosshairgapsize = GetMitkReferenceInterface()->GetInt("Crosshair-Gap-Size", 1);
     if (HasAttribute("Crosshair-Gap-Size"))
     {
         crosshairgapsize = QString(GetAttribute("Crosshair-Gap-Size")).toInt();

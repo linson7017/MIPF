@@ -162,6 +162,10 @@ void MeasurementWidget::Update(const char* szMessage, int iValue , void* pValue 
     {
         SelectionChanged(GetCurrentSelection());
     }
+    else if (strcmp(szMessage, "MITK_MESSAGE_DATA_MANAGER_SELECTION_CHANGED") == 0)
+    {
+        int x = 0;
+    }
     else if (strcmp(szMessage, MITK_MESSAGE_NODE_ADDED) == 0)
     {
         NodeAdded((mitk::DataNode*)pValue);
@@ -820,13 +824,17 @@ void MeasurementWidget::SelectionChanged(const QList<mitk::DataNode::Pointer>& n
            // auto linkedRenderWindow = dynamic_cast<mitk::ILinkedRenderWindowPart*>(this->GetRenderWindowPart());
             QmitkRenderWindow* selectedRenderWindow;
 
-            if (!m_pMitkRenderWindow)
+            if (!GetMitkRenderWindowInterface())
                 return;
-
-            auto axialRenderWindow = m_pMitkRenderWindow->GetQmitkRenderWindow("axial");
-            auto sagittalRenderWindow = m_pMitkRenderWindow->GetQmitkRenderWindow("sagittal");
-            auto coronalRenderWindow = m_pMitkRenderWindow->GetQmitkRenderWindow("coronal");
-            auto threeDimRenderWindow = m_pMitkRenderWindow->GetQmitkRenderWindow("3d");
+            QString multiWigetID = "multi-widget-default";
+            if (HasAttribute("multiWidget"))
+            {
+                multiWigetID = GetAttribute("multiWidget");
+            }  
+            auto axialRenderWindow = GetMitkRenderWindowInterface()->GetQmitkRenderWindow(multiWigetID+"-axial");
+            auto sagittalRenderWindow = GetMitkRenderWindowInterface()->GetQmitkRenderWindow(multiWigetID + "-sagittal");
+            auto coronalRenderWindow = GetMitkRenderWindowInterface()->GetQmitkRenderWindow(multiWigetID + "-coronal");
+            auto threeDimRenderWindow = GetMitkRenderWindowInterface()->GetQmitkRenderWindow(multiWigetID + "-3d");
 
             if (node->GetBoolProperty("planarFigureInitializedWindow", planarFigureInitializedWindow, axialRenderWindow->GetRenderer()))
             {

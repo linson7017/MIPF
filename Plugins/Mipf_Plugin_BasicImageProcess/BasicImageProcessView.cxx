@@ -229,9 +229,9 @@ void BasicImageProcessView::CreateConnections()
 
 void BasicImageProcessView::InternalGetTimeNavigationController()
 {
-    if (m_pMitkRenderWindow)
+    if (GetMitkRenderWindowInterface())
     {
-        auto tnc = m_pMitkRenderWindow->GetRenderingManager()->GetTimeNavigationController();
+        auto tnc = GetMitkRenderWindowInterface()->GetRenderingManager()->GetTimeNavigationController();
         if (tnc != nullptr)
         {
             m_TimeStepperAdapter = new QmitkStepperAdapter((QObject*)m_Controls->sliceNavigatorTime, tnc->GetTime(), "sliceNavigatorTimeFromBIP");

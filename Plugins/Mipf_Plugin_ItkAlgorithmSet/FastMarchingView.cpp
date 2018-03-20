@@ -80,7 +80,7 @@ void FastMarchingView::CreateView()
     m_pPointSetNode->SetProperty("layer", mitk::IntProperty::New(1024));
     GetDataStorage()->Add(m_pPointSetNode);
     m_ui.SeedWidget->SetPointSetNode(m_pPointSetNode);
-    m_ui.SeedWidget->SetMultiWidget(m_pMitkRenderWindow->GetMitkStdMultiWidget());
+    m_ui.SeedWidget->SetMultiWidget(GetMitkRenderWindowInterface()->GetMitkStdMultiWidget());
 
     connect(m_ui.SeedWidget, SIGNAL(PointListChanged()), this, SLOT(SeedPointsChanged()));
 

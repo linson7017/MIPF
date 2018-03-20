@@ -470,7 +470,7 @@ void SFLSSegmentationView::CreateNewSeedImage()
     m_pMitkSegTool->CreateSegmentationNode(m_Controls->cmbbxOriginalImageSelector->GetSelectedNode(), newNode,
         dialog->GetSegmentationName().toStdString().c_str(), SegRGBColor(color.GetRed(), color.GetGreen(), color.GetBlue()));
     GetDataStorage()->Add(newNode, m_Controls->cmbbxOriginalImageSelector->GetSelectedNode());
-    m_pMitkRenderWindow->Reinit(newNode);
+    GetMitkRenderWindowInterface()->Reinit(newNode);
     m_Controls->cmbbxLabelImageSelector->SetSelectedNode(newNode);
 
     if (!m_bToolInited)

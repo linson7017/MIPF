@@ -40,8 +40,8 @@ class GraphcutSegmentationView : public QObject, public MitkPluginView
 {
     Q_OBJECT
 public:
-    GraphcutSegmentationView(QF::IQF_Main* pMain);
-    void Constructed();
+    GraphcutSegmentationView();
+    void SetupResource();
 protected:
     virtual void Update(const char* szMessage, int iValue = 0, void* pValue = 0);
 

@@ -27,7 +27,7 @@ void SurfaceCombineView::CreateView()
 
 void SurfaceCombineView::Add()
 {
-    std::vector<mitk::DataNode::Pointer> selectedNode = m_pMitkDataManager->GetSelectedNodes();
+    std::vector<mitk::DataNode::Pointer> selectedNode = GetMitkDataManagerInterface()->GetSelectedNodes();
     for (auto node : selectedNode)
     {
         mitk::Surface* surface = dynamic_cast<mitk::Surface*>(node->GetData());

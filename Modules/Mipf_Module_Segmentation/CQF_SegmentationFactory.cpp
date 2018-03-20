@@ -2,12 +2,12 @@
 #include "FastGrowCut/FastGrowCutSegmenter.h"
 #include "Airway/AirwaySegmentation.h"
 #include "Graphcut/GraphCut.h"
+#include "RSS/SFLSRobustStatSegmentor3DLabelMap_single.h"
 
 
 CQF_SegmentationFactory::CQF_SegmentationFactory()
 {
 }
-
 
 CQF_SegmentationFactory::~CQF_SegmentationFactory()
 {
@@ -26,4 +26,9 @@ IQF_AirwaySegmentation* CQF_SegmentationFactory::CreateAirwaySegmentationMethod(
 IQF_GraphcutSegmentation* CQF_SegmentationFactory::CreateGraphcutSegmentationMethod()
 {
     return new GraphCut();
+}
+
+IQF_RSSSegmentation* CQF_SegmentationFactory::CreateRSSSegmentationMethod()
+{
+    return new CSFLSRobustStatSegmentor3DLabelMap<>();
 }

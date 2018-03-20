@@ -5,7 +5,7 @@
 #include "iqf_main.h"
 
 CQF_MitkDataManager::CQF_MitkDataManager(QF::IQF_Main* pMain):m_pMain(pMain),
-m_DefaultDataStorageID("datastorage-default")
+m_DefaultDataStorageID("")
 {
     //Init();
 }
@@ -31,22 +31,8 @@ void CQF_MitkDataManager::SetDataStorage(mitk::DataStorage::Pointer dataStorage,
     {
         return;
     }
-     if (id.empty())
-     {
-         //remove defalut datastorage
-         /*DataStorageMapType::iterator it = m_DataStorageMap.find(m_DefaultDataStorageID);
-         if (it!=m_DataStorageMap.end())
-         {
-             it->second->Delete();
-             m_DataStorageMap.erase(it);
-         }*/
-         m_DataStorageMap[m_DefaultDataStorageID] = dataStorage;
-     }
-     else
-     {
-         m_DataStorageMap[id] = dataStorage;
-     }
-     RelateDataStorage(dataStorage);
+    m_DataStorageMap[id] = dataStorage;
+    RelateDataStorage(dataStorage);
 }
 
 void CQF_MitkDataManager::RelateDataStorage(mitk::DataStorage::Pointer pDataStorage)
@@ -66,12 +52,7 @@ void CQF_MitkDataManager::RelateDataStorage(mitk::DataStorage::Pointer pDataStor
 
 mitk::DataStorage::Pointer CQF_MitkDataManager::GetDataStorage(const std::string& id)
 {
-    std::string temp=id;
-    if (temp.empty())
-    {
-        temp = m_DefaultDataStorageID;
-    }
-    DataStorageMapType::iterator it = m_DataStorageMap.find(temp);
+    DataStorageMapType::iterator it = m_DataStorageMap.find(id);
     if (it != m_DataStorageMap.end())
     {
         return it->second;
@@ -117,6 +98,27 @@ mitk::DataNode::Pointer CQF_MitkDataManager::GetCurrentNode(const std::string& i
     else if(m_NodeSet.size()>0)
     {
         return m_NodeSet.front();
+    }
+    else
+    {
+        return NULL;
+    }
+}
+
+void CQF_MitkDataManager::SetDataManagerSubject(QF::IQF_Subject* pSubject, const std::string& id)
+{
+    if (pSubject)
+    {
+        m_DataManagerSubjects[id] = pSubject;
+    }    
+}
+
+QF::IQF_Subject* CQF_MitkDataManager::GetDataManagerSubject(const std::string& id)
+{
+    SubjectMapType::iterator it = m_DataManagerSubjects.find(id);
+    if (it != m_DataManagerSubjects.end())
+    {
+        return it->second;
     }
     else
     {

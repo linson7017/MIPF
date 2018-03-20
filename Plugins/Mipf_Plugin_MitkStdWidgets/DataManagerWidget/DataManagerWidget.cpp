@@ -77,10 +77,13 @@
 #include <Res/R.h>
 #include <Common/qt_context.h>
 
+#include "iqf_subject.h"
+
 
 DataManagerWidget::DataManagerWidget() :MitkPluginView(),
 m_CurrentRowCount(0)
 {
+    m_pDataManagerSubject = QF::QF_CreateSubjectObject();
 }
 
 DataManagerWidget::~DataManagerWidget()
@@ -91,14 +94,16 @@ DataManagerWidget::~DataManagerWidget()
         // first== the NodeDescriptor; second== the registered QAction
         (it->first)->RemoveAction(it->second);
     }
+    QF::QF_ReleaseSubjectObject(m_pDataManagerSubject);
 }
 
 
 void DataManagerWidget::CreateView()
 {
     m_Parent = this;
-    m_pMain->Attach(this);
+    //m_pMain->Attach(this);
     m_DataManager = (IQF_MitkDataManager*)m_pMain->GetInterfacePtr(QF_MitkMain_DataManager);
+    m_DataManager->SetDataManagerSubject(m_pDataManagerSubject, GetAttribute("id"));
 	QVBoxLayout* layout = new QVBoxLayout;
     setLayout(layout);    
     //# GUI
@@ -373,9 +378,13 @@ void DataManagerWidget::NodeSelectionChanged(const QItemSelection & selected, co
 
     m_DataManager->SetSelectedNode(selectedNodes);
 
-    if (selectedNodes.size()>0)
+    if (selectedNodes.size() > 0)
     {
         m_pMain->SendMessageQf(MITK_MESSAGE_NODE_SELECTION_CHANGED, selectedNodes.size(), m_DataManager);
+    }
+    if (m_pDataManagerSubject)
+    {
+        m_pDataManagerSubject->Notify("MITK_MESSAGE_DATA_MANAGER_SELECTION_CHANGED", selectedNodes.size(), &selectedNodes);
     }
 }
 
