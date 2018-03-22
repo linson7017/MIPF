@@ -104,14 +104,15 @@ void PCLView::Apply()
     icp->align(*tmp, guess);
     t = t * icp->getFinalTransformation();
     //pcl::transformPointCloud(*movingCloud, *tmp, t);
+    Eigen::Matrix4f ftm = icp->getFinalTransformation();
     std::cout << icp->getFinalTransformation() << std::endl;
 
     //display transfrom matrix
     QString matrixStr = QString("%1 %2 %3 %4\n%5 %6 %7 %8\n%9 %10 %11 %12\n%13 %14 %15 %16")
-        .arg(guess(0, 0)).arg(guess(0, 1)).arg(guess(0, 2)).arg(guess(0, 3))
-        .arg(guess(1, 0)).arg(guess(1, 1)).arg(guess(1, 2)).arg(guess(1, 3))
-        .arg(guess(2, 0)).arg(guess(2, 1)).arg(guess(2, 2)).arg(guess(2, 3))
-        .arg(guess(3, 0)).arg(guess(3, 1)).arg(guess(3, 2)).arg(guess(3, 3));
+        .arg(ftm(0, 0)).arg(ftm(0, 1)).arg(ftm(0, 2)).arg(ftm(0, 3))
+        .arg(ftm(1, 0)).arg(ftm(1, 1)).arg(ftm(1, 2)).arg(ftm(1, 3))
+        .arg(ftm(2, 0)).arg(ftm(2, 1)).arg(ftm(2, 2)).arg(ftm(2, 3))
+        .arg(ftm(3, 0)).arg(ftm(3, 1)).arg(ftm(3, 2)).arg(ftm(3, 3));
     m_ui.TransformMatrixTE->setPlainText(matrixStr);
 
 

@@ -123,7 +123,7 @@
 	</ToolBar>
 	
 	<!-- 显示窗口 -->
-	<MultiViewsWidget id="multi-widget-default" centerWidget="true"  contents_margin="0"/>
+	<MultiViewsWidget id="multi-widget-default" centerWidget="true"  contents_margin="0" logo="@icon/mipf.png"/>
 	
 	<!-- 停靠窗口 -->
 	<DockWidget id="main.DataManagerDocWidget" windowTitle="Data Manager" minWidth="400">
@@ -198,6 +198,8 @@
 	</DockWidget>
 	<DockWidget id="main.Test" windowTitle="Test" tabfiedDocWidgetID="main.StaticisTools" dockWidgetArea="RightDockWidgetArea" visible="true">
 		<ToolBox>
+			<SurfaceInteractionWidget text="Surface Interaction"/>
+			<PCLWidget text="PCL"/>
 			<RSSegmentationWidget text="Robust Statistics Segmentation" />
 			<LungSegmentationWidget text="Lung Segmentation" />
 			<ImageInteractionWidget text="Image Interaction" />

@@ -18,9 +18,7 @@ AirwaySegmentationView::AirwaySegmentationView() :MitkPluginView(), m_pPointList
 	connect(&m_watcher, &QFutureWatcher<void>::finished, this, &AirwaySegmentationView::AirwayFinished);
 
 	m_labelimage = mitk::Image::New();
-	m_result = mitk::DataNode::New();
-
-    
+	m_result = mitk::DataNode::New();    
 }
 
 AirwaySegmentationView::~AirwaySegmentationView()

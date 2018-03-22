@@ -218,7 +218,6 @@ add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 #add framework dependencies
 FIND_PACKAGE(QTXML REQUIRED)
 FIND_PACKAGE(QFMAIN REQUIRED)
-FIND_PACKAGE(QFCOMMON REQUIRED)
 macro(link_qf)
 	target_link_libraries(${PROJECT_NAME} ${QTXML_LIBRARIES} ${QFMAIN_LIBRARIES})
 endmacro(link_qf)

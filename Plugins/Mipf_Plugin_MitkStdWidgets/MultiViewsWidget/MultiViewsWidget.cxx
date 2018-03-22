@@ -29,6 +29,12 @@
 #include "Utils/variant.h"
 #include "Res/R.h"
 
+#include "vtkAxesActor.h"
+#include "vtkOrientationMarkerWidget.h"
+#include "vtkRenderWindow.h"
+#include "vtkRenderer.h"
+#include "vtkRendererCollection.h"
+
 //##Documentation
 //## @brief As MultiViews, but with QmitkStdMultiWidget as widget
 
@@ -117,6 +123,7 @@ void MultiViewsWidget::SetupWidgets()
     m_multiWidget->GetWidgetPlane1()->SetIntProperty("Crosshair.Gap Size", crosshairgapsize);
     m_multiWidget->GetWidgetPlane2()->SetIntProperty("Crosshair.Gap Size", crosshairgapsize);
     m_multiWidget->GetWidgetPlane3()->SetIntProperty("Crosshair.Gap Size", crosshairgapsize);
+
 }
 
 
