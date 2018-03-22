@@ -182,9 +182,18 @@ void MapperTestView::Cut(bool enableCut)
 #include "vtkVolume.h"
 #include "vtkAbstractVolumeMapper.h"
 #include "vtkBoxWidget.h"
+#include "Rendering/OrientationMarkerVtkMapper3D.h"
 
 void MapperTestView::Apply()
 {
+    mitk::OrientationMarkerVtkMapper3D::Pointer orientationMapper3D = mitk::OrientationMarkerVtkMapper3D::New();
+    m_ui.DataSelector->GetSelectedNode()->SetMapper(mitk::BaseRenderer::Standard3D, orientationMapper3D);
+    m_ui.DataSelector->GetSelectedNode()->SetMapper(mitk::BaseRenderer::Standard2D, orientationMapper3D);
+    orientationMapper3D->SetDataNode(m_ui.DataSelector->GetSelectedNode());
+    RequestRenderWindowUpdate();
+
+    return;
+
     mitk::DataNode* node = m_ui.DataSelector->GetSelectedNode();
     mitk::VtkMapper* mapper = dynamic_cast<mitk::VtkMapper*>(node->GetMapper(mitk::BaseRenderer::Standard3D));
     vtkProp* prop = mapper->GetVtkProp(GetMitkRenderWindowInterface()->GetMitkStdMultiWidget()->GetRenderWindow4()->GetRenderer());

@@ -50,7 +50,17 @@ void mitk::ColoredSurfaceVtkMapper::GenerateDataForRenderer(mitk::BaseRenderer *
 
     ls->m_Mapper->SetInputData(GetInput()->GetVtkPolyData());
 
-    ls->m_Mapper->SetScalarRange(GetInput()->GetVtkPolyData()->GetPointData()->GetArray("RegionId")->GetRange());
+    ApplyProperties(renderer);
+}
+
+void mitk::ColoredSurfaceVtkMapper::ApplyProperties(mitk::BaseRenderer *renderer)
+{
+    LocalStorage *ls = m_LSH.GetLocalStorage(renderer);
+    vtkDataArray* array = GetInput()->GetVtkPolyData()->GetPointData()->GetArray("RegionId");
+    if (array)
+    {
+        ls->m_Mapper->SetScalarRange(array->GetRange());
+    }
     mitk::LookupTableProperty* lutp = dynamic_cast<mitk::LookupTableProperty*>(GetDataNode()->GetProperty("lookup table"));
 
     if (lutp)

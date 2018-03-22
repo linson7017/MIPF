@@ -34,6 +34,11 @@
 #include "vtkRenderWindow.h"
 #include "vtkRenderer.h"
 #include "vtkRendererCollection.h"
+#include "vtkXMLPolyDataReader.h"
+#include "vtkTransformPolyDataFilter.h"
+#include "vtkMath.h"
+
+#include "Rendering/OrientationMarkerVtkMapper3D.h"
 
 //##Documentation
 //## @brief As MultiViews, but with QmitkStdMultiWidget as widget
@@ -123,6 +128,45 @@ void MultiViewsWidget::SetupWidgets()
     m_multiWidget->GetWidgetPlane1()->SetIntProperty("Crosshair.Gap Size", crosshairgapsize);
     m_multiWidget->GetWidgetPlane2()->SetIntProperty("Crosshair.Gap Size", crosshairgapsize);
     m_multiWidget->GetWidgetPlane3()->SetIntProperty("Crosshair.Gap Size", crosshairgapsize);
+
+    //set orientation marker
+    if (HasAttribute("Orientation-Marker"))
+    { 
+        auto reader = vtkSmartPointer<vtkXMLPolyDataReader>::New();
+        reader->SetFileName(R::Instance()->getImageResourceUrl(GetAttribute("Orientation-Marker")).c_str());
+        reader->Update();
+        vtkPolyData* polyData = reader->GetOutput();
+        if (polyData)
+        {
+            double bounds[6];
+            polyData->GetBounds(bounds);
+            double scale = 100.0/vtkMath::Max(vtkMath::Max(bounds[1] - bounds[0], bounds[3] - bounds[2]), bounds[5] - bounds[4]);
+            double center[3];
+            polyData->GetCenter(center);
+            vtkSmartPointer<vtkTransform> translation =
+                vtkSmartPointer<vtkTransform>::New();
+            translation->Scale(scale, scale, scale);
+            translation->Translate(-center[0],-center[1],-center[2]);
+            vtkSmartPointer<vtkTransformPolyDataFilter> transformFilter =
+                vtkSmartPointer<vtkTransformPolyDataFilter>::New();
+            transformFilter->SetInputData(polyData);
+            transformFilter->SetTransform(translation);
+            transformFilter->Update();
+
+            m_multiWidget->SetCornerAnnotationVisibility(false);
+            mitk::DataNode::Pointer markerNode = mitk::DataNode::New();
+            mitk::Surface::Pointer markerSurface = mitk::Surface::New();
+            markerSurface->SetVtkPolyData(transformFilter->GetOutput());
+            markerNode->SetData(markerSurface);
+            markerNode->SetBoolProperty("helper object", true);
+            markerNode->SetBoolProperty("includeInBoundingBox", false);
+            mitk::OrientationMarkerVtkMapper3D::Pointer orientationMapper3D = mitk::OrientationMarkerVtkMapper3D::New();
+            markerNode->SetMapper(mitk::BaseRenderer::Standard3D, orientationMapper3D);
+            markerNode->SetMapper(mitk::BaseRenderer::Standard2D, orientationMapper3D);
+            orientationMapper3D->SetDataNode(markerNode);
+            GetDataStorage()->Add(markerNode);
+        }
+    }
 
 }
 

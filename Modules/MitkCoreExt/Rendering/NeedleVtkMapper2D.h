@@ -15,7 +15,6 @@ class vtkFloatArray;
 class vtkCellArray;
 class vtkPolyDataMapper2D;
 
-#pragma once
 
 namespace mitk
 {

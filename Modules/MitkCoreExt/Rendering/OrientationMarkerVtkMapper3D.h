@@ -1,33 +1,38 @@
 /********************************************************************
-	FileName:    ColoredSurfaceVtkMapper.h
+	FileName:    OrientationMarkerVtkMapper3D.h
 	Author:        Ling Song
-	Date:           Month 9 ; Year 2017
+	Date:           Month 3 ; Year 2018
 	Purpose:	     
 *********************************************************************/
-#ifndef ColoredSurfaceVtkMapper_h__
-#define ColoredSurfaceVtkMapper_h__
+#ifndef OrientationMarkerVtkMapper3D_h__
+#define OrientationMarkerVtkMapper3D_h__
+
+#include "qf_config.h"
 
 #include "mitkCommon.h"
 #include "mitkVtkMapper.h"
 #include "mitkSurface.h"
+#include "Rendering/ColoredSurfaceVtkMapper.h"
 
 #include "vtkSmartPointer.h"
-#include "qf_config.h"
 
-class vtkActor;
 class vtkPolyDataMapper;
-class vtkPropAssembly;
+class vtkActor;
+class vtkRenderer;
 
 namespace mitk
 {
-    class QF_API  ColoredSurfaceVtkMapper : public VtkMapper
+    class QF_API OrientationMarkerVtkMapper3D : public VtkMapper
     {
     public:
-        mitkClassMacro(ColoredSurfaceVtkMapper, VtkMapper);
+    public:
+        mitkClassMacro(OrientationMarkerVtkMapper3D, VtkMapper);
         itkFactorylessNewMacro(Self) itkCloneMacro(Self);
+
         virtual const mitk::Surface  *GetInput() const;
         /** \brief returns the a prop assembly */
         virtual vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) override;
+
 
         class LocalStorage : public mitk::Mapper::BaseLocalStorage
         {
@@ -37,20 +42,21 @@ namespace mitk
 
             /* destructor */
             ~LocalStorage() {}
-            // actor
-            vtkSmartPointer<vtkActor> m_Actor;
-            vtkSmartPointer<vtkPolyDataMapper> m_Mapper;
 
-            vtkSmartPointer<vtkPropAssembly> m_Assembly;
+            // actor
+            vtkSmartPointer<vtkActor> m_orientationActor;
+            vtkSmartPointer<vtkPolyDataMapper> m_orientationMapper;
         };
 
         mitk::LocalStorageHandler<LocalStorage> m_LSH;
     protected:
-        ColoredSurfaceVtkMapper();
-        ~ColoredSurfaceVtkMapper();
-        virtual void GenerateDataForRenderer(mitk::BaseRenderer *renderer) override;
-        virtual void ApplyProperties(mitk::BaseRenderer *renderer);
-    };
-}
 
-#endif // ColoredSurfaceVtkMapper_h__
+        OrientationMarkerVtkMapper3D();
+        ~OrientationMarkerVtkMapper3D();
+
+        virtual void GenerateDataForRenderer(mitk::BaseRenderer *renderer) override;
+        static double ComputeScale(const double position[3], vtkRenderer *renderer);
+    };
+
+}
+#endif // OrientationMarkerVtkMapper3D_h__
