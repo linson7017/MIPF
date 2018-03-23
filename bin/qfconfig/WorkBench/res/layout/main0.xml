@@ -2,7 +2,7 @@
 	<VLayout>
         <Button text="导入数据" command="@command/loadData1"/>
         <DataManagerWidget datastorage="storage1"/>
-        <MultiViewsWidget datastorage="storage1" height="800" 
+        <MultiViewsWidget datastorage="" height="800" 
 		widgetsVisible="false" logo="@icon/mipf.png"/>
 	</VLayout>
     <VLayout>
@@ -13,8 +13,8 @@
     </VLayout>
 	<VLayout>
         <Button text="导入数据" command="@command/loadData2"/>
-        <DataManagerWidget datastorage="storage2"/>
+        <DataManagerWidget datastorage=""/>
         <MultiViewsWidget datastorage="storage2" height="800" 
-		mapperID="Standard3D" logo="@icon/mipf.png"/>
+		logo="@icon/mipf.png"/>
     </VLayout>
 </HLayout>

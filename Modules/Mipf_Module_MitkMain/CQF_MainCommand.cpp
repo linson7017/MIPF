@@ -63,7 +63,7 @@ bool CQF_MainCommand::ExecuteCommand(const char* szCommandID, QF::IQF_Properties
         }
         catch (const mitk::Exception& e)
         {
-            MITK_INFO << e;
+            MITK_ERROR << e;
             return false;
         }
         mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(pDataStorage);
@@ -176,11 +176,12 @@ bool CQF_MainCommand::ExecuteCommand(const char* szCommandID, QF::IQF_Properties
         IQF_MitkRenderWindow* pRenderWindow = (IQF_MitkRenderWindow*)m_pMain->GetInterfacePtr(QF_MitkMain_RenderWindow);
         if (pRenderWindow)
         {
-            if (pRenderWindow->GetMitkStdMultiWidget())
+            QmitkStdMultiWidget* pMultiWidget = pRenderWindow->GetMitkStdMultiWidget(pInParam->GetStringProperty("MultiViewID", ""));
+            if (pMultiWidget)
             {
-                QmitkStdMultiWidget* pMultiWidget = pRenderWindow->GetMitkStdMultiWidget(pInParam->GetStringProperty("MultiViewID", ""));
                 pMultiWidget->ResetCrosshair();
-            }
+                return true;
+            }    
             else
             {
                 return false;
@@ -188,6 +189,59 @@ bool CQF_MainCommand::ExecuteCommand(const char* szCommandID, QF::IQF_Properties
         }
         else
         {
+            return false;
+        }
+    }
+    else if (strcmp(szCommandID, MITK_MAIN_COMMAND_ENABLE_ORIENTATION_MARKER) == 0)
+    {
+        std::string datastorageID = pInParam->GetStringProperty("DataStorage", "");
+        IQF_MitkDataManager* pMitkDataManager = (IQF_MitkDataManager*)m_pMain->GetInterfacePtr(QF_MitkMain_DataManager);
+        mitk::DataStorage::Pointer pDataStorage = pMitkDataManager->GetDataStorage(datastorageID);
+        if (pDataStorage.IsNull())
+        {
+            MITK_WARN << "Data storage with id \"" << datastorageID << "\" does not exist!";
+            return false;
+        }
+        mitk::DataNode* markerNode = pDataStorage->GetNamedNode("orientation marker");
+        if (markerNode)
+        {
+            IQF_MitkRenderWindow* pMitkRenderWindow = (IQF_MitkRenderWindow*)m_pMain->GetInterfacePtr(QF_MitkMain_RenderWindow);
+            if (pInParam->HasProperty("RenderWindowID"))
+            {
+                QmitkRenderWindow* renderWindow = pMitkRenderWindow->GetQmitkRenderWindow(pInParam->GetStringProperty("RenderWindowID",""));
+                if (renderWindow)
+                {
+                    bool visible = false;
+                    markerNode->GetVisibility(visible, renderWindow->GetRenderer());
+                    markerNode->SetVisibility(pInParam->GetBoolProperty("Visible", visible));
+                    mitk::RenderingManager::GetInstance()->RequestUpdate(renderWindow->GetRenderWindow());
+                }
+            }
+            if (pInParam->HasProperty("MultiViewID"))
+            {
+                QmitkStdMultiWidget* pMultiWidget = pMitkRenderWindow->GetMitkStdMultiWidget(pInParam->GetStringProperty("MultiViewID", ""));
+                if (pMultiWidget)
+                {
+                    bool visible = false;
+                    markerNode->GetVisibility(visible, pMultiWidget->GetRenderWindow1()->GetRenderer());
+                    visible = pInParam->GetBoolProperty("Visible", visible);
+                    markerNode->SetVisibility(visible, pMultiWidget->GetRenderWindow1()->GetRenderer());
+                    markerNode->SetVisibility(visible, pMultiWidget->GetRenderWindow2()->GetRenderer());
+                    markerNode->SetVisibility(visible, pMultiWidget->GetRenderWindow3()->GetRenderer());
+                    markerNode->SetVisibility(visible, pMultiWidget->GetRenderWindow4()->GetRenderer());
+
+                    mitk::RenderingManager::GetInstance()->RequestUpdate(pMultiWidget->GetRenderWindow1()->GetRenderWindow());
+                    mitk::RenderingManager::GetInstance()->RequestUpdate(pMultiWidget->GetRenderWindow2()->GetRenderWindow());
+                    mitk::RenderingManager::GetInstance()->RequestUpdate(pMultiWidget->GetRenderWindow3()->GetRenderWindow());
+                    mitk::RenderingManager::GetInstance()->RequestUpdate(pMultiWidget->GetRenderWindow4()->GetRenderWindow());
+                }
+            }
+            
+            return true;
+        }
+        else
+        {
+            MITK_WARN << "Orientation marker in datastorage " << datastorageID << " does not exist! Please assign the path of Orientation-Marker!";
             return false;
         }
     }
@@ -199,7 +253,7 @@ bool CQF_MainCommand::ExecuteCommand(const char* szCommandID, QF::IQF_Properties
 
 int CQF_MainCommand::GetCommandCount()
 {
-    return 8;
+    return 9;
 }
 
 const char* CQF_MainCommand::GetCommandID(int iIndex)
@@ -222,6 +276,8 @@ const char* CQF_MainCommand::GetCommandID(int iIndex)
         return MITK_MAIN_COMMAND_SAVE_PROJECT;
     case 7:
         return MITK_MAIN_COMMAND_OPEN_PROJECT;
+    case 8:
+        return MITK_MAIN_COMMAND_ENABLE_ORIENTATION_MARKER;
     default:
         return "";
         break;

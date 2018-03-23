@@ -3,11 +3,30 @@
 <Command id="enableVtkWarning" name="MITK_MAIN_COMMAND_ENABLE_VTK_WARNING">
 	<Property type="Object" name="EnableVtkWarning">
 	{
-		"id":"setting.EnableVtkWarning"
+		"id":"setting.EnableVtkWarning",
+		"type":"bool",
 		"name":"checked"
 	}
 	</Property>
 </Command>
+<Command id="enableOrientationMarker" name="MITK_MAIN_COMMAND_ENABLE_ORIENTATION_MARKER">
+	<Property type="Object" name="Visible">
+	{
+		"id":"setting.EnableOrientationMarker",
+		"type":"bool",
+		"name":"checked"
+	}
+	</Property>
+	<Property type="Value" name="RenderWindowID">
+	{
+		"value":"main.TestRenderWindow"
+	}
+	</Property>
+	<Property type="Value" name="MultiViewID">
+	{"value":""}
+	</Property>
+</Command>
+
 <Command id="loadData" name="MITK_MAIN_COMMAND_LOAD_DATA">
 	<!-- <Property type="Value" name="DataStorage">QString:test</Property> -->
 </Command>
@@ -27,11 +46,4 @@
 </Command>
 <Command id="resetMultiView" name="MITK_MAIN_COMMAND_RESET_MULTIVIEW">
     <Property type="Value" name="MultiViewID">{"value":"main.mitkMulitView"}</Property>
-</Command>
-<Command id="loadData1" name="MITK_MAIN_COMMAND_LOAD_DATA">
-	<Property type="Value" name="DataStorage">{"value":"storage1"}</Property>
-</Command>
-
-<Command id="loadData2" name="MITK_MAIN_COMMAND_LOAD_DATA">
-	<Property type="Value" name="DataStorage">{"value":"storage2"}</Property>
 </Command>

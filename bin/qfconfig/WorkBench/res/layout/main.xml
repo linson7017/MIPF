@@ -123,7 +123,7 @@
 	</ToolBar>
 	
 	<!-- 显示窗口 -->
-	<MultiViewsWidget id="multi-widget-default" centerWidget="true"  contents_margin="0" 
+	<MultiViewsWidget centerWidget="true"  contents_margin="0" 
 						logo="@icon/mipf.png"
 						Orientation-Marker="@icon/Human.vtp"/>
 	
@@ -206,7 +206,9 @@
 			<LungSegmentationWidget text="Lung Segmentation" />
 			<ImageInteractionWidget text="Image Interaction" />
 			<Holder id="@ui/ManualSegmentationTest" text="Manual Segmentation" />
-			<RenderWindowWidget	text="Render Window 3D" size="300,300"
+			<RenderWindowWidget	id="main.TestRenderWindow"
+				text="Render Window 3D" 
+				size="300,300"
 				mapperID="Standard3D" 
 				cornerText0="test0&#xA;Second Line" 
 				cornerText1="test1" 

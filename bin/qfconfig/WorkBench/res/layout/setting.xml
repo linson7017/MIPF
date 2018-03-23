@@ -46,6 +46,9 @@
 					<HLayout>
 						<CheckBox id="setting.EnableVtkWarning" text="VTK Warning" checked="false" command="@command/enableVtkWarning"/>
 					</HLayout>
+					<HLayout>
+						<CheckBox id="setting.EnableOrientationMarker" text="Orientation Marker" checked="true" command="@command/enableOrientationMarker" />
+					</HLayout>
 					<Label p_styleType="seperator" width="200" height="2"/>
 					<HLayout>
 						<Label text="Crosshair Gap Size:"/>

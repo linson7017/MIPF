@@ -98,7 +98,13 @@ void OrientationMarkerVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer *r
     {
         return;
     }*/
-
+    bool visible = false;
+    GetDataNode()->GetVisibility(visible, renderer);
+    if (!visible)
+    {
+        return;
+    }
+    
     LocalStorage *ls = m_LSH.GetLocalStorage(renderer);
     ls->UpdateGenerateDataTime();
 

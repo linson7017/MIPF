@@ -29,11 +29,6 @@
 #include "Utils/variant.h"
 #include "Res/R.h"
 
-#include "vtkAxesActor.h"
-#include "vtkOrientationMarkerWidget.h"
-#include "vtkRenderWindow.h"
-#include "vtkRenderer.h"
-#include "vtkRendererCollection.h"
 #include "vtkXMLPolyDataReader.h"
 #include "vtkTransformPolyDataFilter.h"
 #include "vtkMath.h"
@@ -54,13 +49,9 @@ void MultiViewsWidget::CreateView()
 
 void MultiViewsWidget::Update(const char* szMessage, int iValue, void* pValue)
 {
-    if (strcmp(szMessage, "MITK_MESSAGE_MULTIVIEWS_CHANGELAYOUT") == 0)
+    if (strcmp(szMessage, "MITK_MESSAGE_MULTIVIEWS_ENABLE_ORIENTATION_MARKER") == 0)
     {
-        ChangeLayout(variant::GetVariant(*(VarientMap*)pValue, "parameterIndex").getInt());
-    }
-    else if (strcmp(szMessage, "MITK_MESSAGE_MULTIVIEWS_RESET") == 0)
-    {
-        ResetView();
+
     }
 }
 
@@ -132,6 +123,15 @@ void MultiViewsWidget::SetupWidgets()
     //set orientation marker
     if (HasAttribute("Orientation-Marker"))
     { 
+        mitk::DataNode* insideMarkerNode = GetDataStorage()->GetNamedNode("orientation marker");
+        if (insideMarkerNode)
+        {
+            insideMarkerNode->SetVisibility(true, m_multiWidget->GetRenderWindow1()->GetRenderer());
+            insideMarkerNode->SetVisibility(true, m_multiWidget->GetRenderWindow2()->GetRenderer());
+            insideMarkerNode->SetVisibility(true, m_multiWidget->GetRenderWindow3()->GetRenderer());
+            insideMarkerNode->SetVisibility(true, m_multiWidget->GetRenderWindow4()->GetRenderer());
+            return;
+        }
         auto reader = vtkSmartPointer<vtkXMLPolyDataReader>::New();
         reader->SetFileName(R::Instance()->getImageResourceUrl(GetAttribute("Orientation-Marker")).c_str());
         reader->Update();
@@ -160,6 +160,12 @@ void MultiViewsWidget::SetupWidgets()
             markerNode->SetData(markerSurface);
             markerNode->SetBoolProperty("helper object", true);
             markerNode->SetBoolProperty("includeInBoundingBox", false);
+            markerNode->SetName("orientation marker");
+            markerNode->SetVisibility(false);
+            markerNode->SetVisibility(true, m_multiWidget->GetRenderWindow1()->GetRenderer());
+            markerNode->SetVisibility(true, m_multiWidget->GetRenderWindow2()->GetRenderer());
+            markerNode->SetVisibility(true, m_multiWidget->GetRenderWindow3()->GetRenderer());
+            markerNode->SetVisibility(true, m_multiWidget->GetRenderWindow4()->GetRenderer());
             mitk::OrientationMarkerVtkMapper3D::Pointer orientationMapper3D = mitk::OrientationMarkerVtkMapper3D::New();
             markerNode->SetMapper(mitk::BaseRenderer::Standard3D, orientationMapper3D);
             markerNode->SetMapper(mitk::BaseRenderer::Standard2D, orientationMapper3D);

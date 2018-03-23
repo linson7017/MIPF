@@ -4,7 +4,7 @@
 #include <mitkRenderingManager.h>
 #include <QmitkRenderWindow.h>
 
-CQF_MitkRenderWindow::CQF_MitkRenderWindow():m_DefaultMultiWidgetID("multi-widget-default")
+CQF_MitkRenderWindow::CQF_MitkRenderWindow():m_DefaultMultiWidgetID("")
 {
 
 }
