@@ -1,7 +1,8 @@
 #include "Mipf_Plugin_ImageCropperActivator.h"
 #include "ImageCropperView.h"
 #include "Res/R.h"
-#include <mitkBoundingShapeObjectFactory.h>
+#include "Utils/PluginFactory.h"
+
 
 QF_API QF::IQF_Activator* QF::QF_CreatePluginActivator(QF::IQF_Main* pMain)
 {
@@ -18,8 +19,7 @@ Mipf_Plugin_ImageCropper_Activator::Mipf_Plugin_ImageCropper_Activator(QF::IQF_M
 
 bool Mipf_Plugin_ImageCropper_Activator::Init()
 {
-    mitk::RegisterBoundingShapeObjectFactory();
-    m_pImageCropperView = new ImageCropperView(m_pMain); 
+    
     return true; 
 }
 
@@ -30,6 +30,5 @@ const char* Mipf_Plugin_ImageCropper_Activator::GetID()
 
 void Mipf_Plugin_ImageCropper_Activator::Register()
 {
-    m_pImageCropperView->InitResource(); 
-    R::Instance()->registerCustomWidget("ImageCropperWidget", m_pImageCropperView);
+    REGISTER_PLUGIN("ImageCropperWidget", ImageCropperView);
 }

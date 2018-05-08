@@ -30,10 +30,10 @@ void VolumeCutView::CreateView()
 {
     m_ui.setupUi(this);
     m_ui.DataSelector->SetDataStorage(GetDataStorage());
-    m_ui.DataSelector->SetPredicate(mitk::TNodePredicateDataType<mitk::Image>::New());
+    m_ui.DataSelector->SetPredicate(CreateImagePredicate());
 
     m_ui.ModelSelector->SetDataStorage(GetDataStorage());
-    m_ui.ModelSelector->SetPredicate(mitk::TNodePredicateDataType<mitk::Surface>::New());
+    m_ui.ModelSelector->SetPredicate(CreateSurfacePredicate());
 
     connect(m_ui.AddBoxBtn, SIGNAL(clicked()), this, SLOT(AddBox()));
     connect(m_ui.RemoveBoxBtn, SIGNAL(clicked()), this, SLOT(RemoveBox()));

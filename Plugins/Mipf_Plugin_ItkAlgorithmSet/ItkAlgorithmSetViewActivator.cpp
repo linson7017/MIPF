@@ -1,5 +1,5 @@
 #include "ItkAlgorithmSetViewActivator.h"
-#include "ItkAlgorithmSetView.h"
+//#include "ItkAlgorithmSetView.h"
 #include "SigmoidImageView.h"
 #include "FastMarchingView.h"
 
@@ -33,7 +33,7 @@ const char* ItkAlgorithmSetView_Activator::GetID()
 
 void ItkAlgorithmSetView_Activator::Register()
 {
-    REGISTER_QOBJECT("ItkAlgorithmSetWidget", ItkAlgorithmSetView);
+    //REGISTER_QOBJECT("ItkAlgorithmSetWidget", ItkAlgorithmSetView);
 
     REGISTER_PLUGIN("SigmoidImageWidget", SigmoidImageView);
 

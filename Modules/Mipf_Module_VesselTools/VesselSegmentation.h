@@ -19,6 +19,8 @@ public:
 
     virtual void GenerateVesselSurface(vtkImageData* pInput, vtkPolyData* pOutput, double dThreshold);
 
+    virtual void CapSurface(vtkPolyData* input, vtkPolyData*output);
+
     virtual void Release() { delete this; }
 protected:
     void SegmentationInitialize(vtkImageData* pInput, vtkImageData* pOutput, 

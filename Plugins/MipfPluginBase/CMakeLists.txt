@@ -15,7 +15,7 @@ endif()
 project(MipfPluginBase)
 
 file(GLOB Headers "./*.h")
-AUX_SOURCE_DIRECTORY(./ DIR_SRCS)
+AUX_SOURCE_DIRECTORY(./ DIR_SRCS) 
 
 set(MipfPluginBase_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/"  CACHE INTERNAL "MipfPluginBase headers")
 set(MipfPluginBase_LIBRARIES 
@@ -25,7 +25,7 @@ set(MipfPluginBase_LIBRARIES
 macro(link_MipfPluginBase)
 	include_directories(${MipfPluginBase_INCLUDE_DIR})
 	target_link_libraries(${PROJECT_NAME} ${MipfPluginBase_LIBRARIES})
-endmacro(link_MipfPluginBase)
+endmacro(link_MipfPluginBase) 
 
 add_library(MipfPluginBase SHARED ${DIR_SRCS} ${Headers})
 target_link_libraries(MipfPluginBase MitkQtWidgets)

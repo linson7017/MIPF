@@ -38,12 +38,9 @@ void SphereCropperView::CreateView()
 	m_Controls.setupUi(this);
 
 	m_Controls.boundingShapeSelector->SetDataStorage(this->GetDataStorage());
-//	m_Controls.boundingShapeSelector->SetPredicate(mitk::TNodePredicateDataType<mitk::Image>::New());
+//	m_Controls.boundingShapeSelector->SetPredicate(CreateImagePredicate());
 	m_Controls.boundingShapeSelector->SetPredicate(mitk::NodePredicateOr::New(
-			mitk::TNodePredicateDataType<mitk::Image>::New(), 
-		  mitk::NodePredicateAnd::New(
-				mitk::TNodePredicateDataType<mitk::Surface>::New(),
-				mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object")))));
+			CreateImagePredicate(), CreateSurfacePredicate()));
 	m_Controls.buttonCreateNewBoundingBox->setEnabled(false);
 	m_Controls.boundingShapeSelector->setEnabled(true);
 	m_Controls.buttonStart->setEnabled(false);

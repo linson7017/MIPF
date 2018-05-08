@@ -174,6 +174,11 @@ void MultiViewsWidget::SetupWidgets()
         }
     }
 
+    if (HasAttribute("menuVisible"))
+    {
+        m_multiWidget->ActivateMenuWidget(QString(GetAttribute("menuVisible")).compare("true", Qt::CaseInsensitive) == 0);
+    }
+
 }
 
 

@@ -37,8 +37,8 @@ void AirwaySegmentationView::CreateView()
         m_pPointList = pFactory->CreatePointList();
 	}
 
-    mitk::DataNode::Pointer pointSetNode = mitk::DataNode::New();
-    m_pPointList->CreateNewPointSetNode(pointSetNode);
+    mitk::DataNode::Pointer pointSetNode = m_pPointList->CreateNewPointSetNode();
+    GetDataStorage()->Add(pointSetNode);
 
     m_ui.ImageSelector->SetDataStorage(GetDataStorage());
     m_ui.ImageSelector->SetPredicate(CreatePredicate(Image));
@@ -47,6 +47,8 @@ void AirwaySegmentationView::CreateView()
     connect(m_ui.SeedSelectBtn,SIGNAL(clicked(bool)) , this, SLOT(OnSelectSeed(bool)));
     connect(m_ui.SeedClearBtn, SIGNAL(clicked()), this, SLOT(OnClearSeed()));
     connect(m_ui.SegmentBtn, SIGNAL(clicked()), this, SLOT(Segment()));
+
+
 
 }
 

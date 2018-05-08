@@ -224,3 +224,19 @@ mitk::DataNode::Pointer MitkPluginView::ImportVtkPolyData(vtkPolyData* polydata,
 
 }
 
+mitk::NodePredicateBase::Pointer MitkPluginView::CreateImagePredicate()
+{
+    return mitk::NodePredicateAnd::New(mitk::TNodePredicateDataType<mitk::Image>::New(),
+        mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object")));
+}
+mitk::NodePredicateBase::Pointer MitkPluginView::CreateSurfacePredicate()
+{
+    return mitk::NodePredicateAnd::New(mitk::TNodePredicateDataType<mitk::Surface>::New(),
+        mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object")));
+}
+mitk::NodePredicateBase::Pointer MitkPluginView::CreatePointSetPredicate()
+{
+    return mitk::NodePredicateAnd::New(mitk::NodePredicateDataType::New("PointSet"),
+        mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object")));
+}
+

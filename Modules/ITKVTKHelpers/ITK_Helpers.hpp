@@ -368,26 +368,23 @@ namespace ITKHelpers
     template <class TInput, class TOutput>
     void ExtractLargestConnected(TInput* input, TOutput* output)
     {
-        TInput::PixelType min, max;
-        GetImageScalarRange<TInput>(input, min, max);
-
-        typedef itk::ConnectedComponentImageFilter <TInput, UInt3DImageType >
+        typedef itk::ConnectedComponentImageFilter <TInput, TOutput >
             ConnectedComponentImageFilterType;
         ConnectedComponentImageFilterType::Pointer connected = ConnectedComponentImageFilterType::New();
         connected->SetInput(input);
         connected->Update();
 
-        typedef itk::LabelShapeKeepNObjectsImageFilter< UInt3DImageType > LabelShapeKeepNObjectsImageFilterType;
+        typedef itk::LabelShapeKeepNObjectsImageFilter< TOutput > LabelShapeKeepNObjectsImageFilterType;
         LabelShapeKeepNObjectsImageFilterType::Pointer labelShapeKeepNObjectsImageFilter = LabelShapeKeepNObjectsImageFilterType::New();
         labelShapeKeepNObjectsImageFilter->SetInput(connected->GetOutput());
         labelShapeKeepNObjectsImageFilter->SetBackgroundValue(0);
         labelShapeKeepNObjectsImageFilter->SetNumberOfObjects(1);
         labelShapeKeepNObjectsImageFilter->SetAttribute(LabelShapeKeepNObjectsImageFilterType::LabelObjectType::NUMBER_OF_PIXELS);
 
-        typedef itk::RescaleIntensityImageFilter< UInt3DImageType, TOutput > RescaleFilterType;
+        typedef itk::RescaleIntensityImageFilter< TOutput, TOutput > RescaleFilterType;
         RescaleFilterType::Pointer rescaleFilter = RescaleFilterType::New();
-        rescaleFilter->SetOutputMinimum(min);
-        rescaleFilter->SetOutputMaximum(max);
+        rescaleFilter->SetOutputMinimum(0);
+        rescaleFilter->SetOutputMaximum(1);
         rescaleFilter->SetInput(labelShapeKeepNObjectsImageFilter->GetOutput());
         rescaleFilter->Update();
 
@@ -571,6 +568,127 @@ namespace ITKHelpers
         invertIntensityFilter->Update();
 
         output->Graft(invertIntensityFilter->GetOutput());
+    }
+
+    template <class ImageType3D, class ImageType2D>
+    void Extract2DSlice(ImageType3D* input, ImageType2D* output, int sliceIndex)
+    {
+        if (input->GetImageDimension()!=3|| output->GetImageDimension()!=2)
+        {
+            std::cout << "Wrong input in Extract2DSlice function !" << std::endl;
+            return;
+        }
+        ImageType3D::RegionType::SizeType imageSize = input->GetLargestPossibleRegion().GetSize();
+        ImageType3D::IndexType start;
+        start[0] = 0;
+        start[1] = 0;
+        start[2] = sliceIndex;
+        ImageType3D::SizeType size;
+        size[0] = imageSize[0];
+        size[1] = imageSize[1];
+        size[2] = 1;
+        ImageType3D::RegionType region3D;
+        region3D.SetSize(size);
+        region3D.SetIndex(start);
+
+        ImageType2D::IndexType start2D;
+        start2D[0] = 0;
+        start2D[1] = 0;
+        ImageType2D::SizeType size2D;
+        size2D[0] = imageSize[0];
+        size2D[1] = imageSize[1];
+        ImageType2D::RegionType region2D;
+        region2D.SetSize(size2D);
+        region2D.SetIndex(start2D);
+        
+        double origin[2] = { 0,0 };
+        double spacing[2] = { input->GetSpacing()[0],input->GetSpacing()[1] };
+
+        output->SetRegions(region2D);
+        output->SetOrigin(origin);
+        output->SetSpacing(spacing);
+        output->Allocate();
+
+        itk::ImageRegionIterator<ImageType3D> targetIterator(input, region3D);
+        itk::ImageRegionIterator<ImageType2D> iter(output, region2D);
+        iter.GoToBegin();  targetIterator.GoToBegin();
+        while (!iter.IsAtEnd())
+        {
+            iter.Set(targetIterator.Get());
+            ++iter;
+            ++targetIterator;
+        }
+    }
+
+    template <class ImageType3D, class ImageType2D>
+    void Assign2DSlice(ImageType3D* image, ImageType2D* slice, int sliceIndex)
+    {
+        if (image->GetImageDimension() != 3 || slice->GetImageDimension() != 2)
+        {
+            std::cout << "Wrong input in Assign2DSlice function !" << std::endl;
+            return;
+        }
+        ImageType3D::RegionType::SizeType imageSize = image->GetLargestPossibleRegion().GetSize();
+        ImageType3D::IndexType start;
+        start[0] = 0;
+        start[1] = 0;
+        start[2] = sliceIndex;
+        ImageType3D::SizeType size;
+        size[0] = imageSize[0];
+        size[1] = imageSize[1];
+        size[2] = 1;
+        ImageType3D::RegionType region3D;
+        region3D.SetSize(size);
+        region3D.SetIndex(start);
+
+        ImageType2D::IndexType start2D;
+        start2D[0] = 0;
+        start2D[1] = 0;
+        ImageType2D::SizeType size2D;
+        size2D[0] = imageSize[0];
+        size2D[1] = imageSize[1];
+        ImageType2D::RegionType region2D;
+        region2D.SetSize(size2D);
+        region2D.SetIndex(start2D);
+
+        itk::ImageRegionIterator<ImageType3D> targetIterator(image, region3D);
+        itk::ImageRegionIterator<ImageType2D> iter(slice, region2D);
+        iter.GoToBegin();  targetIterator.GoToBegin();
+        while (!iter.IsAtEnd())
+        {
+            targetIterator.Set(iter.Get());
+            ++iter;
+            ++targetIterator;
+        }
+    }
+
+    template <class ImageType>
+    void ConvertWorldToIndex(ImageType* image, double* world, int* index)
+    {
+        ImageType::RegionType refRegion = image->GetLargestPossibleRegion();
+        ImageType::SizeType refSize = refRegion.GetSize();
+        ImageType::IndexType refStart = refRegion.GetIndex();
+        ImageType::SpacingType refSpacing = image->GetSpacing();
+        ImageType::PointType refOrigin = image->GetOrigin();
+        for (int i=0;i<image->GetImageDimension();i++)
+        {
+            index[i] = round((world[i] - refOrigin[i]) / refSpacing[i]);
+        }
+    }
+
+    template <class ImageType>
+    void ConvertIndexToWorld(ImageType* image, int* index, double* world)
+    {
+        itk::Image::TransformIndexToPhysicalPoint()
+        ImageType::RegionType refRegion = image->GetLargestPossibleRegion();
+        ImageType::SizeType refSize = refRegion.GetSize();
+        ImageType::IndexType refStart = refRegion.GetIndex();
+        ImageType::SpacingType refSpacing = image->GetSpacing();
+        ImageType::PointType refOrigin = image->GetOrigin();
+        for (int i = 0; i < image->GetImageDimension(); i++)
+        {
+            world[i] = refRegion[i] + index[i] * spacing[i];
+        }
     }
 
 }

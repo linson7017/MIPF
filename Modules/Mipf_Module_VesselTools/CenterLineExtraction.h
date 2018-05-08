@@ -16,6 +16,8 @@ public:
     CenterLineExtraction();
     ~CenterLineExtraction();
     virtual void ExtractCenterLineNetwork(vtkPolyData* pInput, double* vStartPoint,vtkPolyData* pOutputNetwork,vtkPoints* pOutputEndpoints=NULL,vtkPolyData* pOutputVoronoi=NULL);
+    virtual void ExtractCenterLineNetwork(vtkPolyData* pInput, vtkPolyData* pNetWork);
+    virtual void ExtractCenterLine(vtkPolyData* pInput, vtkPoints* pSourcePoints, vtkPoints* pTargetPoints,vtkPolyData* pOutputNetwork);
     virtual void ReconstructTubularSurfaceByCenterLine(vtkPolyData* pCenterLine, vtkPolyData* pOutputData);
     virtual void Release() { delete this; }
 protected:

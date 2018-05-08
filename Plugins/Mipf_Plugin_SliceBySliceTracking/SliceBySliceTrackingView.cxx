@@ -199,7 +199,7 @@ void SliceBySliceTrackingView::SetupResource()
     {
         IQF_MitkDataManager* pMitkDataStorage = (IQF_MitkDataManager*)m_pMain->GetInterfacePtr("QF_MitkMain_DataManager");
         selector->SetDataStorage(GetDataStorage());
-        selector->SetPredicate(mitk::TNodePredicateDataType<mitk::Image>::New());
+        selector->SetPredicate(CreateImagePredicate());
     }
     IQF_MitkRenderWindow* pRenderWindow = (IQF_MitkRenderWindow*)m_pMain->GetInterfacePtr(QF_MitkMain_RenderWindow);
     if (pRenderWindow)

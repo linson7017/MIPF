@@ -23,60 +23,6 @@
 #include "MitkSegmentation/mitk_seg_msg.h"
 #include "MitkMain/mitk_main_msg.h"
 
-mitk::NodePredicateBase::Pointer CreateUserPredicate(int type)
-{
-    auto imageType = mitk::TNodePredicateDataType<mitk::Image>::New();
-    auto labelSetImageType = mitk::TNodePredicateDataType<mitk::LabelSetImage>::New();
-    auto surfaceType = mitk::TNodePredicateDataType<mitk::Surface>::New();
-    auto contourModelType = mitk::TNodePredicateDataType<mitk::ContourModel>::New();
-    auto contourModelSetType = mitk::TNodePredicateDataType<mitk::ContourModelSet>::New();
-    auto nonLabelSetImageType = mitk::NodePredicateAnd::New(imageType, mitk::NodePredicateNot::New(labelSetImageType));
-    auto nonHelperObject = mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object"));
-    auto isBinary = mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(true));
-    auto isSegmentation = mitk::NodePredicateProperty::New("segmentation", mitk::BoolProperty::New(true));
-    auto isBinaryOrSegmentation = mitk::NodePredicateOr::New(isBinary, isSegmentation);
-
-    auto isSurfaceParent = mitk::NodePredicateProperty::New("surfaceUuid");
-
-    mitk::NodePredicateBase::Pointer returnValue;
-
-    switch (type)
-    {
-    case 1:
-        returnValue = mitk::NodePredicateAnd::New(
-            mitk::NodePredicateNot::New(isBinaryOrSegmentation),
-            nonLabelSetImageType).GetPointer();
-        break;
-
-    case 2:
-        returnValue = mitk::NodePredicateOr::New(
-            mitk::NodePredicateAnd::New(imageType, isBinaryOrSegmentation),
-            labelSetImageType).GetPointer();
-        break;
-
-    case 3:
-        returnValue = surfaceType.GetPointer();
-        break;
-
-    case 4:
-        returnValue = imageType.GetPointer();
-        break;
-
-    case 5:
-        returnValue = mitk::NodePredicateOr::New(
-            contourModelSetType,
-            contourModelSetType).GetPointer();
-        break;
-    case 6:
-        returnValue = isSurfaceParent.GetPointer();
-        break;
-    default:
-        assert(false && "Unknown predefined predicate!");
-        return nullptr;
-    }
-
-    return mitk::NodePredicateAnd::New(returnValue, nonHelperObject).GetPointer();
-}
 
 ManualSegmentationTestView::ManualSegmentationTestView(QF::IQF_Main* pMain) :MitkPluginView(pMain),
 m_bToolInited(false),
@@ -235,7 +181,7 @@ void ManualSegmentationTestView::Constructed()
     if (m_pImageSelector)
     {
         m_pImageSelector->SetDataStorage(GetDataStorage());
-        m_pImageSelector->SetPredicate(CreatePredicate(MitkPluginView::Image));
+        m_pImageSelector->SetPredicate(CreateImagePredicate());
         connect(m_pImageSelector, SIGNAL(OnSelectionChanged(const mitk::DataNode *)), this, SLOT(OnImageSelectionChanged(const mitk::DataNode *)));
     }
     
@@ -244,7 +190,7 @@ void ManualSegmentationTestView::Constructed()
     if (m_pSegmentSelector)
     {
         m_pSegmentSelector->SetDataStorage(GetDataStorage());
-        m_pSegmentSelector->SetPredicate(CreateUserPredicate(2));
+        m_pSegmentSelector->SetPredicate(CreateImagePredicate());
         connect(m_pSegmentSelector, SIGNAL(OnSelectionChanged(const mitk::DataNode *)), this, SLOT(OnSegmentSelectionChanged(const mitk::DataNode *)));
     }  
 }

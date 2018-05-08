@@ -26,7 +26,7 @@ set(CMAKE_AUTOMOC ON)
 
 file(GLOB_RECURSE ColorEdit_DIR_SRC RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} 
 ${CMAKE_CURRENT_SOURCE_DIR}/ColorEdit/*.h* 
-${CMAKE_CURRENT_SOURCE_DIR}/ColorEdit/*.c* )
+${CMAKE_CURRENT_SOURCE_DIR}/ColorEdit/*.c* ) 
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/ColorEdit)
 source_group(ColorEdit FILES  ${ColorEdit_DIR_SRC})

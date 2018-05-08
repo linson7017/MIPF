@@ -49,7 +49,7 @@
         <x>0</x>
         <y>0</y>
         <width>396</width>
-        <height>535</height>
+        <height>533</height>
        </rect>
       </property>
       <attribute name="icon">
@@ -183,10 +183,10 @@
                </size>
               </property>
               <property name="minimum">
-               <double>-1000.000000000000000</double>
+               <double>-9999999.000000000000000</double>
               </property>
               <property name="maximum">
-               <double>1000.000000000000000</double>
+               <double>9999999.000000000000000</double>
               </property>
               <property name="value">
                <double>1.000000000000000</double>
@@ -302,8 +302,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>185</width>
-        <height>132</height>
+        <width>230</width>
+        <height>138</height>
        </rect>
       </property>
       <attribute name="icon">

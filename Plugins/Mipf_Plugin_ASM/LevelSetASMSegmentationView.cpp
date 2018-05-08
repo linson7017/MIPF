@@ -41,6 +41,7 @@
 
 #include "itkCurvatureFlowImageFilter.h"
 #include <LSASMSegmentation.h>
+#include <MitkPluginView.h>
 
 
 template<class TFilter>
@@ -98,9 +99,10 @@ LevelSetASMSegmentationView::LevelSetASMSegmentationView(QF::IQF_Main* pMain, QW
     m_ui.ImageSelector->SetDataStorage(pDataManager->GetDataStorage());
     m_ui.MeanImageSelector->SetDataStorage(pDataManager->GetDataStorage());
 
-
-    m_ui.ImageSelector->SetPredicate(mitk::TNodePredicateDataType<mitk::Image>::New());
-    m_ui.MeanImageSelector->SetPredicate(mitk::TNodePredicateDataType<mitk::Image>::New());
+    auto imagePredicate = mitk::NodePredicateAnd::New(mitk::TNodePredicateDataType<mitk::Image>::New(),
+        mitk::NodePredicateProperty::New("helper object", mitk::BoolProperty::New(false)));
+    m_ui.ImageSelector->SetPredicate(imagePredicate);
+    m_ui.MeanImageSelector->SetPredicate(imagePredicate);
 
 
     connect(m_ui.AddPCAImageBtn, &QPushButton::clicked, this, &LevelSetASMSegmentationView::AddPCAImage);

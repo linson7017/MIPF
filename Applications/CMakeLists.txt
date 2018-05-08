@@ -47,16 +47,20 @@ macro(MipfGetQfConfig projectname QfConfigFiles)
 	source_group("qfconfig" FILES ${QfConfigFiles} )
 endmacro(MipfGetQfConfig)
 
-#拷贝qfconfig文件到运行目录下
+#拷贝qfconfig文件到运行目录下,并清空之前的资源目录
 macro(InstallQfConfig projectname)
 # add_custom_command(TARGET ${projectname} POST_BUILD
                   # COMMAND ${CMAKE_COMMAND} -E copy_directory
                   # ${CMAKE_SOURCE_DIR}/bin/qfconfig/${projectname} ${CMAKE_BINARY_DIR}/bin/qfconfig/${projectname})
 add_custom_target(Copy_${projectname}_Resources ALL
-				  COMMAND echo "copying ${CMAKE_SOURCE_DIR}/bin/qfconfig/${projectname} to ${CMAKE_BINARY_DIR}/bin/qfconfig/${projectname}"
-				  COMMAND ${CMAKE_COMMAND} -E copy_directory
-				  ${CMAKE_SOURCE_DIR}/bin/qfconfig/${projectname} ${CMAKE_BINARY_DIR}/bin/qfconfig/${projectname})
+                  COMMAND echo "removing ${CMAKE_BINARY_DIR}/bin/qfconfig/${projectname}"
+				  COMMAND ${CMAKE_COMMAND} -E remove_directory ${CMAKE_BINARY_DIR}/bin/qfconfig/${projectname}
+				  COMMAND echo "copying ${CMAKE_SOURCE_DIR}/bin/qfconfig/${projectname} to ${CMAKE_BINARY_DIR}/bin/qfconfig/${projectname}" 
+				  COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/bin/qfconfig/${projectname} ${CMAKE_BINARY_DIR}/bin/qfconfig/${projectname})
 endmacro(InstallQfConfig) 
+
+find_package(TCLAP REQUIRED)
+include_directories (${TCLAP_INCLUDE_DIR})
 
 add_subdirectory(WorkBench)
 add_subdirectory(PluginGenerator)

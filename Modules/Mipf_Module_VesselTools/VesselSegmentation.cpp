@@ -19,6 +19,7 @@
 #include "vtkMarchingCubes.h"
 #include "vtkTransformPolyDataFilter.h"
 #include "vtkStripper.h"
+#include "vtkLinearSubdivisionFilter.h"
 
 //VMTK
 #include "vtkvmtkFastMarchingUpwindGradientImageFilter.h"
@@ -175,4 +176,38 @@ void VesselSegmentation::SegmentationInitialize(vtkImageData* pInput, vtkImageDa
    subtract->Update();
 
    pOutput->DeepCopy(subtract->GetOutput());
+}
+
+void VesselSegmentation::CapSurface(vtkPolyData* input, vtkPolyData*output)
+{
+    vtkSmartPointer<vtkCleanPolyData>  surfaceCleaner = vtkSmartPointer<vtkCleanPolyData>::New();
+    surfaceCleaner->SetInputData(input);
+    surfaceCleaner->Update();
+
+    vtkSmartPointer<vtkTriangleFilter> surfaceTriangulator = vtkSmartPointer<vtkTriangleFilter>::New();
+    surfaceTriangulator->SetInputData(surfaceCleaner->GetOutput());
+    surfaceTriangulator->PassLinesOff();
+    surfaceTriangulator->PassVertsOff();
+    surfaceTriangulator->Update();
+
+    vtkSmartPointer<vtkLinearSubdivisionFilter> subdiv = vtkSmartPointer<vtkLinearSubdivisionFilter>::New();
+    subdiv->SetInputData(surfaceTriangulator->GetOutput());
+    subdiv->SetNumberOfSubdivisions(1);
+    subdiv->Update();
+
+    vtkSmartPointer<vtkPolyDataNormals> normals = vtkSmartPointer<vtkPolyDataNormals>::New();
+    normals->SetInputData(subdiv->GetOutput());
+    normals->SetAutoOrientNormals(1);
+    normals->SetFlipNormals(0);
+    normals->SetConsistency(1);
+    normals->SplittingOff();
+    normals->Update();
+
+    vtkSmartPointer<vtkvmtkCapPolyData> surfaceCapper = vtkSmartPointer<vtkvmtkCapPolyData>::New();
+    surfaceCapper->SetInputData(normals->GetOutput());
+    surfaceCapper->SetDisplacement(0.0);
+    surfaceCapper->SetInPlaneDisplacement(0.0);
+    surfaceCapper->Update();
+
+    output->DeepCopy(surfaceCapper->GetOutput());
 }

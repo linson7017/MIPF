@@ -71,10 +71,10 @@ void VesselSegmentationView::CreateView()
     connect(ui.pbtnCreateVesselSurfaceFromMask, SIGNAL(clicked()), this, SLOT(OnCreateVesselSurfaceFromMask()));
 
     ui.cmbbxImageSelector->SetDataStorage(GetDataStorage());
-    ui.cmbbxImageSelector->SetPredicate(mitk::NodePredicateDataType::New("Image"));
+    ui.cmbbxImageSelector->SetPredicate(CreateImagePredicate());
 
     ui.cmbbxSurfaceSelector->SetDataStorage(GetDataStorage());
-    ui.cmbbxSurfaceSelector->SetPredicate(mitk::NodePredicateDataType::New("Surface"));
+    ui.cmbbxSurfaceSelector->SetPredicate(CreateSurfacePredicate());
 
 
     ui.lstPoints->SetMultiWidget(GetMitkRenderWindowInterface()->GetMitkStdMultiWidget());

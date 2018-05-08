@@ -565,8 +565,8 @@ void GraphcutSegmentationView::ExtractROI()
     IQF_PointListFactory* pFactory = (IQF_PointListFactory*)m_pMain->GetInterfacePtr(QF_MitkStd_PointListFactory);
     IQF_MitkPointList* pList = pFactory->CreatePointList();
     pList->Initialize();
-    mitk::DataNode::Pointer pointsNode = mitk::DataNode::New();
-    pList->CreateNewPointSetNode(pointsNode);
+    mitk::DataNode::Pointer pointsNode =   pList->CreateNewPointSetNode();
+    GetDataStorage()->Add(pointsNode);
     itk::Point<double, 3> center = binaryImageToShapeLabelMapFilter->GetOutput()->GetNthLabelObject(0)->GetCentroid();
     double width = 100;
     double height = 100;

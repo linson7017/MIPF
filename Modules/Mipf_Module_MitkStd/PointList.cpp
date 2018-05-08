@@ -46,23 +46,19 @@ void PointList::Initialize()
     m_PointSetNode = NULL;
 }
 
-void PointList::CreateNewPointSetNode(mitk::DataNode * pointSetNode, bool bDirectUse)
+mitk::DataNode::Pointer PointList::CreateNewPointSetNode()
 {
     mitk::PointSet::Pointer pointSet = mitk::PointSet::New();
-    pointSetNode->SetData(pointSet);
-    pointSetNode->SetName("seed points for tracking");
-    pointSetNode->SetProperty("helper object", mitk::BoolProperty::New(true));
-    pointSetNode->SetProperty("layer", mitk::IntProperty::New(1024));
-
-    if (bDirectUse)
+    if (m_PointSetNode.IsNull())
     {
-        IQF_MitkDataManager* pDataManager = (IQF_MitkDataManager*)m_pMain->GetInterfacePtr(QF_MitkMain_DataManager);
-        if (pDataManager)
-        {
-            pDataManager->GetDataStorage()->Add(pointSetNode);
-            SetPointSetNode(pointSetNode);
-        }
+        m_PointSetNode = mitk::DataNode::New();
     }
+    m_PointSetNode->SetData(pointSet);
+    m_PointSetNode->SetName("seed points for tracking");
+    m_PointSetNode->SetProperty("helper object", mitk::BoolProperty::New(true));
+    m_PointSetNode->SetProperty("layer", mitk::IntProperty::New(1024));
+
+    return m_PointSetNode;
 }
 
 void PointList::AddPoint(bool bAdd)
@@ -185,7 +181,7 @@ mitk::PointSet *PointList::CheckForPointSetInNode(mitk::DataNode *node) const
     return NULL;
 }
 
-mitk::DataNode *PointList::GetPointSetNode()
+mitk::DataNode::Pointer PointList::GetPointSetNode()
 {
     return m_PointSetNode;
 }

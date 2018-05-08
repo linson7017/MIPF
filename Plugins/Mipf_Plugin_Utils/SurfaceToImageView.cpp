@@ -11,7 +11,7 @@
 #include <vtkDataArray.h>
 #include <vtkPolyDataToImageStencil.h>
 #include <vtkImageStencil.h>
-
+#include "MitkSegmentation/IQF_MitkSurfaceTool.h"
 SurfaceToImageView::SurfaceToImageView()
 {
 }
@@ -25,10 +25,10 @@ void SurfaceToImageView::CreateView()
 {
     m_ui.setupUi(this);
     m_ui.DataSelector->SetDataStorage(GetDataStorage());
-    m_ui.DataSelector->SetPredicate(mitk::TNodePredicateDataType<mitk::Surface>::New());
+    m_ui.DataSelector->SetPredicate(CreateSurfacePredicate());
 
     m_ui.ReferenceImageSelector->SetDataStorage(GetDataStorage());
-    m_ui.ReferenceImageSelector->SetPredicate(mitk::TNodePredicateDataType<mitk::Image>::New());
+    m_ui.ReferenceImageSelector->SetPredicate(CreateImagePredicate());
 
     connect(m_ui.ApplyBtn, &QPushButton::clicked, this, &SurfaceToImageView::Apply);
 }
@@ -40,15 +40,14 @@ WndHandle SurfaceToImageView::GetPluginHandle()
 
 void SurfaceToImageView::Apply()
 {
-    if (!m_ui.ReferenceImageSelector->GetSelectedNode() || !m_ui.DataSelector->GetSelectedNode())
+    if ( !m_ui.DataSelector->GetSelectedNode())
     {
         return;
     }
-
-    mitk::Image* refImage = dynamic_cast<mitk::Image*>(m_ui.ReferenceImageSelector->GetSelectedNode()->GetData());
     mitk::Surface* surface = dynamic_cast<mitk::Surface*>(m_ui.DataSelector->GetSelectedNode()->GetData());
+    //mitk::Image* refImage = dynamic_cast<mitk::Image*>(m_ui.ReferenceImageSelector->GetSelectedNode()->GetData());
 
-    if (!refImage||!surface)
+    if (!surface)
     {
         return;
     }
@@ -56,7 +55,7 @@ void SurfaceToImageView::Apply()
     double bounds[6];
     polydata->GetBounds(bounds);
 
-    double spacing[3] = { 2.0,2.0,2.0 };
+    double spacing[3] = { 0.5,0.5,0.5 };
    
     int dim[3];
     for (int i = 0; i < 3; i++)
@@ -87,8 +86,6 @@ void SurfaceToImageView::Apply()
     imgstenc->SetBackgroundValue(0);
     imgstenc->Update();
 
-    VTKHelpers::SaveVtkImageData(imgstenc->GetOutput(), "D:/temp/stenc.mha");
-
     mitk::SlicedGeometry3D::Pointer geometry = mitk::SlicedGeometry3D::New();
     geometry->SetOrigin(origin);
     geometry->SetSpacing(spacing);
@@ -101,7 +98,7 @@ void SurfaceToImageView::Apply()
 vtkSmartPointer<vtkImageData>  SurfaceToImageView::CreateWhiteImage(double* spacing, double* origin, int* extent, int* dim)
 {
     
-    unsigned char inval = 255;
+    unsigned char inval = 1;
     unsigned char outval = 0;
 
     vtkSmartPointer<vtkImageData> whiteImage =

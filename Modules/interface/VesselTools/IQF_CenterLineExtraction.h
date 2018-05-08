@@ -24,6 +24,8 @@ class IQF_CenterLineExtraction :public IQF_Object
 public:
     virtual void ExtractCenterLineNetwork(vtkPolyData* pInput, double* vStartPoint, vtkPolyData* pOutputNetwork, 
         vtkPoints* pOutputEndpoints = nullptr, vtkPolyData* pOutputVoronoi = nullptr) = 0;
+    virtual void ExtractCenterLine(vtkPolyData* pInput, vtkPoints* pSourcePoints, vtkPoints* pTargetPoints, vtkPolyData* pOutputNetwork) = 0;
+    virtual void ExtractCenterLineNetwork(vtkPolyData* pInput, vtkPolyData* pNetWork) = 0;
     virtual void ReconstructTubularSurfaceByCenterLine(vtkPolyData* pCenterLine, vtkPolyData* pOutputData) = 0;
 };
 

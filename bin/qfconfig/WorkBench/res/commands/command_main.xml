@@ -30,6 +30,13 @@
 <Command id="loadData" name="MITK_MAIN_COMMAND_LOAD_DATA">
 	<!-- <Property type="Value" name="DataStorage">QString:test</Property> -->
 </Command>
+<Command id="loadSingleModeData" name="MITK_MAIN_COMMAND_LOAD_DATA">
+	<Property type="Value" name="SingleMode">{"value":"true","type":"bool"}</Property>
+</Command>
+<Command id="loadSingleModeDSAData" name="CVA_COMMAND_LOAD_DSA">
+	<Property type="Value" name="SingleMode">{"value":"true","type":"bool"}</Property>
+</Command>
+
 <Command id="changeCrosshairSize" name="MITK_MAIN_COMMAND_CHANGE_CROSSHAIR_GAP_SIZE">
 	<Property type="Object" name="CrosshairGapSize">
 	{
@@ -41,7 +48,7 @@
 	<Property type="Value" name="MultiViewID">{"value":"main.mitkMulitView"}</Property>
 </Command>
 <Command id="changeMultiViewLayout" name="MITK_MAIN_COMMAND_CHANGE_MULTIVIEW_LAYOUT">
-	<Property type="Object" name="LayoutMode">{"name":"layoutMode"}</Property>
+	<Property type="Object" name="LayoutMode">{"name":"layoutMode" type="int"}</Property>
     <Property type="Value" name="MultiViewID">{"value":"main.mitkMulitView"}</Property>
 </Command>
 <Command id="resetMultiView" name="MITK_MAIN_COMMAND_RESET_MULTIVIEW">

@@ -11,6 +11,10 @@
 #include "mitkRenderingManager.h"
 #include "QmitkStdMultiWidget.h"
 #include "mitkDataNode.h"
+#include "mitkDicomSeriesReader.h"
+#include "mitkProgressBar.h"
+#include "mitkNodePredicateNot.h"
+#include "mitkNodePredicateProperty.h"
 
 #include "QmitkIOUtil.h"
 #include <QFileDialog>
@@ -21,6 +25,7 @@
 
 //qt
 #include <QMessageBox>
+
 
 CQF_MainCommand::CQF_MainCommand(QF::IQF_Main* pMain)
 {
@@ -37,6 +42,11 @@ void CQF_MainCommand::Release()
     delete this;
 }
 
+void LoadDicomSeriesCallBack(float value)
+{
+    mitk::ProgressBar::GetInstance()->Progress(100*value);
+}
+
 bool CQF_MainCommand::ExecuteCommand(const char* szCommandID, QF::IQF_Properties* pInParam, QF::IQF_Properties* pOutParam)
 {
     if (strcmp(szCommandID, MITK_MAIN_COMMAND_LOAD_DATA) == 0)
@@ -46,7 +56,7 @@ bool CQF_MainCommand::ExecuteCommand(const char* szCommandID, QF::IQF_Properties
         mitk::DataStorage::Pointer pDataStorage = pMitkDataManager->GetDataStorage(datastorageID);
         if (pDataStorage.IsNull())
         {
-            MITK_INFO << "Data storage with id \""<<datastorageID<<"\" does not exist!";
+            MITK_ERROR << "Data storage with id \""<<datastorageID<<"\" does not exist!";
             return false;
         }
         IQF_MitkReference* pMitkReference = (IQF_MitkReference*)m_pMain->GetInterfacePtr(QF_MitkMain_Reference);
@@ -59,6 +69,10 @@ bool CQF_MainCommand::ExecuteCommand(const char* szCommandID, QF::IQF_Properties
             return false;
         try
         {
+            if (pInParam->GetBoolProperty("SingleMode", false))
+            {
+                pDataStorage->Remove(pDataStorage->GetSubset(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object"))));
+            }
             QmitkIOUtil::Load(fileNames, *pDataStorage);
         }
         catch (const mitk::Exception& e)
@@ -245,6 +259,57 @@ bool CQF_MainCommand::ExecuteCommand(const char* szCommandID, QF::IQF_Properties
             return false;
         }
     }
+    else if (strcmp(szCommandID, MITK_MAIN_COMMAND_LOAD_DICOMS) == 0)
+    {
+        std::string datastorageID = pInParam->GetStringProperty("DataStorage", "");
+        IQF_MitkDataManager* pMitkDataManager = (IQF_MitkDataManager*)m_pMain->GetInterfacePtr(QF_MitkMain_DataManager);
+        mitk::DataStorage::Pointer pDataStorage = pMitkDataManager->GetDataStorage(datastorageID);
+        if (pDataStorage.IsNull())
+        {
+            MBI_ERROR << "Data storage with id \"" << datastorageID << "\" does not exist!";
+            return false;
+        }
+        IQF_MitkReference* pMitkReference = (IQF_MitkReference*)m_pMain->GetInterfacePtr(QF_MitkMain_Reference);
+        QString defaultOpenFilePath = pMitkReference->GetString("LastOpenDirectory");
+
+        QString fileName = QFileDialog::getOpenFileName(NULL, "Open Dicom",
+            defaultOpenFilePath,
+            "DICOM (*.*)");
+        if (fileName.isEmpty())
+            return false;
+        try
+        {
+            QFileInfo fi(fileName);
+            if (fi.exists())
+            {
+                QDir dir = fi.absoluteDir();
+                QFileInfoList filenames = dir.entryInfoList(QDir::Files, QDir::Name);
+                mitk::DicomSeriesReader::StringContainer  files;
+                foreach(QFileInfo file, filenames)
+                {
+                    files.push_back(file.absoluteFilePath().toStdString());
+                }
+                mitk::ProgressBar::GetInstance()->AddStepsToDo(100);
+                mitk::DataNode::Pointer node = mitk::DicomSeriesReader::LoadDicomSeries(files,true,true,true, LoadDicomSeriesCallBack);
+                if (node.IsNotNull())
+                {
+                    if (pInParam->GetBoolProperty("SingleMode", false))
+                    {
+                        pDataStorage->Remove(pDataStorage->GetSubset(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object"))));
+                    }
+                    pDataStorage->Add(node);
+                }
+            }    
+        }
+        catch (const mitk::Exception& e)
+        {
+            MITK_ERROR << e;
+            return false;
+        }
+        mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(pDataStorage);
+        pMitkReference->SetString("LastOpenDirectory", QFileInfo(fileName).absolutePath().toStdString().c_str());
+        return true;
+    }
     else
     {
         return false;
@@ -253,7 +318,7 @@ bool CQF_MainCommand::ExecuteCommand(const char* szCommandID, QF::IQF_Properties
 
 int CQF_MainCommand::GetCommandCount()
 {
-    return 9;
+    return 10;
 }
 
 const char* CQF_MainCommand::GetCommandID(int iIndex)
@@ -278,6 +343,8 @@ const char* CQF_MainCommand::GetCommandID(int iIndex)
         return MITK_MAIN_COMMAND_OPEN_PROJECT;
     case 8:
         return MITK_MAIN_COMMAND_ENABLE_ORIENTATION_MARKER;
+    case 9:
+        return MITK_MAIN_COMMAND_LOAD_DICOMS;
     default:
         return "";
         break;

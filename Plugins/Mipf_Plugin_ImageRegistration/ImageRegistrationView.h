@@ -4,7 +4,6 @@
 #include "MitkPluginView.h"
 #include "mitkPointSet.h"
 #include "mitkDataNode.h"
-#include "Vector3.h"
 #include <QObject>
 #include "ITKImageTypeDef.h"
 #include <QMatrix4x4>

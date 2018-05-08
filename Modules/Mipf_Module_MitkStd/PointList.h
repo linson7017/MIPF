@@ -32,7 +32,7 @@ public:
     PointList(QF::IQF_Main* pMain);
     ~PointList();
     virtual void Initialize();
-    virtual void CreateNewPointSetNode(mitk::DataNode * pointSetNode,bool bDirectUse = true);
+    virtual mitk::DataNode::Pointer CreateNewPointSetNode();
     virtual void SetPointSetNode(mitk::DataNode *newNode);
     virtual void AddPoint(bool bAdd = true);
     virtual mitk::PointSet* GetPointSet();
@@ -41,7 +41,7 @@ public:
     virtual void Attach(QF::IQF_Observer* observer);
     virtual void Detach(QF::IQF_Observer* observer);
     virtual bool InsertPoint(const double x, const double y, const double z);
-    mitk::DataNode *GetPointSetNode();
+    mitk::DataNode::Pointer GetPointSetNode();
     virtual void Release();
 private:
     mitk::PointSet * CheckForPointSetInNode(mitk::DataNode *node) const;

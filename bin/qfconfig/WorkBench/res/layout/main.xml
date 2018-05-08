@@ -3,7 +3,7 @@
 	<!-- 菜单栏 -->
 	<MenuBar >
 		<Menu p_title="QString:Files">
-			<Action text="Load Data" uicommand="@uicommand/popOpenImageDlg"/>
+			<Action text="Load Data" command="MITK_MAIN_COMMAND_LOAD_DICOMS"/>
 			<Action text="Save Data" />
 		</Menu>
 		<Menu p_title="QString:Views">
@@ -97,8 +97,9 @@
 	
 	<!-- 工具栏 -->
 	<ToolBar p_movable="Bool:true" p_iconSize="QSize:40,40" toolButtonStyle="ToolButtonTextBesideIcon" p_windowTitle="QString:File">
-		<Action text="Open" icon="@icon/open.png" command="@command/loadData"/>
-		<Action text="Save Project" icon="@icon/SaveAs.png" msgcommand="main.SaveProject"/>
+		<Action text="Open" icon="@icon/Load.png" command="@command/loadData"/>
+		<Action text="Save Project" icon="@icon/Save.png" msgcommand="main.SaveProject"/>
+        <Action text="Load DSA" icon="@icon/dsa.png"  command="CVA_COMMAND_LOAD_DSA"/>
 	</ToolBar>
 	<ToolBar p_movable="Bool:false" p_iconSize="QSize:40,40" p_windowTitle="QString:Views">
 		<ActionGroup>
@@ -112,7 +113,7 @@
 	</ToolBar>
 	<ToolBar p_movable="Bool:false" p_iconSize="QSize:40,40" p_windowTitle="QString:Tools">
 		<ActionGroup>
-			<Action text="Volume Visualization" command="MITK_MAIN_COMMAND_VOLUME_VISUALIZATION" icon="@icon/volume_visualization.png" />
+			<Action text="Volume Visualization" command="MITK_MAIN_COMMAND_VOLUME_VISUALIZATION" icon="@icon/plugin/volume_visualization.png" />
 		</ActionGroup>
 	</ToolBar>
 	<ToolBar p_movable="Bool:false" p_iconSize="QSize:40,40" p_windowTitle="QString:Options">
@@ -123,16 +124,15 @@
 	</ToolBar>
 	
 	<!-- 显示窗口 -->
-	<MultiViewsWidget centerWidget="true"  contents_margin="0" 
+	<!-- <MultiViewsWidget centerWidget="true"  contents_margin="0" 
 						logo="@icon/mipf.png"
-						Orientation-Marker="@icon/Human.vtp"/>
-	
+						Orientation-Marker="@icon/Human.vtp"/> -->
+	<MultiViewsWidget centerWidget="true"  contents_margin="0" 
+						logo="@icon/mipflp.png"
+						/>
 	<!-- 停靠窗口 -->
 	<DockWidget id="main.DataManagerDocWidget" windowTitle="Data Manager" minWidth="400">
 		<DataManagerWidget id="main.DataManager" />
-	</DockWidget>
-	<DockWidget id="main.DataManagerDocWidget2" windowTitle="Data Manager2" minWidth="400">
-		<DataManagerWidget id="main.DataManager2" />
 	</DockWidget>
 	<DockWidget id="main.ImageNavigatorDockWidget" height="300" windowTitle="Image Navigator">
 		<ImageNavigatorWidget id="main.ImageNavigator" />
@@ -144,11 +144,13 @@
 			<MapperTestWidget text="Mapper Test" id="main.MapperTestWidget"/>
 			<ImageRegistrationWidget text="Image Registration" id="main.ImageRegistrationWidget"  icon="@icon/plugin/rigid_registration.png"/>		
 			<MaskImageWidget text="Mask Image" id="main.MaskImageWidget"  icon="@icon/plugin/mask.png"/>
+            <!-- <LabelImageProcessWidget text="Label ImageProcess" /> -->
 			<LargestConnectedComponentExtractWidget text="Image Connected Component" id="main.LargestConnectedComponentExtractWidget" icon="@icon/plugin/connected_component.png"/>
 			<SurfaceExtractWidget text="Surface Extract"  id="main.SurfaceExtractWidget"  icon="@icon/plugin/surface_extract.png"/>	
 			<ItkAlgorithmSetWidget text="Itk Algorithm Set" id="main.ItkAlgorithmSetWidget"/>
 			<TransformNodeWidget text="Transform Node" id="main.TransformNodeWidget"/>
-			<LandMarkExtractWidget text="Land Mark" id="main.LandMarkExtractWidget"/>	
+            <ExtractImageSliceWidget text="Extract Image Slice" />
+			<!-- <LandMarkExtractWidget text="Land Mark" id="main.LandMarkExtractWidget"/> -->	
 			<SigmoidImageWidget text="Sigmoid"  id="main.SigmoidImageWidget"  icon="@icon/plugin/sigmoid.png"/>
 			<ThresholdImageWidget text="Threshold Image" id="main.ThresholdImageWidget" icon="@icon/plugin/binary_threshold.png"/>
 			<VolumeVisualizationWidget text="Volume Visualization" id="main.VolumeVisualizationWidget" icon="@icon/plugin/volume_visualization.png"/>
@@ -156,11 +158,13 @@
 	</DockWidget>
 	<DockWidget id="main.BasicSurfaceTools" windowTitle="Surface Tools" tabfiedDocWidgetID="main.BasicImageTools" dockWidgetArea="RightDockWidgetArea"  visible="true">
 		<ToolBox >
+            <SurfaceNormalWidget text="Surface Normal"/>
 			<SurfaceCombineWidget text="Surface Combine" id="main.SurfaceCombineWidget"/>
 			<SurfaceConnectedWidget text="Surface Connected" id="main.SurfaceConnectedWidget"/>
 			<SurfaceCutWidget text="Surface Cut" id="main.SurfaceCutWidget"  icon="@icon/plugin/surface_cut.png"/>
 			<SurfaceToImageWidget text="Surface To Image" id="main.SurfaceToImageWidget"/>
 			<ModelExporterWidget text="Model Exporter" id="main.ModelExporterWidget"/>
+            <SurfaceIntersectWidget text="Surface Intersect" />
 		</ToolBox>
 	</DockWidget>
 	<DockWidget id="main.SegmentationTools" windowTitle="Segmentation Tools" tabfiedDocWidgetID="main.BasicSurfaceTools" dockWidgetArea="RightDockWidgetArea"   visible="true">
@@ -196,10 +200,17 @@
 			<ProfileGrayScaleDistributionWidget text="Profile Gray Scale Distribution" id="main.ProfileGrayScaleDistributionWidget"  icon="@icon/plugin/scalar_distribution.png"/>
 			<MeasurementWidget text="Measure" id="main.MeasurementWidget"  icon="@icon/plugin/SimpleMeasurement.png" datamanager="main.DataManager2"/>
 			<GeometryInformationWidget text="Geometry Information"  id="main.GeometryInformationWidget" icon="@icon/plugin/geometry.png"/>
+            <SurfaceInformationWidget text="Surface Information" id="main.SurfaceInformationWidget"/>
 		</ToolBox>
 	</DockWidget>
 	<DockWidget id="main.Test" windowTitle="Test" tabfiedDocWidgetID="main.StaticisTools" dockWidgetArea="RightDockWidgetArea" visible="true">
 		<ToolBox>
+            <WireMouldingWidget text="Wire Moulding" />
+            <!-- <WireSimulationPBDWidget text="PBD Simulation"/>
+            <WireSimulationWidget text="wire "/>
+            <DSARemoveBoneWidget text="DSA Remove Bone"/>
+            <DSAHistogramWidget text="DSA Histogram" />
+            <DSAReaderWidget text="DSA" />
 			<SurfaceInteractionWidget text="Surface Interaction"/>
 			<PCLWidget text="PCL"/>
 			<RSSegmentationWidget text="Robust Statistics Segmentation" />
@@ -217,11 +228,16 @@
 				cornerTextColor="1.0,0.0,0.0" 
 				colorRectangleOn="true"
 				rectangleColor="0.0,1.0,1.0"
-				stdPlaneWidgetsOn="false"
+				stdPlaneWidgetsOn="false" -->
 			/>
 		</ToolBox>
 	</DockWidget>
-	
+	<DockWidget windowTitle="Tutorial" dockWidgetArea="RightDockWidgetArea" minWidth="400" tabfiedDocWidgetID="main.Test"  features="NoDockWidgetFeatures" floating="false">
+        <ToolBox>
+            <TestWidget text="Test" />
+            <!-- <CVSegmentationWidget text="CVS"/> -->
+        </ToolBox>
+	</DockWidget>
 	<!-- 状态条 -->
 	<StatusBarWidget statusBar="true"/>
 	<ProgressBarWidget geometry="0" size="200,25"/>

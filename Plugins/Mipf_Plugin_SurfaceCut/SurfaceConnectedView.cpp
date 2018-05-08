@@ -35,7 +35,7 @@ void SurfaceConnectedView::CreateView()
     m_ui.setupUi(this);
 
     m_ui.SurfaceSelector->SetDataStorage(GetDataStorage());
-    m_ui.SurfaceSelector->SetPredicate(mitk::TNodePredicateDataType<mitk::Surface>::New());
+    m_ui.SurfaceSelector->SetPredicate(CreateSurfacePredicate());
     connect(m_ui.ApplyBtn, SIGNAL(clicked()), this, SLOT(Apply()));
     connect(m_ui.SaveBtn, SIGNAL(clicked()), this, SLOT(Save()));
     connect(m_ui.ImportBtn, SIGNAL(clicked()), this, SLOT(Import()));

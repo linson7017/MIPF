@@ -14,13 +14,15 @@ endif()
 
 project(Mipf_Plugin_ItkAlgorithmSet)
 
-include_directories(${VMTK_INCLUDE_DIR})
+include_directories(${VMTK_INCLUDE_DIR}
+${MODULES_DIR}/include/extern/itk)
 
 file (GLOB Headers "./*.h")
 file(GLOB UI_Srcs "./*.ui")
-AUX_SOURCE_DIRECTORY(. DIR_SRCS)
+AUX_SOURCE_DIRECTORY(. DIR_SRCS)  
 
 set(CMAKE_AUTOMOC ON)
+
 
 
 qt5_wrap_ui(ui_Files ${UI_Srcs})

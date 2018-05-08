@@ -1,0 +1,17 @@
+<MainWindow activityRoot="true" id="main" tabPosition="Right;Right" tabShape="T" title="去骨软件" icon="@icon/dsa.png">
+    <MenuBar>
+        <Menu p_title="QString:文件">
+            <Action text="打开DSA文件" command="@command/loadSingleModeDSAData"/>
+            <Action text="打开文件" command="@command/loadSingleModeData"/>
+        </Menu>
+    </MenuBar> 
+<!--     <DockWidget id="main.DataManagerDocWidget" windowTitle="Data Manager" minWidth="400">
+		<DataManagerWidget id="main.DataManager" />
+	</DockWidget> -->
+	<RenderWindowWidget mapperID="Standard2D" direction="Axial" centerWidget="true" menuVisible="true"/>
+	<DockWidget  dockWidgetArea="RightDockWidgetArea" minWidth="400" features="NoDockWidgetFeatures" floating="false">
+        <DSARemoveBoneWidget />
+	</DockWidget>
+    <StatusBarWidget statusBar="true"/>
+    <ProgressBarWidget geometry="0" size="200,25"/>
+</MainWindow>

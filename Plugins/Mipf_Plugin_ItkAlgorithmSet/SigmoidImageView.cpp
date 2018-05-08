@@ -20,7 +20,7 @@ void SigmoidImageView::CreateView()
 {
     m_ui.setupUi(this);
     m_ui.DataSelector->SetDataStorage(GetDataStorage());
-    m_ui.DataSelector->SetPredicate(mitk::TNodePredicateDataType<mitk::Image>::New());
+    m_ui.DataSelector->SetPredicate(CreateImagePredicate());
     connect(m_ui.DataSelector, SIGNAL(OnSelectionChanged(const mitk::DataNode *)), this, SLOT(OnImageSelectionChanged(const mitk::DataNode *)));
 
     m_ui.AlphaValueSlider->setRange(-100.0, 100.0);

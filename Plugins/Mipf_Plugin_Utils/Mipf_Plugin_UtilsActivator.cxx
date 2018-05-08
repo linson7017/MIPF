@@ -12,6 +12,10 @@
 #include "ImageInteractionView.h"
 #include "ThresholdImageView.h"
 #include "SurfaceInteractionView.h"
+#include "SurfaceInformationView.h"
+#include "LabelImageProcessView.h"
+#include "SurfaceIntersectView.h"
+#include "ExtractImageSliceView.h"
 
 #include "Res/R.h"
 #include "Utils/QObjectFactory.h"
@@ -57,4 +61,10 @@ void Mipf_Plugin_Utils_Activator::Register()
     REGISTER_PLUGIN("ImageInteractionWidget", ImageInteractionView);
     REGISTER_PLUGIN("ThresholdImageWidget", ThresholdImageView);
     REGISTER_PLUGIN("SurfaceInteractionWidget", SurfaceInteractionView);
+
+    REGISTER_PLUGIN("SurfaceInformationWidget", SurfaceInformationView);
+    REGISTER_PLUGIN("LabelImageProcessWidget", LabelImageProcessView);
+    REGISTER_PLUGIN("SurfaceIntersectWidget", SurfaceIntersectView);
+    REGISTER_PLUGIN("ExtractImageSliceWidget", ExtractImageSliceView);
+
 }

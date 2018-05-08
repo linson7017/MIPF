@@ -193,7 +193,6 @@ void RenderWindow::CreateView()
     {
         GetMitkRenderWindowInterface()->AddMitkRenderWindow(this, GetAttribute("id"));
     }
-     
 }
 
 WndHandle RenderWindow::GetPluginHandle()
@@ -212,10 +211,89 @@ void RenderWindow::wheelEvent(QWheelEvent *e)
             GetSliceNavigationController()->GetSlice()->SetPos(currentSlice);
             if (m_annotation)
             {
-                QString info = QString("Slice: %1").arg(currentSlice);
+                QString info = QString("Slice: %1").arg(GetSliceNavigationController()->GetSlice()->GetSteps()-currentSlice);
                 m_annotation->SetText(0, info.toStdString().c_str());
             } 
         }     
     }
     QmitkRenderWindow::wheelEvent(e);
+}
+
+void RenderWindow::mousePressEvent(QMouseEvent *event)
+{
+    m_dragging = true;
+    m_preMousePt = event->pos();
+}
+
+void RenderWindow::mouseReleaseEvent(QMouseEvent *event)
+{
+    m_dragging = false;
+}
+
+void RenderWindow::mouseMoveEvent(QMouseEvent *event)
+{
+    if (m_dragging)
+    {
+        QPoint currentPoint = event->pos();
+        QPoint delta = currentPoint - m_preMousePt;
+        mitk::DataNode::Pointer node = DetectTopMostVisibleImage();
+        if (node.IsNotNull())
+        {
+            mitk::LevelWindow lw;
+            node->GetLevelWindow(lw, GetRenderer());
+            lw.SetLevelWindow(lw.GetLevel() + delta.y(), lw.GetWindow() + delta.x());
+            node->SetLevelWindow(lw);
+            mitk::RenderingManager::GetInstance()->RequestUpdate(GetVtkRenderWindow());
+        }
+        m_preMousePt = currentPoint;
+    } 
+}
+
+mitk::DataNode::Pointer RenderWindow::DetectTopMostVisibleImage()
+{
+   
+    if (!GetDataStorage())
+    {
+        return NULL;
+    }
+    // get all images from the data storage which are not a segmentation
+    auto isImage = mitk::TNodePredicateDataType<mitk::Image>::New();
+    auto isBinary = mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(true));
+    auto isNotBinary = mitk::NodePredicateNot::New(isBinary);
+    auto isNormalImage = mitk::NodePredicateAnd::New(isImage, isNotBinary);
+    auto images = GetDataStorage()->GetSubset(isNormalImage);
+
+    mitk::DataNode::Pointer currentNode;
+    int maxLayer = std::numeric_limits<int>::min();
+    int layer = 0;
+
+    // iterate over selection
+    for (auto it = images->Begin(); it != images->End(); ++it)
+    {
+        auto node = it->Value();
+
+        if (node.IsNull())
+            continue;
+
+        if (node->IsVisible(nullptr) == false)
+            continue;
+
+        // we also do not want to assign planar figures to helper objects ( even if they are of type image )
+        if (node->GetProperty("helper object") != nullptr)
+            continue;
+
+        node->GetIntProperty("layer", layer);
+
+        if (layer < maxLayer)
+        {
+            continue;
+        }
+        else
+        {
+            maxLayer = layer;
+            currentNode = node;
+        }
+    }
+
+    return currentNode;
 }

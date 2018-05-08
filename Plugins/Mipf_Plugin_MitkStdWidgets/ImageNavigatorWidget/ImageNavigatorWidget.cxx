@@ -22,6 +22,8 @@
 #include <QtWidgets>
 
 
+#include <itkSpatialOrientationAdapter.h>
+
 #include <MitkMain/IQF_MitkDataManager.h>
 #include <mitkMain/IQF_MitkRenderWindow.h>
 
@@ -130,8 +132,8 @@ void ImageNavigatorWidget::RenderWindowPartActivated()
     IQF_MitkRenderWindow* pMitkRenderWindow = (IQF_MitkRenderWindow*)m_pMain->GetInterfacePtr(QF_MitkMain_RenderWindow);
     if (pMitkRenderWindow)
     {
-
-        QmitkRenderWindow* renderWindow = pMitkRenderWindow->GetQmitkRenderWindow("axial");
+        QString multiViewsID = GetAttribute("MultiViewID");
+        QmitkRenderWindow* renderWindow = pMitkRenderWindow->GetQmitkRenderWindow(multiViewsID +"-axial");
         if (renderWindow)
         {
             if (m_AxialStepper) m_AxialStepper->deleteLater();
@@ -151,7 +153,7 @@ void ImageNavigatorWidget::RenderWindowPartActivated()
             m_ZWorldCoordinateSpinBox->setEnabled(false);
         }
 
-        renderWindow = pMitkRenderWindow->GetQmitkRenderWindow("sagittal");
+        renderWindow = pMitkRenderWindow->GetQmitkRenderWindow(multiViewsID + "-sagittal");
         if (renderWindow)
         {
             if (m_SagittalStepper) m_SagittalStepper->deleteLater();
@@ -171,7 +173,7 @@ void ImageNavigatorWidget::RenderWindowPartActivated()
             m_YWorldCoordinateSpinBox->setEnabled(false);
         }
 
-        renderWindow = pMitkRenderWindow->GetQmitkRenderWindow("coronal");
+        renderWindow = pMitkRenderWindow->GetQmitkRenderWindow(multiViewsID + "-coronal");
         if (renderWindow)
         {
             if (m_FrontalStepper) m_FrontalStepper->deleteLater();
@@ -216,15 +218,14 @@ void ImageNavigatorWidget::RenderWindowPartActivated()
 
 void ImageNavigatorWidget::OnRefetch()
 {
-    IQF_MitkRenderWindow* pMitkRenderWindow = (IQF_MitkRenderWindow*)m_pMain->GetInterfacePtr(QF_MitkMain_RenderWindow);
-    if (pMitkRenderWindow&&pMitkRenderWindow->GetActiveMitkRenderWindow())
+    if (GetMitkRenderWindowInterface())
     {
-        mitk::BaseGeometry::ConstPointer geometry = pMitkRenderWindow->GetActiveMitkRenderWindow()->GetSliceNavigationController()->GetInputWorldGeometry3D();
-        mitk::TimeGeometry::ConstPointer timeGeometry = pMitkRenderWindow->GetActiveMitkRenderWindow()->GetSliceNavigationController()->GetInputWorldTimeGeometry();
+        mitk::BaseGeometry::ConstPointer geometry = GetMitkRenderWindowInterface()->GetActiveMitkRenderWindow()->GetSliceNavigationController()->GetInputWorldGeometry3D();
+        mitk::TimeGeometry::ConstPointer timeGeometry = GetMitkRenderWindowInterface()->GetActiveMitkRenderWindow()->GetSliceNavigationController()->GetInputWorldTimeGeometry();
 
         if (geometry.IsNull() && timeGeometry.IsNotNull())
         {
-            mitk::TimeStepType timeStep = pMitkRenderWindow->GetActiveMitkRenderWindow()->GetSliceNavigationController()->GetTime()->GetPos();
+            mitk::TimeStepType timeStep = GetMitkRenderWindowInterface()->GetActiveMitkRenderWindow()->GetSliceNavigationController()->GetTime()->GetPos();
             geometry = timeGeometry->GetGeometryForTimeStep(timeStep);
         }
 
@@ -252,7 +253,7 @@ void ImageNavigatorWidget::OnRefetch()
                 cornerPoint2InIndexCoordinates[2] -= 0.5;
             }
 
-            mitk::Point3D crossPositionInWorldCoordinates = pMitkRenderWindow->GetMitkStdMultiWidget()->GetCrossPosition();
+            mitk::Point3D crossPositionInWorldCoordinates = GetMitkRenderWindowInterface()->GetMitkStdMultiWidget()->GetCrossPosition();
 
             mitk::Point3D cornerPoint1InWorldCoordinates;
             mitk::Point3D cornerPoint2InWorldCoordinates;
@@ -278,9 +279,84 @@ void ImageNavigatorWidget::OnRefetch()
             m_XWorldCoordinateSpinBox->blockSignals(false);
             m_YWorldCoordinateSpinBox->blockSignals(false);
             m_ZWorldCoordinateSpinBox->blockSignals(false);
+
+            /// Calculating 'inverse direction' property.
+
+            mitk::AffineTransform3D::MatrixType matrix = geometry->GetIndexToWorldTransform()->GetMatrix();
+            matrix.GetVnlMatrix().normalize_columns();
+            mitk::AffineTransform3D::MatrixType::InternalMatrixType inverseMatrix = matrix.GetInverse();
+
+            for (int worldAxis = 0; worldAxis < 3; ++worldAxis)
+            {
+                QString multiViewID = GetAttribute("MultiViewID");
+                QmitkRenderWindow* renderWindow =
+                    worldAxis == 0 ? GetMitkRenderWindowInterface()->GetQmitkRenderWindow(multiViewID+"-sagittal") :
+                    worldAxis == 1 ? GetMitkRenderWindowInterface()->GetQmitkRenderWindow(multiViewID + "-coronal") :
+                    GetMitkRenderWindowInterface()->GetQmitkRenderWindow(multiViewID + "-axial");
+
+                if (renderWindow)
+                {
+                    const mitk::BaseGeometry* rendererGeometry = renderWindow->GetRenderer()->GetCurrentWorldGeometry();
+
+                    /// Because of some problems with the current way of event signalling,
+                    /// 'Modified' events are sent out from the stepper while the renderer
+                    /// does not have a geometry yet. Therefore, we do a nullptr check here.
+                    /// See bug T22122. This check can be resolved after T22122 got fixed.
+                    if (rendererGeometry)
+                    {
+                        int dominantAxis = itk::Function::Max3(
+                            inverseMatrix[0][worldAxis],
+                            inverseMatrix[1][worldAxis],
+                            inverseMatrix[2][worldAxis]);
+
+                        bool referenceGeometryAxisInverted = inverseMatrix[dominantAxis][worldAxis] < 0;
+                        bool rendererZAxisInverted = rendererGeometry->GetAxisVector(2)[worldAxis] < 0;
+
+                        /// `referenceGeometryAxisInverted` tells if the direction of the corresponding axis
+                        /// of the reference geometry is flipped compared to the 'world direction' or not.
+                        ///
+                        /// `rendererZAxisInverted` tells if direction of the renderer geometry z axis is
+                        /// flipped compared to the 'world direction' or not. This is the same as the indexing
+                        /// direction in the slice navigation controller and matches the 'top' property when
+                        /// initialising the renderer planes. (If 'top' was true then the direction is
+                        /// inverted.)
+                        ///
+                        /// The world direction can be +1 ('up') that means right, anterior or superior, or
+                        /// it can be -1 ('down') that means left, posterior or inferior, respectively.
+                        ///
+                        /// If these two do not match, we have to invert the index between the slice navigation
+                        /// controller and the slider navigator widget, so that the user can see and control
+                        /// the index according to the reference geometry, rather than the slice navigation
+                        /// controller. The index in the slice navigation controller depends on in which way
+                        /// the reference geometry has been resliced for the renderer, and it does not necessarily
+                        /// match neither the world direction, nor the direction of the corresponding axis of
+                        /// the reference geometry. Hence, it is a merely internal information that should not
+                        /// be exposed to the GUI.
+                        ///
+                        /// So that one can navigate in the same world direction by dragging the slider
+                        /// right, regardless of the direction of the corresponding axis of the reference
+                        /// geometry, we invert the direction of the controls if the reference geometry axis
+                        /// is inverted but the direction is not ('inversDirection' is false) or the other
+                        /// way around.
+
+                        bool inverseDirection = referenceGeometryAxisInverted != rendererZAxisInverted;
+
+                        QmitkSliderNavigatorWidget* navigatorWidget =
+                            worldAxis == 0 ? m_SliceNavigatorSagittal :
+                            worldAxis == 1 ? m_SliceNavigatorFrontal :
+                            m_SliceNavigatorAxial;
+
+                        navigatorWidget->SetInverseDirection(inverseDirection);
+
+                        // This should be a preference (see T22254)
+                        // bool invertedControls = referenceGeometryAxisInverted != inverseDirection;
+                        // navigatorWidget->SetInvertedControls(invertedControls);
+                    }
+                }
+            }
         }
 
-        //this->SetBorderColors();
+       // this->SetBorderColors();
 
     }
 }

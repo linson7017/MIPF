@@ -1,0 +1,14 @@
+<VLayout activityRoot="true" title="test">
+    <HLayout>
+        <VLayout>
+            <Button text="Load" command="MITK_MAIN_COMMAND_LOAD_DICOMS"/>
+            <DataManagerWidget id="main.DataManager" />
+        </VLayout>
+        <MultiViewsWidget centerWidget="true"  contents_margin="0" 
+						logo="@icon/mipflp.png"
+						/>
+        <TestWidget width="400" test="test"/>
+    </HLayout>
+    <StatusBarWidget statusBar="true"/>
+	<ProgressBarWidget geometry="0" size="200,25"/>
+</VLayout>

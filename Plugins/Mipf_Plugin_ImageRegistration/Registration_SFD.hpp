@@ -223,7 +223,7 @@ void RegistrationSFD<FixedImageType, MovingImageType>::Start(const FixedImageTyp
 	warper->SetDisplacementField(filter->GetOutput());
 
 	warper->Update();
-    m_notifier->ResultImageGenerated(warper->GetOutput());
+    m_notifier->ResultImageGenerated(filter->GetOutput());
     return;
 
     /*typedef  float                         OutputPixelType;

@@ -38,7 +38,10 @@
      </layout>
     </item>
     <item>
-     <widget class="QmitkPointListWidget" name="SeedWidget" native="true"/>
+     <widget class="QmitkPointListWidget" name="SourceSeedWidget" native="true"/>
+    </item>
+    <item>
+     <widget class="QmitkPointListWidget" name="TargetSeedWidget" native="true"/>
     </item>
     <item>
      <widget class="QPushButton" name="ApplyBtn">

@@ -104,6 +104,56 @@ void CenterLineExtraction::ReconstructTubularSurfaceByCenterLine(vtkPolyData* pC
     pOutputData->DeepCopy(marchingCubes->GetOutput());
 }
 
+void CenterLineExtraction::ExtractCenterLine(vtkPolyData* pInput, vtkPoints* pSourcePoints, vtkPoints* pTargetPoints, vtkPolyData* pOutputNetwork)
+{
+    auto preparedModel = vtkSmartPointer<vtkPolyData>::New();
+    auto model = vtkSmartPointer<vtkPolyData>::New();
+    auto voronoi = vtkSmartPointer<vtkPolyData>::New();
+
+    PrepareModel(pInput, preparedModel);
+    DecimateSurface(preparedModel, model);
+
+    vtkIdList*  sourceSeedIds = vtkIdList::New();
+    vtkIdList*  targetSeedIds = vtkIdList::New();
+
+    vtkSmartPointer<vtkPointLocator> pointLocator = vtkSmartPointer<vtkPointLocator>::New();
+    pointLocator->SetDataSet(model);
+    pointLocator->BuildLocator();
+
+    for (int i=0;i<pTargetPoints->GetNumberOfPoints();i++)
+    {
+        sourceSeedIds->InsertNextId(pointLocator->FindClosestPoint(pTargetPoints->GetPoint(i)));
+    }
+
+    for (int i = 0; i < pSourcePoints->GetNumberOfPoints(); i++)
+    {
+        targetSeedIds->InsertNextId(pointLocator->FindClosestPoint(pSourcePoints->GetPoint(i)));
+    }
+
+    ComputeCenterlines(model, sourceSeedIds, targetSeedIds, pOutputNetwork,nullptr);
+}
+
+void CenterLineExtraction::ExtractCenterLineNetwork(vtkPolyData* pInput, vtkPolyData* pNetWork)
+{
+    if (!pInput)
+    {
+        return;
+    }
+    std::string radiusArrayName = "Radius";
+    std::string topologyArrayName = "Topology";
+    std::string marksArrayName = "Marks";
+
+    vtkSmartPointer<vtkvmtkPolyDataNetworkExtraction> networkExtraction =
+        vtkSmartPointer < vtkvmtkPolyDataNetworkExtraction>::New();
+    networkExtraction->SetInputData(pInput);
+    networkExtraction->SetAdvancementRatio(1.05);
+    networkExtraction->SetRadiusArrayName(radiusArrayName.c_str());
+    networkExtraction->SetTopologyArrayName(topologyArrayName.c_str());
+    networkExtraction->SetMarksArrayName(marksArrayName.c_str());
+    networkExtraction->Update();
+    pNetWork->DeepCopy(networkExtraction->GetOutput());
+}
+
 
 void CenterLineExtraction::ExtractCenterLineNetwork(vtkPolyData* pInput, double* vStartPoint, vtkPolyData* pOutputNetwork, vtkPoints* pOutputEndpoints, vtkPolyData* pOutputVoronoi)
 {
@@ -375,6 +425,10 @@ void CenterLineExtraction::ClipSurfaceAtEndPoints(vtkPolyData* networkPolyData, 
 void CenterLineExtraction::ComputeCenterlines(vtkPolyData* polyData, vtkIdList* inletSeedIds, vtkIdList* outletSeedIds,
     vtkPolyData* outPolyData, vtkPolyData* outPolyData2)
 {
+    if (!polyData||!outPolyData)
+    {
+        return;
+    }
     int flipNormals = 0;
     auto radiusArrayName = "Radius";
     auto costFunction = "1/R";
@@ -395,6 +449,8 @@ void CenterLineExtraction::ComputeCenterlines(vtkPolyData* polyData, vtkIdList* 
 
 
     outPolyData->DeepCopy(centerlineFilter->GetOutput());
-    outPolyData2->DeepCopy(centerlineFilter->GetVoronoiDiagram());
-
+    if (outPolyData2)
+    {
+        outPolyData2->DeepCopy(centerlineFilter->GetVoronoiDiagram());
+    }
 }

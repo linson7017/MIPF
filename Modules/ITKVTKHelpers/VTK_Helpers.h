@@ -9,6 +9,11 @@
 
 namespace VTKHelpers
 {
+#ifndef  VTK_CREATE
+# define VTK_CREATE(type, name) \
+  vtkSmartPointer<type> name = vtkSmartPointer<type>::New()
+#endif
+
 
     QF_API void SetImageSizeToMatch(vtkImageData* const input, vtkImageData* const output);
 

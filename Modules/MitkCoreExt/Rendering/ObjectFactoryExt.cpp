@@ -12,6 +12,7 @@
 #include "CutUSImageVtkMapper.h"
 #include "FreehandSurfaceCutMapper3D.h"
 #include "ColoredSurfaceVtkMapper.h"
+#include "WireVtkMapper.h"
 
 using namespace  mitk;
 
@@ -85,9 +86,16 @@ mitk::Mapper::Pointer mitk::ObjectFactoryExt::CreateMapper(mitk::DataNode *node,
         if (mapper.IsNotNull())
             mapper->SetDataNode(node);
     }
+    else if (dynamic_cast<Wire *>(node->GetData()) != nullptr)
+    {
+        mapper = WireVtkMapper::New();
+        if (mapper.IsNotNull())
+            mapper->SetDataNode(node);
+    }
 
     return mapper;
 }
+
 
 
 const char *mitk::ObjectFactoryExt::GetDescription() const

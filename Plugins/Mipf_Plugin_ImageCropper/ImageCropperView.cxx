@@ -36,13 +36,15 @@
 #include <mitkNodePredicateProperty.h>
 #include <mitkRenderingManager.h>
 #include <mitkProperties.h>
+#include <mitkBoundingShapeObjectFactory.h>
 
 #include <itkBoundingBox.h>
 #include <itkCommand.h>
 #include <usModuleRegistry.h>
 #include <usGetModuleContext.h>
 
-ImageCropperView::ImageCropperView(QF::IQF_Main* pMain) :MitkPluginView(pMain),
+
+ImageCropperView::ImageCropperView() :MitkPluginView(),
 m_ImageNode(nullptr),
 m_CroppingObject(nullptr),
 m_CroppingObjectNode(nullptr),
@@ -52,7 +54,8 @@ m_Advanced(0),
 m_Active(0),
 m_ScrollEnabled(true)
 {
-    m_pMain->Attach(this);
+    mitk::RegisterBoundingShapeObjectFactory();
+
     CreateBoundingShapeInteractor(false);
 }
 
@@ -80,6 +83,7 @@ void ImageCropperView::Update(const char* szMessage, int iValue, void* pValue)
 
 void ImageCropperView::CreateView()
 {
+    m_pMain->Attach(this);
     m_Controls.setupUi(this);
 
     m_Controls.boundingShapeSelector->SetDataStorage(GetDataStorage());

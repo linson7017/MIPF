@@ -29,6 +29,8 @@ public:
         double dLowerThreshold, double dHigherThreshold, vtkIdList*  pSourceSeedIds, vtkIdList* pTargetSeedIds, int iInitializeMode = 0) = 0;
 
     virtual void GenerateVesselSurface(vtkImageData* pInput, vtkPolyData* pOutput, double dThreshold) = 0;
+
+    virtual void CapSurface(vtkPolyData* input, vtkPolyData*output) = 0;
 };
 
 

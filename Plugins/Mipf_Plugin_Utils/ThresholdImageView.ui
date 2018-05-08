@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>150</height>
+    <width>436</width>
+    <height>201</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,8 +18,8 @@
     <rect>
      <x>10</x>
      <y>10</y>
-     <width>381</width>
-     <height>121</height>
+     <width>421</width>
+     <height>182</height>
     </rect>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout">
@@ -53,8 +53,8 @@
         <rect>
          <x>0</x>
          <y>-1</y>
-         <width>401</width>
-         <height>91</height>
+         <width>413</width>
+         <height>108</height>
         </rect>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -69,21 +69,44 @@
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="ExportBtn">
-          <property name="text">
-           <string>Export</string>
-          </property>
-         </widget>
+         <layout class="QHBoxLayout" name="horizontalLayout_2">
+          <item>
+           <widget class="QPushButton" name="ExportBtn">
+            <property name="text">
+             <string>Export</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="ExportBinaryCB">
+            <property name="maximumSize">
+             <size>
+              <width>130</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>Export Binary</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="ReplaceValueLE">
+            <property name="maximumSize">
+             <size>
+              <width>60</width>
+              <height>16777215</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </item>
        </layout>
       </widget>
-      <zorder>ExportBtn</zorder>
-      <zorder>ThresholdSlider</zorder>
-      <zorder>VisibleCB</zorder>
-      <zorder>ExportBtn</zorder>
-      <zorder>ThresholdSlider</zorder>
-      <zorder>VisibleCB</zorder>
-      <zorder>verticalLayoutWidget_2</zorder>
      </widget>
     </item>
    </layout>

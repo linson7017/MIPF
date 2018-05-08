@@ -29,6 +29,7 @@
 class IQF_GraphcutSegmentation:public IQF_Object
 {
 public:
+
     virtual void Init()=0;
     virtual void PerformSegmentation() = 0;
     virtual void SetImage(const Float3DImageType* pF3DImage) = 0;

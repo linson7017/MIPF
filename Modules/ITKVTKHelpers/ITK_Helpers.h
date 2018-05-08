@@ -76,6 +76,15 @@ namespace ITKHelpers
     template <class TImageType,class PixelType=TImageType::PixelType>
     void BinaryFillLargeHolesByRegionGrowing(TImageType* input, TImageType* output,itk::Index<TImageType::ImageDimension> seed, PixelType replaceValue=1);
 
+    template <class ImageType3D,class ImageType2D>
+    void Extract2DSlice(ImageType3D* input, ImageType2D* output,int sliceIndex);
+
+    template <class ImageType3D, class ImageType2D>
+    void Assign2DSlice(ImageType3D* image, ImageType2D* slice, int sliceIndex);
+
+    template <class ImageType>
+    void ConvertWorldToIndex(ImageType* image,double* world,int* index);
+
     QF_API std::vector<itk::Index<3> > DilatePixelList(const std::vector<itk::Index<3> >& pixelList,
         const itk::ImageRegion<3>& region, const unsigned int radius);
 

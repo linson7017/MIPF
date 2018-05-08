@@ -27,6 +27,7 @@ protected slots:
     void Export();
     void SelectionChanged(const mitk::DataNode* node);
     void VisibleChanged(bool visible);
+    void ExportTypeChanged(bool checked);
 
 private:
     Ui::ThresholdImageView m_ui;

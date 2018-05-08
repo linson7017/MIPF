@@ -4,6 +4,7 @@
 #include "ITKImageTypeDef.h"
 
 #include "itkBinaryThresholdImageFilter.h"
+#include "itkThresholdImageFilter.h"
 
 #include "mitkImageCast.h"
 
@@ -27,7 +28,7 @@ void ThresholdImageView::CreateView()
     m_pMain->Attach(this);
 
     m_ui.ImageSelector->SetDataStorage(GetDataStorage());
-    m_ui.ImageSelector->SetPredicate(mitk::TNodePredicateDataType<mitk::Image>::New());
+    m_ui.ImageSelector->SetPredicate(CreateImagePredicate());
     connect(m_ui.ImageSelector, SIGNAL(OnSelectionChanged(const mitk::DataNode*)), this, SLOT(SelectionChanged(const mitk::DataNode*)));
 
     m_ui.ThresholdSlider->setTracking(false);
@@ -40,7 +41,28 @@ void ThresholdImageView::CreateView()
 
     m_ui.VisibleCB->setChecked(false);
     connect(m_ui.VisibleCB, SIGNAL(clicked(bool)), this, SLOT(VisibleChanged(bool)));
+    connect(m_ui.ExportBinaryCB, SIGNAL(clicked(bool)), this, SLOT(ExportTypeChanged(bool)));
+
+    m_ui.ReplaceValueLE->setVisible(false);
     
+}
+
+void ThresholdImageView::ExportTypeChanged(bool checked)
+{
+     if (checked)
+     {
+         m_ui.ReplaceValueLE->setVisible(false);
+     }
+     else
+     {
+         if (m_ui.ImageSelector->GetSelectedNode())
+         {
+             mitk::Image* image = dynamic_cast<mitk::Image*>(m_ui.ImageSelector->GetSelectedNode()->GetData());
+             m_ui.ReplaceValueLE->setText(QString("%1").arg(image->GetScalarValueMin()));
+         }
+         m_ui.ReplaceValueLE->setVisible(true);
+     }
+
 }
 
 void ThresholdImageView::showEvent(QShowEvent *event)
@@ -109,20 +131,44 @@ void ThresholdImageView::Export()
 {
     if (m_pResultNode&&m_ui.ImageSelector->GetSelectedNode())
     {
-
-        mitk::DataNode::Pointer newNode = mitk::DataNode::New();
-        mitk::Image::Pointer image = mitk::Image::New();
-        image->Initialize(static_cast<mitk::Image*>(m_pResultNode->GetData()));
-        auto data = vtkSmartPointer<vtkImageData>::New();
-        data->DeepCopy(static_cast<mitk::Image*>(m_pResultNode->GetData())->GetVtkImageData());
-        image->SetVolume(data->GetScalarPointer());
-        newNode->SetData(image);
-        newNode->SetColor(1.0, 0.0, 0.0);
         QString name = QString("Threshold(%1,%2)").arg(m_ui.ThresholdSlider->minimumValue()).arg(m_ui.ThresholdSlider->maximumValue());
+        if (m_ui.ExportBinaryCB->isChecked())
+        {
+            auto data = vtkSmartPointer<vtkImageData>::New();
+            data->DeepCopy(static_cast<mitk::Image*>(m_pResultNode->GetData())->GetVtkImageData());
+            ImportVTKImage(data, ("Binary"+name).toLocal8Bit().constData(), m_ui.ImageSelector->GetSelectedNode());   
+        }
+        else
+        {
+            mitk::Image* imageData = dynamic_cast<mitk::Image*>(m_ui.ImageSelector->GetSelectedNode()->GetData());
+            if (imageData->GetDimension() == 3)
+            {
+                Int3DImageType::Pointer itkImage;
+                mitk::CastToItkImage(dynamic_cast<mitk::Image*>(m_ui.ImageSelector->GetSelectedNode()->GetData()), itkImage);
+                typedef itk::ThresholdImageFilter<Int3DImageType> thresholdImageType;
+                thresholdImageType::Pointer filter = thresholdImageType::New();
+                filter->SetInput(itkImage);
+                filter->ThresholdOutside(m_ui.ThresholdSlider->minimumValue(), m_ui.ThresholdSlider->maximumValue());
+                filter->SetOutsideValue(m_ui.ReplaceValueLE->text().toDouble());
+                filter->Update();
+                ImportITKImage(filter->GetOutput(), name.toLocal8Bit().constData(), m_ui.ImageSelector->GetSelectedNode());
+            }
+            else if (imageData->GetDimension() == 2)
+            {
+                Int2DImageType::Pointer itkImage;
+                mitk::CastToItkImage(dynamic_cast<mitk::Image*>(m_ui.ImageSelector->GetSelectedNode()->GetData()), itkImage);
+                typedef itk::ThresholdImageFilter<Int2DImageType> thresholdImageType;
+                thresholdImageType::Pointer filter = thresholdImageType::New();
+                filter->SetInput(itkImage);
+                filter->ThresholdOutside(m_ui.ThresholdSlider->minimumValue(), m_ui.ThresholdSlider->maximumValue());
+                filter->SetOutsideValue(m_ui.ReplaceValueLE->text().toDouble());
+                filter->Update();
+                ImportITKImage(filter->GetOutput(), name.toLocal8Bit().constData(), m_ui.ImageSelector->GetSelectedNode());
 
-        newNode->SetName(name.toLocal8Bit().constData());
-        GetDataStorage()->Add(newNode, m_ui.ImageSelector->GetSelectedNode());
-        RequestRenderWindowUpdate();
+            }
+            
+        }
+        
     }
 }
 
@@ -133,18 +179,36 @@ void ThresholdImageView::ThresholdChanged(double minValue, double maxValue)
         mitk::Image* imageData = dynamic_cast<mitk::Image*>(m_ui.ImageSelector->GetSelectedNode()->GetData());
         if (imageData)
         {
-            Int3DImageType::Pointer itkImage;
-            mitk::CastToItkImage(imageData, itkImage);
-            typedef itk::BinaryThresholdImageFilter<Int3DImageType, UChar3DImageType> btImageFilterType;
-            btImageFilterType::Pointer btFilter = btImageFilterType::New();
-            btFilter->SetInput(itkImage);
-            btFilter->SetLowerThreshold(m_ui.ThresholdSlider->minimumValue());
-            btFilter->SetUpperThreshold(m_ui.ThresholdSlider->maximumValue());
-            btFilter->SetInsideValue(255);
-            btFilter->SetOutsideValue(0);
-            btFilter->Update();
+           
             mitk::Image::Pointer resultImage;
-            mitk::CastToMitkImage(btFilter->GetOutput(), resultImage);
+            if (imageData->GetDimension()==3)
+            {
+                Int3DImageType::Pointer itkImage;
+                mitk::CastToItkImage(imageData, itkImage);
+                typedef itk::BinaryThresholdImageFilter<Int3DImageType, UChar3DImageType> btImageFilterType;
+                btImageFilterType::Pointer btFilter = btImageFilterType::New();
+                btFilter->SetInput(itkImage);
+                btFilter->SetLowerThreshold(m_ui.ThresholdSlider->minimumValue());
+                btFilter->SetUpperThreshold(m_ui.ThresholdSlider->maximumValue());
+                btFilter->SetInsideValue(255);
+                btFilter->SetOutsideValue(0);
+                btFilter->Update();
+                mitk::CastToMitkImage(btFilter->GetOutput(), resultImage);
+            }
+            else if (imageData->GetDimension() == 2)
+            {
+                Int2DImageType::Pointer itkImage;
+                mitk::CastToItkImage(imageData, itkImage);
+                typedef itk::BinaryThresholdImageFilter<Int2DImageType, UChar2DImageType> btImageFilterType;
+                btImageFilterType::Pointer btFilter = btImageFilterType::New();
+                btFilter->SetInput(itkImage);
+                btFilter->SetLowerThreshold(m_ui.ThresholdSlider->minimumValue());
+                btFilter->SetUpperThreshold(m_ui.ThresholdSlider->maximumValue());
+                btFilter->SetInsideValue(255);
+                btFilter->SetOutsideValue(0);
+                btFilter->Update();
+                mitk::CastToMitkImage(btFilter->GetOutput(), resultImage);
+            }      
             m_pResultNode->SetData(resultImage);
             m_pResultNode->SetColor(1.0, 0.0, 0.0);
             m_pResultNode->SetVisibility(true);

@@ -31,7 +31,7 @@ void ModelExporterView::CreateView()
 {
     m_ui.setupUi(this);
     m_ui.DataSelector->SetDataStorage(GetDataStorage());
-    m_ui.DataSelector->SetPredicate(mitk::TNodePredicateDataType<mitk::Surface>::New());
+    m_ui.DataSelector->SetPredicate(CreateSurfacePredicate());
 
     connect(m_ui.ApplyBtn, &QPushButton::clicked,this, &ModelExporterView::Apply);
     connect(m_ui.ImportBtn, &QPushButton::clicked, this, &ModelExporterView::Import);

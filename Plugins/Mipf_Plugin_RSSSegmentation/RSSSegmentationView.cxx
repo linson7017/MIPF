@@ -74,10 +74,10 @@ void RSSSegmentationView::CreateView()
 {
     m_ui.setupUi(this);
     m_ui.DataSelector->SetDataStorage(GetDataStorage());
-    m_ui.DataSelector->SetPredicate(mitk::TNodePredicateDataType<mitk::Image>::New());
+    m_ui.DataSelector->SetPredicate(CreateImagePredicate());
 
     m_ui.LabelSelector->SetDataStorage(GetDataStorage());
-    m_ui.LabelSelector->SetPredicate(mitk::TNodePredicateDataType<mitk::Image>::New());
+    m_ui.LabelSelector->SetPredicate(CreateImagePredicate());
 
     connect(m_ui.ApplyBtn, &QPushButton::clicked, this, &RSSSegmentationView::Apply);
 

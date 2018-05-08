@@ -1,0 +1,21 @@
+<MainWindow activityRoot="true" id="main" tabPosition="Right;Right" tabShape="T">
+    <MenuBar>
+        <Menu p_title="QString:文件">
+            <Action text="打开" command="@command/loadSingleModeData"/>
+        </Menu>
+        <Menu p_title="QString:关于">
+            <Action text="关于3DPathFinder" uicommand="@uicommand/popOpenImageDlg"/>
+        </Menu>
+    </MenuBar> 
+    <DockWidget id="main.DataManagerDocWidget" windowTitle="Data Manager" minWidth="400">
+		<DataManagerWidget id="main.DataManager" />
+	</DockWidget>
+	<MultiViewsWidget centerWidget="true" contents_margin="0" 
+						logo="@icon/mipf.png"
+						/>
+	<DockWidget  dockWidgetArea="RightDockWidgetArea" minWidth="400" features="NoDockWidgetFeatures" floating="false">
+        <WireMouldingWidget text="Wire Moulding" />
+	</DockWidget>
+    <StatusBarWidget statusBar="true"/>
+    <ProgressBarWidget geometry="0" size="200,25"/>
+</MainWindow>

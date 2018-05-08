@@ -1,4 +1,4 @@
-<VLayout activityRoot="true" id="main.main" style="@style/mainstyle" title="Plugin Generator" >
+<VLayout activityRoot="true" id="main.main" style="@style/mainstyle" title="Module Generator" >
 	<GridLayout>
 		<Label text="* Project Name: " row="0" col="0"/>
 		<LineEdit id="ProjectName"  row="0" col="1"/>
@@ -27,6 +27,7 @@
 		<CheckBox id="UseVTK" text="VTK" checked="true"/>
 		<CheckBox id="UseMitkWidgets" text="MitkWidgets" checked="true"/>
 		<CheckBox id="UseMitkWidgetsExt" text="MitkWidgetsExt" checked="true"/>
+        <CheckBox id="AddToProjectCMakeList" text="Apply To CMakeLists" checked="true" />
 	</HLayout>
 	<Button text="Generate" msgcommand="Generate"/>
 </VLayout>

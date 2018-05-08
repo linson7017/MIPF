@@ -39,8 +39,8 @@ void PCLView::CreateView()
     m_ui.FixedPointSetSelector->SetDataStorage(GetDataStorage());
     m_ui.MovingPointSetSelector->SetDataStorage(GetDataStorage());
 
-    m_ui.FixedPointSetSelector->SetPredicate(mitk::TNodePredicateDataType<mitk::Surface>::New());
-    m_ui.MovingPointSetSelector->SetPredicate(mitk::TNodePredicateDataType<mitk::Surface>::New());
+    m_ui.FixedPointSetSelector->SetPredicate(CreateSurfacePredicate());
+    m_ui.MovingPointSetSelector->SetPredicate(CreateSurfacePredicate());
 
 
     connect(m_ui.ApplyBtn, &QPushButton::clicked, this, &PCLView::Apply);

@@ -4,10 +4,12 @@
 #include "SurfaceCutView.h"
 #include "SurfaceConnectedView.h"
 #include "SurfaceCombineView.h"
+#include "SurfaceNormalView.h"
 
 #include "Res/R.h"
 
 #include "Utils/QObjectFactory.h"
+#include "Utils/PluginFactory.h"
 
 #include <usModuleInitialization.h>
 #include <usGetModuleContext.h>
@@ -44,4 +46,5 @@ void Mipf_Plugin_SurfaceCut_Activator::Register()
     REGISTER_QOBJECT("SurfaceConnectedWidget", SurfaceConnectedView);
     REGISTER_QOBJECT("SurfaceCombineWidget", SurfaceCombineView);
 
+    REGISTER_PLUGIN("SurfaceNormalWidget", SurfaceNormalView);
 }

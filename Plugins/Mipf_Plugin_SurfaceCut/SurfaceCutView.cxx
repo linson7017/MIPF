@@ -46,7 +46,7 @@ void SurfaceCutView::CreateView()
     m_ui.setupUi(this);
 
     m_ui.DataSelector->SetDataStorage(GetDataStorage());
-    m_ui.DataSelector->SetPredicate(mitk::TNodePredicateDataType<mitk::Surface>::New());
+    m_ui.DataSelector->SetPredicate(CreateSurfacePredicate());
 
     //freehand cut
     connect(m_ui.FreehandCutBtn, SIGNAL(clicked(bool)), this, SLOT(FreehandCut(bool)));

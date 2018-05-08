@@ -359,8 +359,8 @@ void GraphcutSegmentationViewUi::ExtractROI()
     IQF_PointListFactory* pFactory = (IQF_PointListFactory*)m_pMain->GetInterfacePtr(QF_MitkStd_PointListFactory);
     IQF_MitkPointList* pList = pFactory->CreatePointList();
     pList->Initialize();
-    mitk::DataNode::Pointer pointsNode = mitk::DataNode::New();
-    pList->CreateNewPointSetNode(pointsNode);
+    mitk::DataNode::Pointer pointsNode =   pList->CreateNewPointSetNode();
+    GetDataStorage()->Add(pointsNode);
     itk::Point<double, 3> center = binaryImageToShapeLabelMapFilter->GetOutput()->GetNthLabelObject(0)->GetCentroid();
     double width = 100;
     double height = 100;
@@ -892,7 +892,7 @@ void GraphcutSegmentationViewUi::CreateView()
     m_ui.setupUi(this);
 
     m_ui.ImageSelector->SetDataStorage(GetDataStorage());
-    m_ui.ImageSelector->SetPredicate(mitk::TNodePredicateDataType<mitk::Image>::New());
+    m_ui.ImageSelector->SetPredicate(CreateImagePredicate());
     connect(m_ui.ImageSelector, SIGNAL(OnSelectionChanged(const mitk::DataNode *)), this, SLOT(OnImageSelectionChanged(const mitk::DataNode *)));
 
     connect(m_ui.ResampleBtn, SIGNAL(clicked()), this, SLOT(Resmaple()));

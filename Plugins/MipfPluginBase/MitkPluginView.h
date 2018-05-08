@@ -65,6 +65,7 @@ protected:
     static mitk::NodePredicateBase::Pointer CreatePredicate(PredicateType type);
 
     mitk::DataNode::Pointer ImportVTKImage(vtkImageData* data, const char* name, mitk::DataNode* parentNode = nullptr, mitk::BaseGeometry* geometry = nullptr);
+    
     template<class TImageType>
     mitk::DataNode::Pointer MitkPluginView::ImportITKImage(TImageType* itkImage, const char* name, mitk::DataNode* parentNode=nullptr)
     {
@@ -77,7 +78,12 @@ protected:
         GetDataStorage()->Add(node, parentNode);
         return node;
     }
+   
     mitk::DataNode::Pointer ImportVtkPolyData(vtkPolyData* polydata, const char* name, mitk::DataNode* parentNode = nullptr);
+
+    static mitk::NodePredicateBase::Pointer CreateImagePredicate();
+    static mitk::NodePredicateBase::Pointer CreateSurfacePredicate();
+    static mitk::NodePredicateBase::Pointer CreatePointSetPredicate();
 private:
     MitkPluginViewPrivate* base;
 };

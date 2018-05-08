@@ -34,8 +34,10 @@ protected slots:
 private:
     Ui::CenterLineExtractView m_ui;
 
-    mitk::PointSet::Pointer m_pPointSet;
-    mitk::DataNode::Pointer m_pPointSetNode;
+    mitk::PointSet::Pointer m_pTargetPointSet;
+    mitk::DataNode::Pointer m_pTargetPointSetNode;
+    mitk::PointSet::Pointer m_pSourcePointSet;
+    mitk::DataNode::Pointer m_pSourcePointSetNode;
 
     mitk::PointSet::Pointer m_pEndPointSet;
     mitk::DataNode::Pointer m_pEndPointSetNode;

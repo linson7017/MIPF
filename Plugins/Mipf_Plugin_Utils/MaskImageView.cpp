@@ -40,7 +40,7 @@ MaskImageView::~MaskImageView()
 void MaskImageView::CreateView()
 {
     m_ui.setupUi(this);
-    m_ui.ImageSelector->SetPredicate(mitk::TNodePredicateDataType<mitk::Image>::New());
+    m_ui.ImageSelector->SetPredicate(CreateImagePredicate());
     m_ui.ImageSelector->SetDataStorage(GetDataStorage());
     m_ui.MaskSelector->SetPredicate(mitk::NodePredicateAnd::New(
         mitk::TNodePredicateDataType < mitk::Image>::New(),

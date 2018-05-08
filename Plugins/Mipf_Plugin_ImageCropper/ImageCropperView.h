@@ -29,9 +29,10 @@ class ImageCropperView :public QWidget, public MitkPluginView
 {
     Q_OBJECT
 public:
-    ImageCropperView(QF::IQF_Main* pMain);
+    ImageCropperView();
     ~ImageCropperView();
     void CreateView();
+    WndHandle GetPluginHandle() { return this; }
 protected:
     virtual void Update(const char* szMessage, int iValue = 0, void* pValue = 0);
 

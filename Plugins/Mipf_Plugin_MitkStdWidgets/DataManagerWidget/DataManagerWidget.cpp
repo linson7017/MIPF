@@ -384,7 +384,7 @@ void DataManagerWidget::NodeSelectionChanged(const QItemSelection & selected, co
     }
     if (m_pDataManagerSubject)
     {
-        m_pDataManagerSubject->Notify("MITK_MESSAGE_DATA_MANAGER_SELECTION_CHANGED", selectedNodes.size(), &selectedNodes);
+        m_pDataManagerSubject->Notify(MITK_MESSAGE_DATA_MANAGER_SELECTION_CHANGED, selectedNodes.size(), &selectedNodes);
     }
 }
 

@@ -29,8 +29,8 @@ void PointListView::CreateView()
     m_pPointList->Initialize();
     m_pPointList->Attach(this);
 
-    m_pPointSetNode = mitk::DataNode::New();
-    m_pPointList->CreateNewPointSetNode(m_pPointSetNode);
+    m_pPointSetNode =   m_pPointList->CreateNewPointSetNode();
+    GetDataStorage()->Add(m_pPointSetNode);
     m_ui.AddPointBtn->setCheckable(true);
 
     m_ui.PointsTable->SetMultiWidget(GetMitkRenderWindowInterface()->GetMitkStdMultiWidget());

@@ -19,16 +19,18 @@ class RenderWindow:public QmitkRenderWindow,public MitkPluginView
 public:
     RenderWindow();
     ~RenderWindow();
-
     void CreateView();
-
     WndHandle GetPluginHandle();
-    
+protected:
     void wheelEvent(QWheelEvent *e);
-
+    void mousePressEvent(QMouseEvent *event);
+    void mouseReleaseEvent(QMouseEvent *event);
+    void mouseMoveEvent(QMouseEvent *event);
+    mitk::DataNode::Pointer RenderWindow::DetectTopMostVisibleImage();
 private:
     vtkSmartPointer<vtkCornerAnnotation> m_annotation;
-
+    bool m_dragging;
+    QPoint m_preMousePt;
 };
 
 #endif // RenderWindow3D_h__

@@ -107,6 +107,25 @@ void MainWindow::Generate()
     }
     GenerateCMakeList();
     GenerateSourceFiles();
+
+    QCheckBox* cb = (QCheckBox*)getViewByID("AddToProjectCMakeList");
+    if (cb->isChecked())
+    {
+        QString projectModuleCMakeListsPaht = m_Dir + "/CMakeLists.txt";
+        QFile file(projectModuleCMakeListsPaht);
+        if (!file.exists())
+        {
+            qDebug() << "Can not found project module "<< projectModuleCMakeListsPaht<<" !";
+            return;
+        }
+        if (!file.open(QIODevice::Append | QIODevice::Text))
+            return;
+
+        QTextStream out(&file);
+        QString appendContent = QString("\n \nadd_subdirectory(%1)").arg(m_ProjectName);
+        out << appendContent;
+    }
+
     
     msgBox.setText("The Module "+ m_ModuleName +" Has Been Generated Successfully!");
     msgBox.exec();

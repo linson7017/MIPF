@@ -18,6 +18,8 @@
 
 #include <QSettings>
 
+#include "tclap/CmdLine.h"
+
 
 #ifdef Q_WS_X11
 #include <X11/Xlib.h>
@@ -25,6 +27,8 @@
 
 int main(int argc, char *argv[])
 {
+
+
     QApplication qtapplication(argc, argv);
 
     /**************程序环境和Qt环境的初始化*******************/
@@ -41,8 +45,6 @@ int main(int argc, char *argv[])
     qt_context context(&qtapplication);
     //设置qt程序编码
     qt_context::setApplicationCoding("UTF-8");
-
-
     //添加qt插件库的搜索路径
 #if defined _WIN32 || defined WIN32 || defined __NT__ || defined __WIN32__
     qt_context::addLibraryPath(wk.append("plugins/win32").toLocal8Bit().constData());
@@ -50,6 +52,7 @@ int main(int argc, char *argv[])
     qt_context::addLibraryPath(wk.append("/plugins/linux").toLocal8Bit().constData());
 #endif   
 
+//自动拷贝资源文件，调试用
 #define QFCONFIG_DEBUG  
 #ifdef QFCONFIG_DEBUG
     //复制 qfconfig 目录
@@ -59,24 +62,50 @@ int main(int argc, char *argv[])
     system(cmd.toLocal8Bit().constData());
 #endif
 
-    QSettings set(QString(pMain->GetConfigPath()).append("/config.ini"), QSettings::IniFormat);
+    std::string configFilename;
+    try {
+        TCLAP::CmdLine cmd("Command description message", ' ', "0.9");
+        TCLAP::ValueArg<std::string> configArg("c", "ConifgFileName", "The config file to start application.", false, "config.ini", "string");
+        cmd.add(configArg);
+        cmd.parse(argc, argv);
+        configFilename = configArg.getValue();
+    }
+    catch (TCLAP::ArgException &e)  // catch any exceptions
+    {
+        std::cerr << "error: " << e.error() << " for arg " << e.argId() << std::endl;
+    }
+    QString configFilePath = QString(pMain->GetConfigPath())+QString("/%1").arg(configFilename.c_str());
+    std::cout << "The config file of application is: " << configFilename << std::endl;
+    QSettings set(configFilePath, QSettings::IniFormat);
     set.beginGroup("config");
     std::string startXML = set.value("Start-XML-File", "main.xml").toString().toStdString();
     std::string style = set.value("Default-Application-Style", "fusion").toString().toStdString();
     std::string splashImage = set.value("Splash-Image", "@image/splash.png").toString().toStdString();
+    std::string componentsFile = set.value("Components-Config-File", "components.cfg").toString().toStdString();
+    std::string pluginsFile = set.value("Plugins-Config-File", "plugins.cfg").toString().toStdString();
     set.endGroup();
+    std::cout << "Start config file is " << QString(pMain->GetConfigPath()).append(QString("/%1").arg(configFilename.c_str())).toStdString()<<std::endl;
     //设置qt程序默认语言
     // qt_context::setDefaultLanguage("Chinese");
     //设置qt程序风格
     qt_context::setApplicationStyle(style.c_str());
 
+#ifndef _DEBUG
     SplashWindow splashWindow(pMain, R::Instance()->getImageResourceUrl(splashImage.c_str()).c_str());
     splashWindow.show();
-    pMain->Init();
+#endif // _DEBUG
+
+    pMain->Init(componentsFile.c_str(),pluginsFile.c_str());
+#ifndef  _DEBUG
     MainWindow mainWidget(startXML.c_str(), &splashWindow);
+#else
+    MainWindow mainWidget(startXML.c_str());
+#endif
     mainWidget.setShowMode(Activity::MAXIMIZED);
     mainWidget.active();
+#ifndef _DEBUG
     splashWindow.close();
+#endif
 
     return qtapplication.exec();
 }

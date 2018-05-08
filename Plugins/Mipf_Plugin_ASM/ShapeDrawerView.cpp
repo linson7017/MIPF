@@ -22,8 +22,8 @@ ShapeDrawerView::ShapeDrawerView(QF::IQF_Main* pMain, QWidget* parent) :QWidget(
 
     m_ui.MeanImageSelector->SetDataStorage(GetDataStorage());
     m_ui.PCAImageSelector->SetDataStorage(GetDataStorage());
-    m_ui.MeanImageSelector->SetPredicate(mitk::TNodePredicateDataType<mitk::Image>::New());
-    m_ui.PCAImageSelector->SetPredicate(mitk::TNodePredicateDataType<mitk::Image>::New());
+    m_ui.MeanImageSelector->SetPredicate(CreateImagePredicate());
+    m_ui.PCAImageSelector->SetPredicate(CreateImagePredicate());
 
     
 

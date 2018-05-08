@@ -19,7 +19,7 @@ LevelSetSegmentationView::LevelSetSegmentationView(QF::IQF_Main* pMain, QWidget*
     m_ui.setupUi(this);
 
     m_ui.DataSelector->SetDataStorage(GetDataStorage());
-    m_ui.DataSelector->SetPredicate(mitk::TNodePredicateDataType<mitk::Image>::New());
+    m_ui.DataSelector->SetPredicate(CreateImagePredicate());
 
     connect(m_ui.ApplyBtn, &QPushButton::clicked, this, &LevelSetSegmentationView::Apply);
     connect(m_ui.StopBtn, &QPushButton::clicked, this, &LevelSetSegmentationView::Stop);

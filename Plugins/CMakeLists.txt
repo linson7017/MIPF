@@ -1,6 +1,8 @@
+
+set(MODULES_DIR ${CMAKE_SOURCE_DIR}/Modules)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
-include_directories(${PROJECT_SOURCE_DIR}/Modules/include)
-include_directories(${PROJECT_SOURCE_DIR}/Modules/interface)
+include_directories(${MODULES_DIR}/include)
+include_directories(${MODULES_DIR}/interface)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
@@ -76,3 +78,12 @@ add_subdirectory(Mipf_Plugin_SphereCropper)
 add_subdirectory(Mipf_Plugin_TruncusSegmentation)
  
 add_subdirectory(Mipf_Plugin_RSSSegmentation)
+ 
+add_subdirectory(Mipf_Plugin_Simulation)
+ 
+add_subdirectory(Mipf_Plugin_CVA)
+ 
+add_subdirectory(Mipf_Plugin_DSATool)
+ 
+ 
+add_subdirectory(Mipf_Plugin_Test)
