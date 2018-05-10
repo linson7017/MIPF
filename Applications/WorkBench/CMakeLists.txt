@@ -14,47 +14,19 @@ endif()
 
 project(WorkBench)
 
-#add_definitions(-DQFCONFIG_DEBUG)
-
 include_directories(
   ${CMAKE_CURRENT_BINARY_DIR}
   ${CMAKE_CURRENT_SOURCE_DIR}
-  ${CMAKE_SOURCE_DIR}/Modules/interface
 )
 
 file (GLOB Headers "./*.h")
-
 AUX_SOURCE_DIRECTORY(. DIR_SRCS)
 
-# Instruct CMake to run moc automatically when needed.
-set(CMAKE_AUTOMOC ON)
-
-MipfGetQfConfig(WorkBench QfConfigFiles)
-#source_group_by_dir(QfConfigFiles)
-
-if(VTK_QT_VERSION VERSION_GREATER "4")
-  find_package(Qt5 COMPONENTS Widgets REQUIRED QUIET)
-  qt5_wrap_ui(UI_Srcs ${UIs})
-  # CMAKE_AUTOMOC in ON so the MocHdrs will be automatically wrapped.
-  add_executable(WorkBench ${DIR_SRCS} ${Headers} ${UI_Srcs} ${MOC_Hdrs} ${QfConfigFiles})
-  qt5_use_modules(WorkBench Core Gui Widgets)
-  link_framework()
-else()
-  find_package(Qt4 REQUIRED)
-  include(${QT_USE_FILE})
-  qt4_wrap_ui(UI_Srcs ${UIs})
-  add_executable(WorkBench ${DIR_SRCS} ${Headers} ${UI_Srcs} ${MOC_Hdrs})
-  target_link_libraries(WorkBench ${QT_LIBRARIES}) 
-  link_framework()
-endif()
+find_package(Qt5 COMPONENTS Widgets REQUIRED QUIET)
+add_executable(WorkBench ${DIR_SRCS} ${Headers})
+qt5_use_modules(WorkBench Widgets)
+link_qf()
+InstallQfConfig(${PROJECT_NAME})
 
 #Release去控制台窗口
 #Set_Target_Properties(WorkBench PROPERTIES LINK_FLAGS_RELEASE "/SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup")
-
-# add_custom_command(TARGET WorkBench
-  # POST_BUILD 
-  # COMMAND copy "$(OutDir)/$(TargetName).exe" "../qf/bin"
-  # COMMENT "copy to qf bin"
- # )
- 
-InstallQfConfig(${PROJECT_NAME})

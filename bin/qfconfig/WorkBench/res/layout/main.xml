@@ -1,4 +1,4 @@
-<MainWindow activityRoot="true" id="main" tabPosition="Right;Right" tabShape="T">
+<MainWindow activityRoot="true" id="main" tabPosition="Right;Right" tabShape="T" title=" "  icon="@icon/mipf_icon.png">
 	<TitleBar titleText="Algorithm"/>
 	<!-- 菜单栏 -->
 	<MenuBar >

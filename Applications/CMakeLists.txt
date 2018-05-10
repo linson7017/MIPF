@@ -43,7 +43,7 @@ macro(MipfGetQfConfig projectname QfConfigFiles)
 	${qfconfig_qtframework_layout_files}
 	${qfconfig_qtframework_ui_files}
 	${qfconfig_qtframework_styles_files}
-	${qfconfig_qtframework_uicommands_files})
+	${qfconfig_qtframework_uicommands_files}) 
 	source_group("qfconfig" FILES ${QfConfigFiles} )
 endmacro(MipfGetQfConfig)
 
@@ -59,7 +59,7 @@ add_custom_target(Copy_${projectname}_Resources ALL
 				  COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/bin/qfconfig/${projectname} ${CMAKE_BINARY_DIR}/bin/qfconfig/${projectname})
 endmacro(InstallQfConfig) 
 
-find_package(TCLAP REQUIRED)
+
 include_directories (${TCLAP_INCLUDE_DIR})
 
 add_subdirectory(WorkBench)

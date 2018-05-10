@@ -24,5 +24,5 @@ target_link_libraries(Mipf_Module_CVA ${VTK_LIBRARIES} ${ITK_LIBRARIES}
 ${QFMAIN_LIBRARIES}
 MitkCore
  ) 
- link_ITKVTKHelpers()
+link_ITKVTKHelpers()
 
