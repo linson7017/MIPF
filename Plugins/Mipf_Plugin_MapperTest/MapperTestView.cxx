@@ -33,6 +33,8 @@
 //itk
 #include "itkCreateObjectFunction.h"
 
+#include "qf_log.h"
+
 namespace mitk
 {
     class NewObject : public itk::Object
@@ -48,7 +50,7 @@ namespace mitk
         //virtual const char *GetNameOfClass() const;  
         itkTypeMacro(Self, Superclass);
 
-        void Test() { MITK_INFO << "Test"; }
+        void Test() { QF_INFO << "Test"; }
 
     };
 }
@@ -111,7 +113,7 @@ void MapperTestView::Cut(bool enableCut)
 
     mitk::DataNode* node = m_ui.DataSelector->GetSelectedNode();
 
-    MITK_INFO << node->GetData();
+    QF_INFO << node->GetData();
 
     mitk::BaseProperty* property = node->GetProperty("LookupTable");
 
@@ -134,7 +136,7 @@ void MapperTestView::Cut(bool enableCut)
             }
             catch (std::exception &e)
             {
-                MITK_ERROR << "Serializer " << serializer->GetNameOfClass() << " failed: " << e.what();
+                QF_ERROR << "Serializer " << serializer->GetNameOfClass() << " failed: " << e.what();
                 // \TODO: log only if all potential serializers fail?
             }
         }

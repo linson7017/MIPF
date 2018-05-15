@@ -28,7 +28,7 @@
 #include "usModuleResource.h"
 #include "usModuleResourceStream.h"
 
-
+#include "qf_log.h"
 
 
 MitkSegmentation::MitkSegmentation() :MitkPluginView(),
@@ -280,7 +280,7 @@ void MitkSegmentation::CreateNewSegmentation()
 	}
 	else
 	{
-		MITK_ERROR << "'Create new segmentation' button should never be clickable unless a patient image is selected...";
+		QF_ERROR << "'Create new segmentation' button should never be clickable unless a patient image is selected...";
 	}
 }
 

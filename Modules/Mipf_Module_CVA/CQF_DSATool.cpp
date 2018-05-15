@@ -1,11 +1,14 @@
 #include "CQF_DSATool.h"
 
 #include "itkGDCMImageIO.h"
-#include "ITKImageTypeDef.h"
+#include "itkMetaDataObject.h"
 
+#include "ITKImageTypeDef.h"
 
 //mitk
 #include "mitkImageCast.h"
+
+#include "qf_log.h"
 
 template <class ImageType>
 mitk::DataNode::Pointer ReadDicomToITKImage(itk::GDCMImageIO* io, const char* name = "")
@@ -81,32 +84,32 @@ mitk::DataNode::Pointer CQF_DSATool::LoadDSADicomFile(const char* szFileName,con
             {
             case itk::ImageIOBase::INT:
             {
-                MITK_INFO << "The scalar type of loading image is INT";
+                QF_INFO << "The scalar type of loading image is INT";
                 return ReadDicomToITKImage<Int3DImageType>(io, szNodeName);
             }
             case itk::ImageIOBase::UCHAR:
             {
-                MITK_INFO << "The scalar type of loading image is UCHAR";
+                QF_INFO << "The scalar type of loading image is UCHAR";
                 return ReadDicomToITKImage<UChar3DImageType>(io, szNodeName);
             }
             case itk::ImageIOBase::FLOAT:
             {
-                MITK_INFO << "The scalar type of loading image is FLOAT";
+                QF_INFO << "The scalar type of loading image is FLOAT";
                 return ReadDicomToITKImage<Float3DImageType>(io, szNodeName);
             }
             case itk::ImageIOBase::USHORT:
             {
-                MITK_INFO << "The scalar type of loading image is USHORT";
+                QF_INFO << "The scalar type of loading image is USHORT";
                 return ReadDicomToITKImage<UShort3DImageType>(io, szNodeName);
             }
             case itk::ImageIOBase::SHORT:
             {
-                MITK_INFO << "The scalar type of loading image is SHORT";
+                QF_INFO << "The scalar type of loading image is SHORT";
                 return ReadDicomToITKImage<Short3DImageType>(io, szNodeName);
             }
             case itk::ImageIOBase::CHAR:
             {
-                MITK_INFO << "The scalar type of loading image is CHAR";
+                QF_INFO << "The scalar type of loading image is CHAR";
                 return ReadDicomToITKImage<Char3DImageType>(io, szNodeName);
             }
             default:
@@ -117,12 +120,12 @@ mitk::DataNode::Pointer CQF_DSATool::LoadDSADicomFile(const char* szFileName,con
     }
     else
     {    
-        MITK_WARN << "File " << szFileName << " can not be read!";
+        QF_WARN << "File " << szFileName << " can not be read!";
         return NULL;
     }
 }
 
-bool CQF_DSATool::SaveDSADicomFile(mitk::Image* pImage, const char* szFileName)
+bool CQF_DSATool::SaveDSADicomFile(mitk::Image* pImage, const char* szFileName, std::map<std::string, std::string>& dictionary)
 {
     if (strcmp(szFileName,"")==0)
     {
@@ -134,13 +137,19 @@ bool CQF_DSATool::SaveDSADicomFile(mitk::Image* pImage, const char* szFileName)
     {
         io->SetFileName(szFileName);
         io->ReadImageInformation();
-        std::string value;
+        itk::MetaDataDictionary dic = io->GetMetaDataDictionary();
+        for (std::map<std::string, std::string>::iterator it= dictionary.begin();it!= dictionary.end();it++)
+        {
+            itk::EncapsulateMetaData<std::string>(dic, it->first, it->second);
+        }
+        io->SetMetaDataDictionary(dic);
+        io->WriteImageInformation();
         io->Write(pImage->GetVtkImageData()->GetScalarPointer());
         return true;
     }
     else
     {
-        MITK_WARN << "File " << szFileName << " can not be read!";
+        QF_WARN << "File " << szFileName << " can not be read!";
         return false;
     }
 }

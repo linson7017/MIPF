@@ -63,7 +63,7 @@ void ModelExporterView ::Apply()
         while (i < numberOfRenderers)
         {
             vtkRenderer *r = renderers->GetNextItem();
-            MITK_INFO << "Number Of actors in renderer " << i << " of renderwindow " << j << " : " << r->GetActors()->GetNumberOfItems();
+            QF_INFO << "Number Of actors in renderer " << i << " of renderwindow " << j << " : " << r->GetActors()->GetNumberOfItems();
             ++i;
         }
     }*/

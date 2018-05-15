@@ -30,6 +30,7 @@ struct AneurysmData
 {
     vtkSmartPointer<vtkPolyData> aneurysmSurfaceData;
     vtkSmartPointer<vtkPolyData> aneurysmDisplayPolyData;
+	vtkSmartPointer<vtkPolyData> aneurysmDisplayPolyData2;
     vtkSmartPointer<vtkPoints> seeds;
     double diameter;
     double height;
@@ -44,6 +45,7 @@ struct AneurysmData
 	double normalDirPoint[3];
 	double vesselRadius;
 	double microtubulePoint[3];
+	//double neckcenterpoint_test[3];
 };
 
 struct PatientInfo
@@ -67,11 +69,11 @@ public:
 	ImageAlgorithm();
 	PatientInfo patientInfo;
 	void destroy();
-	bool init(vtkSmartPointer<vtkImageData> img);
+	bool readFolder(const char* dn);
+    bool init(vtkSmartPointer<vtkImageData> input);
 	vtkSmartPointer<vtkImageData> getInputData();
-    void SetInputData(vtkSmartPointer<vtkImageData> img) { inputData = img; }
 	vtkSmartPointer<vtkImageData> getResampledInputData();
-	
+    vtkSmartPointer<vtkImageData> getSegmentedData() { return segmentedData; }
 	int getImageType();
 	double getLimitLow();
 	double getLimitHigh();
@@ -101,9 +103,10 @@ public:
 	bool isStartEndPointTooClose;
 	bool isAneurysmPointTooFar;
 	bool isAneurysmLocPointTooFar;
+	bool isStartEndPointOnOneVessel;
     
     bool addAneurysmPoint(double x[3]);
-	bool setAneurysmLocationPoint(double x[3]);
+	bool setAneurysmLocationPoint(int order,double x[3]);
     
     AneurysmData detectAneurysm();
 
@@ -122,7 +125,9 @@ public:
 	void setWallThickness(int thickness);
 	void setPruneRadius(int radius);
 
-    vtkSmartPointer<vtkImageData> getSegmentedData() { return segmentedData; }
+	double startPointonSkeleton[3];
+	double endPointOnSkeleton[3];
+	vtkSmartPointer<vtkPolyData> DisplayPathData;
 
 private: 
 	int imageType; // 0 - DSA, 1 - CTA, 2 - MRA
@@ -140,6 +145,7 @@ private:
 	int lastAneurysmLocPointIdx = -1;
     vtkSmartPointer<vtkIntArray> skeletonNeighbors;
     vtkSmartPointer<vtkPolyData> currentSurface;
+	vtkSmartPointer<vtkPolyData> vesselSurface;
 	vtkSmartPointer<vtkPolyData> currentSurfaceShowing;
     
     AneurysmData aneurysmData;

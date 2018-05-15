@@ -79,6 +79,8 @@
 
 #include "iqf_subject.h"
 
+#include "qf_log.h"
+
 
 DataManagerWidget::DataManagerWidget() :MitkPluginView(),
 m_CurrentRowCount(0)
@@ -575,7 +577,7 @@ void DataManagerWidget::SaveSelectedNodes(bool checked)
     }
     catch (const mitk::Exception& e)
     {
-        MITK_INFO << e;
+        QF_INFO << e;
         return;
     }
     

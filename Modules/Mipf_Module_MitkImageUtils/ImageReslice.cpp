@@ -22,6 +22,7 @@
 #include "vtkSmartPointer.h" 
 #include "vtkImageExtractComponents.h"
 
+#include "qf_log.h"
 
 void ApplyLevelWindow(mitk::DataNode* imageNode, mitk::BaseRenderer* renderer, vtkMitkLevelWindowFilter* levelWindowFilter)
 {
@@ -52,7 +53,7 @@ void ApplyColorTransferFunction(mitk::DataNode* imageNode, mitk::BaseRenderer* r
 
     if (transferFunctionProp.IsNull())
     {
-        MITK_ERROR << "'Image Rendering.Mode'' was set to use a color transfer function but there is no property 'Image "
+        QF_ERROR << "'Image Rendering.Mode'' was set to use a color transfer function but there is no property 'Image "
             "Rendering.Transfer Function'. Nothing will be done.";
         return;
     }
@@ -164,7 +165,7 @@ void ApplyRenderingMode(mitk::DataNode* imageNode, mitk::BaseRenderer* renderer,
             ApplyColorTransferFunction(imageNode, renderer, levelWindowFilter);
             break;
         default:
-            MITK_ERROR << "No valid 'Image Rendering.Mode' set. Using LOOKUPTABLE_LEVELWINDOW_COLOR instead.";
+            QF_ERROR << "No valid 'Image Rendering.Mode' set. Using LOOKUPTABLE_LEVELWINDOW_COLOR instead.";
             ApplyLookuptable(imageNode, renderer, levelWindowFilter);
             ApplyLevelWindow(imageNode, renderer, levelWindowFilter);
             break;
@@ -275,7 +276,7 @@ bool ImageReslice::GetReslicePlaneImageWithLevelWindow(mitk::DataNode* imageNode
         }
         else
         {
-            MITK_WARN << "no associated widget plane data tree node found";
+            QF_WARN << "no associated widget plane data tree node found";
         }
     }
 
@@ -398,7 +399,7 @@ bool ImageReslice::GetReslicePlaneImageWithLevelWindow(mitk::DataNode* imageNode
     //        default:
     //            binaryOutline = false;
     //            this->ApplyLookuptable(renderer);
-    //            MITK_WARN << "Type of all binary images should be unsigned char or unsigned short. Outline does not work on other pixel types!";
+    //            QF_WARN << "Type of all binary images should be unsigned char or unsigned short. Outline does not work on other pixel types!";
     //        }
     //        if (binaryOutline) // binary outline is still true --> add outline
     //        {
@@ -422,7 +423,7 @@ bool ImageReslice::GetReslicePlaneImageWithLevelWindow(mitk::DataNode* imageNode
     //    {
     //        if (numberOfComponents != 1)
     //        {
-    //            MITK_ERROR << "Rendering Error: Binary Images with more then 1 component are not supported!";
+    //            QF_ERROR << "Rendering Error: Binary Images with more then 1 component are not supported!";
     //        }
     //    }
     //}

@@ -6,6 +6,7 @@
 #include "mitkRenderingManager.h"
 #include <QList>
 
+#include "qf_log.h"
 
 //Qt
 #include <QApplication> 
@@ -64,7 +65,7 @@ void MitkPluginView::InitResource()
         base->m_dataStorageID = GetAttribute("datastorage");
         if (!GetDataStorage())
         {
-            MITK_WARN << "DataStorage with id " << base->m_dataStorageID << " has not been initialized! ";
+            QF_WARN << "DataStorage with id " << base->m_dataStorageID << " has not been initialized! ";
             return;
         }
     }

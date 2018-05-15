@@ -17,7 +17,7 @@ public:
 
     //interface 
     virtual mitk::DataNode::Pointer LoadDSADicomFile(const char* szFileName, const char* szNodeName = "");
-    virtual bool SaveDSADicomFile(mitk::Image* pImage, const char* szFileName);
+    virtual bool SaveDSADicomFile(mitk::Image* pImage, const char* szFileName, std::map<std::string, std::string>& dictionary = std::map<std::string, std::string>());
     virtual void Release() { delete this; }
 
 };

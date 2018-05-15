@@ -18,6 +18,8 @@ file(GLOB UI_Srcs "./*.ui")
 AUX_SOURCE_DIRECTORY(. DIR_SRCS) 
 
 set(CMAKE_AUTOMOC ON)
+
+include_directories(${VMTK_INCLUDE_DIR})
  
 qt5_wrap_ui(ui_Files ${UI_Srcs})
 add_library(Mipf_Plugin_CVA SHARED ${DIR_SRCS} ${Headers} ${UI_Srcs} ${MOC_Hdrs})

@@ -25,6 +25,8 @@
 #include <iostream>
 #include <cmath>
 
+#include "qf_log.h"
+
 FreehandSurfaceCutInteractor::FreehandSurfaceCutInteractor() :m_bDrawing(false), m_bInitFlag(false), m_pSurfaceData(nullptr), m_pCurveNode(nullptr), m_pDataStorage(nullptr)
 , m_currentSurfaceIndex(0), m_bInsideOut(false), m_bModify(false)
 {
@@ -126,7 +128,7 @@ void FreehandSurfaceCutInteractor::InitMove(mitk::StateMachineAction *, mitk::In
 
 void FreehandSurfaceCutInteractor::InitModify(mitk::StateMachineAction *, mitk::InteractionEvent *interactionEvent)
 {
-  MITK_INFO << "Begin Modify";
+  QF_INFO << "Begin Modify";
   mitk::InteractionPositionEvent *positionEvent = dynamic_cast<mitk::InteractionPositionEvent *>(interactionEvent);
   if (positionEvent == NULL)
 	return;

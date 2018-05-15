@@ -215,10 +215,10 @@ endif()
 
 add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 
+#tclap
+set(TCLAP_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Extern/tclap-1.2.2/include)
+
 #add framework dependencies
-# FIND_PACKAGE(QTXML REQUIRED)
-# FIND_PACKAGE(QFMAIN REQUIRED)
-# find_package(TCLAP REQUIRED)
 find_package(QTFRAMEWORK REQUIRED) 
 macro(link_qf)
 	target_link_libraries(${PROJECT_NAME} ${QTXML_LIBRARIES} ${QFMAIN_LIBRARIES})

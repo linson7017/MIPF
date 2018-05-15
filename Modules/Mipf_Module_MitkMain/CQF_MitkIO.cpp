@@ -23,6 +23,7 @@
 #include "MitkMain/IQF_MitkDataManager.h"
 
 #include "iqf_main.h"
+#include "qf_log.h"
 
 CQF_MitkIO::CQF_MitkIO(QF::IQF_Main* pMain):m_pMain(pMain)
 {
@@ -82,7 +83,7 @@ void CQF_MitkIO::LoadFiles()
     }
     catch (const mitk::Exception& e)
     {
-        MITK_INFO << e;
+        QF_INFO << e;
         return;
     }
     mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(pMitkDataManager->GetDataStorage());
@@ -128,7 +129,7 @@ void CQF_MitkIO::OpenProject()
     }
     catch (std::exception& e)
     {
-        MITK_ERROR << "Exception caught during scene opening: " << e.what();
+        QF_ERROR << "Exception caught during scene opening: " << e.what();
     }
 
     
@@ -152,7 +153,7 @@ void CQF_MitkIO::SaveProject()
             if (pMitkDataManager->GetDataStorage().IsNull())
             {
                 QString msg = "IDataStorageService service not available. Unable to open files.";
-                MITK_WARN << msg.toStdString();
+                QF_WARN << msg.toStdString();
                 QMessageBox::warning(QApplication::activeWindow(), "Unable to open files", msg);
                 return;
             }
@@ -217,7 +218,7 @@ void CQF_MitkIO::SaveProject()
                 ss << " contained in node '" << (*iter)->GetName() << "'" << std::endl;
             }
 
-            MITK_WARN << ss.str();
+            QF_WARN << ss.str();
         }
 
         mitk::PropertyList::ConstPointer failedProperties = sceneIO->GetFailedProperties();
@@ -233,12 +234,12 @@ void CQF_MitkIO::SaveProject()
                 ss << " - " << iter->second->GetNameOfClass() << " associated to key '" << iter->first << "'" << std::endl;
             }
 
-            MITK_WARN << ss.str();
+            QF_WARN << ss.str();
         }
     }
     catch (std::exception& e)
     {
-        MITK_ERROR << "Exception caught during scene saving: " << e.what();
+        QF_ERROR << "Exception caught during scene saving: " << e.what();
     }
 }
 
@@ -257,7 +258,7 @@ void CQF_MitkIO::Save(const mitk::BaseData *data)
       }
       catch (const mitk::Exception& e)
       {
-          MITK_INFO << e;
+          QF_INFO << e;
           return;
       }*/
 }

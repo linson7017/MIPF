@@ -24,6 +24,7 @@ public:
     virtual mitk::DataNode::Pointer CreateNewPointSetNode() = 0;
     virtual void SetPointSetNode(mitk::DataNode *pPointSetNode) = 0;
     virtual void AddPoint(bool bAdd = true) = 0;
+    virtual void SetSingleMode(bool bSingleMode = true)=0;
     virtual bool InsertPoint(const double dX, const double dY, const double dZ)=0;
     virtual mitk::PointSet* GetPointSet() = 0;
     virtual void SavePoints() = 0;

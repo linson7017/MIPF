@@ -415,7 +415,7 @@ void WireMouldingView::Moulde(const mitk::Point3D& start, const mitk::Vector3D& 
     mitk::Vector3D direction = direct;
     direction.Normalize();
     mitk::Point3D nextPoint;
-    
+   
     
     int numOfInsertedPoint = 0;
     bool bCollided = false;
@@ -486,7 +486,7 @@ void WireMouldingView::Bend(double bendRatio, double length, WirePointsType& wir
         }*/
         double angle = (bendRatio - 1)*wire[i].dK * 180 / vtkMath::Pi();
         double rotateAxis[3];
-        vtkMath::Cross(wire[i - 1].direction,wire[i].direction, rotateAxis);
+        vtkMath::Cross(wire[i].direction, wire[i - 1].direction,rotateAxis);
         vtkMath::Normalize(rotateAxis);
         for (int j=i-1;j>=0;j--)
         {
@@ -630,10 +630,10 @@ void WireMouldingView::Apply()
     m_invert = m_ui.InvertCB->isChecked();
     if (m_invert)
     {
-        currentPoint = m_ljPoint;
+        currentPoint = m_lxPoint;
         direction = m_ljPoint - m_lxPoint;
         direction.Normalize();
-        Moulde(currentPoint, direction,centerLineLength, m_returnPathPoints);
+        Moulde(currentPoint, direction,1.5*centerLineLength, m_returnPathPoints);
 
     }
     else
@@ -641,7 +641,7 @@ void WireMouldingView::Apply()
         currentPoint = m_entryPoint;
         direction = m_entryDirectionPoint - m_entryPoint;
         direction.Normalize();
-        Moulde(currentPoint, direction, centerLineLength, m_enterPathPoints);
+        Moulde(currentPoint, direction, 1.5*centerLineLength, m_enterPathPoints);
     }
 
     auto wireAppendFilter = vtkSmartPointer<vtkAppendPolyData>::New();

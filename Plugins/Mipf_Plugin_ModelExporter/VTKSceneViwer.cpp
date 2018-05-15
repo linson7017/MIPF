@@ -22,15 +22,6 @@
 #include <QImage>
 
 
-
-
-//ctk
-#include <ctkDoubleSlider.h>
-
-#include "iqf_main.h"
-#include "mitkMain/IQF_MitkReference.h"
-
-
 //mitk
 #include "mitkVtkInterpolationProperty.h"
 #include "mitkVtkRepresentationProperty.h"
@@ -46,6 +37,16 @@
 #include <mitkVtkInterpolationProperty.h>
 #include <mitkVtkRepresentationProperty.h>
 #include <mitkVtkScalarModeProperty.h>
+
+//ctk
+#include <ctkDoubleSlider.h>
+
+#include "iqf_main.h"
+#include "qf_log.h"
+#include "mitkMain/IQF_MitkReference.h"
+
+
+
 
 
 const int VTKSceneViwer::s_DataRole = 10086;
@@ -722,7 +723,7 @@ void VTKSceneViwer::ApplyProperties(vtkActor* actor, vtkPolyDataMapper* mapper, 
         // Either select the first slice of a volume
         if (miktTexture->GetDimension(2) > 1)
         {
-            MITK_WARN << "3D Textures are not supported by VTK and MITK. The first slice of the volume will be used instead!";
+            QF_WARN << "3D Textures are not supported by VTK and MITK. The first slice of the volume will be used instead!";
             mitk::ImageSliceSelector::Pointer sliceselector = mitk::ImageSliceSelector::New();
             sliceselector->SetSliceNr(0);
             sliceselector->SetChannelNr(0);
@@ -739,7 +740,7 @@ void VTKSceneViwer::ApplyProperties(vtkActor* actor, vtkPolyDataMapper* mapper, 
         actor->SetTexture(vtkTxture);
         if (mapper->GetInput()->GetPointData()->GetTCoords() == NULL)
         {
-            MITK_ERROR << "Surface.Texture property was set, but there are no texture coordinates. Please provide texture "
+            QF_ERROR << "Surface.Texture property was set, but there are no texture coordinates. Please provide texture "
                 "coordinates for the vtkPolyData via vtkPolyData->GetPointData()->SetTCoords().";
         }
         // if no texture is set, this will also remove a previously used texture

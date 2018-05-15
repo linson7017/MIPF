@@ -77,7 +77,10 @@
           </font>
          </property>
          <property name="text">
-          <string>设定当前为截取起点</string>
+          <string>选取起点</string>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
          </property>
         </widget>
        </item>
@@ -89,7 +92,10 @@
           </font>
          </property>
          <property name="text">
-          <string>设定当前为截取终点</string>
+          <string>选取中点</string>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
          </property>
         </widget>
        </item>
@@ -819,6 +825,9 @@
          <property name="text">
           <string>添加血管瘤</string>
          </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
         </widget>
        </item>
        <item>
@@ -831,6 +840,9 @@
          <property name="text">
           <string>设置血管瘤定位点1</string>
          </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
         </widget>
        </item>
        <item>
@@ -842,6 +854,9 @@
          </property>
          <property name="text">
           <string>设置血管瘤定位点2</string>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
          </property>
         </widget>
        </item>

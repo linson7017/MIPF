@@ -183,7 +183,7 @@ void GuideWireMoulding::Simulate(double* pEntryPoint, double* pAdvanceDirection,
         direction = curDirection;
         numOfInsertedPoint++;       
         std::cout << "Tracked Point:" << numOfInsertedPoint << std::endl;
-      //  MITK_INFO << "Tracked Point:" << numOfInsertedPoint;
+      //  QF_INFO << "Tracked Point:" << numOfInsertedPoint;
     }
 
 }

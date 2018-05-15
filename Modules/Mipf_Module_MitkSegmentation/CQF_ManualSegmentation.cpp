@@ -26,6 +26,7 @@
 
 #include <MitkSegmentation/mitk_seg_msg.h>
 #include <iqf_main.h>
+#include "qf_log.h"
 
 int CQF_ManualSegmentation::GetToolIdByToolName(const std::string &toolName)
 {
@@ -285,7 +286,7 @@ bool CQF_ManualSegmentation::CreateLabelSetImageNode(const mitk::Image* pOriginI
     }
     catch (mitk::Exception &e)
     {
-        MITK_ERROR << e.GetDescription();
+        QF_ERROR << e.GetDescription();
         return false;
     }
 

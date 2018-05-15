@@ -17,7 +17,7 @@ project(Mipf_Module_CVA)
 file(GLOB Headers "./*.h")
 AUX_SOURCE_DIRECTORY(./ DIR_SRCS)
 
-FIND_PACKAGE(PocoFoundation REQUIRED)
+FIND_PACKAGE(PocoFoundation REQUIRED) 
 
 add_library(Mipf_Module_CVA SHARED ${DIR_SRCS} ${Headers})
 target_link_libraries(Mipf_Module_CVA ${VTK_LIBRARIES} ${ITK_LIBRARIES} 

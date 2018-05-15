@@ -16,6 +16,7 @@
 #include "itkGradientMagnitudeRecursiveGaussianImageFilter.h"
 
 #include "iqf_main.h"
+#include "qf_log.h"
 
 template<class TFilter>
 class LSSegmentation::CommandIterationUpdate : public itk::Command
@@ -196,7 +197,7 @@ void LSSegmentation::SlotDoSegmentation(const mitk::Image::Pointer& inputImage, 
 
 void LSSegmentation::SlotStopSegmentation()
 {
-    MITK_INFO << "SlotStopSegmentation";
+    QF_INFO << "SlotStopSegmentation";
      if (m_levelFilter.IsNotNull())
      {
          

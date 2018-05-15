@@ -64,8 +64,8 @@ include_directories (${TCLAP_INCLUDE_DIR})
 
 add_subdirectory(WorkBench)
 add_subdirectory(PluginGenerator)
-add_subdirectory(RobotControlApp)
+#add_subdirectory(RobotControlApp)
 add_subdirectory(ModuleGenerator)
-add_subdirectory(MapperTest)
+#add_subdirectory(MapperTest)
 add_subdirectory(TestApp)
 

@@ -276,7 +276,7 @@ void mitk::WxBoundingShapeVtkMapper2D::GenerateDataForRenderer(BaseRenderer *ren
     normal[1] = planeGeometry->GetNormal()[1];
     normal[2] = planeGeometry->GetNormal()[2];
 
-    //    MITK_INFO << "normal1 " << normal[0] << " " << normal[1] << " " << normal[2];
+    //    QF_INFO << "normal1 " << normal[0] << " " << normal[1] << " " << normal[2];
     localStorage->m_CuttingPlane->SetOrigin(origin);
     localStorage->m_CuttingPlane->SetNormal(normal);
 

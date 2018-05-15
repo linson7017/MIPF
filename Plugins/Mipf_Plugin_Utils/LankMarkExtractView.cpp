@@ -23,6 +23,8 @@
 #include <vtkPolyData.h>
 #include <vtkSphereSource.h>
 
+#include "qf_log.h"
+
 int maxSubArray(std::vector<int> &nums)
 {
     if (nums.size()==1)
@@ -83,9 +85,9 @@ void LankMarkExtractView::CreateView()
     double dis1 = (p1 - p0).length();
     double dis2 = (p2 - p0).length();
     double dis3 = (p3 - p0).length();
-    MITK_INFO << dis1;
-    MITK_INFO << dis2;
-    MITK_INFO << dis3;
+    QF_INFO << dis1;
+    QF_INFO << dis2;
+    QF_INFO << dis3;
 
     m_ui.setupUi(this);
 

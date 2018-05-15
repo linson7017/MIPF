@@ -13,6 +13,7 @@
 
 
 #include "LSSegmentation.h"
+#include "qf_log.h"
 
 LevelSetSegmentationView::LevelSetSegmentationView(QF::IQF_Main* pMain, QWidget* parent) :QWidget(parent), MitkPluginView(pMain),m_pSegmentation(NULL)
 {
@@ -62,7 +63,7 @@ void LevelSetSegmentationView::SlotInteractionEnd(const mitk::Image::Pointer& im
 
 void  LevelSetSegmentationView::SlotSegmentationFinished()
 {
-    MITK_INFO << "Segmentation Finished!";
+    QF_INFO << "Segmentation Finished!";
     disconnect(this, &LevelSetSegmentationView::SignalDoSegmentation, m_pSegmentation, &LSSegmentation::SlotDoSegmentation);
     disconnect(this, &LevelSetSegmentationView::SignalStopSegmentation, m_pSegmentation, &LSSegmentation::SlotStopSegmentation);
     disconnect(m_pSegmentation, &LSSegmentation::SignalInteractionEnd, this, &LevelSetSegmentationView::SlotInteractionEnd);
@@ -73,7 +74,7 @@ void  LevelSetSegmentationView::SlotSegmentationFinished()
 
 void LevelSetSegmentationView::Stop()
 {
-    MITK_INFO << "Stop";
+    QF_INFO << "Stop";
     emit SignalStopSegmentation();
 }
 
@@ -82,7 +83,7 @@ void LevelSetSegmentationView::Apply()
     IQF_MitkDataManager* pDataManager = (IQF_MitkDataManager*)m_pMain->GetInterfacePtr(QF_MitkMain_DataManager);
     if (!m_ui.DataSelector->GetSelectedNode())
     {
-        MITK_ERROR << "Please Select Image Or Mean Image!";
+        QF_ERROR << "Please Select Image Or Mean Image!";
         return;
     }
 
@@ -116,7 +117,7 @@ void LevelSetSegmentationView::Apply()
 
     if (!mitkImage )
     {
-        MITK_ERROR << "Please Select Image!";
+        QF_ERROR << "Please Select Image!";
         return;
     }
     if (!m_ObserveNode)
@@ -145,7 +146,7 @@ void LevelSetSegmentationView::Apply()
 //{
 //    if (!m_ui.DataSelector->GetSelectedNode())
 //    {
-//        MITK_ERROR << "Please Select Image !";
+//        QF_ERROR << "Please Select Image !";
 //        return;
 //    }
 //

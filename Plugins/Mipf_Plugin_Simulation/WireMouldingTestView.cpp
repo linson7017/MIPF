@@ -99,7 +99,7 @@ void WireMouldingTestView::Apply()
     }
     mitk::Surface* vessel = dynamic_cast<mitk::Surface*>(GetDataStorage()->GetNamedNode("tumorVessel")->GetData());
     pGuideWireMoulding->SetSurface(vessel->GetVtkPolyData());
-    pGuideWireMoulding->SetBendFactor(1.0);
+    pGuideWireMoulding->SetBendFactor(0.0);
 
     WirePointsType wire;
     mitk::Point3D currentPoint;

@@ -14,6 +14,8 @@
 #include "CVA/IQF_DSATool.h"
 #include "cva/cva_command_def.h"
 
+#include "qf_log.h"
+
 DSARemoveBoneView::DSARemoveBoneView() :MitkPluginView() 
 {
 }
@@ -133,7 +135,7 @@ void DSARemoveBoneView::StartCut()
 {
     if (m_ui.SaveDirLE->text().isEmpty()||m_ui.OpenDirLE->text().isEmpty())
     {
-        MITK_ERROR << "Please set the open directory and save directory!";
+        QF_ERROR << "Please set the open directory and save directory!";
         return;
     }
     m_ui.LogTE->clear();   

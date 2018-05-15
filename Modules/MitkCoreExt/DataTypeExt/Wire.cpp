@@ -1,18 +1,4 @@
-/*===================================================================
 
-The Medical Imaging Interaction Toolkit (MITK)
-
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
-All rights reserved.
-
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
-
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
 
 #include "Wire.h"
 #include "mitkInteractionConst.h"
@@ -20,6 +6,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <iomanip>
 #include <mitkNumericTypes.h>
+
+#include "qf_log.h"
 
 mitk::Wire::Wire() : m_CalculateBoundingBox(true)
 {
@@ -347,7 +335,7 @@ void mitk::Wire::InsertPoint(PointIdentifier id, PointType point, PointSpecifica
         mitk::BaseGeometry *tempGeometry = this->GetGeometry(t);
         if (tempGeometry == nullptr)
         {
-            MITK_INFO << __FILE__ << ", l." << __LINE__ << ": GetGeometry of " << t << " returned NULL!" << std::endl;
+            QF_INFO << __FILE__ << ", l." << __LINE__ << ": GetGeometry of " << t << " returned NULL!" << std::endl;
             return;
         }
         tempGeometry->WorldToIndex(point, indexPoint);
@@ -586,7 +574,7 @@ void mitk::Wire::ExecuteOperation(Operation *operation)
 
     if (timeStep < 0)
     {
-        MITK_ERROR << "Time step (" << timeStep << ") outside of Wire time bounds" << std::endl;
+        QF_ERROR << "Time step (" << timeStep << ") outside of Wire time bounds" << std::endl;
         return;
     }
 
@@ -609,7 +597,7 @@ void mitk::Wire::ExecuteOperation(Operation *operation)
         mitk::BaseGeometry *geometry = this->GetGeometry(timeStep);
         if (geometry == nullptr)
         {
-            MITK_INFO << "GetGeometry returned NULL!\n";
+            QF_INFO << "GetGeometry returned NULL!\n";
             return;
         }
         geometry->WorldToIndex(pt, pt);
@@ -891,7 +879,7 @@ bool mitk::Equal(const mitk::Wire *leftHandSide,
 {
     if ((leftHandSide == nullptr) || (rightHandSide == nullptr))
     {
-        MITK_ERROR << "mitk::Equal( const mitk::Wire* leftHandSide, const mitk::Wire* rightHandSide, "
+        QF_ERROR << "mitk::Equal( const mitk::Wire* leftHandSide, const mitk::Wire* rightHandSide, "
             "mitk::ScalarType eps, bool verbose ) does not work with NULL pointer input.";
         return false;
     }
@@ -913,7 +901,7 @@ bool mitk::Equal(const mitk::Wire &leftHandSide,
         if (!mitk::Equal(*leftHandSide.GetGeometry(), *rightHandSide.GetGeometry(), eps, verbose))
         {
             if (verbose)
-                MITK_INFO << "[( Wire )] Geometries differ.";
+                QF_INFO << "[( Wire )] Geometries differ.";
             result = false;
         }
     }
@@ -921,7 +909,7 @@ bool mitk::Equal(const mitk::Wire &leftHandSide,
     if (leftHandSide.GetSize() != rightHandSide.GetSize())
     {
         if (verbose)
-            MITK_INFO << "[( Wire )] Number of points differ.";
+            QF_INFO << "[( Wire )] Number of points differ.";
         result = false;
     }
     else
@@ -944,7 +932,7 @@ bool mitk::Equal(const mitk::Wire &leftHandSide,
             if (!mitk::Equal(pointLeftHandSide, pointRightHandSide, eps, verbose))
             {
                 if (verbose)
-                    MITK_INFO << "[( Wire )] Point values are different.";
+                    QF_INFO << "[( Wire )] Point values are different.";
                 result = false;
                 numberOfIncorrectPoints++;
             }
@@ -952,7 +940,7 @@ bool mitk::Equal(const mitk::Wire &leftHandSide,
 
         if ((numberOfIncorrectPoints > 0) && verbose)
         {
-            MITK_INFO << numberOfIncorrectPoints << " of a total of " << leftHandSide.GetSize() << " points are different.";
+            QF_INFO << numberOfIncorrectPoints << " of a total of " << leftHandSide.GetSize() << " points are different.";
         }
     }
     return result;

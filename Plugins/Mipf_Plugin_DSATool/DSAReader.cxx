@@ -42,6 +42,8 @@
 #include "CVA/IQF_DSATool.h"
 #include "cva/cva_command_def.h"
 
+#include "qf_log.h"
+
 DSAReader::DSAReader() :MitkPluginView() 
 {
 }
@@ -97,10 +99,10 @@ void DSAReader::RefreshSlice()
     QmitkRenderWindow* renderWindow = GetMitkRenderWindowInterface()->GetQmitkRenderWindow(multiViewID + "-axial");
     int pos = renderWindow->GetSliceNavigationController()->GetSlice()->GetSteps() - 1 -
         renderWindow->GetSliceNavigationController()->GetSlice()->GetPos();
-    MITK_INFO << renderWindow->GetSliceNavigationController()->GetSlice()->GetRangeMin() << "," << renderWindow->GetSliceNavigationController()->GetSlice()->GetRangeMax();
+    QF_INFO << renderWindow->GetSliceNavigationController()->GetSlice()->GetRangeMin() << "," << renderWindow->GetSliceNavigationController()->GetSlice()->GetRangeMax();
     int currentSlice =  renderWindow->GetSliceNavigationController()->GetSlice()->GetPos();
-    MITK_INFO << currentSlice;
-    MITK_INFO << renderWindow->GetSliceNavigationController()->GetSlice()->GetSteps();
+    QF_INFO << currentSlice;
+    QF_INFO << renderWindow->GetSliceNavigationController()->GetSlice()->GetSteps();
     if (currentSlice > 0)
     {
         renderWindow->GetSliceNavigationController()->GetSlice()->SetPos(currentSlice-1);
@@ -395,8 +397,8 @@ void DSAReader::Cut()
         if (m_ui.PreRegisterCB->isChecked())
         {
             initTransform->SetIdentity();
-            MITK_INFO << "Init Matrix:";
-            MITK_INFO << initTransform->GetMatrix();
+            QF_INFO << "Init Matrix:";
+            QF_INFO << initTransform->GetMatrix();
             Register<Int2DImageType,Int2DImageType,itk::Euler2DTransform<double>>(targetSlice.GetPointer(), originSlice.GetPointer(), result.GetPointer(), initTransform);
         }
         else

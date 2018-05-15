@@ -40,6 +40,8 @@
 #include "MitkSegmentation/IQF_MitkSurfaceTool.h"
 
 #include "iqf_main.h"
+#include "qf_log.h"
+
 
 
 template<class TFilter>
@@ -118,7 +120,7 @@ void LSASMSegmentation::SlotDoSegmentation(mitk::Image* inputImage, mitk::Image*
 
     if (!inputImage || !inputImage)
     {
-        MITK_ERROR << "Please Select Image!";
+        QF_ERROR << "Please Select Image!";
         return;
     }
 
@@ -243,7 +245,7 @@ void LSASMSegmentation::SlotDoSegmentation(mitk::Image* inputImage, mitk::Image*
 
 
     const unsigned int numberOfPCAModes = pcaImageList.size();
-    MITK_INFO << "Principal Components Number£º" << numberOfPCAModes;
+    QF_INFO << "Principal Components Number£º" << numberOfPCAModes;
     typedef itk::PCAShapeSignedDistanceFunction<
         double,
         3,
@@ -276,7 +278,7 @@ void LSASMSegmentation::SlotDoSegmentation(mitk::Image* inputImage, mitk::Image*
     //translate[0] = m_PointSet->GetPoint(0)[0] - mitkMeanImage->GetVtkImageData()->GetCenter()[0];
     //translate[1] = m_PointSet->GetPoint(0)[1] - mitkMeanImage->GetVtkImageData()->GetCenter()[1];
     //translate[2] = m_PointSet->GetPoint(0)[2] - mitkMeanImage->GetVtkImageData()->GetCenter()[2];
-    //MITK_INFO << "Shape Translate:" << translate[0] <<", "<< translate[1] << ", " << translate[2];
+    //QF_INFO << "Shape Translate:" << translate[0] <<", "<< translate[1] << ", " << translate[2];
     //transform->Translate(-translate);
     shape->SetTransform(transform);
 
@@ -306,7 +308,7 @@ void LSASMSegmentation::SlotDoSegmentation(mitk::Image* inputImage, mitk::Image*
     generator->Initialize(20020702);
     optimizer->SetNormalVariateGenerator(generator);
 
-    MITK_INFO << "Name of shape parameters :" << shape->GetNumberOfParameters();
+    QF_INFO << "Name of shape parameters :" << shape->GetNumberOfParameters();
     OptimizerType::ScalesType scales(shape->GetNumberOfParameters());
     scales.Fill(1.0);
     for (unsigned int k = 0; k < numberOfPCAModes; k++)
@@ -363,7 +365,7 @@ void LSASMSegmentation::SlotDoSegmentation(mitk::Image* inputImage, mitk::Image*
 
     /* for (int  i=0;i<geodesicActiveContour->GetNumberOfInputs();i++)
     {
-    MITK_INFO << "iniput "<<i<<" :" << geodesicActiveContour->GetInput(i)->GetObjectName();
+    QF_INFO << "iniput "<<i<<" :" << geodesicActiveContour->GetInput(i)->GetObjectName();
     }
 
     return;*/
@@ -373,7 +375,7 @@ void LSASMSegmentation::SlotDoSegmentation(mitk::Image* inputImage, mitk::Image*
     }
     catch (itk::ExceptionObject &excep)
     {
-        MITK_ERROR << "Exception caught: " << excep.GetDescription();
+        QF_ERROR << "Exception caught: " << excep.GetDescription();
 
         return;
     }

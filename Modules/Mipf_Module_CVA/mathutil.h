@@ -1,12 +1,3 @@
-#ifndef mathutil_h__
-#define mathutil_h__
-/********************************************************************
-	FileName:    mathutil
-	Author:        Ling Song
-	Date:           Month 3 ; Year 2018
-	Purpose:	     
-*********************************************************************/
-
 #include <vtkMath.h>
 #include <math.h>
 #include <vtkPoints.h>
@@ -62,6 +53,9 @@ double hypot2(double x, double y);
 void tql2(double V[3][3], double d[3], double e[3]);
 double absd(double val);
 void eigen_decomposition(double A[3][3], double V[3][3], double d[3]);
+void threePoints2volPoints(int origDims[3], int firstSub[3], int lastSub[3], int seedSub[3], int newOrigSub[3], int finalSub[3]);
+void onePoint2volPoints(int origDims[3], int seedpointSub[3], int origPointSub[3], int finalPointSub[3]);
+void endPointCompute(double pA[3], double pB[3], double pC[3], double pAbbar[3]);
+void endPointCompute0(double pA[3], double pB[3], double pC[3], double pCbbar[3]);
 
 #endif
-#endif // mathutil_h__

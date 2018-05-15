@@ -21,6 +21,8 @@
 //mitk
 #include "mitkImageCast.h"
 
+#include "qf_log.h"
+
 
 VesselnessFilteringView::VesselnessFilteringView() :m_contrast(100)
 {
@@ -80,11 +82,11 @@ void VesselnessFilteringView::Start()
 
     vtkSmartPointer<vtkImageData> resultVtkImage = vtkSmartPointer<vtkImageData>::New();
 
-    MITK_INFO << "Parameters:";
-    MITK_INFO << "Diameter:" << minDimeter << ", " << maxDimeter;
-    MITK_INFO << "Alpha:" << alpha;
-    MITK_INFO << "Beta:" << beta;
-    MITK_INFO << "Contrast:" << m_contrast;
+    QF_INFO << "Parameters:";
+    QF_INFO << "Diameter:" << minDimeter << ", " << maxDimeter;
+    QF_INFO << "Alpha:" << alpha;
+    QF_INFO << "Beta:" << beta;
+    QF_INFO << "Contrast:" << m_contrast;
     computeVesselnessVolume(mitkImage->GetVtkImageData(), resultVtkImage.Get(), m_seeds->GetPoint(0), 100,
         minDimeter, maxDimeter, alpha, beta, m_contrast);
 

@@ -1,4 +1,4 @@
-<MainWindow activityRoot="true" id="main" tabPosition="Right;Right" tabShape="T" title=" "  icon="@icon/mipf_icon.png">
+<MainWindow activityRoot="true" id="main" tabPosition="Right;Right" tabShape="T" title=" "  icon="@image/medical.png">
 	<TitleBar titleText="Algorithm"/>
 	<!-- 菜单栏 -->
 	<MenuBar >
@@ -234,6 +234,7 @@
 	</DockWidget>
 	<DockWidget windowTitle="Tutorial" dockWidgetArea="RightDockWidgetArea" minWidth="400" tabfiedDocWidgetID="main.Test"  features="NoDockWidgetFeatures" floating="false">
         <ToolBox>
+            <DicomTagsWidget text="Dicom Tags" />
             <TestWidget text="Test" />
             <!-- <CVSegmentationWidget text="CVS"/> -->
         </ToolBox>

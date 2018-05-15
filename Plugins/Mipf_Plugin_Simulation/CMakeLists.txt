@@ -13,7 +13,7 @@ cmake_policy(SET CMP0053 NEW) # CMake 3.1
 endif()
 
 project(Mipf_Plugin_Simulation)
-file(GLOB Headers "./*.h")
+file(GLOB Headers "./*.h") 
 file(GLOB UI_Srcs "./*.ui")
 AUX_SOURCE_DIRECTORY(. DIR_SRCS)
   
@@ -21,7 +21,7 @@ AUX_SOURCE_DIRECTORY(. DIR_SRCS)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/DER/libs/cml-1_0_2
                     ${CMAKE_CURRENT_SOURCE_DIR}/DER/libs/dlib-18.9) 
 file(GLOB DER_Headers "./DER/*.h")
-AUX_SOURCE_DIRECTORY(./DER DER_DIR_SRCS)
+AUX_SOURCE_DIRECTORY(./DER DER_DIR_SRCS) 
 source_group(DER FILES ${DER_DIR_SRCS} ${DER_Headers})
  
 #PBD

@@ -294,7 +294,7 @@ double angle(double x[3], double y[3], double d[3])
         d[0] = d[0] / normD;
         d[1] = d[1] / normD;
         d[2] = d[2] / normD;
-        return abs(acos(xy[0] * d[0] + xy[1] * d[1] + xy[2] * d[2]));
+        return acos(xy[0] * d[0] + xy[1] * d[1] + xy[2] * d[2]);
     }
     else
     {
@@ -589,4 +589,210 @@ void eigen_decomposition(double A[3][3], double V[3][3], double d[3]) {
 	}
 
 
+}
+
+void threePoints2volPoints(int origDims[3], int firstSub[3], int lastSub[3], int seedSub[3], int newOrigSub[3], int finalSub[3])
+{
+	newOrigSub[0] = seedSub[0];
+	finalSub[0] = seedSub[0];
+	if (firstSub[0] < seedSub[0] && firstSub[0] <= lastSub[0])
+	{
+		newOrigSub[0] = firstSub[0];
+	}
+	if (lastSub[0] < seedSub[0] && lastSub[0] <= firstSub[0])
+	{
+		newOrigSub[0] = lastSub[0];
+	}
+	if (firstSub[0] > seedSub[0] && firstSub[0] >= lastSub[0])
+	{
+		finalSub[0] = firstSub[0];
+	}
+	if (lastSub[0] > seedSub[0] && lastSub[0] >= firstSub[0])
+	{
+		finalSub[0] = lastSub[0];
+	}
+
+	newOrigSub[1] = seedSub[1];
+	finalSub[1] = seedSub[1];
+	if (firstSub[1] < seedSub[1] && firstSub[1] <= lastSub[1])
+	{
+		newOrigSub[1] = firstSub[1];
+	}
+	if (lastSub[1] < seedSub[1] && lastSub[1] <= firstSub[1])
+	{
+		newOrigSub[1] = lastSub[1];
+	}
+	if (firstSub[1] > seedSub[1] && firstSub[1] >= lastSub[1])
+	{
+		finalSub[1] = firstSub[1];
+	}
+	if (lastSub[1] > seedSub[1] && lastSub[1] >= firstSub[1])
+	{
+		finalSub[1] = lastSub[1];
+	}
+
+	newOrigSub[2] = seedSub[2];
+	finalSub[2] = seedSub[2];
+	if (firstSub[2] < seedSub[2] && firstSub[2] <= lastSub[2])
+	{
+		newOrigSub[2] = firstSub[2];
+	}
+	if (lastSub[2] < seedSub[2] && lastSub[2] <= firstSub[2])
+	{
+		newOrigSub[2] = lastSub[2];
+	}
+	if (firstSub[2] > seedSub[2] && firstSub[2] >= lastSub[2])
+	{
+		finalSub[2] = firstSub[2];
+	}
+	if (lastSub[2] > seedSub[2] && lastSub[2] >= firstSub[2])
+	{
+		finalSub[2] = lastSub[2];
+	}
+
+	if (finalSub[0] + 20 > origDims[0])
+	{
+		finalSub[0] = finalSub[0];
+	}
+	else
+	{
+		finalSub[0] = finalSub[0] + 20;
+	}
+	if (finalSub[1] + 20 > origDims[1])
+	{
+		finalSub[1] = finalSub[1];
+	}
+	else
+	{
+		finalSub[1] = finalSub[1] + 20;
+	}
+	if (finalSub[2] + 20 > origDims[2])
+	{
+		finalSub[2] = finalSub[2];
+	}
+	else
+	{
+		finalSub[2] = finalSub[2] + 20;
+	}
+	if (newOrigSub[0] - 20 < 0)
+	{
+		newOrigSub[0] = newOrigSub[0];
+	}
+	else
+	{
+		newOrigSub[0] = newOrigSub[0] - 20;
+	}
+	if (newOrigSub[1] - 20 < 0)
+	{
+		newOrigSub[1] = newOrigSub[1];
+	}
+	else
+	{
+		newOrigSub[1] = newOrigSub[1] - 20;
+	}
+	if (newOrigSub[2] - 20 < 0)
+	{
+		newOrigSub[2] = newOrigSub[2];
+	}
+	else
+	{
+		newOrigSub[2] = newOrigSub[2] - 20;
+	}
+}
+
+void onePoint2volPoints(int origDims[3], int seedpointSub[3], int origPointSub[3], int finalPointSub[3])
+{
+	if (seedpointSub[0] - 30 < 0)
+	{
+		origPointSub[0] = seedpointSub[0];
+	}
+	else
+	{
+		origPointSub[0] = seedpointSub[0] - 30;
+	}
+	if (seedpointSub[1] - 30 < 0)
+	{
+		origPointSub[1] = seedpointSub[1];
+	}
+	else
+	{
+		origPointSub[1] = seedpointSub[1] - 30;
+	}
+	if (seedpointSub[2] - 30 < 0)
+	{
+		origPointSub[2] = seedpointSub[2];
+	}
+	else
+	{
+		origPointSub[2] = seedpointSub[2] - 30;
+	}
+
+	if (seedpointSub[0] + 30 > origDims[0])
+	{
+		finalPointSub[0] = seedpointSub[0];
+	}
+	else
+	{
+		finalPointSub[0] = seedpointSub[0] + 30;
+	}
+	if (seedpointSub[1] + 30 > origDims[1])
+	{
+		finalPointSub[1] = seedpointSub[1];
+	}
+	else
+	{
+		finalPointSub[1] = seedpointSub[1] + 30;
+	}
+	if (seedpointSub[2] + 30 > origDims[2])
+	{
+		finalPointSub[2] = seedpointSub[2];
+	}
+	else
+	{
+		finalPointSub[2] = seedpointSub[2] + 30;
+	}
+}
+
+void endPointCompute(double pA[3],double pB[3],double pC[3],double pAbbar[3])
+{
+	double distBC = sqrtSquare(pC, pB);
+	double AB[3];
+	vfp(AB, pB, pA);
+	vn(AB);
+	double pAbar[3];
+	pAbar[0] = pB[0] + distBC*AB[0];
+	pAbar[1] = pB[1] + distBC*AB[1];
+	pAbar[2] = pB[2] + distBC*AB[2];
+
+	double pD[3];
+	double BC[3], BAbar[3];
+	vfp(BC, pC, pB);
+	vfp(BAbar, pAbar, pB);
+	double dotproduction = vtkMath::Dot(BAbar, BC);
+	vn(BC);
+	pD[0] = pB[0] + dotproduction*BC[0] / distBC;
+	pD[1] = pB[1] + dotproduction*BC[1] / distBC;
+	pD[2] = pB[2] + dotproduction*BC[2] / distBC;
+
+	//double pAbbar[3];
+	pAbbar[0] = pD[0] * 2 - pAbar[0];
+	pAbbar[1] = pD[1] * 2 - pAbar[1];
+	pAbbar[2] = pD[2] * 2 - pAbar[2];
+}
+
+void endPointCompute0(double pA[3], double pB[3], double pC[3], double pCbbar[3])
+{
+	double distAB = sqrtSquare(pA,pB);
+	double distBC = sqrtSquare(pB, pC);
+	double pCbar[3];
+	pCbar[0] = pA[0] * distBC / (distBC + distAB) + pC[0] * distAB / (distAB + distBC);
+	pCbar[1] = pA[1] * distBC / (distBC + distAB) + pC[1] * distAB / (distAB + distBC);
+	pCbar[2] = pA[2] * distBC / (distBC + distAB) + pC[2] * distAB / (distAB + distBC);
+
+	double BCbar[3];
+	vfp(BCbar, pCbar, pB);
+	vn(BCbar);
+	pCbbar[0] = pB[0] + distBC*BCbar[0];
+	pCbbar[1] = pB[1] + distBC*BCbar[1];
+	pCbbar[2] = pB[2] + distBC*BCbar[2];
 }

@@ -8,6 +8,8 @@
 #include "itkThresholdImageFilter.h"
 
 #include "Test/ITest.h"
+
+#include "qf_log.h"
   
 TestView::TestView() :MitkPluginView() 
 {
@@ -45,7 +47,7 @@ void TestView::Apply()
     ITest* pTest = (ITest*)GetInterfacePtr(QF_INTERFACE_TEST);
     if (pTest)
     {
-        MITK_INFO << pTest->Add(5, 7);
+        QF_INFO << pTest->Add(5, 7);
     }
     return;
     mitk::Image* mitkImage = dynamic_cast<mitk::Image*>(m_ui.DataSelector->GetSelectedNode()->GetData());

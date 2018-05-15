@@ -16,6 +16,7 @@
 #include "SplashWindow.h"
 
 #include "tclap/CmdLine.h"
+#include "qf_log.h"
 
 
 LauncherView::LauncherView() 
@@ -45,6 +46,7 @@ void LauncherView::SetupResource()
     {
         arguments.push_back(argStr.toLocal8Bit().constData());
     }
+    std::cout << "************************************************Parse Config File*****************************************************" << std::endl;
     std::string configFilename = "config.ini";
     if (arguments.size()>1)
     {
@@ -57,14 +59,15 @@ void LauncherView::SetupResource()
         }
         catch (TCLAP::ArgException &e)  // catch any exceptions
         {
-            std::cerr << "error: " << e.error() << " for arg " << e.argId() << std::endl;
+
+            QF_ERROR<< "error: " << e.error() << " for arg " << e.argId();
         }
     }
     QString configFilePath = QString(m_pMain->GetConfigPath()) + QString("/%1").arg(configFilename.c_str());
-    std::cout << "The config file of application is: " << configFilename << std::endl;
+    QF_INFO<< "The config file of application is: " << configFilename;
     if (!QFile(configFilePath.toLocal8Bit().constData()).exists())
     {
-        std::cout << "Config file " << configFilePath.toLocal8Bit().constData() << " does not exist ! The application will use the default settings !" << std::endl;
+        QF_WARN<< "Config file " << configFilePath.toLocal8Bit().constData() << " does not exist ! The application will use the default settings !";
     }
     QSettings set(configFilePath, QSettings::IniFormat);
     set.beginGroup("config");
@@ -74,39 +77,40 @@ void LauncherView::SetupResource()
     std::string componentsFile = set.value("Components-Config-File", "components.cfg").toString().toStdString();
     std::string pluginsFile = set.value("Plugins-Config-File", "plugins.cfg").toString().toStdString();
     set.endGroup();
+
+    QF_INFO << "Start-XML-File: " << startXML;
+    QF_INFO << "Default-Application-Style: " << style;
+    QF_INFO << "Splash-Image: " << splashImage;
+    QF_INFO << "Components-Config-File: " << componentsFile;
+    QF_INFO << "Plugins-Config-File: " << pluginsFile;
+    std::cout << "*****************************************************Parse Finished***************************************************\n" << std::endl;
+
+
     //设置qt程序默认语言
     // qt_context::setDefaultLanguage("Chinese");
     //设置qt程序风格
     qt_context::setApplicationStyle(style.c_str());
 
-#define  SHOW_SPASH
-    if (splashImage.empty())
+    bool bShowSplashWindow = !splashImage.empty();
+    SplashWindow* splashWindow = NULL;
+    if (bShowSplashWindow)
     {
-#undef SHOW_SPASH
+        splashWindow = new SplashWindow(m_pMain, R::Instance()->getImageResourceUrl(splashImage.c_str()).c_str());
+        splashWindow->show();
     }
-#ifdef _DEBUG
-#undef SHOW_SPASH
-#endif
 
-
-#ifdef SHOW_SPASH
-    SplashWindow splashWindow(m_pMain, R::Instance()->getImageResourceUrl(splashImage.c_str()).c_str());
-    splashWindow.show();
-#endif // _DEBUG
-
+    std::cout << "*********************************************Start Loading Libraries**************************************************" << std::endl;
     m_pMain->Init(componentsFile.c_str(), pluginsFile.c_str());
+    std::cout << "**************************************************Load Completed****************************************************\n" << std::endl;
 
-#ifdef  SHOW_SPASH
-    m_pMainWindow = new MainWindow(startXML.c_str(), &splashWindow);
-#else
-    m_pMainWindow = new MainWindow(startXML.c_str());
-#endif
+    m_pMainWindow = new MainWindow(startXML.c_str(), splashWindow);
     m_pMainWindow->setShowMode(Activity::MAXIMIZED);
     m_pMainWindow->active();
 
-#ifdef SHOW_SPASH
-    splashWindow.close();
-#endif
+    if (bShowSplashWindow)
+    {
+        splashWindow->close();
+    }
 }
 
 void LauncherView::Update(const char* szMessage, int iValue, void* pValue)

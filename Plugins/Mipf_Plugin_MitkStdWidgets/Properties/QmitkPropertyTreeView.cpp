@@ -27,6 +27,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QPainter>
 #include <memory>
 
+#include "qf_log.h"
+
 
 const char FILTER_PROPERTIES[] = "filter properties";
 const char SHOW_ALIASES[] = "show aliases";
@@ -72,8 +74,8 @@ void QmitkPropertyTreeView::Update(const char* szMessage, int iValue /* = 0 */, 
         else if (strcmp(szMessage, MITK_MESSAGE_REFERENCE_STRING_CHANGED) == 0)
         {
             std::pair<const char*, const char*> p = *(std::pair<const char*, const char*>*)(pValue);
-            MITK_INFO << p.first;
-            MITK_INFO << p.second;
+            QF_INFO << p.first;
+            QF_INFO << p.second;
         }
 }
 

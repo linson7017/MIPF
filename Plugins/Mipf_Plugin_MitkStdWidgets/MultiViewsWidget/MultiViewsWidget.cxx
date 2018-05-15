@@ -33,7 +33,9 @@
 #include "vtkTransformPolyDataFilter.h"
 #include "vtkMath.h"
 
-#include "Rendering/OrientationMarkerVtkMapper3D.h"
+#include "Rendering/OrientationMarkerVtkMapper3D.h"          \
+
+#include "qf_log.h"
 
 //##Documentation
 //## @brief As MultiViews, but with QmitkStdMultiWidget as widget
@@ -104,7 +106,8 @@ void MultiViewsWidget::SetupWidgets()
     m_multiWidget->DisableDepartmentLogo();
     if (HasAttribute("logo"))
     {
-        MITK_INFO << R::Instance()->getImageResourceUrl(GetAttribute("logo"));
+
+        //QF_INFO << R::Instance()->getImageResourceUrl(GetAttribute("logo"));
         m_multiWidget->SetDepartmentLogoPath(R::Instance()->getImageResourceUrl(GetAttribute("logo")).c_str());
         m_multiWidget->EnableDepartmentLogo();
     }

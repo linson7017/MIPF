@@ -43,6 +43,8 @@
 #include <LSASMSegmentation.h>
 #include <MitkPluginView.h>
 
+#include "qf_log.h"
+
 
 template<class TFilter>
 class CommandIterationUpdate : public itk::Command
@@ -149,7 +151,7 @@ void LevelSetASMSegmentationView::CenterImage()
 {
     if (!m_ui.ImageSelector->GetSelectedNode())
     {
-        MITK_ERROR << "Please Select Image !";
+        QF_ERROR << "Please Select Image !";
         return;
     }
 
@@ -157,7 +159,7 @@ void LevelSetASMSegmentationView::CenterImage()
 
     if (!mitkImage )
     {
-        MITK_ERROR << "Please Select Image!";
+        QF_ERROR << "Please Select Image!";
         return;
     }
 
@@ -207,7 +209,7 @@ void LevelSetASMSegmentationView::Apply()
     IQF_MitkDataManager* pDataManager = (IQF_MitkDataManager*)m_pMain->GetInterfacePtr(QF_MitkMain_DataManager);
     if (!m_ui.ImageSelector->GetSelectedNode() || !m_ui.MeanImageSelector->GetSelectedNode())
     {
-        MITK_ERROR << "Please Select Image Or Mean Image!";
+        QF_ERROR << "Please Select Image Or Mean Image!";
         return;
     }
 
@@ -229,7 +231,7 @@ void LevelSetASMSegmentationView::Apply()
 
     if (!mitkImage || !mitkMeanImage)
     {
-        MITK_ERROR << "Please Select Image!";
+        QF_ERROR << "Please Select Image!";
         return;
     }
     if (!m_ObserveNode)
@@ -271,7 +273,7 @@ void LevelSetASMSegmentationView::DoSegmentation()
 
     if (!m_ui.ImageSelector->GetSelectedNode() || !m_ui.MeanImageSelector->GetSelectedNode())
     {
-        MITK_ERROR << "Please Select Image Or Mean Image!";
+        QF_ERROR << "Please Select Image Or Mean Image!";
         return;
     }
 
@@ -280,7 +282,7 @@ void LevelSetASMSegmentationView::DoSegmentation()
 
     if (!mitkImage || !mitkMeanImage)
     {
-        MITK_ERROR << "Please Select Image!";
+        QF_ERROR << "Please Select Image!";
         return;
     }
 
@@ -405,7 +407,7 @@ void LevelSetASMSegmentationView::DoSegmentation()
 
 
     const unsigned int numberOfPCAModes = m_ui.PCAImageList->count();
-    MITK_INFO << "Principal Components Number£º" << numberOfPCAModes;
+    QF_INFO << "Principal Components Number£º" << numberOfPCAModes;
     typedef itk::PCAShapeSignedDistanceFunction<
         double,
         3,
@@ -438,7 +440,7 @@ void LevelSetASMSegmentationView::DoSegmentation()
     //translate[0] = m_PointSet->GetPoint(0)[0] - mitkMeanImage->GetVtkImageData()->GetCenter()[0];
     //translate[1] = m_PointSet->GetPoint(0)[1] - mitkMeanImage->GetVtkImageData()->GetCenter()[1];
     //translate[2] = m_PointSet->GetPoint(0)[2] - mitkMeanImage->GetVtkImageData()->GetCenter()[2];
-    //MITK_INFO << "Shape Translate:" << translate[0] <<", "<< translate[1] << ", " << translate[2];
+    //QF_INFO << "Shape Translate:" << translate[0] <<", "<< translate[1] << ", " << translate[2];
     //transform->Translate(-translate);
     shape->SetTransform(transform);
 
@@ -468,7 +470,7 @@ void LevelSetASMSegmentationView::DoSegmentation()
     generator->Initialize(20020702);
     optimizer->SetNormalVariateGenerator(generator);
 
-    MITK_INFO << "Name of shape parameters :" << shape->GetNumberOfParameters();
+    QF_INFO << "Name of shape parameters :" << shape->GetNumberOfParameters();
     OptimizerType::ScalesType scales(shape->GetNumberOfParameters());
     scales.Fill(1.0);
     for (unsigned int k = 0; k < numberOfPCAModes; k++)
@@ -530,7 +532,7 @@ void LevelSetASMSegmentationView::DoSegmentation()
 
     /* for (int  i=0;i<geodesicActiveContour->GetNumberOfInputs();i++)
     {
-    MITK_INFO << "iniput "<<i<<" :" << geodesicActiveContour->GetInput(i)->GetObjectName();
+    QF_INFO << "iniput "<<i<<" :" << geodesicActiveContour->GetInput(i)->GetObjectName();
     }
 
     return;*/
@@ -540,7 +542,7 @@ void LevelSetASMSegmentationView::DoSegmentation()
     }
     catch (itk::ExceptionObject &excep)
     {
-        MITK_ERROR << "Exception caught: " << excep.GetDescription();
+        QF_ERROR << "Exception caught: " << excep.GetDescription();
 
         return;
     }

@@ -139,7 +139,10 @@ void CutThread::ProcessAndSaveDSA(QString openDir, QString saveDir)
             dir.remove(dcmSaveFilePath);
         }
         QFile::copy(dcmFilePath, dcmSaveFilePath);
-        if (m_pDSATool->SaveDSADicomFile(mitkResultImage, QStringUtils::GetLocalString(dcmSaveFilePath, localStr)))
+        std::map<std::string, std::string> dict;
+        dict["0028|1050"] = "1600";
+        dict["0028|1051"] = "2100";
+        if (m_pDSATool->SaveDSADicomFile(mitkResultImage, QStringUtils::GetLocalString(dcmSaveFilePath, localStr), dict))
         {
             emit SignalLog("<font color=green>Save result to " + dcmSaveFilePath + " !</font><br>", dcmFilePath);
         }

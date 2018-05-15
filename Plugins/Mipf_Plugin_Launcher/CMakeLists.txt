@@ -24,8 +24,7 @@ set(CMAKE_AUTOMOC ON)
 qt5_wrap_ui(ui_Files ${UI_Srcs})
 add_library(Mipf_Plugin_Launcher SHARED ${DIR_SRCS} ${Headers} ${UI_Srcs} ${MOC_Hdrs})
 qt5_use_modules(Mipf_Plugin_Launcher Core Gui Widgets)
-target_link_libraries(Mipf_Plugin_Launcher    
-    
- )
+target_link_libraries(Mipf_Plugin_Launcher       
+)
 link_qf()
  

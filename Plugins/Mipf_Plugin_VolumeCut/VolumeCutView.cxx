@@ -15,8 +15,9 @@
 #include "Interactions/FreehandCutInteractor.h"
 #include "Interactions/FreehandVolumeCutImplementation.h"
 
+#include "qf_log.h"
 
-  
+
 VolumeCutView::VolumeCutView() :MitkPluginView(), m_boxNumber(0) , m_pImplementation(nullptr),m_freehandCutInteractor(nullptr)
 {
 
@@ -233,16 +234,16 @@ void VolumeCutView::BoxCut()
     image->GetGeometry()->SetOrigin(p);*/
     vtkSmartPointer<vtkImageData> tempImage = vtkSmartPointer<vtkImageData>::New();
     tempImage->DeepCopy(image->GetVtkImageData());
-    MITK_INFO << "vtkImageData:[" << tempImage->GetBounds()[0]<<" " << tempImage->GetBounds()[1] << " " << tempImage->GetBounds()[2] << " "
+    QF_INFO << "vtkImageData:[" << tempImage->GetBounds()[0]<<" " << tempImage->GetBounds()[1] << " " << tempImage->GetBounds()[2] << " "
         << tempImage->GetBounds()[3] << " " << tempImage->GetBounds()[4] << " " << tempImage->GetBounds()[5] << "]["
         << tempImage->GetBounds()[0] << " " << tempImage->GetOrigin()[1] << " " << tempImage->GetOrigin()[2]<<"]";
 
 
-    MITK_INFO << image->GetGeometry()->GetIndexToWorldTransform()->GetTranslation();
-    MITK_INFO << image->GetGeometry()->GetIndexToWorldTransform()->GetScale();
+    QF_INFO << image->GetGeometry()->GetIndexToWorldTransform()->GetTranslation();
+    QF_INFO << image->GetGeometry()->GetIndexToWorldTransform()->GetScale();
     vtkMatrix4x4* vm = image->GetGeometry()->GetVtkMatrix();
 
-    MITK_INFO << image->GetGeometry()->GetBounds() << image->GetGeometry()->GetOrigin();
+    QF_INFO << image->GetGeometry()->GetBounds() << image->GetGeometry()->GetOrigin();
 
     mitk::NodePredicateProperty::Pointer propertyPredicate = mitk::NodePredicateProperty::New("VolumeBoxCut", mitk::BoolProperty::New(true));
     mitk::DataStorage::SetOfObjects::ConstPointer boxs = GetDataStorage()->GetSubset(propertyPredicate);
@@ -255,7 +256,7 @@ void VolumeCutView::BoxCut()
         mitk::BaseGeometry::BoundsArrayType bound = node->GetData()->GetGeometry()->GetBounds();
         mitk::Point3D origin = node->GetData()->GetGeometry()->GetOrigin();
 
-        MITK_INFO << bound<< origin;
+        QF_INFO << bound<< origin;
         bound[0] *= vm->GetElement(0, 0);
         bound[1] *= vm->GetElement(0, 0);
         bound[2] *= vm->GetElement(1, 1);
@@ -280,7 +281,7 @@ void VolumeCutView::BoxCut()
         clipFunction->SetTransform(transform);*/
         
 
-        MITK_INFO<<"Box Bounds"<<clipFunction->GetBounds()[0]<<" " << clipFunction->GetBounds()[1] << " " << clipFunction->GetBounds()[2] 
+        QF_INFO<<"Box Bounds"<<clipFunction->GetBounds()[0]<<" " << clipFunction->GetBounds()[1] << " " << clipFunction->GetBounds()[2] 
             << " " << clipFunction->GetBounds()[3] << " " << clipFunction->GetBounds()[4] << " " << clipFunction->GetBounds()[5];
 
 

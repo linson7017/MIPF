@@ -19,6 +19,8 @@
 #include "iqf_properties.h"
 #include "iqf_property.h"
 
+#include "qf_log.h"
+
 CQF_CVACommand::CQF_CVACommand(QF::IQF_Main* pMain)
 {
     m_pMain = pMain;
@@ -91,7 +93,7 @@ bool CQF_CVACommand::ExecuteCommand(const char* szCommandID, QF::IQF_Properties*
         }
         catch (const mitk::Exception& e)
         {
-            MITK_ERROR << e;
+            QF_ERROR << e;
             return false;
         }
         if (pReference)

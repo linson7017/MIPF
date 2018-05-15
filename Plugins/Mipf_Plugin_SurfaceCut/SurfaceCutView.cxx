@@ -258,7 +258,7 @@ void SurfaceCutView::BoxCut()
 
         mitk::BaseGeometry::BoundsArrayType bound = node->GetData()->GetGeometry()->GetBounds();
         mitk::Point3D origin = node->GetData()->GetGeometry()->GetOrigin();
-        //MITK_INFO << node->GetData()->GetGeometry() << ":" << bound << ". Origin:" << origin;
+        //QF_INFO << node->GetData()->GetGeometry() << ":" << bound << ". Origin:" << origin;
 
         bound[0] = bound[0] + origin[0];
         bound[1] = bound[1] + origin[0];

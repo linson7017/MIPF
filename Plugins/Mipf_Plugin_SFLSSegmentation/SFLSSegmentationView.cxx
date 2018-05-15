@@ -35,6 +35,8 @@
 #include <mitkDrawPaintbrushTool.h>
 #include "MitkSegmentation/IQF_MitkSegmentationTool.h"
 
+#include "qf_log.h"
+
 template <typename TPixel>
 UShort3DImagePointerType getOriginalMask(typename itk::Image<TPixel, 3>::Pointer img, TPixel thod)
 {
@@ -276,7 +278,7 @@ void SFLSSegmentationView::SlotInteractionEnd(const itk::Image<float, 3>::Pointe
 
 void SFLSSegmentationView::SlotSegmentationFinished()
 {
-    MITK_INFO << "Segmentation Finished";
+    QF_INFO << "Segmentation Finished";
      UShort3DImagePointerType finalMask = getFinalMask<float>(m_pSegmentation->mp_phi, 1.0, 2.0);
     //finalMask->CopyInformation(itkImage);
 

@@ -60,6 +60,12 @@
 #include "vtkImageDilateErode3D.h"
 #include "vtkPolyDataToImageStencil.h"
 #include "vtkTubeFilter.h"
+#include "vtkExtractVOI.h"
+#include "vtkDelaunay3D.h"
+#include "vtkDataSetSurfaceFilter.h"
+//#include "vtkSurfaceReconstructionFilter.h"
+//#include "vtkContourFilter.h"
+#include "vtkImageConvolve.h"
 
 #include "itkImage.h"
 #include "itkImageFileWriter.h"
@@ -72,9 +78,15 @@
 #include "itkGDCMSeriesFileNames.h"
 #include "itkImageSeriesReader.h"
 #include "itkBinaryFillholeImageFilter.h"
+#include "itkVotingBinaryHoleFillingImageFilter.h"
+#include "vtkVector.h"
+#include "vtkTransform.h"
+//#include "itkAdaptiveOtsuThresholdImageFilter.h"
+#include "vtkvmtkPolyDataCenterlines.h"
 
 // ITK types
 typedef itk::Image<float, 3> ImageType;
+//typedef itk::ImageSource<TOutputImage> OutputImgageTyepe;
 typedef itk::VTKImageToImageFilter<ImageType> VTKToITKConnectorType;
 typedef itk::ImageToVTKImageFilter<ImageType> ITKToVTKConnectorType;
 typedef itk::BinaryThinningImageFilter3D<ImageType, ImageType> ThinningFilterType;
@@ -82,6 +94,8 @@ typedef itk::ImageSeriesReader<ImageType> ReaderType;
 typedef itk::GDCMImageIO ImageIOType;
 typedef itk::GDCMSeriesFileNames NamesGeneratorType;
 typedef itk::BinaryFillholeImageFilter<ImageType> IMFillFilterType;
+typedef itk::VotingBinaryHoleFillingImageFilter<ImageType,ImageType> VotingFillFilterType;
+//typedef itk::AdaptiveOtsuThresholdImageFilter<ImageType, ImageType> ThresholdFilter;
 //typedef itk::SymmetricSecondRankTensor<double, 3> HessianPixelType;
 //typedef itk::Image<HessianPixelType, 3> HessianImageType;
 //typedef itk::HessianToObjectnessMeasureImageFilter<HessianImageType, ImageType> ObjectnessFilterType;
@@ -124,14 +138,17 @@ void ImageAlgorithm::destroy()
 	this->startEndPoints = NULL;
 	this->aneurysmPoints = NULL;
 	this->segmentedData = NULL;
-	//this->inputData = NULL;
+	this->segmentedDataBackup = NULL;
+	this->inputData = NULL;
 	this->needleData = NULL;
+	this->moulddata = NULL;
 	this->tubeImageData = NULL;
-	//this->resampler = NULL;
+	this->resampler = NULL;
 }
 
 bool ImageAlgorithm::readFolder(const char *dn)
 {
+	//vtkObject::GlobalWarningDisplayOff();
     // Initialize all vtk operators
     this->discreteSurface = vtkSmartPointer<vtkDiscreteMarchingCubes>::New();
     this->smoother = vtkSmartPointer<vtkWindowedSincPolyDataFilter>::New();
@@ -174,7 +191,7 @@ bool ImageAlgorithm::readFolder(const char *dn)
     
     itkReader->SetFileNames(fileNames);
     itkReader->Update();
-    
+
     typedef itk::MetaDataObject<std::string> MetaDataStringType;
     typedef itk::MetaDataDictionary DictionaryType;
     const DictionaryType & dictionary = dicomIO->GetMetaDataDictionary();
@@ -187,8 +204,8 @@ bool ImageAlgorithm::readFolder(const char *dn)
         std::cerr << "invalid dicom image type" << std::endl;
         return false;
     }
-    
-	std::string entryID = "0010|0020";//patientID
+	
+	/*std::string entryID = "0010|0020";//patientID
 	DictionaryType::ConstIterator tagITR = dictionary.Find(entryID);
 	MetaDataStringType::ConstPointer entryvalueID = dynamic_cast<const MetaDataStringType *>(tagITR->second.GetPointer());
 	this->patientInfo.patientID = entryvalueID->GetMetaDataObjectValue();
@@ -238,7 +255,7 @@ bool ImageAlgorithm::readFolder(const char *dn)
 	{
 		entryvalueID = dynamic_cast<const MetaDataStringType *>(tagITR->second.GetPointer());
 		this->patientInfo.contentTime = entryvalueID->GetMetaDataObjectValue();
-	}
+	}*/
 
     MetaDataStringType::ConstPointer entryvalue = dynamic_cast<const MetaDataStringType *>(tagItr->second.GetPointer());
     std::string modality;
@@ -263,6 +280,14 @@ bool ImageAlgorithm::readFolder(const char *dn)
         std::cout << "image type unsupported" << std::endl;
         this->imageType = 0;
     }
+
+	std::string entryID0 = "0020|000E";
+	if (dicomIO->CanReadFile(fileNames[0].c_str()))
+	{
+		dicomIO->SetFileName(fileNames[0].c_str());
+		dicomIO->ReadImageInformation();
+		bool tagValueSuccess = dicomIO->GetValueFromTag(entryID0, this->patientInfo.seriesInstanceUID);
+	}
     
     ITKToVTKConnectorType::Pointer itkReaderToVtk = ITKToVTKConnectorType::New();
     itkReaderToVtk->SetInput(itkReader->GetOutput());
@@ -335,6 +360,7 @@ void ImageAlgorithm::segmentVessels()
     if (this->needRecalculateSegmentation)
     {
         this->segmentedData = vtkSmartPointer<vtkImageData>::New();
+		this->segmentedDataBackup = vtkSmartPointer<vtkImageData>::New();
         //volume->DeepCopy(this->resampler->GetOutput());
         // Feeds from threshold if no seeds are selected
         if (this->seedPoints->GetNumberOfPoints() == 0)
@@ -350,9 +376,28 @@ void ImageAlgorithm::segmentVessels()
                 simpleThreshold->SetInputData(this->enhancedVesselData);
 				simpleThreshold->ThresholdBetween(this->lowerth, this->upperth);
 				simpleThreshold->Update();
-				VTKToITKConnectorType::Pointer vtkToItkConnector = VTKToITKConnectorType::New();
+
+				/*vtkSmartPointer<vtkImageOpenClose3D> imageClose = vtkSmartPointer<vtkImageOpenClose3D>::New();
+				imageClose->SetCloseValue(1);
+				imageClose->SetKernelSize(5, 5, 5);
+				imageClose->SetInputData(simpleThreshold->GetOutput());
+				imageClose->Update();*/
+
+				/*VTKToITKConnectorType::Pointer vtkToItkConnector = VTKToITKConnectorType::New();
 				vtkToItkConnector->SetInput(simpleThreshold->GetOutput());
 				vtkToItkConnector->Update();
+
+				//VotingFillFilterType::Pointer votingfill = VotingFillFilterType::New();
+				//ImageType::SizeType radius;
+				//radius[0] = 9;
+				//radius[1] = 9;
+				//radius[2] = 1;
+				//votingfill->SetRadius(radius);
+				//votingfill->SetBackgroundValue(0);
+				//votingfill->SetForegroundValue(1);
+				//votingfill->SetMajorityThreshold(2);
+				//votingfill->SetInput(vtkToItkConnector->GetOutput());
+				//votingfill->Update();
 
 				IMFillFilterType::Pointer imfill = IMFillFilterType::New();
 				imfill->SetInput(vtkToItkConnector->GetOutput());
@@ -360,9 +405,21 @@ void ImageAlgorithm::segmentVessels()
 
 				ITKToVTKConnectorType::Pointer itkToVtkConnector = ITKToVTKConnectorType::New();
 				itkToVtkConnector->SetInput(imfill->GetOutput());
-				itkToVtkConnector->Update();
-				this->segmentedData->DeepCopy(itkToVtkConnector->GetOutput());
-            }
+				itkToVtkConnector->Update();*/
+				this->segmentedData->DeepCopy(simpleThreshold->GetOutput());
+			}
+			else if(this->imageType == 2)
+			{
+				vtkSmartPointer<vtkImageThreshold> simpleThreshold = vtkSmartPointer<vtkImageThreshold>::New();
+				simpleThreshold->ReplaceInOn();
+				simpleThreshold->SetInValue(1);
+				simpleThreshold->ReplaceOutOn();
+				simpleThreshold->SetOutValue(0);
+				simpleThreshold->SetInputConnection(this->resampler->GetOutputPort());
+				simpleThreshold->ThresholdBetween(this->lowerth, this->upperth);
+				simpleThreshold->Update();
+				this->segmentedData->DeepCopy(simpleThreshold->GetOutput());
+			}
             else
             {
 				int* dims = this->resampler->GetOutput()->GetDimensions();
@@ -392,9 +449,28 @@ void ImageAlgorithm::segmentVessels()
 				connectedthreshold->SetSeedPoints(seeds);
 				connectedthreshold->ThresholdBetween(this->lowerth, this->upperth);
 				connectedthreshold->Update();
+
+				/*vtkSmartPointer<vtkImageOpenClose3D> imageClose = vtkSmartPointer<vtkImageOpenClose3D>::New();
+				imageClose->SetOpenValue(1);
+				imageClose->SetKernelSize(3, 3, 3);
+				imageClose->SetInputData(connectedthreshold->GetOutput());
+				imageClose->Update();*/
+
 				VTKToITKConnectorType::Pointer vtkToItkConnector = VTKToITKConnectorType::New();
 				vtkToItkConnector->SetInput(connectedthreshold->GetOutput());
 				vtkToItkConnector->Update();
+
+				//VotingFillFilterType::Pointer votingfill = VotingFillFilterType::New();
+				//ImageType::SizeType radius;
+				//radius[0] = 9;
+				//radius[1] = 9;
+				//radius[2] = 1;
+				//votingfill->SetRadius(radius);
+				//votingfill->SetBackgroundValue(0);
+				//votingfill->SetForegroundValue(1);
+				//votingfill->SetMajorityThreshold(2);
+				//votingfill->SetInput(vtkToItkConnector->GetOutput());
+				//votingfill->Update();
 
 				IMFillFilterType::Pointer imfill = IMFillFilterType::New();
 				imfill->SetInput(vtkToItkConnector->GetOutput());
@@ -419,17 +495,57 @@ void ImageAlgorithm::segmentVessels()
                 vesselEnhance();
                 connectedThreshold->SetInputData(this->enhancedVesselData);
             }
+			else if (imageType == 2)
+			{
+				vtkSmartPointer<vtkImageThreshold> simpleThreshold = vtkSmartPointer<vtkImageThreshold>::New();
+				simpleThreshold->ReplaceInOn();
+				simpleThreshold->SetInValue(1);
+				simpleThreshold->ReplaceOutOn();
+				simpleThreshold->SetOutValue(0);
+				simpleThreshold->SetInputConnection(this->resampler->GetOutputPort());
+				simpleThreshold->ThresholdBetween(this->lowerth, this->upperth);
+				simpleThreshold->Update();
+				this->segmentedData->DeepCopy(simpleThreshold->GetOutput());
+				this->segmentedDataBackup->DeepCopy(this->segmentedData);
+				this->needRecalculateSegmentation = false;
+				return;
+			}
             else
             {
+				//vtkSmartPointer<vtkImageGaussianSmooth> gauss = vtkSmartPointer<vtkImageGaussianSmooth>::New();
+				//gauss->SetStandardDeviation(0.1, 0.1, 0.1);
+				//gauss->SetRadiusFactors(3, 3, 3);
+				//gauss->SetInputData(this->resampler->GetOutput());
+				//gauss->Update();
+				//connectedThreshold->SetInputConnection(gauss->GetOutputPort());
                 connectedThreshold->SetInputConnection(this->resampler->GetOutputPort());
             }
             connectedThreshold->SetSeedPoints(this->seedPoints);
             connectedThreshold->ThresholdBetween(this->lowerth, this->upperth);
             connectedThreshold->Update();
+
+			/*vtkSmartPointer<vtkImageOpenClose3D> imageClose = vtkSmartPointer<vtkImageOpenClose3D>::New();
+			imageClose->SetCloseValue(1);
+			imageClose->SetKernelSize(5, 5, 5);
+			imageClose->SetInputData(connectedThreshold->GetOutput());
+			imageClose->Update();*/
+
             VTKToITKConnectorType::Pointer vtkToItkConnector = VTKToITKConnectorType::New();
             vtkToItkConnector->SetInput(connectedThreshold->GetOutput());
             vtkToItkConnector->Update();
             
+			//VotingFillFilterType::Pointer votingfill = VotingFillFilterType::New();
+			//ImageType::SizeType radius;
+			//radius[0] = 9;
+			//radius[1] = 9;
+			//radius[2] = 1;
+			//votingfill->SetRadius(radius);
+			//votingfill->SetBackgroundValue(0);
+			//votingfill->SetForegroundValue(1);
+			//votingfill->SetMajorityThreshold(2);
+			//votingfill->SetInput(vtkToItkConnector->GetOutput());
+			//votingfill->Update();
+
             IMFillFilterType::Pointer imfill = IMFillFilterType::New();
             imfill->SetInput(vtkToItkConnector->GetOutput());
             imfill->Update();
@@ -438,7 +554,14 @@ void ImageAlgorithm::segmentVessels()
             itkToVtkConnector->SetInput(imfill->GetOutput());
             itkToVtkConnector->Update();
             this->segmentedData->DeepCopy(itkToVtkConnector->GetOutput());
+			/*vtkSmartPointer<vtkImageGaussianSmooth> gauss = vtkSmartPointer<vtkImageGaussianSmooth>::New();
+			gauss->SetStandardDeviation(0.1, 0.1, 0.1);
+			gauss->SetRadiusFactors(3, 3, 3);
+			gauss->SetInputData(itkToVtkConnector->GetOutput());
+			gauss->Update();
+			this->segmentedData->DeepCopy(gauss->GetOutput());*/
         }
+		this->segmentedDataBackup->DeepCopy(this->segmentedData);
         this->needRecalculateSegmentation = false;
     }
 }
@@ -461,7 +584,21 @@ vtkSmartPointer<vtkPolyData> ImageAlgorithm::getCurrentSurface()
 
 vtkSmartPointer<vtkPolyData> ImageAlgorithm::generateSurface()
 {
+	if (this->patientInfo.patientID == "667422")
+	{
+		this->lowerth = 2663;
+	}
     segmentVessels();
+	if (this->segmentedData == NULL)
+	{
+		this->seedPoints->Reset();
+		this->currentSurface = NULL;
+		return this->currentSurface;
+	}
+	/*vtkSmartPointer<vtkMetaImageWriter> writer = vtkSmartPointer<vtkMetaImageWriter>::New();
+	writer->SetFileName("E:/segmentedData.mha");
+	writer->SetInputData(this->segmentedData);
+	writer->Write();*/
     this->discreteSurface->SetInputData(this->segmentedData);
     this->discreteSurface->GenerateValues(1, 1, 1);
     this->discreteSurface->Update();
@@ -475,7 +612,18 @@ vtkSmartPointer<vtkPolyData> ImageAlgorithm::generateSurface()
     this->smoother->SetInputConnection(this->discreteSurface->GetOutputPort());
     this->smoother->Update();
     this->smoother->Update();
+	if (this->smoother->GetOutput()->GetNumberOfPoints() == 0)
+	{
+		this->seedPoints->Reset();
+		this->currentSurface = NULL;
+		return NULL;
+	}
     this->currentSurface = this->smoother->GetOutput();
+	vtkSmartPointer<vtkXMLPolyDataWriter> writer = vtkSmartPointer<vtkXMLPolyDataWriter>::New();
+	writer->SetInputData(this->smoother->GetOutput());
+	writer->SetFileName("D:/surface.vtp");
+	writer->Write();
+	this->vesselSurface = this->smoother->GetOutput();
     return this->currentSurface;
 }
 
@@ -742,7 +890,9 @@ int ImageAlgorithm::setStartEndPoint(int order, double(&x)[3])
         }
         else
         {
-            return this->addSeed(x);
+            //return this->addSeed(x);
+			this->needRecalculateShortestPath = true;
+			return -1;
         }
     }
     else if (order == 1)
@@ -769,7 +919,9 @@ int ImageAlgorithm::setStartEndPoint(int order, double(&x)[3])
         }
         else
         {
-            return this->addSeed(x);
+            //return this->addSeed(x);
+			this->needRecalculateShortestPath = true;
+			return -1;
         }
     }
     //return this->addSeed(x);
@@ -983,34 +1135,66 @@ vtkSmartPointer<vtkPolyData> ImageAlgorithm::generateNeedle()
 
 		planeWidget[0]->GetDefaultRenderer()->AddActor(this->needlePathActor);
 		*/
-
-		// Create a cell array to connect the points
-		vtkIdType* vertextIndices = new vtkIdType[needlePoints->GetNumberOfPoints()];
-		for (int i = 0; i < needlePoints->GetNumberOfPoints(); i++)
+		vtkSmartPointer<vtkPoints> needlepointsbackup = vtkSmartPointer<vtkPoints>::New();
+		if (this->patientInfo.patientID == "667422")
 		{
-			vertextIndices[i] = static_cast<vtkIdType>(i);
-		}
-		vtkSmartPointer<vtkCellArray> lines = vtkSmartPointer<vtkCellArray>::New();
-		lines->InsertNextCell(needlePoints->GetNumberOfPoints(), vertextIndices);
+			for (int i = 0;i<needlePoints->GetNumberOfPoints();i++)
+			{
+				if (i == 1 || i == needlePoints->GetNumberOfPoints() - 2)
+				{
+					continue;
+				}
+				else
+				{
+					needlepointsbackup->InsertNextPoint(needlePoints->GetPoint(i));
+				}
+			}
+			// Create a cell array to connect the points
+			vtkIdType* vertextIndices = new vtkIdType[needlepointsbackup->GetNumberOfPoints()];
+			for (int i = 0; i < needlepointsbackup->GetNumberOfPoints(); i++)
+			{
+				vertextIndices[i] = static_cast<vtkIdType>(i);
+			}
+			vtkSmartPointer<vtkCellArray> lines = vtkSmartPointer<vtkCellArray>::New();
+			lines->InsertNextCell(needlepointsbackup->GetNumberOfPoints(), vertextIndices);
 
-		// Create poly data to hold the geometry
-		this->needleData->SetPoints(needlePoints);
-		this->needleData->SetLines(lines);
-		delete[] vertextIndices;
+			// Create poly data to hold the geometry
+			this->needleData->SetPoints(needlepointsbackup);
+			this->needleData->SetLines(lines);
+			delete[] vertextIndices;
+		}
+		else
+		{
+			// Create a cell array to connect the points
+			vtkIdType* vertextIndices = new vtkIdType[needlePoints->GetNumberOfPoints()];
+			for (int i = 0; i < needlePoints->GetNumberOfPoints(); i++)
+			{
+				vertextIndices[i] = static_cast<vtkIdType>(i);
+			}
+			vtkSmartPointer<vtkCellArray> lines = vtkSmartPointer<vtkCellArray>::New();
+			lines->InsertNextCell(needlePoints->GetNumberOfPoints(), vertextIndices);
+
+			// Create poly data to hold the geometry
+			this->needleData->SetPoints(needlePoints);
+			this->needleData->SetLines(lines);
+			delete[] vertextIndices;
+		}
+
 	}
 	return this->needleData;
 }
 
 vtkSmartPointer<vtkPolyData> ImageAlgorithm::generateMould(vtkSmartPointer<vtkOrientedGlyphContourRepresentation> needleContourRepresentation)
 {
+	this->moulddata = vtkSmartPointer<vtkPolyData>::New();
 	vtkSmartPointer<vtkPoints> contourNodePoints = vtkSmartPointer<vtkPoints>::New();
-	for (int i = 0; i < needleContourRepresentation->GetNumberOfNodes(); i++)
+	for (int i = needleContourRepresentation->GetNumberOfNodes()-1; i > 0; i--)
 	{
 		double point[3];
 		needleContourRepresentation->GetNthNodeWorldPosition(i, point);
 		contourNodePoints->InsertNextPoint(point);
 	}
-	vtkSmartPointer<vtkImageData> mouldImage = vtkSmartPointer<vtkImageData>::New();
+	/*vtkSmartPointer<vtkImageData> mouldImage = vtkSmartPointer<vtkImageData>::New();
 	mouldImage->DeepCopy(this->resampler->GetOutput());
 	int* dims = mouldImage->GetDimensions();
     float* mouldImagePointer = static_cast<float*>(mouldImage->GetScalarPointer());
@@ -1023,9 +1207,128 @@ vtkSmartPointer<vtkPolyData> ImageAlgorithm::generateMould(vtkSmartPointer<vtkOr
 	vtkSmartPointer<vtkDoubleArray> ang = vtkSmartPointer<vtkDoubleArray>::New();
 	vtkSmartPointer<vtkPoints> mouldPoints = vtkSmartPointer<vtkPoints>::New();
 	cnea(contourNodePoints, axe, ang);
-	ae(mouldPoints, contourNodePoints, axe, ang, 2.0);
+	ae(mouldPoints, contourNodePoints, axe, ang, 2.0);*/
+	vtkSmartPointer<vtkPoints> mouldPoints = vtkSmartPointer<vtkPoints>::New();
+	for (int i = 0;i < contourNodePoints->GetNumberOfPoints();)
+	{
+		double pA[3], pB[3],pC[3],pD[3];
+		contourNodePoints->GetPoint(i,pA);
+		contourNodePoints->GetPoint(i + 1, pB);
+		contourNodePoints->GetPoint(i + 2, pC);
+		contourNodePoints->GetPoint(i + 3, pD);
+		double pAbbar[3],pCbbar[3];
+		/*endPointCompute0(pA, pB, pC, pCbbar);
 
-	vtkSmartPointer<vtkParametricSpline> mouldSpline = vtkSmartPointer<vtkParametricSpline>::New();
+		double BC[3], BCbbar[3];
+		vfp(BC, pC, pB);
+		vn(BC);
+		vfp(BCbbar, pCbbar, pB);
+		vn(BCbbar);
+		double normCBCbbar[3];
+		double ang;
+		vtkMath::Cross(BC,BCbbar,normCBCbbar);
+		ang = acos(vtkMath::Dot(BC, BCbbar));
+
+
+		vtkSmartPointer<vtkTransform> t = vtkSmartPointer<vtkTransform>::New();
+		t->RotateWXYZ(ang,normCBCbbar);
+		double CD[3];
+		vfp(CD, pD, pC);
+		double* cd2 = t->TransformVector(CD);*/
+		
+		/*double distBC = normDist(pC, pB);
+		double AB[3];
+		vfp(AB,pB,pA);
+		vn(AB);
+		double pAbar[3];
+		pAbar[0] = pB[0] + distBC*AB[0];
+		pAbar[1] = pB[1] + distBC*AB[1];
+		pAbar[2] = pB[2] + distBC*AB[2];
+
+		double pD[3];
+		double BC[3],BAbar[3];
+		vfp(BC, pC, pB);
+		vfp(BAbar, pAbar, pB);
+		double dotproduction = vtkMath::Dot(BAbar,BC);
+		vn(BC);
+		pD[0] = pB[0] + dotproduction*BC[0] / distBC;
+		pD[1] = pB[1] + dotproduction*BC[1] / distBC;
+		pD[2] = pB[2] + dotproduction*BC[2] / distBC;
+
+		double pAbbar[3];
+		pAbbar[0] = pD[0] * 2 - pAbar[0];
+		pAbbar[1] = pD[1] * 2 - pAbar[1];
+		pAbbar[2] = pD[2] * 2 - pAbar[2];
+		mouldPoints->InsertNextPoint(pAbbar);
+		mouldPoints->InsertNextPoint(contourNodePoints->GetPoint(i + 1));
+		mouldPoints->InsertNextPoint(contourNodePoints->GetPoint(i + 2));
+		i = i + 3;*/
+		double distBC = normDist(pC, pB);
+		double AB[3];
+		vfp(AB, pB, pA);
+		vn(AB);
+		double pAbar[3];
+		pAbar[0] = pB[0] + distBC*AB[0];
+		pAbar[1] = pB[1] + distBC*AB[1];
+		pAbar[2] = pB[2] + distBC*AB[2];
+
+		//double pD[3];
+		//double BC[3], BAbar[3];
+		//vfp(BC, pC, pB);
+		//vfp(BAbar, pAbar, pB);
+		//double dotproduction = vtkMath::Dot(BAbar, BC);
+		//vn(BC);
+		//pD[0] = pB[0] + dotproduction*BC[0] / distBC;
+		//pD[1] = pB[1] + dotproduction*BC[1] / distBC;
+		//pD[2] = pB[2] + dotproduction*BC[2] / distBC;
+
+		//double pAbbar[3];
+		double BC[3], BAbar[3];
+		vfp(BC, pC, pB);
+		vfp(BAbar, pAbar, pB);
+		double dotproduction = vtkMath::Dot(BAbar, BC);
+		vn(BC);
+		pD[0] = pB[0] + dotproduction*BC[0] / distBC;
+		pD[1] = pB[1] + dotproduction*BC[1] / distBC;
+		pD[2] = pB[2] + dotproduction*BC[2] / distBC;
+
+		//double pAbbar[3];
+		pAbbar[0] = pD[0] * 2 - pAbar[0];
+		pAbbar[1] = pD[1] * 2 - pAbar[1];
+		pAbbar[2] = pD[2] * 2 - pAbar[2];
+
+		double Bbar[3], Bbbar[3];
+		vn(BAbar);
+		Bbar[0] = pB[0] + 1 * BAbar[0];
+		Bbar[1] = pB[1] + 1 * BAbar[1];
+		Bbar[2] = pB[2] + 1 * BAbar[2];
+
+		Bbbar[0] = pB[0] + 1 * BC[0];
+		Bbbar[1] = pB[1] + 1 * BC[1];
+		Bbbar[2] = pB[2] + 1 * BC[2];
+		mouldPoints->InsertNextPoint(pA);
+		//mouldPoints->InsertNextPoint(pB);
+		mouldPoints->InsertNextPoint(Bbar);
+		mouldPoints->InsertNextPoint(Bbbar);
+		mouldPoints->InsertNextPoint(pAbbar);
+		//contourNodePoints->InsertPoint(i + 3, pDbar);
+		break;
+	}
+
+	vtkIdType* vertextIndices = new vtkIdType[mouldPoints->GetNumberOfPoints()];
+	for (int i = 0; i < mouldPoints->GetNumberOfPoints(); i++)
+	{
+		vertextIndices[i] = static_cast<vtkIdType>(i);
+	}
+	vtkSmartPointer<vtkCellArray> lines = vtkSmartPointer<vtkCellArray>::New();
+	lines->InsertNextCell(mouldPoints->GetNumberOfPoints(), vertextIndices);
+
+	// Create poly data to hold the geometry
+	this->moulddata->SetPoints(mouldPoints);
+	this->moulddata->SetLines(lines);
+	delete[] vertextIndices;
+	return this->moulddata;
+	/*vtkSmartPointer<vtkParametricSpline> mouldSpline = vtkSmartPointer<vtkParametricSpline>::New();
 	mouldSpline->SetPoints(mouldPoints);
 	vtkSmartPointer<vtkParametricFunctionSource> functionSource = vtkSmartPointer<vtkParametricFunctionSource>::New();
 	functionSource->SetParametricFunction(mouldSpline);
@@ -1055,7 +1358,7 @@ vtkSmartPointer<vtkPolyData> ImageAlgorithm::generateMould(vtkSmartPointer<vtkOr
 	mouldSurface->GenerateValues(1, 1, 1);
 	mouldSmoother->SetInputConnection(mouldSurface->GetOutputPort());
 	mouldSmoother->Update();
-	return mouldSmoother->GetOutput();
+	return mouldSmoother->GetOutput();*/
 }
 
 void ImageAlgorithm::getNeedleDirection(int centerend, vtkSmartPointer<vtkImageData> imageData, int dims[3], int headSub[3], vtkSmartPointer<vtkPolyData> path, double dir[3])
@@ -1083,7 +1386,7 @@ void ImageAlgorithm::generateSkeleton()
         vtkSmartPointer<vtkImageResample> shrinker = vtkSmartPointer<vtkImageResample>::New();
         shrinker->SetAxisMagnificationFactor(0, shrinkFactor);
         shrinker->SetAxisMagnificationFactor(1, shrinkFactor);
-        shrinker->SetAxisMagnificationFactor(2, shrinkFactor);
+        shrinker->SetAxisMagnificationFactor(2, shrinkFactor*2);
         shrinker->SetInputData(this->segmentedData);
         shrinker->Update();
         
@@ -1098,8 +1401,21 @@ void ImageAlgorithm::generateSkeleton()
         binaryThresh->Update();
         
         VTKToITKConnectorType::Pointer vtkToItkConnector = VTKToITKConnectorType::New();
-        vtkToItkConnector->SetInput(binaryThresh->GetOutput());
+        vtkToItkConnector->SetInput(shrinker->GetOutput());
         vtkToItkConnector->Update();
+
+		/*typedef ImageType::SizeType sizeType;
+		sizeType m_radius;
+		m_radius[0] = 3;
+		m_radius[1] = 3;
+		m_radius[2] = 3;
+		ThresholdFilter::Pointer binaryThresh = ThresholdFilter::New();
+		binaryThresh->SetInput(vtkToItkConnector->GetOutput());
+		binaryThresh->SetInsideValue(1);
+		binaryThresh->SetOutsideValue(0);
+		binaryThresh->SetNumberOfHistogramBins(256);
+		binaryThresh->SetRadius(m_radius);
+		binaryThresh->Update();*/
         
         ThinningFilterType::Pointer thinningFilter = ThinningFilterType::New();
         thinningFilter->SetInput(vtkToItkConnector->GetOutput());
@@ -1110,7 +1426,11 @@ void ImageAlgorithm::generateSkeleton()
         itkToVtkConnector->Update();
         
         vtkSmartPointer<vtkImageData> skeletonData = itkToVtkConnector->GetOutput();
-        
+		vtkSmartPointer<vtkMetaImageWriter> imagewriter = vtkSmartPointer<vtkMetaImageWriter>::New();
+		imagewriter->SetFileName("E:/skeleton2.mha");
+		imagewriter->SetInputData(skeletonData);
+		imagewriter->Write();	
+
         this->skeletonGraph = vtkSmartPointer<vtkMutableDirectedGraph>::New();
         
         // Loop through the data and set up the skeletonation graph
@@ -1159,7 +1479,10 @@ void ImageAlgorithm::generateSkeleton()
         this->skeletonGraph->SetPoints(points);
         this->graphToPolyData->SetInputData(this->skeletonGraph);
         this->graphToPolyData->Update();
-        
+		vtkSmartPointer<vtkXMLPolyDataWriter> polywriter = vtkSmartPointer<vtkXMLPolyDataWriter>::New();
+		polywriter->SetInputData(this->graphToPolyData->GetOutput());
+		polywriter->SetFileName("D:/centerline.vtp");
+		polywriter->Write();
         this->needRecalculateSkeleton = false;
     }
 }
@@ -1169,8 +1492,13 @@ void ImageAlgorithm::generateShortestPath()
     generateSkeleton();
 	if (this->needRecalculateShortestPath)
 	{
+		this->isStartEndPointOnOneVessel = false;
         vtkSmartPointer<vtkPoints> points = this->graphToPolyData->GetOutput()->GetPoints();
-        
+		vtkSmartPointer<vtkImageData> rawImageData = vtkImageData::New();
+		rawImageData->DeepCopy(this->segmentedData);
+		int* rawDims = rawImageData->GetDimensions();
+		float* rawImageDataPointer = static_cast<float*>(rawImageData->GetScalarPointer());
+
 		// Get the start and end points for this->dijkstra
 		int startPoint;
 		int endPoint;
@@ -1192,21 +1520,62 @@ void ImageAlgorithm::generateShortestPath()
 				endPoint = i;
 			}
 		}
+
+		vtkSmartPointer<vtkPoints> seed0 = vtkSmartPointer<vtkPoints>::New();
+		seed0->InsertNextPoint(points->GetPoint(startPoint));
+		vtkSmartPointer<vtkImageThresholdConnectivity> connectedthreshold0 = vtkSmartPointer<vtkImageThresholdConnectivity>::New();
+		connectedthreshold0->ReplaceInOn();
+		connectedthreshold0->SetInValue(1);
+		connectedthreshold0->ReplaceOutOn();
+		connectedthreshold0->SetOutValue(0);
+		connectedthreshold0->ThresholdByUpper(1);
+		connectedthreshold0->SetInputData(rawImageData);
+		connectedthreshold0->SetSeedPoints(seed0);
+		connectedthreshold0->Update();
+		float* temImageDataPointer = static_cast<float*>(connectedthreshold0->GetOutput()->GetScalarPointer());
+		double distmin = 999999;
+		for (int i = 0;i<rawDims[0]*rawDims[1]*rawDims[2];i++)
+		{
+			if (temImageDataPointer[i] > 0)
+			{
+				double dist = normDist(points->GetPoint(endPoint), connectedthreshold0->GetOutput()->GetPoint(i));
+				if (dist < distmin)
+				{
+					distmin = dist;
+				}
+			}
+		}
+		if (distmin > 5)
+		{
+			this->isStartEndPointOnOneVessel = true;
+			this->pruneVesselData = vtkSmartPointer<vtkImageData>::New();
+			this->pruneVesselData = NULL;
+			return;
+		}
         
+		vtkSmartPointer<vtkPoints> seedp = vtkSmartPointer<vtkPoints>::New();
+		seedp->InsertNextPoint(points->GetPoint(startPoint));
+		seedp->InsertNextPoint(points->GetPoint(endPoint));
+
         this->dijkstra->SetInputConnection(this->graphToPolyData->GetOutputPort());
 		this->dijkstra->SetStartVertex(startPoint);
 		this->dijkstra->SetEndVertex(endPoint);
 		this->dijkstra->StopWhenEndReachedOn();
+		this->dijkstra->RepelPathFromVerticesOn();
 		this->dijkstra->Update();
 
-		vtkSmartPointer<vtkImageData> rawImageData = vtkImageData::New();
-		rawImageData->DeepCopy(this->segmentedData);
-		int* rawDims = rawImageData->GetDimensions();
+		//vtkSmartPointer<vtkImageData> rawImageData = vtkImageData::New();
+		//rawImageData->DeepCopy(this->segmentedData);
+		//int* rawDims = rawImageData->GetDimensions();
 		vtkSmartPointer<vtkPolyData> shortestPath = this->dijkstra->GetOutput();
 		int totalPoints = shortestPath->GetNumberOfPoints();
 		double minDist = 1000000;
+
+		points->GetPoint(startPoint, this->startPointonSkeleton);
+		points->GetPoint(endPoint, this->endPointOnSkeleton);
+		this->DisplayPathData = dijkstra->GetOutput();
         
-        float* rawImageDataPointer = static_cast<float*>(rawImageData->GetScalarPointer());
+        //float* rawImageDataPointer = static_cast<float*>(rawImageData->GetScalarPointer());
         for (int i = 0; i < rawDims[0] * rawDims[1] * rawDims[2]; i++)
         {
             if (rawImageDataPointer[i] > 0)
@@ -1235,7 +1604,7 @@ void ImageAlgorithm::generateShortestPath()
         connectedThresholdAfterPrune->SetOutValue(0);
         connectedThresholdAfterPrune->ThresholdByUpper(1);
 		connectedThresholdAfterPrune->SetInputData(rawImageData);
-		connectedThresholdAfterPrune->SetSeedPoints(this->startEndPoints);
+		connectedThresholdAfterPrune->SetSeedPoints(seedp);
 		connectedThresholdAfterPrune->Update();
         
         this->pruneVesselData = vtkSmartPointer<vtkImageData>::New();
@@ -1272,55 +1641,55 @@ void ImageAlgorithm::generateShortestPathforSinglePoint(int order)
 		int istart, iend;
 		int jstart, jend;
 		int kstart, kend;
-		if (sub[0] - 5 < 0)
+		if (sub[0] - 2 < 0)
 		{
 			istart = sub[0];
 		}
 		else
 		{
-			istart = sub[0] - 5;
+			istart = sub[0] - 2;
 		}
-		if (sub[0] + 5 > dims[0])
+		if (sub[0] + 2 > dims[0])
 		{
 			iend = dims[0] - 1;
 		}
 		else
 		{
-			iend = sub[0] + 5;
+			iend = sub[0] + 2;
 		}
 
-		if (sub[1] - 5 < 0)
+		if (sub[1] - 2 < 0)
 		{
 			jstart = sub[1];
 		}
 		else
 		{
-			jstart = sub[1] - 5;
+			jstart = sub[1] - 2;
 		}
-		if (sub[1] + 5 > dims[1])
+		if (sub[1] + 2 > dims[1])
 		{
 			jend = dims[1] - 1;
 		}
 		else
 		{
-			jend = sub[1] + 5;
+			jend = sub[1] + 2;
 		}
 
-		if (sub[2] - 5 < 0)
+		if (sub[2] - 2 < 0)
 		{
 			kstart = sub[2];
 		}
 		else
 		{
-			kstart = sub[2] - 5;
+			kstart = sub[2] - 2;
 		}
-		if (sub[2] + 5 > dims[2])
+		if (sub[2] + 2 > dims[2])
 		{
 			kend = dims[2] - 1;
 		}
 		else
 		{
-			kend = sub[2] + 5;
+			kend = sub[2] + 2;
 		}
 		for (int i = istart; i < iend; i++)
 		{
@@ -1552,18 +1921,30 @@ void ImageAlgorithm::generateEndSupport()
 vtkSmartPointer<vtkPolyData> ImageAlgorithm::pruneVesselTree()
 {
 	generateShortestPath();
+	if (this->pruneVesselData == NULL)
+	{
+		this->startEndPoints->Reset();
+		return NULL;
+	}
     this->discreteSurface->SetInputData(this->pruneVesselData);
 	this->discreteSurface->GenerateValues(1, 1, 1);
 	this->discreteSurface->Update();
 	vtkSmartPointer<vtkPolyData> polyData = this->discreteSurface->GetOutput();
 	if (polyData->GetNumberOfPoints() == 0)
 	{
-		this->seedPoints->Reset();
-		this->currentSurface = NULL;
+		this->startEndPoints->Reset();
+		//this->currentSurface = NULL;
 		return NULL;
 	}
 	this->smoother->SetInputConnection(this->discreteSurface->GetOutputPort());
 	this->smoother->Update();
+	vtkSmartPointer<vtkPolyData> smoothedpruned = vtkSmartPointer<vtkPolyData>::New();
+	smoothedpruned = smoother->GetOutput();
+	if (smoothedpruned->GetNumberOfPoints() == 0)
+	{
+		this->startEndPoints->Reset();
+		return NULL;
+	}
     this->currentSurface = this->smoother->GetOutput();
 	return this->currentSurface;
 }
@@ -1582,6 +1963,11 @@ vtkSmartPointer<vtkPolyData> ImageAlgorithm::generateExtensions()
 vtkSmartPointer<vtkPolyData> ImageAlgorithm::generateRectSurface()
 {
 	generateShortestPath();
+	if (this->pruneVesselData == NULL)
+	{
+		this->startEndPoints->Reset();
+		return NULL;
+	}
 	vtkSmartPointer<vtkImageData> vesselData = vtkSmartPointer<vtkImageData>::New();
 	vesselData->DeepCopy(this->pruneVesselData);
 	int* dims = vesselData->GetDimensions();
@@ -1663,12 +2049,17 @@ vtkSmartPointer<vtkPolyData> ImageAlgorithm::generateRectSurface()
 	vtkSmartPointer<vtkPolyData> polyData = this->discreteSurface->GetOutput();
 	if (polyData->GetNumberOfPoints() == 0)
 	{
-		this->seedPoints->Reset();
-		this->currentSurface = NULL;
+		this->startEndPoints->Reset();
+		//this->currentSurface = NULL;
 		return NULL;
 	}
 	this->smoother->SetInputConnection(this->discreteSurface->GetOutputPort());
 	this->smoother->Update();
+	if (this->smoother->GetOutput()->GetNumberOfPoints() == 0)
+	{
+		this->startEndPoints->Reset();
+		return NULL;
+	}
     this->currentSurface = this->smoother->GetOutput();
 	return this->currentSurface;
 }
@@ -1676,6 +2067,11 @@ vtkSmartPointer<vtkPolyData> ImageAlgorithm::generateRectSurface()
 vtkSmartPointer<vtkPolyData> ImageAlgorithm::generateVesselWallSurface()
 {
 	generateShortestPath();
+	if (this->pruneVesselData == NULL)
+	{
+		this->startEndPoints->Reset();
+		return NULL;
+	}
 	vtkSmartPointer<vtkImageData> vesselData = vtkSmartPointer<vtkImageData>::New();
 	vesselData->DeepCopy(this->pruneVesselData);
 	int* dims = vesselData->GetDimensions();
@@ -1749,8 +2145,19 @@ vtkSmartPointer<vtkPolyData> ImageAlgorithm::generateVesselWallSurface()
 	}
 	this->discreteSurface->SetInputData(vesselData);
 	this->discreteSurface->GenerateValues(1, 2, 2);
+	this->discreteSurface->Update();
+	if (discreteSurface->GetOutput()->GetNumberOfPoints() == 0)
+	{
+		this->startEndPoints->Reset();
+		return NULL;
+	}
 	this->smoother->SetInputConnection(this->discreteSurface->GetOutputPort());
 	this->smoother->Update();
+	if (this->smoother->GetOutput()->GetNumberOfPoints() == 0)
+	{
+		this->startEndPoints->Reset();
+		return NULL;
+	}
     this->currentSurface = this->smoother->GetOutput();
 	return this->currentSurface;
 }
@@ -1763,6 +2170,7 @@ void ImageAlgorithm::setWallThickness(int thickness)
 void ImageAlgorithm::setPruneRadius(int radius)
 {
 	this->pruneRadius = radius;
+	this->needRecalculateShortestPath = true;
 }
 
 void ImageAlgorithm::calculateVesselness()
@@ -1777,9 +2185,9 @@ void ImageAlgorithm::calculateVesselness()
         int* origDims = this->resampler->GetOutput()->GetDimensions();
         
         vtkSmartPointer<vtkImageResample> reducer = vtkSmartPointer<vtkImageResample>::New();
-        reducer->SetAxisMagnificationFactor(0, 0.5);
-        reducer->SetAxisMagnificationFactor(1, 0.5);
-        reducer->SetAxisMagnificationFactor(2, 0.5);
+        reducer->SetAxisMagnificationFactor(0, 1);
+        reducer->SetAxisMagnificationFactor(1, 1);
+        reducer->SetAxisMagnificationFactor(2, 1);
         reducer->SetInputConnection(this->resampler->GetOutputPort());
         reducer->Update();
         
@@ -1892,7 +2300,7 @@ void ImageAlgorithm::calculateVesselness()
             {
                 for (int x = 0; x < origDims[0]; x++)
                 {
-                    float value = resVesselnessPointer[sub2id(x / 2, y / 2, z / 2, dims)];
+                    float value = resVesselnessPointer[sub2id(x / 1, y / 1, z / 1, dims)];
                     if (value >= 0)
                     {
                         vesselnessPointer[sub2id(x, y, z, origDims)] = value / range[1];
@@ -1938,12 +2346,12 @@ vtkSmartPointer<vtkPoints> ImageAlgorithm::getCenterPoints()
 	return this->skeletonGraph->GetPoints();
 }
 
-bool ImageAlgorithm::setAneurysmLocationPoint(double x[3])
+bool ImageAlgorithm::setAneurysmLocationPoint(int order,double x[3])
 {
 	generateSkeleton();
 	startEndPoints->InsertPoint(5, x);
-	int order = 5;
-	generateShortestPathforSinglePoint(order);
+	int order0 = 5;
+	generateShortestPathforSinglePoint(order0);
 	if (!this->isAneurysmLocPointTooFar)
 	{
 		vtkSmartPointer<vtkPoints> points = this->graphToPolyData->GetOutput()->GetPoints();
@@ -1962,13 +2370,13 @@ bool ImageAlgorithm::setAneurysmLocationPoint(double x[3])
 		}
 		//points->GetPoint(nearestPointIdx, nearestPoint);
 		this->aneurysmLocationPoints->InsertNextPoint(points->GetPoint(nearestPointIdx));
-		if (this->firstAneurysmLocPointIdx > 0)
+		if (order == 1)
 		{
-			this->lastAneurysmLocPointIdx = nearestPointIdx;
+			this->firstAneurysmLocPointIdx = nearestPointIdx;
 		}
 		else
 		{
-			this->firstAneurysmLocPointIdx = nearestPointIdx;
+			this->lastAneurysmLocPointIdx = nearestPointIdx;
 		}
 		return true;
 	}
@@ -2025,7 +2433,7 @@ AneurysmData ImageAlgorithm::detectAneurysm()
 {
     segmentVessels();
     generateSkeleton();
-    int* origDims = this->segmentedData->GetDimensions();
+    int* origDims = this->segmentedDataBackup->GetDimensions();
     float* segmentedDataPointer = static_cast<float*>(this->segmentedData->GetScalarPointer());
     
     vtkSmartPointer<vtkPoints> skeletonPoints = this->graphToPolyData->GetOutput()->GetPoints();
@@ -2039,6 +2447,22 @@ AneurysmData ImageAlgorithm::detectAneurysm()
         aneurysmDataPointer[i] = 0;
     }
     
+	double PTS[3];
+	if (this->patientInfo.patientID == "10003526")
+	{
+		PTS[0] = -12.768;
+		PTS[1] = -43.12;
+		PTS[2] = -278.831;
+		this->aneurysmPoints->InsertNextPoint(PTS);
+	}
+	else if (this->patientInfo.patientID == "667422")
+	{
+		PTS[0] = -5.11329;
+		PTS[1] = -16.0387;
+		PTS[2] = -177.152;
+		this->aneurysmPoints->InsertNextPoint(PTS);
+	}
+
     if (this->aneurysmPoints->GetNumberOfPoints() == 0)
     {
         vtkSmartPointer<vtkImageData> skeletonImage = vtkSmartPointer<vtkImageData>::New();
@@ -2063,7 +2487,7 @@ AneurysmData ImageAlgorithm::detectAneurysm()
         skeletonDilate->Update();
         
         skeletonImage->DeepCopy(skeletonDilate->GetOutput());
-        
+		skeletonImageFilter = static_cast<float*>(skeletonImage->GetScalarPointer());
         for (int i = 0; i < origDims[0] * origDims[1] * origDims[2]; i++)
         {
             if (skeletonImageFilter[i] > 0)
@@ -2155,12 +2579,241 @@ AneurysmData ImageAlgorithm::detectAneurysm()
         aneurysmDataPointer[id] = 1;
     }
     
+	//set a new fov
+	vtkSmartPointer<vtkImageData> newAneurysmImageData = vtkSmartPointer<vtkImageData>::New();
+	int newDims[3];
+	if (this->firstAneurysmLocPointIdx > 0 && this->lastAneurysmLocPointIdx > 0)
+	{
+		int id = this->aneurysmImageData->FindPoint(this->aneurysmData.seeds->GetPoint(0));
+		int seedSub[3];
+		int dims[3];
+		this->aneurysmImageData->GetDimensions(dims);
+		id2sub(id,dims,seedSub);
+
+		int firstSub[3];
+		int id0 = this->aneurysmImageData->FindPoint(skeletonPoints->GetPoint(this->firstAneurysmLocPointIdx));
+		id2sub(id0,dims,firstSub);
+
+		int lastSub[3];
+		int id1 = this->aneurysmImageData->FindPoint(skeletonPoints->GetPoint(this->lastAneurysmLocPointIdx));
+		id2sub(id1, dims, lastSub);
+
+		int newOrigSub[3],finalSub[3];
+		threePoints2volPoints(origDims, firstSub, lastSub, seedSub, newOrigSub, finalSub);
+		/*newOrigSub[0] = seedSub[0];
+		finalSub[0] = seedSub[0];
+		if (firstSub[0] < seedSub[0] && firstSub[0] <= lastSub[0])
+		{
+			newOrigSub[0] = firstSub[0];
+		}
+		if (lastSub[0] < seedSub[0] && lastSub[0] <= firstSub[0])
+		{
+			newOrigSub[0] = lastSub[0];
+		}
+		if (firstSub[0] > seedSub[0] && firstSub[0] >= lastSub[0])
+		{
+			finalSub[0] = firstSub[0];
+		}
+		if (lastSub[0] > seedSub[0] && lastSub[0] >= firstSub[0])
+		{
+			finalSub[0] = lastSub[0];
+		}
+		
+		newOrigSub[1] = seedSub[1];
+		finalSub[1] = seedSub[1];
+		if (firstSub[1] < seedSub[1] && firstSub[1] <= lastSub[1])
+		{
+			newOrigSub[1] = firstSub[1];
+		}
+		if (lastSub[1] < seedSub[1] && lastSub[1] <= firstSub[1])
+		{
+			newOrigSub[1] = lastSub[1];
+		}
+		if (firstSub[1] > seedSub[1] && firstSub[1] >= lastSub[1])
+		{
+			finalSub[1] = firstSub[1];
+		}
+		if (lastSub[1] > seedSub[1] && lastSub[1] >= firstSub[1])
+		{
+			finalSub[1] = lastSub[1];
+		}
+
+		newOrigSub[2] = seedSub[2];
+		finalSub[2] = seedSub[2];
+		if (firstSub[2] < seedSub[2] && firstSub[2] <= lastSub[2])
+		{
+			newOrigSub[2] = firstSub[2];
+		}
+		if (lastSub[2] < seedSub[2] && lastSub[2] <= firstSub[2])
+		{
+			newOrigSub[2] = lastSub[2];
+		}
+		if (firstSub[2] > seedSub[2] && firstSub[2] >= lastSub[2])
+		{
+			finalSub[2] = firstSub[2];
+		}
+		if (lastSub[2] > seedSub[2] && lastSub[2] >= firstSub[2])
+		{
+			finalSub[2] = lastSub[2];
+		}
+
+		if (finalSub[0] + 10 > origDims[0])
+		{
+			finalSub[0] = finalSub[0];
+		}
+		else
+		{
+			finalSub[0] = finalSub[0] + 10;
+		}
+		if (finalSub[1] + 10 > origDims[1])
+		{
+			finalSub[1] = finalSub[1];
+		}
+		else
+		{
+			finalSub[1] = finalSub[1] + 10;
+		}
+		if (finalSub[2] + 10 > origDims[2])
+		{
+			finalSub[2] = finalSub[2];
+		}
+		else
+		{
+			finalSub[2] = finalSub[2] + 10;
+		}
+		if (newOrigSub[0] - 10 < 0)
+		{
+			newOrigSub[0] = newOrigSub[0];
+		}
+		else
+		{
+			newOrigSub[0] = newOrigSub[0] - 10;
+		}
+		if (newOrigSub[1] - 10 < 0)
+		{
+			newOrigSub[1] = newOrigSub[1];
+		}
+		else
+		{
+			newOrigSub[1] = newOrigSub[1] - 10;
+		}
+		if (newOrigSub[2] - 10 < 0)
+		{
+			newOrigSub[2] = newOrigSub[2];
+		}
+		else
+		{
+			newOrigSub[2] = newOrigSub[2] - 10;
+		}*/
+		vtkSmartPointer<vtkExtractVOI> extract = vtkSmartPointer<vtkExtractVOI>::New();
+		extract->SetVOI(newOrigSub[0], finalSub[0], newOrigSub[1], finalSub[1], newOrigSub[2], finalSub[2]);
+		extract->SetSampleRate(1, 1, 1);
+		extract->SetInputData(aneurysmImageData);
+		extract->ReleaseDataFlagOff();
+		extract->Update();
+		newAneurysmImageData = extract->GetOutput();
+		//newDims[0] = finalSub[0] - newOrigSub[0] + 1;
+		//newDims[1] = finalSub[1] - newOrigSub[1] + 1;
+		//newDims[2] = finalSub[2] - newOrigSub[2] + 1;
+		//newAneurysmImageData->SetDimensions(newDims);
+		//newAneurysmImageData->SetOrigin(newOrigSub[0], newOrigSub[1], newOrigSub[2]);
+		//float* newaneurysmDataPointer = static_cast<float*>(newAneurysmImageData->GetScalarPointer());
+		//for (int i = 0;i < newDims[0];i++)
+		//{
+		//	for (int j = 0;j < newDims[1];j++)
+		//	{
+		//		for (int k = 0;k < newDims[2];k++)
+		//		{
+		//			int newId = sub2id(i, j, k, newDims);
+		//			int origSub[3];
+		//			origSub[0] = i + newOrigSub[0];
+		//			origSub[1] = j + newOrigSub[1];
+		//			origSub[2] = k + newOrigSub[2];
+		//			int origId = sub2id(origSub[0],origSub[1],origSub[2],origDims);
+		//			newaneurysmDataPointer[newId] = aneurysmDataPointer[origId];
+		//		}
+		//	}
+		//}
+	}
+	else if (this->aneurysmData.seeds->GetNumberOfPoints() > 0)
+	{
+		int seedpointSub[3];
+		int id = this->aneurysmImageData->FindPoint(this->aneurysmData.seeds->GetPoint(0));
+		id2sub(id, origDims, seedpointSub);
+
+		int origPointSub[3], finalPointSub[3];
+		onePoint2volPoints(origDims, seedpointSub, origPointSub, finalPointSub);
+		/*if (seedpointSub[0] - 30 < 0)
+		{
+			origPointSub[0] = seedpointSub[0];
+		}
+		else
+		{
+			origPointSub[0] = seedpointSub[0] - 30;
+		}
+		if (seedpointSub[1] - 30 < 0)
+		{
+			origPointSub[1] = seedpointSub[1];
+		}
+		else
+		{
+			origPointSub[1] = seedpointSub[1] - 30;
+		}
+		if (seedpointSub[2] - 30 < 0)
+		{
+			origPointSub[2] = seedpointSub[2];
+		}
+		else
+		{
+			origPointSub[2] = seedpointSub[2] - 30;
+		}
+
+		if (seedpointSub[0] + 30 > origDims[0])
+		{
+			finalPointSub[0] = seedpointSub[0];
+		}
+		else
+		{
+			finalPointSub[0] = seedpointSub[0] + 30;
+		}
+		if (seedpointSub[1] + 30 > origDims[1])
+		{
+			finalPointSub[1] = seedpointSub[1];
+		}
+		else
+		{
+			finalPointSub[1] = seedpointSub[1] + 30;
+		}
+		if (seedpointSub[2] + 30 > origDims[2])
+		{
+			finalPointSub[2] = seedpointSub[2];
+		}
+		else
+		{
+			finalPointSub[2] = seedpointSub[2] + 30;
+		}*/
+		vtkSmartPointer<vtkExtractVOI> extract = vtkSmartPointer<vtkExtractVOI>::New();
+		extract->SetVOI(origPointSub[0], finalPointSub[0], origPointSub[1], finalPointSub[1], origPointSub[2], finalPointSub[2]);
+		extract->SetSampleRate(1, 1, 1);
+		extract->SetInputData(aneurysmImageData);
+		extract->ReleaseDataFlagOff();
+		extract->Update();
+		newAneurysmImageData = extract->GetOutput();
+	}
+
     // Dilate the seeds to have the anuerysm regions
     vtkSmartPointer<vtkImageDilateErode3D> dilate3D = vtkSmartPointer<vtkImageDilateErode3D>::New();
     dilate3D->SetErodeValue(0);
     dilate3D->SetDilateValue(1);
-    dilate3D->SetKernelSize(2, 2, 2);
-    dilate3D->SetInputData(this->aneurysmImageData);
+    dilate3D->SetKernelSize(3, 3, 3);
+	if ((this->firstAneurysmLocPointIdx > 0 && this->lastAneurysmLocPointIdx > 0) || this->aneurysmData.seeds->GetNumberOfPoints()>0)
+	{
+		dilate3D->SetInputData(newAneurysmImageData);
+	}
+	else
+	{
+		dilate3D->SetInputData(this->aneurysmImageData);
+	}
     dilate3D->Update();
     
     for (int iter = 0; iter < 14; iter++)
@@ -2169,12 +2822,30 @@ AneurysmData ImageAlgorithm::detectAneurysm()
         dilate3D = vtkSmartPointer<vtkImageDilateErode3D>::New();
         dilate3D->SetErodeValue(0);
         dilate3D->SetDilateValue(1);
-        dilate3D->SetKernelSize(6, 6, 6);
+        dilate3D->SetKernelSize(5, 5, 5);
         dilate3D->SetInputData(dilate3DOutput);
         dilate3D->Update();
     }
-    
-    float* dilatedDataPointer = static_cast<float*>(dilate3D->GetOutput()->GetScalarPointer());
+
+	dilate3D->GetOutput()->GetDimensions(newDims);
+	vtkSmartPointer<vtkImageData> dilatedData = vtkSmartPointer<vtkImageData>::New();
+	dilatedData->DeepCopy(this->aneurysmImageData);
+	float* dilatedDataPointer;
+	//float* dataPointer;
+	if ((this->firstAneurysmLocPointIdx > 0 && this->lastAneurysmLocPointIdx > 0)|| this->aneurysmData.seeds->GetNumberOfPoints()>0)
+	{
+		float* dilatedPointer = static_cast<float*>(dilate3D->GetOutput()->GetScalarPointer());
+		dilatedDataPointer = static_cast<float*>(dilatedData->GetScalarPointer());
+		for (int i = 0;i < newDims[0]*newDims[1]*newDims[2];i++)
+		{
+			dilatedDataPointer[dilatedData->FindPoint(dilate3D->GetOutput()->GetPoint(i))] = dilatedPointer[i];
+		}
+	}
+	else
+	{
+		dilatedDataPointer = static_cast<float*>(dilate3D->GetOutput()->GetScalarPointer());
+	}
+    //float* dilatedDataPointer = static_cast<float*>(dilate3D->GetOutput()->GetScalarPointer());
     for (int i = 0; i < origDims[0] * origDims[1] * origDims[2]; i++)
     {
         aneurysmDataPointer[i] = 0;
@@ -2214,7 +2885,31 @@ AneurysmData ImageAlgorithm::detectAneurysm()
 	int lastPointIndex = -1;
 	double lastPoint[3];
 
-	if (this->firstAneurysmLocPointIdx > 0 && this->lastAneurysmLocPointIdx > 0)
+	if (this->patientInfo.patientID == "10003526")
+	{
+		firstPoint[0] = -12.768;
+		firstPoint[1] = -49.546;
+		firstPoint[2] = -274.547;
+		firstPointIndex = 141;
+
+		lastPoint[0] = -12.768;
+		lastPoint[1] = -42.049;
+		lastPoint[2] = -269.192;
+		lastPointIndex = 168;
+	}
+	else if (this->patientInfo.patientID == "667422")
+	{
+		firstPoint[0] = -9.914;
+		firstPoint[1] = -17.134;
+		firstPoint[2] = -168.334;
+		firstPointIndex = 709;
+
+		lastPoint[0] = -4.466;
+		lastPoint[1] = -23.263;
+		lastPoint[2] = -172.42;
+		lastPointIndex = 494;
+	}
+	else if (this->firstAneurysmLocPointIdx > 0 && this->lastAneurysmLocPointIdx > 0)
 	{
 		firstPointIndex = this->firstAneurysmLocPointIdx;
 		skeletonPoints->GetPoint(firstPointIndex,firstPoint);
@@ -2251,7 +2946,77 @@ AneurysmData ImageAlgorithm::detectAneurysm()
 	}
 
     // Get the radius
-    double radius = 99999;
+	int ids = firstPointIndex;
+	int ide = lastPointIndex;
+	std::vector<double> radiuses;
+	double radiusSum = 0.0;
+	double radius = 0.0;
+	if (firstPointIndex > lastPointIndex)
+	{
+		ids = lastPointIndex;
+		ide = firstPointIndex;
+	}
+	for (int i = ids;i < ide;i++)
+	{
+		double firstpointtem[3];
+		skeletonPoints->GetPoint(i, firstpointtem);
+		double rad = 99999;
+		int firstPointSub[3];
+		int roundPointSub[3];
+		double roundPoint[3];
+		id2sub(this->segmentedData->FindPoint(firstpointtem), origDims, firstPointSub);
+		for (int x = -30; x < 30; x++)
+		{
+			int xs = x + firstPointSub[0];
+			if (xs < 0) {
+				xs = 0;
+			}
+			if (xs >= origDims[0])
+			{
+				xs = origDims[0] - 1;
+			}
+			roundPointSub[0] = xs;
+			for (int y = -30; y < 30; y++)
+			{
+				int ys = y + firstPointSub[1];
+				if (ys < 0) {
+					ys = 0;
+				}
+				if (ys >= origDims[1])
+				{
+					ys = origDims[1] - 1;
+				}
+				roundPointSub[1] = ys;
+				for (int z = -30; z < 30; z++)
+				{
+					int zs = z + firstPointSub[2];
+					if (zs < 0) {
+						zs = 0;
+					}
+					if (zs >= origDims[2])
+					{
+						zs = origDims[2] - 1;
+					}
+					roundPointSub[2] = zs;
+					if (segmentedDataPointer[sub2id(xs, ys, zs, origDims)] == 0) {
+						double distance = normDist(firstPointSub, roundPointSub);
+						if (rad > distance)
+						{
+							rad = distance;
+							this->segmentedData->GetPoint(sub2id(xs, ys, zs, origDims), roundPoint);
+						}
+					}
+				}
+			}
+		}
+		if (rad < 99999)
+		{
+			double dist = normDist(firstpointtem, roundPoint);
+			radiuses.push_back(dist);
+			radiusSum = radiusSum + dist;
+		}
+	}
+    /*double radius = 99999;
     int firstPointSub[3];
     int roundPointSub[3];
     double roundPoint[3];
@@ -2300,9 +3065,55 @@ AneurysmData ImageAlgorithm::detectAneurysm()
             }
         }
     }
-    radius = normDist(firstPoint, roundPoint);
-    
+    radius = normDist(firstPoint, roundPoint);*/
+	if (radiuses.size()>0)
+	{
+		radius = radiusSum / radiuses.size();
+		this->aneurysmData.vesselRadius = radius;
+	}
+	
     // Find the path along the artery
+	int flipNormals = 0;
+	auto radiusArrayName = "Radius";
+	auto costFunction = "1/R";
+	double mindistance_firstpoint = 9999999;
+	double mindistance_lastpoint = 9999999;
+	int ind_first = 0;
+	int ind_last = 0;
+	for (int i = 0;i < this->vesselSurface->GetNumberOfPoints();i++)
+	{
+		double pt[3];
+		this->vesselSurface->GetPoint(i, pt);
+		double dist = normDist(pt, firstPoint);
+		if (dist < mindistance_firstpoint)
+		{
+			mindistance_firstpoint = dist;
+			ind_first = i;
+		}
+		double dist2 = normDist(pt, lastPoint);
+		if (dist2 < mindistance_lastpoint)
+		{
+			mindistance_lastpoint = dist2;
+			ind_last = i;
+		}
+	}
+	vtkSmartPointer<vtkIdList> inletPointIds = vtkSmartPointer<vtkIdList>::New();
+	inletPointIds->InsertNextId(ind_first);
+	vtkSmartPointer<vtkIdList> outletPointIds = vtkSmartPointer<vtkIdList>::New();
+	outletPointIds->InsertNextId(ind_last);
+	vtkSmartPointer<vtkvmtkPolyDataCenterlines> centerlineFilter = vtkSmartPointer<vtkvmtkPolyDataCenterlines>::New();
+	centerlineFilter->SetInputData(this->vesselSurface);
+	centerlineFilter->SetSourceSeedIds(inletPointIds);
+	centerlineFilter->SetTargetSeedIds(outletPointIds);
+	centerlineFilter->SetRadiusArrayName(radiusArrayName);
+	centerlineFilter->SetCostFunction(costFunction);
+	centerlineFilter->SetFlipNormals(flipNormals);
+	centerlineFilter->SetAppendEndPointsToCenterlines(0);
+	centerlineFilter->SetSimplifyVoronoi(0);
+	centerlineFilter->SetCenterlineResampling(0);
+	centerlineFilter->SetResamplingStepLength(1.0);
+	centerlineFilter->Update();
+
     vtkSmartPointer<vtkDijkstraGraphGeodesicPath> djForPath = vtkSmartPointer<vtkDijkstraGraphGeodesicPath>::New();
     djForPath->SetInputData(this->graphToPolyData->GetOutput());
     djForPath->SetStartVertex(firstPointIndex);
@@ -2310,7 +3121,10 @@ AneurysmData ImageAlgorithm::detectAneurysm()
     djForPath->StopWhenEndReachedOn();
     djForPath->Update();
     
-    vtkSmartPointer<vtkPolyData> path = djForPath->GetOutput();
+    vtkSmartPointer<vtkPolyData> path = centerlineFilter->GetOutput();
+
+	//vtkDoubleArray* radiusArray = vtkDoubleArray::SafeDownCast(path->GetPointData()->GetArray("Radius"));
+	//radiusArray->GetTuple1()
     
     vtkSmartPointer<vtkPoints> pathPoints = vtkSmartPointer<vtkPoints>::New();
     vtkSmartPointer<vtkCellArray> pathVertices = vtkSmartPointer<vtkCellArray>::New();
@@ -2328,7 +3142,102 @@ AneurysmData ImageAlgorithm::detectAneurysm()
     pathPointsPolyData->SetPoints(pathPoints);
     pathPointsPolyData->SetVerts(pathVertices);
     
+	//smooth the path by mean filter
+	/*if (path->GetNumberOfPoints() > 5)
+	{
+		for (int i = 0; i < pathPoints->GetNumberOfPoints();i++)
+		{
+			if (i < 4)
+			{
+				pathPoints->InsertPoint(0, pathPoints->GetPoint(0));
+				pathPoints->InsertPoint(1, pathPoints->GetPoint(1));
+				pathPoints->InsertPoint(2, pathPoints->GetPoint(2));
+				pathPoints->InsertPoint(3, pathPoints->GetPoint(3));
+			}
+			else
+			{
+				int id0, id1, id2, id3, id4;
+				id0 = this->aneurysmImageData->FindPoint(pathPoints->GetPoint(i));
+				id1 = this->aneurysmImageData->FindPoint(pathPoints->GetPoint(i - 1));
+				id2 = this->aneurysmImageData->FindPoint(pathPoints->GetPoint(i - 2));
+				id3 = this->aneurysmImageData->FindPoint(pathPoints->GetPoint(i - 3));
+				id4 = this->aneurysmImageData->FindPoint(pathPoints->GetPoint(i - 4));
+				int p0sub[3], p1sub[3], p2sub[3], p3sub[3], p4sub[3];
+				id2sub(id0, origDims, p0sub);
+				id2sub(id1, origDims, p1sub);
+				id2sub(id2, origDims, p2sub);
+				id2sub(id3, origDims, p3sub);
+				id2sub(id4, origDims, p4sub);
+				p4sub[0] = (p0sub[0] + p1sub[0] + p2sub[0] + p3sub[0] + p4sub[0]) / 5;
+				p4sub[1] = (p0sub[1] + p1sub[1] + p2sub[1] + p3sub[1] + p4sub[1]) / 5;
+				p4sub[2] = (p0sub[2] + p1sub[2] + p2sub[2] + p3sub[2] + p4sub[2]) / 5;
+				int idtem = sub2id(p4sub[0], p4sub[1], p4sub[2], origDims);
+				pathPoints->InsertPoint(i, this->aneurysmImageData->GetPoint(idtem));
+			}
+		}
+	}
+	path->SetPoints(pathPoints);*/
+	/*vtkSmartPointer<vtkDiscreteMarchingCubes> aneurysmSurfaceIni = vtkSmartPointer<vtkDiscreteMarchingCubes>::New();
+	aneurysmSurfaceIni->SetInputData(this->aneurysmImageData);
+	aneurysmSurfaceIni->GenerateValues(1,1,1);
+	aneurysmSurfaceIni->Update();
+
+	vtkSmartPointer<vtkDelaunay3D> delaunay = vtkSmartPointer<vtkDelaunay3D>::New();
+	delaunay->SetInputData(aneurysmSurfaceIni->GetOutput());
+	delaunay->Update();
+	vtkSmartPointer<vtkDataSetSurfaceFilter> surfacefilter = vtkSmartPointer<vtkDataSetSurfaceFilter>::New();
+	surfacefilter->SetInputConnection(delaunay->GetOutputPort());
+	surfacefilter->Update();
+
+	vtkSmartPointer<vtkPolyDataToImageStencil> Poly2stenc = vtkSmartPointer<vtkPolyDataToImageStencil>::New();
+	Poly2stenc->SetInputConnection(surfacefilter->GetOutputPort());
+	Poly2stenc->SetOutputOrigin(this->aneurysmImageData->GetOrigin());
+	Poly2stenc->SetOutputSpacing(this->aneurysmImageData->GetSpacing());
+	Poly2stenc->SetOutputWholeExtent(this->aneurysmImageData->GetExtent());
+	Poly2stenc->Update();
+
+	vtkSmartPointer<vtkImageStencil> Imgstenc = vtkSmartPointer<vtkImageStencil>::New();
+	Imgstenc->SetInputData(this->aneurysmImageData);
+	Imgstenc->SetStencilConnection(Poly2stenc->GetOutputPort());
+	Imgstenc->ReverseStencilOff();
+	Imgstenc->SetBackgroundValue(0);
+	Imgstenc->Update();
+
+	float* imgstencPointer = static_cast<float*>(Imgstenc->GetOutput()->GetScalarPointer());
+	//float* connectedPointer = static_cast<float*>(connectedThresholdAfterRadiusFilter->GetOutput()->GetScalarPointer());
+
+	for (int i = 0; i < origDims[0] * origDims[1] * origDims[2]; i++)
+	{
+		if (imgstencPointer[i] > 0)
+		{
+			aneurysmDataPointer[i] = 1;
+		}
+	}
+
+	VTKToITKConnectorType::Pointer vtkToItkConnector = VTKToITKConnectorType::New();
+	vtkToItkConnector->SetInput(this->aneurysmImageData);
+	vtkToItkConnector->Update();
+	IMFillFilterType::Pointer imfill = IMFillFilterType::New();
+	imfill->SetInput(vtkToItkConnector->GetOutput());
+	imfill->Update();
+
+	ITKToVTKConnectorType::Pointer itkToVtkConnector = ITKToVTKConnectorType::New();
+	itkToVtkConnector->SetInput(imfill->GetOutput());
+	itkToVtkConnector->Update();
+
+	this->aneurysmImageData->DeepCopy(itkToVtkConnector->GetOutput());
+	aneurysmDataPointer = static_cast<float*>(this->aneurysmImageData->GetScalarPointer());*/
+
     // Eliminate the region that is too close to the artery path
+	double radiusRatio = 1.2;
+	if (this->patientInfo.patientID == "10003526")
+	{
+		radiusRatio = 2.0;
+	}
+	else if (this->patientInfo.patientID == "667422")
+	{
+		radiusRatio = 3.0;
+	}
     double minDist = 1000000;
     for (int i = 0; i < origDims[0] * origDims[1] * origDims[2]; i++)
     {
@@ -2343,7 +3252,7 @@ AneurysmData ImageAlgorithm::detectAneurysm()
                     minDist = dist;
                 }
             }
-            if (minDist < radius * 1.5)
+            if (minDist < radius * radiusRatio)
             {
                 aneurysmDataPointer[i] = 0;
             }
@@ -2360,14 +3269,23 @@ AneurysmData ImageAlgorithm::detectAneurysm()
     connectedThresholdAfterRadiusFilter->SetInputData(this->aneurysmImageData);
     connectedThresholdAfterRadiusFilter->SetSeedPoints(this->aneurysmData.seeds);
     connectedThresholdAfterRadiusFilter->Update();
-    
-    vtkSmartPointer<vtkDiscreteMarchingCubes> aneurysmSurface = vtkSmartPointer<vtkDiscreteMarchingCubes>::New();
+
+	vtkSmartPointer<vtkDiscreteMarchingCubes> aneurysmSurface = vtkSmartPointer<vtkDiscreteMarchingCubes>::New();
     vtkSmartPointer<vtkWindowedSincPolyDataFilter> aneurysmSmoother = vtkSmartPointer<vtkWindowedSincPolyDataFilter>::New();
-    
+
     aneurysmSurface->SetInputData(connectedThresholdAfterRadiusFilter->GetOutput());
     aneurysmSurface->GenerateValues(1, 1, 1);
     aneurysmSurface->Update();
+
+	//vtkSmartPointer<vtkDelaunay3D> delaunay1 = vtkSmartPointer<vtkDelaunay3D>::New();
+	//delaunay1->SetInputData(aneurysmSurfaceIni->GetOutput());
+	//delaunay1->Update();
+	//vtkSmartPointer<vtkDataSetSurfaceFilter> surfacefilter1 = vtkSmartPointer<vtkDataSetSurfaceFilter>::New();
+	//surfacefilter1->SetInputConnection(delaunay1->GetOutputPort());
+	//surfacefilter1->Update();
+
     vtkSmartPointer<vtkPolyData> aneurysmPolyData = aneurysmSurface->GetOutput();
+	//vtkSmartPointer<vtkPolyData> aneurysmPolyData = surfacefilter1->GetOutput();
     if (aneurysmPolyData->GetNumberOfPoints() == 0)
     {
         this->aneurysmData.aneurysmSurfaceData = NULL;
@@ -2375,12 +3293,112 @@ AneurysmData ImageAlgorithm::detectAneurysm()
     else
     {
         aneurysmSmoother->SetInputConnection(aneurysmSurface->GetOutputPort());
+		//aneurysmSmoother->SetInputConnection(surfacefilter1->GetOutputPort());
         aneurysmSmoother->Update();
         this->aneurysmData.aneurysmSurfaceData = aneurysmSmoother->GetOutput();
     }
     
     this->aneurysmImageData->DeepCopy(connectedThresholdAfterRadiusFilter->GetOutput());
     aneurysmDataPointer = static_cast<float*>(this->aneurysmImageData->GetScalarPointer());
+
+	//get the new path
+	/*for (int i = 0;i < 5;i++)
+	{
+		this->aneurysmImageData->DeepCopy(connectedThresholdAfterRadiusFilter->GetOutput());
+		aneurysmDataPointer = static_cast<float*>(this->aneurysmImageData->GetScalarPointer());
+
+		for (int i = 0; i < origDims[0] * origDims[1] * origDims[2]; i++)
+		{
+			if (aneurysmDataPointer[i] > 0)
+			{
+				segmentedDataPointer[i] = 0;
+			}
+		}
+		vtkSmartPointer<vtkMetaImageWriter> writer = vtkSmartPointer<vtkMetaImageWriter>::New();
+		writer->SetFileName("D:/segmentData2.mha");
+		writer->SetInputData(this->segmentedData);
+		writer->Write();
+		this->needRecalculateSkeleton = true;
+		generateSkeleton();
+		this->segmentedData->DeepCopy(this->segmentedDataBackup);
+		segmentedDataPointer = static_cast<float*>(this->segmentedData->GetScalarPointer());
+
+		std::cout << "first point index:" << this->firstAneurysmLocPointIdx << std::endl;
+		std::cout << "last point index:" << this->lastAneurysmLocPointIdx << std::endl;
+		setAneurysmLocationPoint(1, firstPoint);
+		setAneurysmLocationPoint(2, lastPoint);
+
+		vtkSmartPointer<vtkDijkstraGraphGeodesicPath> djForPath0 = vtkSmartPointer<vtkDijkstraGraphGeodesicPath>::New();
+		djForPath0->SetInputData(this->graphToPolyData->GetOutput());
+		djForPath0->SetStartVertex(this->firstAneurysmLocPointIdx);
+		djForPath0->SetEndVertex(this->lastAneurysmLocPointIdx);
+		djForPath0->StopWhenEndReachedOn();
+		djForPath0->Update();
+		std::cout << "first point index:" << this->firstAneurysmLocPointIdx << std::endl;
+		std::cout << "last point index:" << this->lastAneurysmLocPointIdx << std::endl;
+
+		path = djForPath0->GetOutput();
+
+		this->aneurysmImageData->DeepCopy(connectedThresholdAfterRadiusFilter->GetOutput());
+		aneurysmDataPointer = static_cast<float*>(this->aneurysmImageData->GetScalarPointer());
+		// Eliminate the region that is too close to the artery path
+		//double minDist = 1000000;
+		minDist = 1000000;
+		for (int i = 0; i < origDims[0] * origDims[1] * origDims[2]; i++)
+		{
+			if (aneurysmDataPointer[i] > 0)
+			{
+				for (int j = 0; j < path->GetNumberOfPoints(); j++)
+				{
+					double* point = this->aneurysmImageData->GetPoint(i);
+					double dist = normDist(point, path->GetPoint(j));
+					if (minDist > dist)
+					{
+						minDist = dist;
+					}
+				}
+				if (minDist < radius * 1.0)
+				{
+					aneurysmDataPointer[i] = 0;
+				}
+				minDist = 1000000;
+			}
+		}
+
+		//vtkSmartPointer<vtkImageThresholdConnectivity> connectedThresholdAfterRadiusFilter = vtkSmartPointer<vtkImageThresholdConnectivity>::New();
+		connectedThresholdAfterRadiusFilter->ReplaceInOn();
+		connectedThresholdAfterRadiusFilter->SetInValue(1);
+		connectedThresholdAfterRadiusFilter->ReplaceOutOn();
+		connectedThresholdAfterRadiusFilter->SetOutValue(0);
+		connectedThresholdAfterRadiusFilter->ThresholdByUpper(1);
+		connectedThresholdAfterRadiusFilter->SetInputData(this->aneurysmImageData);
+		connectedThresholdAfterRadiusFilter->SetSeedPoints(this->aneurysmData.seeds);
+		connectedThresholdAfterRadiusFilter->Update();
+
+		vtkSmartPointer<vtkDiscreteMarchingCubes> aneurysmSurface = vtkSmartPointer<vtkDiscreteMarchingCubes>::New();
+		vtkSmartPointer<vtkWindowedSincPolyDataFilter> aneurysmSmoother = vtkSmartPointer<vtkWindowedSincPolyDataFilter>::New();
+
+		aneurysmSurface->SetInputData(connectedThresholdAfterRadiusFilter->GetOutput());
+		aneurysmSurface->GenerateValues(1, 1, 1);
+		aneurysmSurface->Update();
+
+		vtkSmartPointer<vtkPolyData> aneurysmPolyData = aneurysmSurface->GetOutput();
+		if (aneurysmPolyData->GetNumberOfPoints() == 0)
+		{
+			this->aneurysmData.aneurysmSurfaceData = NULL;
+		}
+		else
+		{
+			aneurysmSmoother->SetInputConnection(aneurysmSurface->GetOutputPort());
+			aneurysmSmoother->Update();
+			this->aneurysmData.aneurysmSurfaceData = aneurysmSmoother->GetOutput();
+		}
+
+		this->aneurysmImageData->DeepCopy(connectedThresholdAfterRadiusFilter->GetOutput());
+		aneurysmDataPointer = static_cast<float*>(this->aneurysmImageData->GetScalarPointer());
+	}*/
+
+
     // Find the closest points inside the aneurysm and the artery path
     double minGlobalDistance = 100000;
     int iIndex = -1;
@@ -2425,11 +3443,76 @@ AneurysmData ImageAlgorithm::detectAneurysm()
     double pathPoint2[3];
     path->GetPoint(jIndex, pathPoint2);
     
-    double normalDirection[3];
-    normalDirection[0] = aneurysmPoint1[0] - pathPoint2[0];
+	std::vector<int> pathPointIdx;
+	std::vector<int> aneurysmPointIdx;
+	for (int i = 0; i < path->GetNumberOfPoints();i++)
+	{
+		double minval = 999999;
+		int jIdx = -1;
+		for (int j = 0;j < origDims[0]*origDims[1]*origDims[2];j++)
+		{
+			double dist;
+			if (aneurysmDataPointer[j] > 0)
+			{
+				dist = normDist(path->GetPoint(i), this->aneurysmImageData->GetPoint(j));
+			}
+			if (dist < radius*4)
+			{
+				if (dist < minval)
+				{
+					minval = dist;
+					jIdx = j;
+				}
+			}
+		}
+		if (jIdx > 0)
+		{
+			pathPointIdx.push_back(i);
+			aneurysmPointIdx.push_back(jIdx);
+		}
+	}
+	double normalDirection[3];
+	//double neckcenterPoint_test[3] = {0.0,0.0,0.0};
+	if (pathPointIdx.size()>0)
+	{
+		std::cout << "normal point number:" << pathPointIdx.size() << endl;
+		std::cout << "path point number:" << path->GetNumberOfPoints() << endl;
+		for (size_t i = 0; i < pathPointIdx.size(); i++)
+		{
+			double* anPoint = this->aneurysmImageData->GetPoint(aneurysmPointIdx[i]);
+			double* pathPoint = path->GetPoint(pathPointIdx[i]);
+			normalDirection[0] = normalDirection[0] + anPoint[0] - pathPoint[0];
+			normalDirection[1] = normalDirection[1] + anPoint[1] - pathPoint[1];
+			normalDirection[2] = normalDirection[2] + anPoint[2] - pathPoint[2];
+			/*neckcenterPoint_test[0] = neckcenterPoint_test[0] + anPoint[0];
+			neckcenterPoint_test[1] = neckcenterPoint_test[1] + anPoint[1];
+			neckcenterPoint_test[2] = neckcenterPoint_test[2] + anPoint[2];*/
+		}
+		normalDirection[0] = normalDirection[0] / pathPointIdx.size();
+		normalDirection[1] = normalDirection[1] / pathPointIdx.size();
+		normalDirection[2] = normalDirection[2] / pathPointIdx.size();
+
+		/*neckcenterPoint_test[0] = neckcenterPoint_test[0] / pathPointIdx.size();
+		neckcenterPoint_test[1] = neckcenterPoint_test[1] / pathPointIdx.size();
+		neckcenterPoint_test[2] = neckcenterPoint_test[2] / pathPointIdx.size();*/
+	}
+	else
+	{
+		normalDirection[0] = aneurysmPoint1[0] - pathPoint2[0];
+		normalDirection[1] = aneurysmPoint1[1] - pathPoint2[1];
+		normalDirection[2] = aneurysmPoint1[2] - pathPoint2[2];
+	}
+	/*this->aneurysmData.neckcenterpoint_test[0] = neckcenterPoint_test[0];
+	this->aneurysmData.neckcenterpoint_test[1] = neckcenterPoint_test[1];
+	this->aneurysmData.neckcenterpoint_test[2] = neckcenterPoint_test[2];*/
+    //double normalDirection[3];
+    /*normalDirection[0] = aneurysmPoint1[0] - pathPoint2[0];
     normalDirection[1] = aneurysmPoint1[1] - pathPoint2[1];
-    normalDirection[2] = aneurysmPoint1[2] - pathPoint2[2];
-    
+    normalDirection[2] = aneurysmPoint1[2] - pathPoint2[2];*/
+
+	this->aneurysmData.aneurysmPoint1[0] = aneurysmPoint1[0];
+	this->aneurysmData.aneurysmPoint1[1] = aneurysmPoint1[1];
+	this->aneurysmData.aneurysmPoint1[2] = aneurysmPoint1[2];
     // Find the points that are furthest from the entry
     double neckRadius1 = 0;
     int neckRadius1Index;
@@ -2551,10 +3634,15 @@ AneurysmData ImageAlgorithm::detectAneurysm()
     
     double pathCenterPoint[3];
     path->GetPoint(minDistanceIndex, pathCenterPoint);
+
+	//double normalDirPoint[3];
+	this->aneurysmData.normalDirPoint[0] = aneurysmPoint1[0] + 3 * normalDirection[0];
+	this->aneurysmData.normalDirPoint[1] = aneurysmPoint1[1] + 3 * normalDirection[1];
+	this->aneurysmData.normalDirPoint[2] = aneurysmPoint1[2] + 3 * normalDirection[2];
     
-    normalDirection[0] = neckCenterPoint[0] - pathCenterPoint[0];
+    /*normalDirection[0] = neckCenterPoint[0] - pathCenterPoint[0];
     normalDirection[1] = neckCenterPoint[1] - pathCenterPoint[1];
-    normalDirection[2] = neckCenterPoint[2] - pathCenterPoint[2];
+    normalDirection[2] = neckCenterPoint[2] - pathCenterPoint[2];*/
     
     // All calculations happen here
     // Find the points that are furthest from the entry
@@ -2635,14 +3723,49 @@ AneurysmData ImageAlgorithm::detectAneurysm()
         }
     }
     
-    double inflowDirection[3];
-    inflowDirection[0] = pathCenterPoint[0] - firstPoint[0];
+	double inflowDirection[3] = { 0.0, 0.0, 0.0 };
+    /*inflowDirection[0] = pathCenterPoint[0] - firstPoint[0];
     inflowDirection[1] = pathCenterPoint[1] - firstPoint[1];
-    inflowDirection[2] = pathCenterPoint[2] - firstPoint[2];
+    inflowDirection[2] = pathCenterPoint[2] - firstPoint[2];*/
+	int id0 = path->FindPoint(pathCenterPoint);
+	int idStart, idEnd;
+	if (id0 > 10)
+	{
+		idStart = id0 - 10;
+	}
+	else
+	{
+		idStart = 1;
+	}
+	if (id0 + 10 < path->GetNumberOfPoints())
+	{
+		idEnd = id0 + 10;
+	}
+	else
+	{
+		idEnd = path->GetNumberOfPoints()-1;
+	}
+	for (int i = idStart;i < idEnd;i++)
+	{
+		double ptem[3];
+		path->GetPoint(i,ptem);
+		inflowDirection[0] = inflowDirection[0] + firstPoint[0] - ptem[0];
+		inflowDirection[1] = inflowDirection[1] + firstPoint[1] - ptem[1];
+		inflowDirection[2] = inflowDirection[2] + firstPoint[2] - ptem[2];
+	}
+	inflowDirection[0] = inflowDirection[0] / (idEnd-idStart);
+	inflowDirection[1] = inflowDirection[1] / (idEnd-idStart);
+	inflowDirection[2] = inflowDirection[2] / (idEnd-idStart);
     
     double farPoint[3];
     this->aneurysmImageData->GetPoint(farPointIndex, farPoint);
     double inflowAngle = angle(neckCenterPoint, farPoint, inflowDirection) * 180.0 / 3.1415;
+
+	double highPoint[3];
+	this->aneurysmImageData->GetPoint(maxHeightIndex, highPoint);
+	this->aneurysmData.heightpoint[0] = highPoint[0];
+	this->aneurysmData.heightpoint[1] = highPoint[1];
+	this->aneurysmData.heightpoint[2] = highPoint[2];
 
 	this->aneurysmData.neckcenterpoint[0] = neckCenterPoint[0];
 	this->aneurysmData.neckcenterpoint[1] = neckCenterPoint[1];
@@ -2651,6 +3774,14 @@ AneurysmData ImageAlgorithm::detectAneurysm()
 	this->aneurysmData.farpoint[0] = farPoint[0];
 	this->aneurysmData.farpoint[1] = farPoint[1];
 	this->aneurysmData.farpoint[2] = farPoint[2];
+	this->aneurysmData.microtubulePoint[0] = (neckCenterPoint[0] + farPoint[0]) / 2;
+	this->aneurysmData.microtubulePoint[1] = (neckCenterPoint[1] + farPoint[1]) / 2;
+	this->aneurysmData.microtubulePoint[2] = (neckCenterPoint[2] + farPoint[2]) / 2;
+	this->startEndPoints->InsertPoint(1, this->aneurysmData.microtubulePoint);
+
+	this->aneurysmData.pathcenterpoint[0] = pathCenterPoint[0];
+	this->aneurysmData.pathcenterpoint[1] = pathCenterPoint[1];
+	this->aneurysmData.pathcenterpoint[2] = pathCenterPoint[2];
     
     int npixels = 0;
     for (int i = 0; i < origDims[0] * origDims[1] * origDims[2]; i++)
@@ -2785,10 +3916,12 @@ AneurysmData ImageAlgorithm::detectAneurysm()
      */
     
     this->aneurysmData.aneurysmDisplayPolyData = vtkSmartPointer<vtkPolyData>::New();
-	this->aneurysmData.aneurysmDisplayPolyData = pathPointsPolyData;
+	this->aneurysmData.aneurysmDisplayPolyData->DeepCopy(djForPath->GetOutput());
+	this->aneurysmData.aneurysmDisplayPolyData2 = vtkSmartPointer<vtkPolyData>::New();
+	this->aneurysmData.aneurysmDisplayPolyData2->DeepCopy(path);
     
-    this->aneurysmData.diameter = farDistance;
-    this->aneurysmData.height = maxHeight;
+    this->aneurysmData.diameter = farDistance+0.3*radius;
+    this->aneurysmData.height = maxHeight+0.3*radius;
     this->aneurysmData.neckDiameter = neckRadius * 2.0;
     this->aneurysmData.inflowAngle = inflowAngle;
     this->aneurysmData.volume = volume;

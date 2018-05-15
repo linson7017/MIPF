@@ -30,6 +30,7 @@ struct AneurysmData
 {
     vtkSmartPointer<vtkPolyData> aneurysmSurfaceData;
     vtkSmartPointer<vtkPolyData> aneurysmDisplayPolyData;
+	vtkSmartPointer<vtkPolyData> aneurysmDisplayPolyData2;
     vtkSmartPointer<vtkPoints> seeds;
     double diameter;
     double height;
@@ -38,10 +39,18 @@ struct AneurysmData
     double inflowAngle;
 	double neckcenterpoint[3];
 	double farpoint[3];
+	double pathcenterpoint[3];
+	double heightpoint[3];
+	double aneurysmPoint1[3];
+	double normalDirPoint[3];
+	double vesselRadius;
+	double microtubulePoint[3];
+	//double neckcenterpoint_test[3];
 };
 
 struct PatientInfo
 {
+	std::string seriesInstanceUID;
 	std::string patientID;
 	std::string modality;
 	std::string studyID;
@@ -93,9 +102,10 @@ public:
 	bool isStartEndPointTooClose;
 	bool isAneurysmPointTooFar;
 	bool isAneurysmLocPointTooFar;
+	bool isStartEndPointOnOneVessel;
     
     bool addAneurysmPoint(double x[3]);
-	bool setAneurysmLocationPoint(double x[3]);
+	bool setAneurysmLocationPoint(int order,double x[3]);
     
     AneurysmData detectAneurysm();
 
@@ -114,6 +124,10 @@ public:
 	void setWallThickness(int thickness);
 	void setPruneRadius(int radius);
 
+	double startPointonSkeleton[3];
+	double endPointOnSkeleton[3];
+	vtkSmartPointer<vtkPolyData> DisplayPathData;
+
 private: 
 	int imageType; // 0 - DSA, 1 - CTA, 2 - MRA
 	double lowerth;
@@ -130,6 +144,7 @@ private:
 	int lastAneurysmLocPointIdx = -1;
     vtkSmartPointer<vtkIntArray> skeletonNeighbors;
     vtkSmartPointer<vtkPolyData> currentSurface;
+	vtkSmartPointer<vtkPolyData> vesselSurface;
 	vtkSmartPointer<vtkPolyData> currentSurfaceShowing;
     
     AneurysmData aneurysmData;
@@ -144,8 +159,10 @@ private:
     vtkSmartPointer<vtkPoints> aneurysmPoints;
 	vtkSmartPointer<vtkPoints> aneurysmLocationPoints;
     vtkSmartPointer<vtkImageData> segmentedData;
+	vtkSmartPointer<vtkImageData> segmentedDataBackup;
 	vtkSmartPointer<vtkImageData> inputData;
 	vtkSmartPointer<vtkPolyData> needleData;
+	vtkSmartPointer<vtkPolyData> moulddata;
     vtkSmartPointer<vtkImageData> tubeImageData;
 	
 	//vtkSmartPointer<vtkMarchingCubes> mouldsurface;

@@ -247,7 +247,7 @@ void DSAHistogramView::Apply()
 //        ++iter;
 //        ++targetIterator;
 //    }
-//    MITK_INFO << "BR of "<< sliceIndex<<" :" << br;
+//    QF_INFO << "BR of "<< sliceIndex<<" :" << br;
 //
 //
 //    const unsigned int MeasurementVectorSize = 1; // Grayscale
@@ -280,7 +280,7 @@ void DSAHistogramView::Apply()
 //        samples[i] = QwtIntervalSample((double)histogram->GetFrequency(i) / totalNum, interval);
 //        brightness += ((double)histogram->GetFrequency(i) / (double)totalNum)*i;
 //    }
-//    MITK_INFO << "brightness:" << brightness;
+//    QF_INFO << "brightness:" << brightness;
 //    m_histogram->setData(new QwtIntervalSeriesData(samples));
 //
 //

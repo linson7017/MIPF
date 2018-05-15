@@ -7,6 +7,7 @@
 #include <mitkIOUtil.h>
 #include "MitkMain/IQF_MitkDataManager.h"
 #include "iqf_main.h"
+#include "qf_log.h"
 
 IQF_MitkPointList* PointListFactory::CreatePointList()
 {
@@ -49,16 +50,13 @@ void PointList::Initialize()
 mitk::DataNode::Pointer PointList::CreateNewPointSetNode()
 {
     mitk::PointSet::Pointer pointSet = mitk::PointSet::New();
-    if (m_PointSetNode.IsNull())
-    {
-        m_PointSetNode = mitk::DataNode::New();
-    }
-    m_PointSetNode->SetData(pointSet);
-    m_PointSetNode->SetName("seed points for tracking");
-    m_PointSetNode->SetProperty("helper object", mitk::BoolProperty::New(true));
-    m_PointSetNode->SetProperty("layer", mitk::IntProperty::New(1024));
-
-    return m_PointSetNode;
+    mitk::DataNode::Pointer node = mitk::DataNode::New();
+    node->SetData(pointSet);
+    node->SetName("PointSetNode");
+    node->SetProperty("helper object", mitk::BoolProperty::New(true));
+    node->SetProperty("layer", mitk::IntProperty::New(1024));
+    m_PointSetNode = node;
+    return node;
 }
 
 void PointList::AddPoint(bool bAdd)
@@ -90,6 +88,11 @@ void PointList::AddPoint(bool bAdd)
         }
         
     }
+}
+
+void PointList::SetSingleMode(bool bSingleMode)
+{
+    m_bSingleMode = bSingleMode;
 }
 
 bool PointList::InsertPoint(const double x, const double y, const double z)
@@ -127,22 +130,40 @@ void PointList::SetPointSetNode(mitk::DataNode *newNode)
     mitk::PointSet::Pointer pointSet = this->CheckForPointSetInNode(m_PointSetNode);
     if (pointSet.IsNotNull())
     {
-        // add new observer for modified if necessary
-        itk::ReceptorMemberCommand<PointList>::Pointer modCommand =
-            itk::ReceptorMemberCommand<PointList>::New();
-        modCommand->SetCallbackFunction(this, &PointList::OnPointSetChanged);
-        m_PointSetModifiedObserverTag = pointSet->AddObserver(itk::ModifiedEvent(), modCommand);
-
+        if (!pointSet->HasObserver(itk::ModifiedEvent()))
+        {
+            // add new observer for modified if necessary
+            m_modCommand = itk::ReceptorMemberCommand<PointList>::New();
+            m_modCommand->SetCallbackFunction(this, &PointList::OnPointSetChanged);
+            m_PointSetModifiedObserverTag = pointSet->AddObserver(itk::ModifiedEvent(), m_modCommand);
+        }
         // add new observer for detele if necessary
-        itk::ReceptorMemberCommand<PointList>::Pointer delCommand =
-            itk::ReceptorMemberCommand<PointList>::New();
-        delCommand->SetCallbackFunction(this, &PointList::OnPointSetDeleted);
-        m_PointSetDeletedObserverTag = pointSet->AddObserver(itk::DeleteEvent(), delCommand);
+       /* m_delCommand = itk::ReceptorMemberCommand<PointList>::New();
+        m_delCommand->SetCallbackFunction(this, &PointList::OnPointSetDeleted);
+        m_PointSetDeletedObserverTag = pointSet->AddObserver(itk::DeleteEvent(), m_delCommand);*/
     }
     else
     {
         m_PointSetModifiedObserverTag = 0;
         m_PointSetDeletedObserverTag = 0;
+    }
+}
+
+void PointList::EnableCallback()
+{
+    mitk::PointSet::Pointer pointSet = this->CheckForPointSetInNode(m_PointSetNode);
+    if (pointSet.IsNotNull())
+    {
+        m_modCommand->SetCallbackFunction(this, &PointList::OnPointSetChanged);
+    }
+}
+
+void  PointList::DisableCallback()
+{
+    mitk::PointSet::Pointer pointSet = this->CheckForPointSetInNode(m_PointSetNode);
+    if (pointSet.IsNotNull())
+    {
+        m_modCommand->SetCallbackFunction(this, NULL);
     }
 }
 
@@ -152,8 +173,25 @@ void PointList::OnPointSetChanged(const itk::EventObject &e)
     if (ps)
     {
         int selectedIndex = ps->SearchSelectedPoint();
-        m_pSubject->Notify(MITK_MESSAGE_POINTLIST_CHANGED, selectedIndex, ps.GetPointer());
-    }  
+        mitk::Point3D tempPoint;
+        if (ps->IndexExists(selectedIndex))
+        {
+            if (m_bSingleMode)
+            {
+                mitk::Point3D p = ps->GetPoint(selectedIndex);
+                DisableCallback();
+                while (ps->GetMaxId()!=ps->End())
+                {
+                    ps->RemovePointAtEnd();
+                }
+                ps->InsertPoint(0, p);
+                //MITK_INFO << "Points number: " << ps->GetPointSet()->GetNumberOfPoints();
+                selectedIndex = 0;
+                EnableCallback();
+            }
+            m_pSubject->Notify(MITK_MESSAGE_POINTLIST_CHANGED, selectedIndex, ps.GetPointer());
+        }
+    }
 }
 
 void PointList::OnPointSetDeleted(const itk::EventObject &e)

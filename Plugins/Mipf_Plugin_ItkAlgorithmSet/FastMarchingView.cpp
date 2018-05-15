@@ -11,6 +11,8 @@
 
 #include "mitkImageCast.h"
 
+#include "qf_log.h"
+
 
 
 FastMarchingView::FastMarchingView() :m_pResultNode(nullptr)
@@ -120,7 +122,7 @@ void FastMarchingView::OnImageSelectionChanged(const mitk::DataNode *node)
 
 void FastMarchingView::SeedPointsChanged()
 {
-    MITK_INFO << "Seed Points Changed";
+    QF_INFO << "Seed Points Changed";
      if (!m_ui.DataSelector->GetSelectedNode())
      {
          return;
@@ -205,7 +207,7 @@ void FastMarchingView::SeedPointsChanged()
      }
      catch (itk::ExceptionObject &excep)
      {
-         MITK_ERROR << "Exception caught: " << excep.GetDescription();
+         QF_ERROR << "Exception caught: " << excep.GetDescription();
 
          return;
      }

@@ -17,11 +17,14 @@ int main(int argc, char *argv[])
 {
     QApplication qtapplication(argc, argv);
 
+    std::cout << "*********************************************Initialize Main Control**************************************************" << std::endl;
     //Create IQF_Main object, meanwhile assign application entry and library path 
     QF::IQF_Main* pMain = QF::QF_CreateMainObject(qApp->applicationFilePath().toLocal8Bit().constData(),
         qApp->applicationDirPath().toLocal8Bit().constData(), false);
     //Load the launcher plugin
     pMain->Init("","init-plugins.cfg");
+    std::cout << "***************************************************Initialized*********************************************************\n" << std::endl;
+
     //Setup launcher
     QF::QF_Plugin* launcher = dynamic_cast<QF::QF_Plugin*>(QF::PluginFactory::Instance()->Create("Launcher"));
     launcher->SetMainPtr(pMain);

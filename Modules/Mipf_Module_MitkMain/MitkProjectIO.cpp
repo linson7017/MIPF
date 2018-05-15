@@ -29,6 +29,8 @@
 
 #include "itksys/SystemTools.hxx"
 
+#include "qf_log.h"
+
 MitkProjectIO::MitkProjectIO() : m_WorkingDirectory(""), m_UnzipErrors(0)
 {
 }
@@ -52,20 +54,20 @@ std::string MitkProjectIO::CreateEmptyTempDirectory()
         bool existsNot = tempdir.createDirectory();
         if (!existsNot)
         {
-            MITK_ERROR << "Warning: Directory already exitsts: " << uniquename << " (choosing another)";
+            QF_ERROR << "Warning: Directory already exitsts: " << uniquename << " (choosing another)";
             returnValue = mitk::StandardFileLocations::GetInstance()->GetOptionDirectory() + Poco::Path::separator() +
                 "MitkProjectIOTempDirectory" + uidGen.GetUID();
             uniquename = returnValue + Poco::Path::separator();
             Poco::File tempdir2(uniquename);
             if (!tempdir2.createDirectory())
             {
-                MITK_ERROR << "Warning: Second directory also already exitsts: " << uniquename;
+                QF_ERROR << "Warning: Second directory also already exitsts: " << uniquename;
             }
         }
     }
     catch (std::exception &e)
     {
-        MITK_ERROR << "Could not create temporary directory " << uniquename << ":" << e.what();
+        QF_ERROR << "Could not create temporary directory " << uniquename << ":" << e.what();
         return "";
     }
 
@@ -93,14 +95,14 @@ mitk::DataStorage::Pointer MitkProjectIO::LoadScene(const std::string &filename,
         }
         catch (...)
         {
-            MITK_ERROR << "DataStorage cannot be cleared properly.";
+            QF_ERROR << "DataStorage cannot be cleared properly.";
         }
     }
 
     // test input filename
     if (filename.empty())
     {
-        MITK_ERROR << "No filename given. Not possible to load scene.";
+        QF_ERROR << "No filename given. Not possible to load scene.";
         return storage;
     }
 
@@ -108,7 +110,7 @@ mitk::DataStorage::Pointer MitkProjectIO::LoadScene(const std::string &filename,
     std::ifstream file(filename.c_str(), std::ios::binary);
     if (!file.good())
     {
-        MITK_ERROR << "Cannot open '" << filename << "' for reading";
+        QF_ERROR << "Cannot open '" << filename << "' for reading";
         return storage;
     }
 
@@ -116,7 +118,7 @@ mitk::DataStorage::Pointer MitkProjectIO::LoadScene(const std::string &filename,
     m_WorkingDirectory = CreateEmptyTempDirectory();
     if (m_WorkingDirectory.empty())
     {
-        MITK_ERROR << "Could not create temporary directory. Cannot open scene files.";
+        QF_ERROR << "Could not create temporary directory. Cannot open scene files.";
         return storage;
     }
 
@@ -135,7 +137,7 @@ mitk::DataStorage::Pointer MitkProjectIO::LoadScene(const std::string &filename,
 
     if (m_UnzipErrors)
     {
-        MITK_ERROR << "There were " << m_UnzipErrors << " errors unzipping '" << filename
+        QF_ERROR << "There were " << m_UnzipErrors << " errors unzipping '" << filename
             << "'. Will attempt to read whatever could be unzipped.";
     }
 
@@ -144,7 +146,7 @@ mitk::DataStorage::Pointer MitkProjectIO::LoadScene(const std::string &filename,
     TiXmlDocument document(m_WorkingDirectory + mitk::IOUtil::GetDirectorySeparator() + "index.xml");
     if (!document.LoadFile())
     {
-        MITK_ERROR << "Could not open/read/parse " << m_WorkingDirectory << mitk::IOUtil::GetDirectorySeparator()
+        QF_ERROR << "Could not open/read/parse " << m_WorkingDirectory << mitk::IOUtil::GetDirectorySeparator()
             << "index.xml\nTinyXML reports: " << document.ErrorDesc() << std::endl;
         return storage;
     }
@@ -152,7 +154,7 @@ mitk::DataStorage::Pointer MitkProjectIO::LoadScene(const std::string &filename,
     mitk::SceneReader::Pointer reader = mitk::SceneReader::New();
     if (!reader->LoadScene(document, m_WorkingDirectory, storage))
     {
-        MITK_ERROR << "There were errors while loading scene file " << filename << ". Your data may be corrupted";
+        QF_ERROR << "There were errors while loading scene file " << filename << ". Your data may be corrupted";
     }
 
     // delete temp directory
@@ -163,7 +165,7 @@ mitk::DataStorage::Pointer MitkProjectIO::LoadScene(const std::string &filename,
     }
     catch (...)
     {
-        MITK_ERROR << "Could not delete temporary directory " << m_WorkingDirectory;
+        QF_ERROR << "Could not delete temporary directory " << m_WorkingDirectory;
     }
 
     // return new data storage, even if empty or uncomplete (return as much as possible but notify calling method)
@@ -176,19 +178,19 @@ bool MitkProjectIO::SaveScene(mitk::DataStorage::SetOfObjects::ConstPointer scen
 {
     if (!sceneNodes)
     {
-        MITK_ERROR << "No set of nodes given. Not possible to save scene.";
+        QF_ERROR << "No set of nodes given. Not possible to save scene.";
         return false;
     }
     if (!storage)
     {
-        MITK_ERROR << "No data storage given. Not possible to save scene."; // \TODO: Technically, it would be possible to
+        QF_ERROR << "No data storage given. Not possible to save scene."; // \TODO: Technically, it would be possible to
                                                                             // save the nodes without their relation
         return false;
     }
 
     if (filename.empty())
     {
-        MITK_ERROR << "No filename given. Not possible to save scene.";
+        QF_ERROR << "No filename given. Not possible to save scene.";
         return false;
     }
 
@@ -217,21 +219,21 @@ bool MitkProjectIO::SaveScene(mitk::DataStorage::SetOfObjects::ConstPointer scen
 
         if (sceneNodes.IsNull())
         {
-            MITK_WARN << "Saving empty scene to " << filename;
+            QF_WARN << "Saving empty scene to " << filename;
         }
         else
         {
             if (sceneNodes->size() == 0)
             {
-                MITK_WARN << "Saving empty scene to " << filename;
+                QF_WARN << "Saving empty scene to " << filename;
             }
 
-            MITK_INFO << "Storing scene with " << sceneNodes->size() << " objects to " << filename;
+            QF_INFO << "Storing scene with " << sceneNodes->size() << " objects to " << filename;
 
             m_WorkingDirectory = CreateEmptyTempDirectory();
             if (m_WorkingDirectory.empty())
             {
-                MITK_ERROR << "Could not create temporary directory. Cannot create scene files.";
+                QF_ERROR << "Could not create temporary directory. Cannot create scene files.";
                 return false;
             }
 
@@ -360,7 +362,7 @@ bool MitkProjectIO::SaveScene(mitk::DataStorage::SetOfObjects::ConstPointer scen
                 }
                 else
                 {
-                    MITK_WARN << "Ignoring NULL node during scene serialization.";
+                    QF_WARN << "Ignoring NULL node during scene serialization.";
                 }
 
                 mitk::ProgressBar::GetInstance()->Progress();
@@ -369,7 +371,7 @@ bool MitkProjectIO::SaveScene(mitk::DataStorage::SetOfObjects::ConstPointer scen
 
         if (!document.SaveFile(m_WorkingDirectory + Poco::Path::separator() + "index.xml"))
         {
-            MITK_ERROR << "Could not write scene to " << m_WorkingDirectory << Poco::Path::separator() << "index.xml"
+            QF_ERROR << "Could not write scene to " << m_WorkingDirectory << Poco::Path::separator() << "index.xml"
                 << "\nTinyXML reports '" << document.ErrorDesc() << "'";
             return false;
         }
@@ -387,7 +389,7 @@ bool MitkProjectIO::SaveScene(mitk::DataStorage::SetOfObjects::ConstPointer scen
                 std::ofstream file(filename.c_str(), std::ios::binary | std::ios::out);
                 if (!file.good())
                 {
-                    MITK_ERROR << "Could not open a zip file for writing: '" << filename << "'";
+                    QF_ERROR << "Could not open a zip file for writing: '" << filename << "'";
                     return false;
                 }
                 else
@@ -404,13 +406,13 @@ bool MitkProjectIO::SaveScene(mitk::DataStorage::SetOfObjects::ConstPointer scen
                 }
                 catch (...)
                 {
-                    MITK_ERROR << "Could not delete temporary directory " << m_WorkingDirectory;
+                    QF_ERROR << "Could not delete temporary directory " << m_WorkingDirectory;
                     return false; // ok?
                 }
             }
             catch (std::exception &e)
             {
-                MITK_ERROR << "Could not create ZIP file from " << m_WorkingDirectory << "\nReason: " << e.what();
+                QF_ERROR << "Could not create ZIP file from " << m_WorkingDirectory << "\nReason: " << e.what();
                 return false;
             }
             return true;
@@ -418,7 +420,7 @@ bool MitkProjectIO::SaveScene(mitk::DataStorage::SetOfObjects::ConstPointer scen
     }
     catch (std::exception &e)
     {
-        MITK_ERROR << "Caught exception during saving temporary files to disk. Error description: '" << e.what() << "'";
+        QF_ERROR << "Caught exception during saving temporary files to disk. Error description: '" << e.what() << "'";
         return false;
     }
 }
@@ -444,7 +446,7 @@ TiXmlElement *MitkProjectIO::SaveBaseData(mitk::BaseData *data, const std::strin
         itk::ObjectFactoryBase::CreateAllInstance(serializername.c_str());
     if (thingsThatCanSerializeThis.size() < 1)
     {
-        MITK_ERROR << "No serializer found for " << data->GetNameOfClass() << ". Skipping object";
+        QF_ERROR << "No serializer found for " << data->GetNameOfClass() << ". Skipping object";
     }
 
     for (std::list<itk::LightObject::Pointer>::iterator iter = thingsThatCanSerializeThis.begin();
@@ -464,7 +466,7 @@ TiXmlElement *MitkProjectIO::SaveBaseData(mitk::BaseData *data, const std::strin
             }
             catch (std::exception &e)
             {
-                MITK_ERROR << "Serializer " << serializer->GetNameOfClass() << " failed: " << e.what();
+                QF_ERROR << "Serializer " << serializer->GetNameOfClass() << " failed: " << e.what();
             }
             break;
         }
@@ -499,7 +501,7 @@ TiXmlElement *MitkProjectIO::SavePropertyList(mitk::PropertyList *propertyList, 
     }
     catch (std::exception &e)
     {
-        MITK_ERROR << "Serializer " << serializer->GetNameOfClass() << " failed: " << e.what();
+        QF_ERROR << "Serializer " << serializer->GetNameOfClass() << " failed: " << e.what();
     }
 
     return element;
@@ -519,12 +521,12 @@ void MitkProjectIO::OnUnzipError(const void * /*pSender*/,
     std::pair<const Poco::Zip::ZipLocalFileHeader, const std::string> &info)
 {
     ++m_UnzipErrors;
-    MITK_ERROR << "Error while unzipping: " << info.second;
+    QF_ERROR << "Error while unzipping: " << info.second;
 }
 
 void MitkProjectIO::OnUnzipOk(const void * /*pSender*/,
     std::pair<const Poco::Zip::ZipLocalFileHeader, const Poco::Path> & /*info*/)
 {
-    // MITK_INFO << "Unzipped ok: " << info.second.toString();
+    // QF_INFO << "Unzipped ok: " << info.second.toString();
 }
 

@@ -35,6 +35,7 @@ public:
     virtual mitk::DataNode::Pointer CreateNewPointSetNode();
     virtual void SetPointSetNode(mitk::DataNode *newNode);
     virtual void AddPoint(bool bAdd = true);
+    virtual void SetSingleMode(bool bSingleMode = true);
     virtual mitk::PointSet* GetPointSet();
     virtual void SavePoints();
     virtual mitk::PointSet::Pointer LoadPoints();
@@ -47,16 +48,22 @@ private:
     mitk::PointSet * CheckForPointSetInNode(mitk::DataNode *node) const;
     void OnPointSetChanged(const itk::EventObject &e);
     void OnPointSetDeleted(const itk::EventObject &e);
+    void EnableCallback();
+    void DisableCallback();
 
     mitk::DataNode::Pointer m_PointSetNode;
     int m_Orientation;
     mitk::DataInteractor::Pointer m_DataInteractor;
     int m_TimeStep;
 
+    itk::ReceptorMemberCommand<PointList>::Pointer m_modCommand;
+    itk::ReceptorMemberCommand<PointList>::Pointer m_delCommand;
+
     QF::IQF_Main* m_pMain;
     QF::IQF_Subject* m_pSubject;
 
     bool m_bAddingPoint;
+    bool m_bSingleMode;
 
     unsigned int m_PointSetModifiedObserverTag;
     unsigned int m_PointSetDeletedObserverTag;

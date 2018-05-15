@@ -19,6 +19,8 @@
 //mitk
 #include "mitkImageCast.h"
 
+#include "qf_log.h"
+
 LungSegmentationView::LungSegmentationView() :MitkPluginView() 
 {
 }
@@ -46,17 +48,17 @@ void LungSegmentationView::Apply()
 
    /* if (m_ui.DataSelector->GetSelectedNode().IsNull());
      {
-        MITK_INFO << "Null node!";
+        QF_INFO << "Null node!";
         return;
      }*/
      mitk::Image* mitkImage = dynamic_cast<mitk::Image*>(m_ui.DataSelector->GetSelectedNode()->GetData());
      if (!mitkImage)
      {
-         MITK_INFO << "Null Image!";
+         QF_INFO << "Null Image!";
          return;
      }
 
-     MITK_INFO << "Lung Segmention begin!";
+     QF_INFO << "Lung Segmention begin!";
      Float3DImageType::Pointer image;
      mitk::CastToItkImage(mitkImage, image);
 
@@ -211,7 +213,7 @@ void LungSegmentationView::Apply()
     
      for (std::set<int>::iterator it = values.begin();it!=values.end();it++,i++)
      {
-         MITK_INFO << "Active contour segment lung " << i;
+         QF_INFO << "Active contour segment lung " << i;
          uiBtImageFilterType::Pointer bt1 = uiBtImageFilterType::New();
          bt1->SetInput(labelShapeKeepNObjectsImageFilter->GetOutput());
          bt1->SetUpperThreshold(*it);

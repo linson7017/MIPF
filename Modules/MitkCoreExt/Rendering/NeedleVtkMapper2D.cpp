@@ -107,7 +107,7 @@ void NeedleVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *renderer)
     double length = (needleOrigin - needleEnd).GetVnlVector().magnitude();
     mitk::Point2D needleOrigin2d, needleEnd2d;
 
-    mitk::PlaneGeometry::ConstPointer planeGeometry = renderer->GetSliceNavigationController()->GetCurrentPlaneGeometry();
+    mitk::PlaneGeometry::ConstPointer planeGeometry = renderer->GetCurrentWorldGeometry2D();
 
     //judge if intersect
     mitk::Point3D intersectPoint;

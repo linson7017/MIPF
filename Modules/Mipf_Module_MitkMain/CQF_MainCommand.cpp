@@ -22,7 +22,7 @@
 #include "iqf_main.h"
 #include "iqf_properties.h"
 #include "iqf_property.h"
-
+#include "qf_log.h"
 //qt
 #include <QMessageBox>
 
@@ -56,7 +56,7 @@ bool CQF_MainCommand::ExecuteCommand(const char* szCommandID, QF::IQF_Properties
         mitk::DataStorage::Pointer pDataStorage = pMitkDataManager->GetDataStorage(datastorageID);
         if (pDataStorage.IsNull())
         {
-            MITK_ERROR << "Data storage with id \""<<datastorageID<<"\" does not exist!";
+            QF_ERROR << "Data storage with id \""<<datastorageID<<"\" does not exist!";
             return false;
         }
         IQF_MitkReference* pMitkReference = (IQF_MitkReference*)m_pMain->GetInterfacePtr(QF_MitkMain_Reference);
@@ -73,11 +73,15 @@ bool CQF_MainCommand::ExecuteCommand(const char* szCommandID, QF::IQF_Properties
             {
                 pDataStorage->Remove(pDataStorage->GetSubset(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object"))));
             }
-            QmitkIOUtil::Load(fileNames, *pDataStorage);
+            mitk::DataStorage::SetOfObjects::Pointer results = QmitkIOUtil::Load(fileNames, *pDataStorage);
+            if (pOutParam)
+            {
+                pOutParam->SetPtrProperty("LastLoadedDataNode", results->front().GetPointer());
+            }
         }
         catch (const mitk::Exception& e)
         {
-            MITK_ERROR << e;
+            QF_ERROR << e;
             return false;
         }
         mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(pDataStorage);
@@ -213,7 +217,7 @@ bool CQF_MainCommand::ExecuteCommand(const char* szCommandID, QF::IQF_Properties
         mitk::DataStorage::Pointer pDataStorage = pMitkDataManager->GetDataStorage(datastorageID);
         if (pDataStorage.IsNull())
         {
-            MITK_WARN << "Data storage with id \"" << datastorageID << "\" does not exist!";
+            QF_WARN << "Data storage with id \"" << datastorageID << "\" does not exist!";
             return false;
         }
         mitk::DataNode* markerNode = pDataStorage->GetNamedNode("orientation marker");
@@ -255,7 +259,7 @@ bool CQF_MainCommand::ExecuteCommand(const char* szCommandID, QF::IQF_Properties
         }
         else
         {
-            MITK_WARN << "Orientation marker in datastorage " << datastorageID << " does not exist! Please assign the path of Orientation-Marker!";
+            QF_WARN << "Orientation marker in datastorage " << datastorageID << " does not exist! Please assign the path of Orientation-Marker!";
             return false;
         }
     }
@@ -298,12 +302,16 @@ bool CQF_MainCommand::ExecuteCommand(const char* szCommandID, QF::IQF_Properties
                         pDataStorage->Remove(pDataStorage->GetSubset(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object"))));
                     }
                     pDataStorage->Add(node);
+                    if (pOutParam)
+                    {
+                        pOutParam->SetPtrProperty("LastLoadedDicomNode",node.GetPointer());
+                    }
                 }
             }    
         }
         catch (const mitk::Exception& e)
         {
-            MITK_ERROR << e;
+            QF_ERROR << e;
             return false;
         }
         mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(pDataStorage);

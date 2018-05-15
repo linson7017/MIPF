@@ -80,6 +80,8 @@
 #include <itkShiftScaleImageFilter.h>
 
 
+#include "qf_log.h"
+
 // Convenient Definitions
 typedef itk::Image<short, 3>                                                            ImageType;
 typedef itk::Image<unsigned char, 3>                                                    SegmentationImageType;
@@ -1340,8 +1342,8 @@ void BasicImageProcessView::StartButton2Clicked()
             }
             catch (const itk::ExceptionObject &e)
             {
-                MITK_WARN << "Updating resampling filter failed. ";
-                MITK_WARN << "REASON: " << e.what();
+                QF_WARN << "Updating resampling filter failed. ";
+                QF_WARN << "REASON: " << e.what();
             }
 
             DoubleImageType::Pointer resampledImage = resampleFilter->GetOutput();

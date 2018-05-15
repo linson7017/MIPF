@@ -89,3 +89,5 @@ add_subdirectory(Mipf_Plugin_DSATool)
 add_subdirectory(Mipf_Plugin_Test)
  
 add_subdirectory(Mipf_Plugin_Launcher)
+ 
+add_subdirectory(Mipf_Plugin_Dicom)
